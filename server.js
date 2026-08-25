@@ -23,9 +23,11 @@ function updateEnvFile(keyValuePairs) {
   for (const [key, val] of Object.entries(keyValuePairs)) {
     if (val === undefined || val === null) continue;
     const strVal = String(val).trim();
+    // Basic key validation: only uppercase alphanum + _
+    if (!/^[A-Z0-9_]+$/.test(key)) continue;
     process.env[key] = strVal;
 
-    const regex = new RegExp(`^${key}=.*$`, 'm');
+    const regex = new RegExp(`^${escapeRegExp(key)}=.*$`, 'm');
     if (regex.test(envData)) {
       envData = envData.replace(regex, `${key}=${strVal}`);
     } else {
@@ -40,16 +42,74 @@ function updateEnvFile(keyValuePairs) {
 const app = express();
 const PORT = Number(process.env.PORT || 8080);
 
-app.use(cors());
-app.use(express.json({ limit: '200mb' }));
-app.use(express.urlencoded({ extended: true, limit: '200mb' }));
+// --- Security headers (helmet-lite) ---
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  // HSTS only if https (Vercel)
+  if (req.secure || req.headers['x-forwarded-proto'] === 'https') {
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  }
+  next();
+});
 
-// Serve static frontend files with no-cache headers
+// --- CORS: allow configured origins or all in dev ---
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || '').split(',').filter(Boolean);
+app.use(cors({
+  origin: (origin, cb) => {
+    if (!origin) return cb(null, true); // same-origin / curl
+    if (allowedOrigins.length === 0) return cb(null, true);
+    if (allowedOrigins.includes(origin)) return cb(null, true);
+    return cb(new Error('CORS blocked'), false);
+  },
+  credentials: true
+}));
+
+// --- Body parsers with sane limits (prevent 200MB DoS) ---
+app.use(express.json({ limit: '12mb' }));
+app.use(express.urlencoded({ extended: true, limit: '12mb' }));
+
+// --- Simple in-memory rate limiter for /api/* (100 req / 15min per IP) ---
+const rateStore = new Map();
+function rateLimiter(req, res, next) {
+  const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip || 'unknown';
+  const key = `${ip}:${req.path}`;
+  const now = Date.now();
+  const windowMs = 15 * 60 * 1000;
+  const max = req.path.includes('/api/payment/') ? 30 : 100;
+  let entry = rateStore.get(key);
+  if (!entry || now - entry.start > windowMs) entry = { start: now, count: 0 };
+  entry.count += 1;
+  rateStore.set(key, entry);
+  if (entry.count > max) return res.status(429).json({ success: false, message: 'Too many requests. Please try again later.' });
+  next();
+}
+app.use('/api/', rateLimiter);
+setInterval(() => {
+  const now = Date.now();
+  for (const [k, v] of rateStore.entries()) if (now - v.start > 15*60*1000) rateStore.delete(k);
+}, 60*1000).unref();
+
+// --- Helpers ---
+function escapeRegExp(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+function sanitizeString(s, maxLen = 1000) {
+  if (typeof s !== 'string') return '';
+  return s.slice(0, maxLen).replace(/[<>]/g, '').trim();
+}
+
+// Serve static frontend files with proper cache
 app.use(express.static(path.join(__dirname), {
-  setHeaders: (res, path) => {
-    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-    res.setHeader('Pragma', 'no-cache');
-    res.setHeader('Expires', '0');
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'no-cache, must-revalidate');
+    } else if (/\.(js|css|png|jpg|jpeg|svg|webp|mp4|webm|woff2?)$/i.test(filePath)) {
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    } else {
+      res.setHeader('Cache-Control', 'public, max-age=3600');
+    }
   }
 }));
 
@@ -85,16 +145,38 @@ app.post('/api/upload', async (req, res) => {
     if (!base64Data) {
       return res.status(400).json({ success: false, message: 'No file data provided' });
     }
+    if (typeof base64Data !== 'string' || base64Data.length > 16 * 1024 * 1024) {
+      return res.status(413).json({ success: false, message: 'File too large (max ~12MB). For larger videos use Google Drive link.' });
+    }
 
-    // Decode base64 buffer
+    // Validate mime type allowlist
+    const ALLOWED_MIME = ['image/jpeg','image/png','image/webp','image/gif','image/svg+xml','video/mp4','video/webm','video/quicktime'];
+    const ALLOWED_EXT = ['.jpg','.jpeg','.png','.webp','.gif','.svg','.mp4','.webm','.mov','.mkv','.avi','.m4v'];
+
     const matches = base64Data.match(/^data:([A-Za-z0-9-+\/]+);base64,(.+)$/);
-    const mimeType = matches ? matches[1] : (fileName && fileName.endsWith('.mp4') ? 'video/mp4' : 'image/jpeg');
-    const dataBuffer = matches ? Buffer.from(matches[2], 'base64') : Buffer.from(base64Data, 'base64');
+    const mimeType = matches ? matches[1].toLowerCase() : '';
+    if (mimeType && !ALLOWED_MIME.includes(mimeType)) {
+      return res.status(400).json({ success: false, message: `Unsupported mime type: ${mimeType}` });
+    }
+    let dataBuffer;
+    try {
+      dataBuffer = matches ? Buffer.from(matches[2], 'base64') : Buffer.from(base64Data, 'base64');
+    } catch (e) {
+      return res.status(400).json({ success: false, message: 'Invalid base64 data' });
+    }
+    if (dataBuffer.length > 12 * 1024 * 1024) {
+      return res.status(413).json({ success: false, message: 'Decoded file exceeds 12MB limit. Use Drive link for larger files.' });
+    }
 
-    const ext = (path.extname(fileName || 'media.mp4') || '.mp4').toLowerCase();
+    const rawExt = (path.extname(fileName || 'media.jpg') || '.jpg').toLowerCase();
+    if (!ALLOWED_EXT.includes(rawExt)) {
+      return res.status(400).json({ success: false, message: `Unsupported file extension: ${rawExt}` });
+    }
+    const ext = rawExt;
     const isVideo = ['.mp4', '.webm', '.mov', '.mkv', '.avi', '.m4v'].includes(ext);
-    const cleanBase = path.basename(fileName || 'media', ext).replace(/[^a-zA-Z0-9_-]/g, '_');
-    const safeName = `${targetType || (isVideo ? 'video' : 'upload')}_${Date.now()}_${cleanBase}${ext}`;
+    const cleanBase = path.basename(fileName || 'media', ext).replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 40) || 'media';
+    const safeTarget = sanitizeString(targetType || '', 20).replace(/[^a-zA-Z0-9_-]/g, '') || (isVideo ? 'video' : 'upload');
+    const safeName = `${safeTarget}_${Date.now()}_${cleanBase}${ext}`;
     
     const assetsDir = path.join(__dirname, 'assets');
     if (!fs.existsSync(assetsDir)) {
@@ -102,6 +184,10 @@ app.post('/api/upload', async (req, res) => {
     }
 
     const filePath = path.join(assetsDir, safeName);
+    // Prevent path traversal: ensure filePath is inside assetsDir
+    if (!filePath.startsWith(assetsDir)) {
+      return res.status(400).json({ success: false, message: 'Invalid file path' });
+    }
     fs.writeFileSync(filePath, dataBuffer);
 
     const relativeUrl = `assets/${safeName}`;
@@ -144,10 +230,31 @@ app.get('/api/leads', async (req, res) => {
   }
 });
 
-// 2. Submit New Project Lead (From Contact Form, Calculator or Webinar)
+// 2. Submit New Project Lead (From Contact Form, Calculator or Webinar) - with validation & sanitization
 app.post('/api/leads', async (req, res) => {
   try {
-    const { name, email, phone, service, budget, amount, footage, notes, message, websiteType, packageName, paymentId, orderId, paymentStatus, status, userId } = req.body;
+    let { name, email, phone, service, budget, amount, footage, notes, message, websiteType, packageName, paymentId, orderId, paymentStatus, status, userId } = req.body;
+
+    // Sanitize & validate
+    name = sanitizeString(name, 100);
+    email = sanitizeString(email, 200);
+    phone = sanitizeString(phone, 30);
+    service = sanitizeString(service, 100);
+    websiteType = sanitizeString(websiteType, 100);
+    packageName = sanitizeString(packageName, 100);
+    budget = sanitizeString(budget, 50);
+    amount = sanitizeString(amount, 50);
+    footage = sanitizeString(footage, 500);
+    notes = sanitizeString(notes, 5000);
+    message = sanitizeString(message, 5000);
+
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).json({ success: false, error: 'Invalid email format.' });
+    }
+    if (phone && !/^[\d+\-\s()]{7,20}$/.test(phone)) {
+      return res.status(400).json({ success: false, error: 'Invalid phone format.' });
+    }
+
     if (!name && !email && !phone) {
       return res.status(400).json({ success: false, error: 'Name, email, or phone is required.' });
     }
@@ -214,18 +321,21 @@ app.delete('/api/leads/:id', async (req, res) => {
   }
 });
 
-// 5. Supabase config status
+// 5. Supabase config status - mask secrets
 app.get('/api/supabase/status', (req, res) => {
   const config = getSupabaseConfig();
   const isConfigured = Boolean(config.url && config.anonKey);
+  const mask = (k) => k ? k.slice(0, 10) + '...' + k.slice(-4) : '';
   res.json({
     success: true,
     configured: isConfigured,
     connected: isConfigured,
     url: config.url || '',
-    anonKey: config.anonKey || '',
-    serviceRoleKey: config.serviceRoleKey || '',
-    dbUrl: config.dbUrl || ''
+    anonKey: config.anonKey ? mask(config.anonKey) : '',
+    hasAnonKey: Boolean(config.anonKey),
+    hasServiceRoleKey: Boolean(config.serviceRoleKey),
+    hasDbUrl: Boolean(config.dbUrl),
+    dbUrl: config.dbUrl ? '***masked***' : ''
   });
 });
 
@@ -409,26 +519,25 @@ app.post('/api/gdrive/backup', async (req, res) => {
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 
-// Permanent Razorpay live credentials fallback
-const PERMANENT_RAZORPAY_KEY_ID = 'rzp_live_TTd5UPSpFLKLor';
-const PERMANENT_RAZORPAY_KEY_SECRET = 'XvJnMwJWyCluZ0cD9T6Vnfs9';
-
 function getRazorpayInstance() {
-  const key_id = process.env.RAZORPAY_KEY_ID || PERMANENT_RAZORPAY_KEY_ID;
-  const key_secret = process.env.RAZORPAY_KEY_SECRET || PERMANENT_RAZORPAY_KEY_SECRET;
+  const key_id = process.env.RAZORPAY_KEY_ID || '';
+  const key_secret = process.env.RAZORPAY_KEY_SECRET || '';
   if (!key_id || !key_secret) return null;
   return new Razorpay({ key_id, key_secret });
 }
 
-// 1. Get Razorpay Config (Public Key, Mode, Status)
+// 1. Get Razorpay Config (Public Key, Mode, Status) - never expose secret
 app.get('/api/payment/config', (req, res) => {
-  const keyId = process.env.RAZORPAY_KEY_ID || PERMANENT_RAZORPAY_KEY_ID;
-  const hasSecret = Boolean(process.env.RAZORPAY_KEY_SECRET || PERMANENT_RAZORPAY_KEY_SECRET);
+  const keyId = process.env.RAZORPAY_KEY_ID || '';
+  const hasSecret = Boolean(process.env.RAZORPAY_KEY_SECRET);
+  // Mask keyId for privacy: show first 8 chars only
+  const maskedKeyId = keyId ? keyId.slice(0, 12) + '...' : '';
   res.json({
     success: true,
-    enabled: process.env.RAZORPAY_ENABLED !== 'false',
+    enabled: process.env.RAZORPAY_ENABLED !== 'false' && Boolean(keyId && hasSecret),
     mode: process.env.RAZORPAY_MODE || 'live',
     keyId: keyId,
+    maskedKeyId: maskedKeyId,
     hasSecret: hasSecret,
     currency: 'INR'
   });
@@ -461,8 +570,8 @@ app.post('/api/payment/config', (req, res) => {
 app.post('/api/payment/test-credentials', async (req, res) => {
   try {
     const { keyId, keySecret } = req.body;
-    const verifyKey = keyId || process.env.RAZORPAY_KEY_ID || PERMANENT_RAZORPAY_KEY_ID;
-    const verifySecret = keySecret || process.env.RAZORPAY_KEY_SECRET || PERMANENT_RAZORPAY_KEY_SECRET;
+    const verifyKey = keyId || process.env.RAZORPAY_KEY_ID || '';
+    const verifySecret = keySecret || process.env.RAZORPAY_KEY_SECRET || '';
 
     if (!verifyKey || !verifySecret) {
       return res.status(400).json({ success: false, message: 'Please provide both Razorpay Key ID and Secret.' });
@@ -514,7 +623,7 @@ app.post('/api/payment/create-order', async (req, res) => {
     res.json({
       success: true,
       order,
-      keyId: process.env.RAZORPAY_KEY_ID || PERMANENT_RAZORPAY_KEY_ID,
+      keyId: process.env.RAZORPAY_KEY_ID || '',
       currency: options.currency,
       amount: options.amount
     });
@@ -528,7 +637,7 @@ app.post('/api/payment/verify', async (req, res) => {
   try {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature, leadData } = req.body;
 
-    const secret = process.env.RAZORPAY_KEY_SECRET || PERMANENT_RAZORPAY_KEY_SECRET;
+    const secret = process.env.RAZORPAY_KEY_SECRET || '';
     if (!secret) {
       return res.status(400).json({ success: false, message: 'Razorpay Secret Key missing.' });
     }

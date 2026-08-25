@@ -160,7 +160,7 @@ const DEFAULT_SITE_CONTENT = {
         "type": "video",
         "tag": "Viral Reel & Short",
         "videoUrl": "assets/video_1_1787641039321_The_India_International_Science_Festival__organized_by_the_Government_of_India_at_Anna_Universit.mp4",
-        "image": "assets/portfolio_1_1787640050650_ChatGPT_Image_Aug_25__2026__09_47_26_AM.png",
+        "image": "assets/showcase-edit.jpg",
         "linkUrl": "https://drive.google.com/file/d/1gX5B7ZypY19UdEEqt9mQPdZ5USQOqky4/view?usp=drive_link",
         "views": "1.2k Views",
         "stat2": ""

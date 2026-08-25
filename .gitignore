@@ -12,6 +12,7 @@ yarn-error.log*
 # Private Lead Data & Database Backups (Protects your customer information)
 backups/
 leads-backup.json
+site-content-backup.json
 
 # OS & Editor temp files
 .DS_Store
