@@ -1718,10 +1718,35 @@ document.addEventListener('DOMContentLoaded', () => {
         order_id: orderData.order.id,
         prefill: {
           name: clientName,
-          contact: clientPhone
+          contact: clientPhone,
+          method: "upi"
+        },
+        config: {
+          display: {
+            blocks: {
+              upi: {
+                name: "Pay via UPI (Google Pay, PhonePe, Paytm, QR)",
+                instruments: [
+                  { method: "upi" }
+                ]
+              },
+              other: {
+                name: "Cards & Netbanking",
+                instruments: [
+                  { method: "card" },
+                  { method: "netbanking" },
+                  { method: "wallet" }
+                ]
+              }
+            },
+            sequence: ["block.upi", "block.other"],
+            preferences: {
+              show_default_blocks: true
+            }
+          }
         },
         theme: {
-          color: "#6366F1"
+          color: "#4F46E5"
         },
         handler: async function(response) {
           // 4. Verify Signature on Backend
