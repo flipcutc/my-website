@@ -1597,7 +1597,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (emailEl) emailEl.textContent = data.email || '-';
 
     if (waBtn) {
-      const waNum = (content && content.contact && content.contact.whatsappNum) ? content.contact.whatsappNum.replace(/[^0-9]/g, '') : '919999999999';
+      const waNum = (content && content.contact && content.contact.whatsappNum) ? content.contact.whatsappNum.replace(/[^0-9]/g, '') : '917010270151';
       const msg = encodeURIComponent(`Hi FlipCut Studio! I registered my project brief [User ID: ${uid}] for ${data.service || 'Video Editing'} (${data.name || 'Client'}). Let's discuss!`);
       waBtn.href = `https://wa.me/${waNum}?text=${msg}`;
     }
@@ -1646,7 +1646,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (dateEl) dateEl.textContent = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
 
     if (waBtn) {
-      const waNum = (content && content.contact && content.contact.whatsappNum) ? content.contact.whatsappNum.replace(/[^0-9]/g, '') : '919999999999';
+      const waNum = (content && content.contact && content.contact.whatsappNum) ? content.contact.whatsappNum.replace(/[^0-9]/g, '') : '917010270151';
       const msg = encodeURIComponent(`Hi FlipCut Studio! I just booked the ${packageName} plan (User ID: ${uid}, Payment ID: ${paymentId || ''}). Ready to onboard!`);
       waBtn.href = `https://wa.me/${waNum}?text=${msg}`;
     }

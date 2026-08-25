@@ -405,8 +405,8 @@ const DEFAULT_SITE_CONTENT = {
       }
     ],
     "email": "contact@flipcutcreation.com",
-    "phone": "+91 99999 99999",
-    "whatsappNum": "919999999999",
+    "phone": "+91 70102 70151",
+    "whatsappNum": "917010270151",
     "whatsappMessage": "Hi FlipCut Creation, I would like to discuss a video editing project!",
     "instagramHandle": "@flipcutcreation",
     "youtubeChannel": "FlipCut Official",

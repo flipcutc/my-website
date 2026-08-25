@@ -998,7 +998,7 @@
 
         const waBtn = document.getElementById('ticketWhatsAppBtn');
         if (waBtn) {
-          const waNum = (siteContent.contact && siteContent.contact.whatsappNum) ? siteContent.contact.whatsappNum.replace(/[^0-9]/g, '') : '919999999999';
+          const waNum = (siteContent.contact && siteContent.contact.whatsappNum) ? siteContent.contact.whatsappNum.replace(/[^0-9]/g, '') : '917010270151';
           const defaultMsg = webinarCfg.whatsappGroupMsg || `Hi FlipCut Team! I just registered for the Live Webinar [User ID: ${uid}, Payment ID: ${payId}]. Please add me to the VIP Group!`;
           const msg = encodeURIComponent(`${defaultMsg} [User ID: ${uid}]`);
           waBtn.href = `https://wa.me/${waNum}?text=${msg}`;
