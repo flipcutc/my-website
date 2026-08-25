@@ -195,34 +195,126 @@
       display: flex;
     }
 
+    .back-home-btn {
+      padding: 8px 16px;
+      font-size: 0.84rem;
+      border-radius: var(--radius-pill);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+    }
+
+    .webinar-details-bar {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin-bottom: 32px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
     @media (max-width: 768px) {
+      .webinar-hero-section {
+        padding-top: calc(var(--nav-height) + 12px) !important;
+        padding-bottom: 16px !important;
+      }
       .webinar-hero-section h1 {
-        font-size: clamp(1.85rem, 6.5vw, 2.4rem) !important;
+        font-size: clamp(1.45rem, 5.5vw, 1.95rem) !important;
+        margin-bottom: 8px !important;
+        line-height: 1.22 !important;
+      }
+      .webinar-hero-section p {
+        font-size: 0.84rem !important;
+        line-height: 1.45 !important;
+        margin-bottom: 14px !important;
+      }
+      .webinar-badge-pill {
+        font-size: 0.72rem !important;
+        padding: 4px 12px !important;
+        margin-bottom: 10px !important;
+      }
+      .webinar-details-bar {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 8px !important;
+        font-size: 0.76rem !important;
+        margin-bottom: 18px !important;
+        text-align: center !important;
       }
       .nav-links, .nav-actions .btn-primary {
-        display: none;
+        display: none !important;
       }
-      .website-type-grid {
-        grid-template-columns: 1fr;
-        gap: 10px;
+      .brand-logo-img {
+        height: 40px !important;
+        max-height: 44px !important;
+        max-width: 150px !important;
       }
       .webinar-card-wrapper {
-        padding: 24px 18px;
-        border-radius: 18px;
+        padding: 18px 14px !important;
+        border-radius: 16px !important;
+      }
+      .website-type-grid {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 8px !important;
+      }
+      .website-type-box {
+        padding: 10px 8px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        text-align: center !important;
+        gap: 4px !important;
+        border-radius: 10px !important;
+      }
+      .website-type-box i {
+        font-size: 1.25rem !important;
+        margin: 0 auto !important;
+      }
+      .website-type-box h4 {
+        font-size: 0.82rem !important;
+        margin-bottom: 2px !important;
+        line-height: 1.2 !important;
+      }
+      .website-type-box span {
+        font-size: 0.68rem !important;
+        line-height: 1.2 !important;
       }
       .form-row-2 {
         grid-template-columns: 1fr;
-        gap: 12px;
+        gap: 10px;
+      }
+      .payment-options-badge-row {
+        padding: 10px !important;
+        margin: 12px 0 16px !important;
+        gap: 6px !important;
+      }
+      .payment-option-pill {
+        padding: 4px 10px !important;
+        font-size: 0.74rem !important;
+      }
+      .pay-step-box {
+        padding: 16px 12px !important;
+        margin-top: 16px !important;
+      }
+      .active-webinar-price {
+        font-size: 2.2rem !important;
+      }
+      .orig-webinar-price {
+        font-size: 1.15rem !important;
       }
     }
 
     @media (max-width: 480px) {
       .webinar-card-wrapper {
-        padding: 20px 14px;
+        padding: 16px 12px !important;
       }
-      .webinar-details-row {
-        gap: 12px !important;
-        font-size: 0.86rem !important;
+      .brand-logo-img {
+        height: 38px !important;
+        max-height: 42px !important;
+        max-width: 140px !important;
       }
     }
   </style>
@@ -245,6 +337,7 @@
 
       <nav aria-label="Main Navigation">
         <ul class="nav-links">
+          <li><a href="index.html" class="nav-link">Home</a></li>
           <li><a href="index.html#about" class="nav-link">About Agency</a></li>
           <li><a href="index.html#services" class="nav-link">Services</a></li>
           <li><a href="index.html#portfolio" class="nav-link">Portfolio</a></li>
@@ -254,17 +347,46 @@
       </nav>
 
       <div class="nav-actions">
+        <!-- Back to Home Button -->
+        <a href="index.html" class="btn btn-secondary back-home-btn" title="Back to Homepage">
+          <i class="fa-solid fa-arrow-left"></i>
+          <span>Home</span>
+        </a>
+
         <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Theme" aria-label="Toggle Theme">
           <i class="fa-solid fa-moon"></i>
         </button>
 
-        <a href="index.html#contact" class="btn btn-primary">
-          <span>Get Free Quote</span>
-          <i class="fa-solid fa-arrow-right"></i>
-        </a>
+        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open Menu">
+          <i class="fa-solid fa-bars-staggered"></i>
+        </button>
       </div>
     </div>
   </header>
+
+  <!-- Luxury Mobile Navigation Drawer & Backdrop -->
+  <div class="mobile-nav-backdrop" id="mobileNavBackdrop"></div>
+  <aside class="mobile-nav-drawer" id="mobileNavDrawer" aria-label="Mobile Navigation">
+    <div class="mobile-nav-header">
+      <a href="index.html" class="mobile-brand-wrap" aria-label="FlipCut Creation Home">
+        <img src="assets/logo.png" alt="FlipCut Creation Logo" class="brand-logo-img" style="height: 46px;">
+      </a>
+      <button class="mobile-nav-close" id="mobileNavCloseBtn" aria-label="Close Menu">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <nav class="mobile-nav-body">
+      <ul class="mobile-nav-list">
+        <li><a href="index.html" class="mobile-nav-link"><i class="fa-solid fa-house"></i> Home Page</a></li>
+        <li><a href="index.html#about" class="mobile-nav-link"><i class="fa-solid fa-circle-info"></i> About Agency</a></li>
+        <li><a href="index.html#services" class="mobile-nav-link"><i class="fa-solid fa-wand-magic-sparkles"></i> Services</a></li>
+        <li><a href="index.html#portfolio" class="mobile-nav-link"><i class="fa-solid fa-play"></i> Portfolio Works</a></li>
+        <li><a href="index.html#pricing" class="mobile-nav-link"><i class="fa-solid fa-tag"></i> Pricing Plans</a></li>
+        <li><a href="index.html#contact" class="mobile-nav-link"><i class="fa-solid fa-envelope"></i> Contact Us</a></li>
+      </ul>
+    </nav>
+  </aside>
 
   <!-- Hero Headline -->
   <section class="webinar-hero-section container">
@@ -282,7 +404,7 @@
     </p>
 
     <!-- Session Details Bar -->
-    <div style="display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; margin-bottom: 40px; font-size: 0.95rem; font-weight: 600; color: var(--text-primary);">
+    <div class="webinar-details-bar">
       <span><i class="fa-solid fa-calendar-days text-gradient"></i> <span id="webinarDateText">Saturday, 7:00 PM IST</span></span>
       <span><i class="fa-solid fa-clock text-gradient"></i> <span id="webinarDurationText">90 Minutes Live + Q&A</span></span>
       <span><i class="fa-solid fa-users text-gradient"></i> <span id="webinarSeatsText">Limited 100 Seats</span></span>
@@ -850,6 +972,55 @@
 
       if (ticketModalCloseBtn) ticketModalCloseBtn.addEventListener('click', closeTicketModal);
       if (ticketDoneBtn) ticketDoneBtn.addEventListener('click', closeTicketModal);
+
+      // Mobile Navigation Drawer Handlers
+      const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+      const mobileNavDrawer = document.getElementById('mobileNavDrawer');
+      const mobileNavBackdrop = document.getElementById('mobileNavBackdrop');
+      const mobileNavCloseBtn = document.getElementById('mobileNavCloseBtn');
+      const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+
+      function openMobileNav() {
+        if (mobileNavDrawer) mobileNavDrawer.classList.add('active');
+        if (mobileNavBackdrop) mobileNavBackdrop.classList.add('active');
+        if (mobileMenuBtn) {
+          mobileMenuBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+          mobileMenuBtn.setAttribute('aria-label', 'Close Menu');
+        }
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeMobileNav() {
+        if (mobileNavDrawer) mobileNavDrawer.classList.remove('active');
+        if (mobileNavBackdrop) mobileNavBackdrop.classList.remove('active');
+        if (mobileMenuBtn) {
+          mobileMenuBtn.innerHTML = '<i class="fa-solid fa-bars-staggered"></i>';
+          mobileMenuBtn.setAttribute('aria-label', 'Open Menu');
+        }
+        document.body.style.overflow = '';
+      }
+
+      function toggleMobileNav() {
+        if (mobileNavDrawer && mobileNavDrawer.classList.contains('active')) {
+          closeMobileNav();
+        } else {
+          openMobileNav();
+        }
+      }
+
+      if (mobileMenuBtn) {
+        mobileMenuBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          toggleMobileNav();
+        });
+      }
+
+      if (mobileNavCloseBtn) mobileNavCloseBtn.addEventListener('click', closeMobileNav);
+      if (mobileNavBackdrop) mobileNavBackdrop.addEventListener('click', closeMobileNav);
+
+      mobileNavLinks.forEach(link => {
+        link.addEventListener('click', closeMobileNav);
+      });
 
     });
   </script>
