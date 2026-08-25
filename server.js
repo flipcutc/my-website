@@ -53,6 +53,27 @@ app.use(express.static(path.join(__dirname), {
   }
 }));
 
+// Explicit HTML page routes
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.get('/webinar.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'webinar.html'));
+});
+
+app.get('/webinar', (req, res) => {
+  res.sendFile(path.join(__dirname, 'webinar.html'));
+});
+
+app.get('/admin.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'admin.html'));
+});
+
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, 'admin.html'));
+});
+
 /**
  * =========================================================================
  * API ROUTE: DIRECT IMAGE & VIDEO UPLOAD FROM PC (WITH GOOGLE DRIVE SYNC)
@@ -563,20 +584,24 @@ app.post('/api/payment/verify', async (req, res) => {
   }
 });
 
-// Start server
-const server = app.listen(PORT, async () => {
-  console.log(`🚀 FlipCut Studio Server running at http://localhost:${PORT}`);
-  const databaseStatus = db.getDbStatus();
-  console.log(`📦 Local storage status: ${databaseStatus.message} (${databaseStatus.type})`);
-  await db.initDatabase();
-});
+// Start server if run directly
+if (process.env.NODE_ENV !== 'test') {
+  const server = app.listen(PORT, async () => {
+    console.log(`🚀 FlipCut Studio Server running at http://localhost:${PORT}`);
+    const databaseStatus = db.getDbStatus();
+    console.log(`📦 Local storage status: ${databaseStatus.message} (${databaseStatus.type})`);
+    await db.initDatabase();
+  });
 
-server.on('error', (err) => {
-  if (err.code === 'EADDRINUSE') {
-    console.error(`❌ Port ${PORT} is already in use. Stop the running server or start this app with PORT=xxxx.`);
+  server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.error(`❌ Port ${PORT} is already in use. Stop the running server or start this app with PORT=xxxx.`);
+      process.exit(1);
+    }
+
+    console.error('❌ Server startup failed:', err.message);
     process.exit(1);
-  }
+  });
+}
 
-  console.error('❌ Server startup failed:', err.message);
-  process.exit(1);
-});
+module.exports = app;
