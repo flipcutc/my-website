@@ -2497,13 +2497,13 @@ textarea.form-control {
     font-size: 15px !important;
   }
   :root {
-    --nav-height: 68px;
+    --nav-height: 74px;
   }
   section {
     padding: 54px 0 !important;
   }
   .site-header {
-    height: 68px !important;
+    height: 74px !important;
   }
   .nav-container {
     padding-left: 16px !important;
@@ -2520,9 +2520,9 @@ textarea.form-control {
     flex-shrink: 0;
   }
   .brand-logo-img {
-    height: 40px !important;
-    max-height: 44px !important;
-    max-width: 150px !important;
+    height: 50px !important;
+    max-height: 56px !important;
+    max-width: 200px !important;
     width: auto !important;
     object-fit: contain;
     display: block;
@@ -2802,9 +2802,9 @@ textarea.form-control {
     padding-right: 12px !important;
   }
   .brand-logo-img {
-    height: 38px !important;
-    max-height: 42px !important;
-    max-width: 140px !important;
+    height: 46px !important;
+    max-height: 50px !important;
+    max-width: 180px !important;
   }
   .hero-title {
     font-size: 1.65rem !important;
