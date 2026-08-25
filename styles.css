@@ -2690,18 +2690,114 @@ textarea.form-control {
     font-size: 0.9rem !important;
     text-align: center;
   }
-  .about-grid, .services-grid, .pricing-grid, .testimonials-grid {
-    grid-template-columns: 1fr;
-    gap: 16px;
+  /* 1. Who We Are - Compact Stack */
+  .about-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+  .about-card {
+    padding: 14px 14px !important;
+    border-radius: 14px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+    text-align: left !important;
+  }
+  .about-card .card-icon-wrap {
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    font-size: 1.15rem !important;
+    border-radius: 10px !important;
+    margin-bottom: 0 !important;
+    flex-shrink: 0 !important;
+  }
+  .about-card h3 {
+    font-size: 0.98rem !important;
+    margin-bottom: 3px !important;
+    line-height: 1.25 !important;
+  }
+  .about-card p {
+    font-size: 0.8rem !important;
+    line-height: 1.4 !important;
+    color: var(--text-secondary) !important;
+  }
+
+  /* 2. Core Services - Compact Card View */
+  .services-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
   }
   .service-box {
-    padding: 22px 18px;
-    border-radius: 16px;
+    padding: 16px 14px !important;
+    border-radius: 14px !important;
+    gap: 8px !important;
   }
+  .service-header {
+    margin-bottom: 6px !important;
+  }
+  .service-badge {
+    font-size: 0.68rem !important;
+    padding: 3px 8px !important;
+  }
+  .service-box h3 {
+    font-size: 1.05rem !important;
+    margin-bottom: 4px !important;
+  }
+  .service-box p {
+    font-size: 0.8rem !important;
+    line-height: 1.4 !important;
+    margin-bottom: 8px !important;
+  }
+  .service-features-list {
+    margin-bottom: 12px !important;
+    gap: 6px !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+  }
+  .service-features-list li {
+    font-size: 0.76rem !important;
+    gap: 5px !important;
+  }
+  .service-box .btn {
+    padding: 9px 16px !important;
+    font-size: 0.82rem !important;
+    width: 100% !important;
+    border-radius: 9999px !important;
+  }
+
+  /* 3. How We Work - 2-Column Compact Grid */
   .workflow-steps-track {
-    grid-template-columns: 1fr;
-    gap: 14px;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px !important;
+    margin-top: 18px !important;
   }
+  .workflow-step-card {
+    padding: 14px 10px !important;
+    border-radius: 12px !important;
+    text-align: center !important;
+  }
+  .workflow-step-card:last-child {
+    grid-column: span 2 !important;
+  }
+  .step-number-bubble {
+    width: 30px !important;
+    height: 30px !important;
+    font-size: 0.82rem !important;
+    margin: 0 auto 6px !important;
+  }
+  .workflow-step-card h4 {
+    font-size: 0.88rem !important;
+    margin-bottom: 4px !important;
+    line-height: 1.25 !important;
+  }
+  .workflow-step-card p {
+    font-size: 0.74rem !important;
+    line-height: 1.35 !important;
+  }
+
   .portfolio-filter-bar {
     gap: 8px;
     margin-bottom: 24px;
@@ -2745,9 +2841,57 @@ textarea.form-control {
   .format-grid, .form-row-2 {
     grid-template-columns: 1fr;
   }
+
+  /* 4. Why Choose FlipCut - 2x2 Grid */
   .why-us-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px !important;
+    margin-bottom: 20px !important;
+  }
+  .why-feature-box {
+    padding: 14px 10px !important;
+    border-radius: 12px !important;
+    text-align: center !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+  .why-feature-box .why-icon {
+    font-size: 1.35rem !important;
+    margin-bottom: 6px !important;
+  }
+  .why-feature-box h4 {
+    font-size: 0.88rem !important;
+    margin-bottom: 4px !important;
+    line-height: 1.25 !important;
+  }
+  .why-feature-box p {
+    font-size: 0.74rem !important;
+    line-height: 1.35 !important;
+  }
+  .tech-stack-wrap {
+    padding: 14px 10px !important;
+    border-radius: 14px !important;
+    margin-top: 0 !important;
+  }
+  .tech-stack-wrap h4 {
+    font-size: 0.84rem !important;
+    margin-bottom: 10px !important;
+  }
+  .tech-badges-row {
+    gap: 6px !important;
+    justify-content: center !important;
+  }
+  .tech-badge-item {
+    padding: 5px 9px !important;
+    font-size: 0.7rem !important;
+    border-radius: 8px !important;
+  }
+
+  .pricing-grid, .testimonials-grid {
     grid-template-columns: 1fr;
-    gap: 14px;
+    gap: 16px;
   }
   .pricing-card {
     padding: 24px 18px;
