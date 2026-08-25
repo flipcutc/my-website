@@ -457,23 +457,23 @@ app.post('/api/payment/config', (req, res) => {
   }
 });
 
-// 3. Test Razorpay Credentials
+// 3. Verify Live Razorpay Credentials
 app.post('/api/payment/test-credentials', async (req, res) => {
   try {
     const { keyId, keySecret } = req.body;
-    const testKey = keyId || process.env.RAZORPAY_KEY_ID || PERMANENT_RAZORPAY_KEY_ID;
-    const testSecret = keySecret || process.env.RAZORPAY_KEY_SECRET || PERMANENT_RAZORPAY_KEY_SECRET;
+    const verifyKey = keyId || process.env.RAZORPAY_KEY_ID || PERMANENT_RAZORPAY_KEY_ID;
+    const verifySecret = keySecret || process.env.RAZORPAY_KEY_SECRET || PERMANENT_RAZORPAY_KEY_SECRET;
 
-    if (!testKey || !testSecret) {
+    if (!verifyKey || !verifySecret) {
       return res.status(400).json({ success: false, message: 'Please provide both Razorpay Key ID and Secret.' });
     }
 
-    const testInstance = new Razorpay({ key_id: testKey.trim(), key_secret: testSecret.trim() });
+    const liveInstance = new Razorpay({ key_id: verifyKey.trim(), key_secret: verifySecret.trim() });
     
-    // Fetch payments list with count: 1 as validation
-    await testInstance.payments.all({ count: 1 });
+    // Fetch payments list with count: 1 as live validation
+    await liveInstance.payments.all({ count: 1 });
 
-    res.json({ success: true, message: '✅ Razorpay API connection verified successfully!' });
+    res.json({ success: true, message: '✅ Razorpay Live API connection verified successfully!' });
   } catch (err) {
     res.status(400).json({ success: false, message: `❌ Razorpay Connection Failed: ${err.message}` });
   }
