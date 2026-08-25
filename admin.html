@@ -661,8 +661,70 @@
     }
 
     @media (max-width: 900px) {
+      .admin-layout-body {
+        flex-direction: column;
+      }
+      .admin-sidebar {
+        width: 100%;
+        height: auto;
+        position: static;
+        border-right: none;
+        border-bottom: 1px solid var(--border-medium);
+      }
+      .admin-sidebar-nav {
+        flex-direction: row;
+        overflow-x: auto;
+        padding: 10px 14px;
+        gap: 8px;
+        -webkit-overflow-scrolling: touch;
+      }
+      .tab-btn-vertical {
+        white-space: nowrap;
+        padding: 8px 14px;
+        font-size: 0.84rem;
+      }
+      .admin-content-inner {
+        padding: 20px 16px;
+      }
+      .admin-topbar {
+        padding: 14px 16px;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
       .pf-studio-card {
         grid-template-columns: 1fr;
+      }
+      .form-row-2, .form-row-3 {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+      .cms-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      .crm-table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .kpi-grid {
+        grid-template-columns: 1fr;
+      }
+      .admin-content-inner {
+        padding: 14px 10px;
+      }
+      .cms-card {
+        padding: 16px 12px;
+      }
+      .auth-card {
+        padding: 28px 18px;
       }
     }
 

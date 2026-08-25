@@ -2474,17 +2474,22 @@ textarea.form-control {
   .nav-links, .nav-actions .btn-primary {
     display: none;
   }
+  .brand-logo-img {
+    max-height: 38px;
+    max-width: 150px;
+    object-fit: contain;
+  }
   .mobile-menu-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 44px;
-    height: 44px;
+    width: 42px;
+    height: 42px;
     border-radius: 12px;
     background: var(--bg-surface);
     border: 1px solid var(--border-medium);
     color: var(--text-primary);
-    font-size: 1.25rem;
+    font-size: 1.2rem;
     cursor: pointer;
     transition: all var(--transition-fast);
   }
@@ -2493,15 +2498,17 @@ textarea.form-control {
     border-color: var(--brand-indigo);
   }
   .hero-section {
-    padding-top: calc(var(--nav-height) + 24px);
-    padding-bottom: 50px;
+    padding-top: calc(var(--nav-height) + 18px);
+    padding-bottom: 44px;
   }
   .hero-title {
-    font-size: clamp(2.1rem, 7vw, 2.75rem);
-    line-height: 1.15;
+    font-size: clamp(1.95rem, 7.2vw, 2.6rem);
+    line-height: 1.18;
+    word-break: break-word;
   }
   .hero-subtitle {
-    font-size: 1.02rem;
+    font-size: 0.98rem;
+    line-height: 1.55;
   }
   .hero-cta-group {
     flex-direction: column;
@@ -2515,76 +2522,147 @@ textarea.form-control {
   }
   .hero-stats-row {
     grid-template-columns: repeat(2, 1fr);
-    gap: 14px;
+    gap: 10px;
     width: 100%;
-    margin-top: 28px;
+    margin-top: 24px;
   }
   .hero-stat-card {
-    padding: 16px 12px;
+    padding: 14px 10px;
+    border-radius: 12px;
   }
   .hero-stat-number {
-    font-size: 1.6rem;
+    font-size: 1.45rem;
   }
   .hero-stat-label {
-    font-size: 0.78rem;
+    font-size: 0.74rem;
   }
-  .about-grid, .services-grid, .pricing-grid, .testimonials-grid, .portfolio-grid {
+  .section-title {
+    font-size: clamp(1.75rem, 6.5vw, 2.25rem);
+    line-height: 1.22;
+  }
+  .section-subtitle {
+    font-size: 0.75rem;
+    padding: 4px 12px;
+  }
+  .section-desc {
+    font-size: 0.95rem;
+  }
+  .about-grid, .services-grid, .pricing-grid, .testimonials-grid {
     grid-template-columns: 1fr;
-    gap: 20px;
+    gap: 18px;
+  }
+  .service-box {
+    padding: 24px 20px;
+    border-radius: 16px;
   }
   .workflow-steps-track {
     grid-template-columns: 1fr;
-    gap: 20px;
+    gap: 16px;
+  }
+  .portfolio-filter-bar {
+    gap: 8px;
+    margin-bottom: 30px;
+  }
+  .filter-btn {
+    padding: 8px 16px;
+    font-size: 0.82rem;
+  }
+  .portfolio-grid {
+    grid-template-columns: 1fr;
+    gap: 22px;
+    margin-bottom: 40px;
+  }
+  .portfolio-item.is-vertical {
+    max-width: 290px;
+    margin: 0 auto;
+    border-radius: 18px;
+  }
+  .daily-prompt-card-featured {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    padding: 18px 14px;
+    border-radius: 16px;
+  }
+  .prompt-actions-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .prompt-actions-row .btn-copy-main,
+  .prompt-actions-row .btn-use-style {
+    width: 100%;
+    justify-content: center;
+  }
+  .daily-prompts-history-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
   }
   .format-grid, .form-row-2 {
     grid-template-columns: 1fr;
   }
   .why-us-grid {
     grid-template-columns: 1fr;
-    gap: 18px;
+    gap: 16px;
   }
-  .calculator-card {
+  .pricing-card {
+    padding: 26px 20px;
+    border-radius: 18px;
+  }
+  .pricing-amount {
+    font-size: 2.2rem;
+  }
+  .testimonial-card {
     padding: 22px 18px;
+    border-radius: 16px;
   }
-  .calculator-output-box {
-    padding: 24px 18px;
+  .contact-grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
   }
-  .comparison-table {
-    display: block;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+  .contact-form-box {
+    padding: 22px 16px;
+    border-radius: 18px;
   }
   .footer-top-grid {
     grid-template-columns: 1fr;
-    gap: 32px;
+    gap: 28px;
   }
   .footer-bottom-row {
     flex-direction: column;
-    gap: 16px;
+    gap: 14px;
     text-align: center;
   }
 }
 
 @media (max-width: 480px) {
   .container {
-    padding-left: 16px;
-    padding-right: 16px;
+    padding-left: 14px;
+    padding-right: 14px;
   }
   .hero-title {
-    font-size: 1.95rem;
+    font-size: 1.85rem;
   }
   .hero-stats-row {
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    gap: 8px;
   }
-  .service-card, .pricing-card, .testimonial-card {
-    padding: 24px 18px;
+  .hero-stat-number {
+    font-size: 1.35rem;
   }
-  .pricing-amount {
-    font-size: 2.3rem;
+  .service-box, .pricing-card, .testimonial-card {
+    padding: 20px 16px;
+  }
+  .portfolio-item.is-vertical {
+    max-width: 275px;
   }
   .contact-form-box {
-    padding: 24px 16px;
+    padding: 20px 14px;
+  }
+  .mobile-floating-wa {
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    right: calc(16px + env(safe-area-inset-right, 0px));
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
   }
 }
 
