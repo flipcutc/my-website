@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlipCut Creation | Luxury Video Editing & Motion Agency</title>
+  <meta name="description"
+    content="FlipCut Creation transforms raw footage into viral, high-retention visual masterpieces. Premier video editing, cinematic color grading, motion graphics, and creator retainer solutions.">
+  <meta name="keywords"
+    content="video editing agency, viral reels, youtube editing, DaVinci Resolve color grading, motion graphics, commercial video production, FlipCut Creation">
+
+  <!-- Open Graph / Social Meta -->
+  <meta property="og:title" content="FlipCut Creation | Premier Video Editing & Visuals">
+  <meta property="og:description"
+    content="Transforming raw footage into high-retention viral content and cinematic commercial films.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="assets/slider-after.jpg">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/logo.png">
+
+  <!-- Google Fonts: Inter (Clean, Normal & Ultra-Readable) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="styles.css?v=5.0">
+
+  <!-- FontAwesome Icons for clean UI symbols -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Content Store & Instant Fast Pre-Hydration -->
+  <script src="content-store.js?v=5.0"></script>
+  <script>
+    // Instant 0ms Pre-Hydration & Zero-Flicker Visibility Engine
+    (function() {
+      try {
+        var raw = localStorage.getItem('flipcut_site_content');
+        if (raw) {
+          var data = JSON.parse(raw);
+          if (data && data.sectionsVisibility) {
+            var sv = data.sectionsVisibility;
+            var hideSelectors = [];
+            if (sv.hero === false) hideSelectors.push('#hero');
+            if (sv.runningBanner === false) hideSelectors.push('#runningBannerSection');
+            if (sv.about === false) hideSelectors.push('#about');
+            if (sv.dailyPrompts === false) hideSelectors.push('#dailyPrompts');
+            if (sv.services === false) hideSelectors.push('#services');
+            if (sv.workflow === false) hideSelectors.push('#workflow');
+            if (sv.portfolio === false) hideSelectors.push('#portfolio');
+            if (sv.whyUs === false) hideSelectors.push('#why-us');
+            if (sv.pricing === false) hideSelectors.push('#pricing');
+            if (sv.testimonials === false) hideSelectors.push('#testimonials');
+            if (sv.calculator === false) hideSelectors.push('#calculator');
+            if (sv.contact === false) hideSelectors.push('#contact');
+            if (sv.footer === false) hideSelectors.push('#siteFooter');
+            
+            if (sv.headerBadge === false) hideSelectors.push('#heroBadgeWrap');
+            if (sv.headerThemeToggle === false) hideSelectors.push('#themeToggleBtn');
+            if (sv.headerCta === false) hideSelectors.push('#headerCtaBtn');
+            if (sv.navWebinarPill === false) hideSelectors.push('#navWebinarItem');
+            
+            if (sv.heroStats === false) hideSelectors.push('#heroStatsRow');
+            if (sv.heroVideoCard === false) hideSelectors.push('#heroVisualWrap');
+            if (sv.aboutPillars === false) hideSelectors.push('#aboutPillarsGrid');
+            if (sv.beforeAfterSlider === false) hideSelectors.push('#beforeAfterBox');
+            if (sv.portfolioFilters === false) hideSelectors.push('#portfolioFilterBar');
+            if (sv.whyUsGrid === false) hideSelectors.push('#whyUsGrid');
+            if (sv.techStack === false) hideSelectors.push('#techStackWrap');
+            if (sv.contactDriveLink === false) hideSelectors.push('#contactDriveLink');
+            if (sv.floatingWhatsApp === false) hideSelectors.push('#mobileFloatingWa');
+            if (sv.backToTopBtn === false) hideSelectors.push('#backToTopBtn');
+
+            if (hideSelectors.length > 0) {
+              var s = document.createElement('style');
+              s.id = 'cms-instant-visibility-styles';
+              s.textContent = hideSelectors.join(', ') + ' { display: none !important; }';
+              document.head.appendChild(s);
+            }
+          }
+        }
+      } catch (e) {}
+    })();
+  </script>
+</head>
+
+<body>
+
+  <!-- Ambient Luxury Glow Orbs -->
+  <div class="bg-ambient-orb orb-1"></div>
+  <div class="bg-ambient-orb orb-2"></div>
+  <div class="bg-ambient-orb orb-3"></div>
+  <div class="bg-ambient-orb orb-4"></div>
+  <div class="bg-grid-mesh"></div>
+
+  <!-- ==========================================================================
+       HEADER & NAVIGATION BAR (Frosted Luxury Crystal Glass)
+       ========================================================================== -->
+  <header class="site-header" id="siteHeader">
+    <div class="container nav-container">
+      <a href="#hero" class="brand-logo-wrap" aria-label="FlipCut Creation Home">
+        <img src="assets/logo.png" alt="FlipCut Creation Logo" class="brand-logo-img">
+      </a>
+
+      <!-- Desktop Nav Links (Workflow removed from top header as requested) -->
+      <nav aria-label="Main Navigation">
+        <ul class="nav-links">
+          <li><a href="#about" class="nav-link">About</a></li>
+          <li><a href="#services" class="nav-link">Services</a></li>
+          <li><a href="#portfolio" class="nav-link">Portfolio</a></li>
+          <li><a href="#pricing" class="nav-link">Pricing</a></li>
+          <li id="navWebinarItem"><a href="webinar.html" class="nav-link" style="color: var(--brand-indigo); font-weight: 700;"><i class="fa-solid fa-ticket"></i> Webinar (₹199)</a></li>
+          <li><a href="#faq" class="nav-link">FAQ</a></li>
+        </ul>
+      </nav>
+
+      <!-- Header Actions -->
+      <div class="nav-actions">
+        <!-- Luxury Mode / Dark Switcher -->
+        <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Theme" aria-label="Toggle Theme">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+
+        <a href="#contact" class="btn btn-primary" id="headerCtaBtn">
+          <span>Get Free Quote</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </a>
+
+        <!-- Mobile Hamburger Toggle -->
+        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open Menu">
+          <i class="fa-solid fa-bars-staggered"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Luxury Mobile Navigation Drawer & Backdrop -->
+  <div class="mobile-nav-backdrop" id="mobileNavBackdrop"></div>
+  <aside class="mobile-nav-drawer" id="mobileNavDrawer" aria-label="Mobile Navigation">
+    <div class="mobile-nav-header">
+      <a href="#hero" class="mobile-brand-wrap" aria-label="FlipCut Creation Home">
+        <img src="assets/logo.png" alt="FlipCut Creation Logo" class="brand-logo-img" style="height: 46px;">
+      </a>
+      <button class="mobile-nav-close" id="mobileNavCloseBtn" aria-label="Close Menu">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <ul class="mobile-nav-links">
+      <li><a href="#about" class="mobile-nav-link"><i class="fa-solid fa-crown text-gradient"></i> <span>About
+            Agency</span></a></li>
+      <li><a href="#services" class="mobile-nav-link"><i class="fa-solid fa-wand-magic-sparkles text-gradient"></i>
+          <span>Editing Services</span></a></li>
+      <li><a href="#portfolio" class="mobile-nav-link"><i class="fa-solid fa-film text-gradient"></i> <span>Portfolio
+            Showcase</span></a></li>
+      <li><a href="#pricing" class="mobile-nav-link"><i class="fa-solid fa-gem text-gradient"></i> <span>Retainer
+            Plans</span></a></li>
+      <li><a href="webinar.html" class="mobile-nav-link" style="color: var(--brand-indigo); font-weight: 700;"><i class="fa-solid fa-ticket text-gradient"></i> <span>Live Masterclass Webinar (₹199)</span></a></li>
+      <li><a href="#faq" class="mobile-nav-link"><i class="fa-solid fa-circle-question text-gradient"></i>
+          <span>FAQ</span></a></li>
+      <li><a href="#contact" class="mobile-nav-link"><i class="fa-solid fa-envelope text-gradient"></i> <span>Project
+            Brief</span></a></li>
+    </ul>
+
+    <div class="mobile-nav-footer">
+      <a href="#contact" class="btn btn-primary" id="mobileNavCta"
+        style="width: 100%; justify-content: center; padding: 14px 20px;">
+        <span>Get Free Project Quote</span>
+        <i class="fa-solid fa-arrow-right"></i>
+      </a>
+      <a href="https://wa.me/919999999999" target="_blank" rel="noopener noreferrer"
+        class="btn btn-secondary mobile-wa-btn" id="mobileNavWhatsapp"
+        style="width: 100%; justify-content: center; padding: 12px 20px; border-color: rgba(37, 211, 102, 0.4);">
+        <i class="fa-brands fa-whatsapp" style="color: #25D366; font-size: 1.2rem;"></i>
+        <span>Chat on WhatsApp</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Mobile Floating Quick Contact Button -->
+  <a href="https://wa.me/919999999999" target="_blank" rel="noopener noreferrer" class="mobile-floating-wa"
+    id="mobileFloatingWa" aria-label="Chat on WhatsApp">
+    <i class="fa-brands fa-whatsapp"></i>
+    <span class="mobile-wa-tooltip">Quick Chat</span>
+  </a>
+
+  <!-- ==========================================================================
+       HERO SECTION (High-Converting Editorial Layout)
+       ========================================================================== -->
+  <section class="hero-section" id="hero">
+    <div class="container hero-grid">
+
+      <!-- Hero Copy -->
+      <div class="hero-content">
+        <div class="hero-badge-wrap" id="heroBadgeWrap">
+          <div class="badge-pill">
+            <span class="pulse-dot"></span>
+            <span id="headerBadgeText">Open for Q3/Q4 Project Bookings & Retainers</span>
+          </div>
+        </div>
+
+        <h1 class="hero-title" id="heroTitle">
+          We Transform Raw Footage Into <span class="text-gradient">Viral, High-Retention</span> Visual Masterpieces.
+        </h1>
+
+        <p class="hero-description" id="heroDescription">
+          FlipCut Creation is a premier post-production and creative editing studio. We engineer scroll-stopping pacing,
+          cinematic color grading, and dynamic sound design that skyrocket views and conversions.
+        </p>
+
+        <div class="hero-cta-group" id="heroCtaGroup">
+          <a href="#portfolio" class="btn btn-primary">
+            <span>Explore Showcase</span>
+            <i class="fa-solid fa-play"></i>
+          </a>
+          <a href="#pricing" class="btn btn-secondary">
+            <i class="fa-solid fa-tags"></i>
+            <span id="heroCtaSecText">View Pricing Plans</span>
+          </a>
+        </div>
+
+        <!-- Live Metrics Row -->
+        <div class="hero-stats-row" id="heroStatsRow">
+          <div class="hero-stat-item">
+            <span class="stat-number" id="heroStat1Num">50M+</span>
+            <span class="stat-label" id="heroStat1Lbl">Organic Views</span>
+          </div>
+          <div class="hero-stat-item">
+            <span class="stat-number" id="heroStat2Num">99.4%</span>
+            <span class="stat-label" id="heroStat2Lbl">Client Retention</span>
+          </div>
+          <div class="hero-stat-item">
+            <span class="stat-number" id="heroStat3Num">24-48h</span>
+            <span class="stat-label" id="heroStat3Lbl">Avg Turnaround</span>
+          </div>
+          <div class="hero-stat-item">
+            <span class="stat-number" id="heroStat4Num">500+</span>
+            <span class="stat-label" id="heroStat4Lbl">Videos Delivered</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hero Visual Display (Studio Monitor Card) -->
+      <div class="hero-visual-wrap" id="heroVisualWrap">
+        <div class="floating-tag tag-top-left">
+          <i class="fa-solid fa-sparkles text-gradient"></i>
+          <span>DaVinci 4K Color Grade</span>
+        </div>
+        <div class="floating-tag tag-bottom-right">
+          <i class="fa-solid fa-bolt text-gradient"></i>
+          <span>+84% Avg View Duration</span>
+        </div>
+
+        <div class="hero-video-card">
+          <div class="video-screen-frame">
+            <img src="assets/showcase-edit.jpg" alt="FlipCut Creation Editing Suite" id="heroVideoPreviewImg">
+            <button class="play-pulse-btn" id="heroPlayBtn" aria-label="Play Showreel Video"
+              data-video="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ">
+              <i class="fa-solid fa-play"></i>
+            </button>
+          </div>
+
+          <!-- Video HUD Bar -->
+          <div class="video-hud-bar">
+            <div class="hud-track-row">
+              <span><i class="fa-solid fa-sliders"></i> Master Timeline v2.4</span>
+              <span>4K UHD • 60 FPS • Rec.709</span>
+            </div>
+            <div class="hud-progress-track">
+              <div class="hud-progress-fill"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       RUNNING MARQUEE TICKER BANNER (INFINITE SCROLL)
+       ========================================================================== -->
+  <section class="running-banner-section" id="runningBannerSection">
+    <div class="running-banner-track" id="runningBannerTrack">
+      <!-- Group 1 -->
+      <div class="marquee-group">
+        <div class="marquee-item"><i class="fa-solid fa-bolt text-gradient"></i> 50M+ Organic Views Generated</div>
+        <span class="marquee-divider">✦</span>
+        <div class="marquee-item"><i class="fa-solid fa-palette text-gradient"></i> DaVinci Resolve 4K Color Grading
+        </div>
+        <span class="marquee-divider">✦</span>
+        <div class="marquee-item"><i class="fa-solid fa-clock-rotate-left text-gradient"></i> 24-48h Guaranteed
+          Turnaround</div>
+        <span class="marquee-divider">✦</span>
+        <div class="marquee-item"><i class="fa-brands fa-tiktok text-gradient"></i> Viral Reels & Shorts Hook
+          Optimization</div>
+        <span class="marquee-divider">✦</span>
+        <div class="marquee-item"><i class="fa-solid fa-cube text-gradient"></i> Bespoke 3D Motion Graphics & VFX</div>
+        <span class="marquee-divider">✦</span>
+        <div class="marquee-item"><i class="fa-brands fa-google-drive" style="color:#34A853;"></i> 5TB High-Speed Cloud
+          Storage</div>
+        <span class="marquee-divider">✦</span>
+        <div class="marquee-item"><i class="fa-brands fa-whatsapp text-gradient"></i> Direct 1-on-1 WhatsApp
+          Collaboration</div>
+        <span class="marquee-divider">✦</span>
+        <div class="marquee-item"><i class="fa-solid fa-crown text-gradient"></i> Top 1% Retention Pacing</div>
+      </div>
+      <!-- Group 2 (Duplicated for seamless infinite loop) -->
+      <div class="marquee-group" aria-hidden="true">
+        <div class="marquee-item"><i class="fa-solid fa-bolt text-gradient"></i> 50M+ Organic Views Generated</div>
+        <span class="marquee-divider">✦</span>
+        <div class="marquee-item"><i class="fa-solid fa-palette text-gradient"></i> DaVinci Resolve 4K Color Grading
+        </div>
+        <span class="marquee-divider">✦</span>
+        <div class="marquee-item"><i class="fa-solid fa-clock-rotate-left text-gradient"></i> 24-48h Guaranteed
+          Turnaround</div>
+        <span class="marquee-divider">✦</span>
+        <div class="marquee-item"><i class="fa-brands fa-tiktok text-gradient"></i> Viral Reels & Shorts Hook
+          Optimization</div>
+        <span class="marquee-divider">✦</span>
+        <div class="marquee-item"><i class="fa-solid fa-cube text-gradient"></i> Bespoke 3D Motion Graphics & VFX</div>
+        <span class="marquee-divider">✦</span>
+        <div class="marquee-item"><i class="fa-brands fa-google-drive" style="color:#34A853;"></i> 5TB High-Speed Cloud
+          Storage</div>
+        <span class="marquee-divider">✦</span>
+        <div class="marquee-item"><i class="fa-brands fa-whatsapp text-gradient"></i> Direct 1-on-1 WhatsApp
+          Collaboration</div>
+        <span class="marquee-divider">✦</span>
+        <div class="marquee-item"><i class="fa-solid fa-crown text-gradient"></i> Top 1% Retention Pacing</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       ABOUT FLIPCUT CREATION (PHILOSOPHY & 3 PILLARS)
+       ========================================================================== -->
+  <section class="about-section" id="about">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-subtitle" id="aboutSubtitle"
+          style="display: block; color: var(--brand-indigo); font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Who
+          We Are</span>
+        <h2 id="aboutTitle">Mastery Built on Pacing, Rhythm & Precision</h2>
+        <p id="aboutDescription">We don't just cut clips together. We craft immersive storytelling experiences
+          calibrated to capture attention in the first 3 seconds and sustain it to the very last frame.</p>
+      </div>
+
+      <div class="about-grid" id="aboutPillarsGrid">
+        <div class="about-card">
+          <div class="card-icon-wrap">
+            <i class="fa-solid fa-gauge-high"></i>
+          </div>
+          <h3 id="pillar1Title">Retention Engineering</h3>
+          <p id="pillar1Desc">Every cut, zoom, b-roll transition, and sound effect is strategically timed to trigger
+            algorithmic engagement and maximize audience watch time.</p>
+        </div>
+
+        <div class="about-card">
+          <div class="card-icon-wrap">
+            <i class="fa-solid fa-palette"></i>
+          </div>
+          <h3 id="pillar2Title">Cinematic Color & VFX</h3>
+          <p id="pillar2Desc">We transform flat camera footage into rich, filmic visual masterpieces using
+            industry-standard DaVinci Resolve color pipelines and custom After Effects motion graphics.</p>
+        </div>
+
+        <div class="about-card">
+          <div class="card-icon-wrap">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+          </div>
+          <h3 id="pillar3Title">Reliable Rapid Delivery</h3>
+          <p id="pillar3Desc">Never miss a content schedule. Our streamlined cloud ingestion and dedicated creative
+            leads guarantee quick 24-48h turnarounds without compromising perfection.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       DAILY CREATIVE IMAGE & TEXT PROMPT SPOTLIGHT
+       ========================================================================== -->
+  <section class="daily-prompt-section" id="dailyPrompts">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-subtitle" id="dailyPromptSubtitle"
+          style="display: block; color: var(--brand-indigo); font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Daily Creative Inspiration</span>
+        <h2 id="dailyPromptTitle">Daily Visual Masterpiece & <span class="text-gradient">Text Prompt</span></h2>
+        <p id="dailyPromptDescription">Explore our daily curated visual arts and copy the exact engineering prompts used to create them.</p>
+      </div>
+
+      <div class="daily-prompt-wrapper" id="dailyPromptContainer">
+        <!-- Rendered dynamically from CMS via script.js -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       CORE SERVICE OFFERINGS
+       ========================================================================== -->
+  <section class="services-section" id="services">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-subtitle" id="servicesSubtitle"
+          style="display: block; color: var(--brand-indigo); font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Our
+          Core Services</span>
+        <h2 id="servicesTitle">End-to-End Post-Production Services</h2>
+        <p id="servicesDescription">From short-form virality to high-budget brand commercials, we deliver tailor-made
+          video assets designed to perform.</p>
+      </div>
+
+      <div class="services-grid" id="servicesGrid">
+        <!-- Rendered dynamically from CMS via script.js -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       5-STEP SEAMLESS CREATIVE WORKFLOW
+       ========================================================================== -->
+  <section class="workflow-section" id="workflow">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-subtitle" id="workflowSubtitle">How We Work</span>
+        <h2>A Frictionless 5-Step Production Pipeline</h2>
+        <p>From the moment you drop your raw files to final 4K delivery, experience a collaborative and stress-free
+          process.</p>
+      </div>
+
+      <div class="workflow-steps-track">
+        <div class="workflow-step-card">
+          <div class="step-number-bubble">1</div>
+          <h4>Brief & Ingest</h4>
+          <p>Upload raw footage via Drive or Frame.io and specify your target platform and goals.</p>
+        </div>
+
+        <div class="workflow-step-card">
+          <div class="step-number-bubble">2</div>
+          <h4>Rough Cut & Story</h4>
+          <p>We build the narrative skeleton, remove filler, and lock the rhythm and hook structure.</p>
+        </div>
+
+        <div class="workflow-step-card">
+          <div class="step-number-bubble">3</div>
+          <h4>VFX, Color & Sound</h4>
+          <p>We infuse dynamic motion graphics, DaVinci color grading, and layered foley SFX.</p>
+        </div>
+
+        <div class="workflow-step-card">
+          <div class="step-number-bubble">4</div>
+          <h4>Review & Polish</h4>
+          <p>Provide timestamped feedback directly on the video player with rapid same-day tweaks.</p>
+        </div>
+
+        <div class="workflow-step-card">
+          <div class="step-number-bubble">5</div>
+          <h4>Master 4K Delivery</h4>
+          <p>Download pristine, render-optimized master files ready to publish and conquer feeds.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       PORTFOLIO SHOWCASE
+       ========================================================================== -->
+  <section class="portfolio-section" id="portfolio">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-subtitle" id="portfolioSubtitle">Featured Creations</span>
+        <h2>Featured Client Creations</h2>
+        <p>Explore some of our recent high-performing video projects across categories.</p>
+      </div>
+
+      <!-- Filter Buttons -->
+      <div class="portfolio-filter-bar" id="portfolioFilterBar">
+        <button class="filter-btn active" data-filter="reels"><i class="fa-solid fa-mobile-screen-button"></i> Vertical Reels</button>
+        <button class="filter-btn" data-filter="video"><i class="fa-solid fa-film"></i> 16:9 Videos</button>
+        <button class="filter-btn" data-filter="graphic"><i class="fa-solid fa-palette"></i> Graphic Design</button>
+        <button class="filter-btn" data-filter="uiux"><i class="fa-solid fa-laptop-code"></i> Web UI & UX</button>
+        <button class="filter-btn" data-filter="clients"><i class="fa-solid fa-crown"></i> Clients' Work</button>
+      </div>
+
+      <!-- Portfolio Grid (Hydrated dynamically from CMS) -->
+      <div class="portfolio-grid" id="portfolioGrid">
+        <!-- Rendered dynamically by script.js with attachable redirect links -->
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       WHY CHOOSE US & SOFTWARE TECH STACK
+       ========================================================================== -->
+  <section class="why-section" id="why-us">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-subtitle" id="whySubtitle">Why Choose FlipCut</span>
+        <h2>Built for Scale, Reliability & Quality</h2>
+        <p>Why modern creators and forward-thinking brands partner with our post-production team.</p>
+      </div>
+
+      <div class="why-us-grid" id="whyUsGrid">
+        <div class="why-feature-box">
+          <span class="why-icon text-gradient"><i class="fa-solid fa-headset"></i></span>
+          <h4>Dedicated Lead Editor</h4>
+          <p>You get an assigned lead editor who learns your brand tone and style for consistent visual identity.</p>
+        </div>
+
+        <div class="why-feature-box">
+          <span class="why-icon text-gradient"><i class="fa-solid fa-comments"></i></span>
+          <h4>Private WhatsApp / Slack</h4>
+          <p>Direct real-time communication with your production team without messy email chains.</p>
+        </div>
+
+        <div class="why-feature-box">
+          <span class="why-icon text-gradient"><i class="fa-solid fa-infinity"></i></span>
+          <h4>Unlimited Revisions</h4>
+          <p>We iterate rapidly until the cut matches your exact vision on all Retainer plans.</p>
+        </div>
+
+        <div class="why-feature-box">
+          <span class="why-icon text-gradient"><i class="fa-solid fa-hard-drive"></i></span>
+          <h4>Project Files Included</h4>
+          <p>Full access to Adobe Premiere, After Effects, and DaVinci project files on demand.</p>
+        </div>
+      </div>
+
+      <!-- Tech Stack Badges -->
+      <div class="tech-stack-wrap" id="techStackWrap">
+        <h4>Industry Standard Creative Tooling</h4>
+        <div class="tech-badges-row">
+          <div class="tech-badge-item"><i class="fa-solid fa-film" style="color: #9999FF;"></i> Adobe Premiere Pro</div>
+          <div class="tech-badge-item"><i class="fa-solid fa-cubes" style="color: #9999FF;"></i> Adobe After Effects
+          </div>
+          <div class="tech-badge-item"><i class="fa-solid fa-palette" style="color: #FF5500;"></i> DaVinci Resolve
+            Studio</div>
+          <div class="tech-badge-item"><i class="fa-solid fa-cube" style="color: #E87D0D;"></i> Blender 3D</div>
+          <div class="tech-badge-item"><i class="fa-solid fa-wand-sparkles" style="color: #00D2FF;"></i> Topaz Video AI
+          </div>
+          <div class="tech-badge-item"><i class="fa-solid fa-robot" style="color: #7C3AED;"></i> Midjourney / AI Suite
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       PRICING PLANS & RETAINER PACKAGES (INR ₹)
+       ========================================================================== -->
+  <section class="pricing-section" id="pricing">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-subtitle" id="pricingSubtitle">Flexible Retainers</span>
+        <h2 id="pricingTitle">Transparent Packages. Zero Hidden Fees.</h2>
+        <p id="pricingDesc">Choose an agile per-project tier or secure dedicated retainer bandwidth for ongoing growth.
+        </p>
+      </div>
+
+      <div class="pricing-grid" id="pricingGrid">
+
+        <!-- Tier 1: Starter Creator -->
+        <div class="pricing-card">
+          <div class="pricing-header">
+            <h3>Starter Creator</h3>
+            <p>Ideal for solo creators looking to scale short-form output.</p>
+            <div class="pricing-price-wrap">
+              <span class="price-amount" id="pricingStarterAmount">₹14,999</span>
+              <span class="price-period">/ month</span>
+            </div>
+            <ul class="pricing-feature-list">
+              <li><i class="fa-solid fa-circle-check text-gradient"></i> 8 Short-Form Videos / month</li>
+              <li><i class="fa-solid fa-circle-check text-gradient"></i> 48-Hour Turnaround SLA</li>
+              <li><i class="fa-solid fa-circle-check text-gradient"></i> 2 Revision Rounds / video</li>
+              <li><i class="fa-solid fa-circle-check text-gradient"></i> Standard Motion Graphics</li>
+            </ul>
+          </div>
+          <a href="#contact" class="btn btn-secondary" style="width: 100%;">Select Starter</a>
+        </div>
+
+        <!-- Tier 2: Pro Growth (Featured) -->
+        <div class="pricing-card featured-plan">
+          <div class="pricing-badge-popular">Most Popular Choice</div>
+          <div class="pricing-header">
+            <h3>Pro Growth Tier</h3>
+            <p>For high-output creators & brands scaling YouTube + Shorts.</p>
+            <div class="pricing-price-wrap">
+              <span class="price-amount" id="pricingGrowthAmount">₹34,999</span>
+              <span class="price-period">/ month</span>
+            </div>
+            <ul class="pricing-feature-list">
+              <li><i class="fa-solid fa-circle-check text-gradient"></i> 16 Short-Form Videos / month</li>
+              <li><i class="fa-solid fa-circle-check text-gradient"></i> 4 Long-Form YouTube Edits (8-15 min)</li>
+              <li><i class="fa-solid fa-circle-check text-gradient"></i> 24-48h Guaranteed Delivery</li>
+              <li><i class="fa-solid fa-circle-check text-gradient"></i> Unlimited Revisions</li>
+              <li><i class="fa-solid fa-circle-check text-gradient"></i> Dedicated Lead Video Editor</li>
+              <li><i class="fa-solid fa-circle-check text-gradient"></i> DaVinci 4K Color Grading Included</li>
+            </ul>
+          </div>
+          <a href="#contact" class="btn btn-primary" style="width: 100%;">
+            <span>Select Pro Growth</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </a>
+        </div>
+
+        <!-- Tier 3: Studio Enterprise -->
+        <div class="pricing-card">
+          <div class="pricing-header">
+            <h3>Studio Enterprise</h3>
+            <p>Full-service dedicated post-production department.</p>
+            <div class="pricing-price-wrap">
+              <span class="price-amount" id="pricingEnterpriseAmount">₹69,999</span>
+              <span class="price-period">/ month</span>
+            </div>
+            <ul class="pricing-feature-list">
+              <li><i class="fa-solid fa-circle-check text-gradient"></i> Unlimited Short-Form + Long-Form</li>
+              <li><i class="fa-solid fa-circle-check text-gradient"></i> 24-Hour Rush Turnaround</li>
+              <li><i class="fa-solid fa-circle-check text-gradient"></i> Dedicated Senior Editor & Motion Lead</li>
+              <li><i class="fa-solid fa-circle-check text-gradient"></i> 3D Motion Graphics & Blender VFX</li>
+              <li><i class="fa-solid fa-circle-check text-gradient"></i> Private Slack / WhatsApp Channel</li>
+              <li><i class="fa-solid fa-circle-check text-gradient"></i> Project Files & Full Raw Assets</li>
+            </ul>
+          </div>
+          <a href="#contact" class="btn btn-secondary" style="width: 100%;">Contact Enterprise</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       TESTIMONIALS & SOCIAL PROOF
+       ========================================================================== -->
+  <section class="testimonials-section" id="testimonials">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-subtitle" id="testimonialsSubtitle">Client Voices</span>
+        <h2>Trusted by Modern Creators & Brands</h2>
+        <p>Hear how FlipCut Creation transformed their view counts and engagement metrics.</p>
+      </div>
+
+      <div class="testimonials-grid" id="testimonialsGrid">
+
+        <div class="testimonial-card">
+          <div class="testimonial-stars">
+            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
+              class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+          </div>
+          <p class="testimonial-quote">
+            "FlipCut revolutionized our YouTube workflow. Their retention hooks and sound design boosted our average
+            view duration from 42% to 68% in just 30 days."
+          </p>
+          <div class="testimonial-author-wrap">
+            <div class="author-avatar">MS</div>
+            <div class="author-info">
+              <h4>Marcus Sterling</h4>
+              <span>Tech Creator (450K Subs)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card">
+          <div class="testimonial-stars">
+            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
+              class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+          </div>
+          <p class="testimonial-quote">
+            "The turnaround speed is unbelievable. We drop our raw podcast recording on Monday and by Wednesday we have
+            12 viral Reels ready to publish."
+          </p>
+          <div class="testimonial-author-wrap">
+            <div class="author-avatar">EV</div>
+            <div class="author-info">
+              <h4>Elena Vance</h4>
+              <span>Host, The Velocity Podcast</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card">
+          <div class="testimonial-stars">
+            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
+              class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+          </div>
+          <p class="testimonial-quote">
+            "Their DaVinci Resolve color grading took our luxury automobile ad campaign to a whole new level. The
+            visuals look like an 8-figure Bollywood / Hollywood film."
+          </p>
+          <div class="testimonial-author-wrap">
+            <div class="author-avatar">DK</div>
+            <div class="author-info">
+              <h4>David Keller</h4>
+              <span>Creative Director, Apex Motors</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+
+  <!-- ==========================================================================
+       PROJECT INQUIRY FORM & FAQ ACCORDION
+       ========================================================================== -->
+  <section class="contact-section" id="contact">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-subtitle" id="contactSubtitle">Project Brief</span>
+        <h2 id="contactTitle">Ready to Level Up Your Content?</h2>
+        <p id="contactDesc">Fill out the project brief below or reach out directly on WhatsApp for an immediate
+          consultation.</p>
+      </div>
+
+      <div class="contact-grid">
+
+        <!-- Contact Form -->
+        <div class="contact-form-card">
+          <form id="projectInquiryForm">
+            <div class="form-row-2">
+              <div class="form-group">
+                <label for="clientName" id="lblClientName">Your Name *</label>
+                <input type="text" id="clientName" class="form-control" placeholder="e.g. Rahul Sharma" required>
+              </div>
+              <div class="form-group">
+                <label for="clientEmail" id="lblClientEmail">Email Address *</label>
+                <input type="email" id="clientEmail" class="form-control" placeholder="rahul@creator.in" required>
+              </div>
+            </div>
+
+            <div class="form-row-2">
+              <div class="form-group">
+                <label for="clientPhone" id="lblClientPhone">WhatsApp / Mobile Number *</label>
+                <input type="tel" id="clientPhone" class="form-control" placeholder="+91 98765 43210" required>
+              </div>
+              <div class="form-group">
+                <label for="projectTypeSelect" id="lblProjectType">Service / Project Type</label>
+                <select id="projectTypeSelect" class="form-control">
+                  <option value="reels">Viral Short-Form (Reels / TikTok)</option>
+                  <option value="youtube">YouTube Long-Form Production</option>
+                  <option value="commercial">Commercial / Brand Film</option>
+                  <option value="motion">Motion Graphics & 3D Visuals</option>
+                  <option value="retainer">Monthly Retainer Bandwidth</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row-2">
+              <div class="form-group">
+                <label for="projectBudget" id="lblProjectBudget">Estimated Budget (₹ INR)</label>
+                <select id="projectBudget" class="form-control">
+                  <option value="10k-25k">₹10,000 - ₹25,000</option>
+                  <option value="25k-50k" selected>₹25,000 - ₹50,000</option>
+                  <option value="50k-100k">₹50,000 - ₹1,00,000</option>
+                  <option value="100k+">₹1,00,000+ (Custom Retainer)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                  <label for="projectFootageUrl" id="lblProjectFootage" style="margin-bottom:0;">Raw Footage / Reference
+                    Link</label>
+                  <a href="https://drive.google.com/drive/folders/1E71ZRh-3eImKRu49AcDaAyj5vqj9tuq6?usp=sharing"
+                    target="_blank" rel="noopener"
+                    style="font-size:0.8rem; color:var(--brand-indigo); font-weight:600; text-decoration:none;"
+                    id="contactDriveLink">
+                    <i class="fa-brands fa-google-drive" style="color:#34A853;"></i> <span
+                      id="contactDriveLinkText">Open FlipCut 5TB Drive</span>
+                  </a>
+                </div>
+                <input type="url" id="projectFootageUrl" class="form-control"
+                  placeholder="https://drive.google.com/drive/folders/1E71ZRh-3eImKRu49AcDaAyj5vqj9tuq6?usp=sharing">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="projectNotes" id="lblProjectNotes">Project Details & Vision</label>
+              <textarea id="projectNotes" class="form-control"
+                placeholder="Describe your vision, target audience, preferred editing style, and deadline..."></textarea>
+            </div>
+
+            <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+              <button type="submit" class="btn btn-primary" style="flex: 1;">
+                <i class="fa-solid fa-paper-plane"></i>
+                <span id="contactSubmitBtnText">Submit Project Brief</span>
+              </button>
+
+              <a href="https://wa.me/919999999999?text=Hi%20FlipCut%20Creation,%20I%20would%20like%20to%20discuss%20a%20video%20editing%20project!"
+                target="_blank" rel="noopener" class="btn btn-whatsapp" id="contactWhatsappBtn">
+                <i class="fa-brands fa-whatsapp" style="font-size: 1.2rem;"></i>
+                <span id="contactWhatsappBtnText">Quick WhatsApp</span>
+              </a>
+            </div>
+          </form>
+        </div>
+
+        <!-- FAQ Accordion Column -->
+        <div class="faq-column" id="faq">
+          <h3 id="faqHeaderTitle" style="margin-bottom: 20px; font-size: 1.5rem;">Frequently Asked Questions</h3>
+
+          <div class="faq-accordion-wrap" id="faqAccordionWrap">
+
+            <div class="faq-item active">
+              <button class="faq-question-btn">
+                <span>How fast is the turnaround time?</span>
+                <i class="fa-solid fa-chevron-down faq-chevron"></i>
+              </button>
+              <div class="faq-answer" style="max-height: 180px;">
+                <div class="faq-answer-content">
+                  Short-form Reels and TikToks are typically delivered within 24 to 48 hours. Long-form YouTube edits
+                  take 48 to 72 hours. Rush 24-hour turnaround is also available on demand.
+                </div>
+              </div>
+            </div>
+
+            <div class="faq-item">
+              <button class="faq-question-btn">
+                <span>How do we send our raw footage?</span>
+                <i class="fa-solid fa-chevron-down faq-chevron"></i>
+              </button>
+              <div class="faq-answer">
+                <div class="faq-answer-content">
+                  You can share your raw files via Google Drive, Dropbox, WeTransfer, or Frame.io. We maintain
+                  high-speed gigabit fiber connections for rapid multi-gigabyte ingestion.
+                </div>
+              </div>
+            </div>
+
+            <div class="faq-item">
+              <button class="faq-question-btn">
+                <span>How many revisions do I get?</span>
+                <i class="fa-solid fa-chevron-down faq-chevron"></i>
+              </button>
+              <div class="faq-answer">
+                <div class="faq-answer-content">
+                  Individual projects include 2 full revision rounds. All our monthly Retainer tiers (Growth &
+                  Enterprise) include unlimited revisions to ensure you get 100% satisfaction.
+                </div>
+              </div>
+            </div>
+
+            <div class="faq-item">
+              <button class="faq-question-btn">
+                <span>Do I receive the editable project files?</span>
+                <i class="fa-solid fa-chevron-down faq-chevron"></i>
+              </button>
+              <div class="faq-answer">
+                <div class="faq-answer-content">
+                  Yes! We can provide full Adobe Premiere Pro (.prproj), After Effects (.aep), and DaVinci Resolve
+                  project archives with organized bins upon request.
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       FOOTER (Ultra-Modern Editorial Luxury)
+       ========================================================================== -->
+  <footer class="site-footer" id="siteFooter">
+    <div class="container">
+      <div class="footer-top-grid">
+
+        <div class="footer-brand-info">
+          <img src="assets/logo.png" alt="FlipCut Creation Logo" class="brand-logo-img" style="height: 52px;">
+          <p>Transforming raw footage into high-retention viral visual assets and cinematic films for world-class
+            creators and brands.</p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Navigation</h4>
+          <ul class="footer-links">
+            <li><a href="#about">About Studio</a></li>
+            <li><a href="#services">Core Services</a></li>
+            <li><a href="#portfolio">Featured Work</a></li>
+            <li><a href="#pricing">Pricing Plans</a></li>
+            <li><a href="#contact">Contact Brief</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Services</h4>
+          <ul class="footer-links">
+            <li><a href="#services">Viral Short-Form</a></li>
+            <li><a href="#services">YouTube Long-Form</a></li>
+            <li><a href="#services">Brand Commercials</a></li>
+            <li><a href="#services">DaVinci Color Grading</a></li>
+            <li><a href="#services">3D Motion Graphics</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Connect</h4>
+          <ul class="footer-links">
+            <li><a href="mailto:contact@flipcutcreation.com" id="footerEmailLink"><i class="fa-solid fa-envelope"></i>
+                contact@flipcut.com</a></li>
+            <li><a href="https://instagram.com" target="_blank" rel="noopener"><i class="fa-brands fa-instagram"></i>
+                <span id="footerInstagramLink">@flipcutcreation</span></a></li>
+            <li><a href="https://youtube.com" target="_blank" rel="noopener"><i class="fa-brands fa-youtube"></i> <span
+                  id="footerYoutubeLink">FlipCut Official</span></a></li>
+            <li><a href="https://wa.me/919999999999" target="_blank" rel="noopener"><i
+                  class="fa-brands fa-whatsapp"></i> WhatsApp Chat</a></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="footer-bottom-row">
+        <span id="footerCopyrightText">© 2026 FlipCut Creation. All rights reserved. Precision Engineered
+          Post-Production.</span>
+        <span>Designed in Luxury White Mode</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==========================================================================
+       MODAL & TOAST ELEMENTS
+       ========================================================================== -->
+  <!-- Video Lightbox Modal -->
+  <div class="lightbox-modal" id="videoModal">
+    <div class="lightbox-content-box" style="max-width: 960px; background: #000; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--border-glow); box-shadow: 0 30px 80px rgba(0,0,0,0.85);">
+      <button class="modal-close-btn" id="modalCloseBtn" aria-label="Close Modal">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; background: #000;">
+        <video id="modalVideoPlayer" src="" controls playsinline style="position: absolute; top:0; left:0; width:100%; height:100%; object-fit: contain; display: none; background: #000;"></video>
+        <iframe id="modalIframe" src="" style="position: absolute; top:0; left: 0; width: 100%; height: 100%; border:0; display: none;"
+          allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- Graphic Design & UI/UX Image Modal with Direct Project Link -->
+  <div class="lightbox-modal" id="imageModal">
+    <div class="lightbox-content-box"
+      style="max-width: 820px; background: var(--bg-surface); padding: 24px; border-radius: var(--radius-lg); text-align: center; border: 1px solid var(--border-medium); box-shadow: 0 25px 60px rgba(0,0,0,0.6);">
+      <button class="modal-close-btn" id="imageModalCloseBtn" aria-label="Close Modal" style="top: 16px; right: 16px;">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <img id="imageModalImg" src="" alt="Project Visual Preview"
+        style="width: 100%; max-height: 68vh; object-fit: contain; border-radius: var(--radius-md); margin-bottom: 16px; background: #000;">
+      <div
+        style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; border-top: 1px solid var(--border-subtle); padding-top: 14px;">
+        <div style="text-align: left;">
+          <h3 id="imageModalTitle" style="font-size: 1.15rem; margin: 0; color: var(--text-primary);">Graphic Design
+            Work</h3>
+          <span id="imageModalTag" style="font-size: 0.82rem; color: var(--brand-indigo); font-weight: 700;">Key Visual
+            / Prototype</span>
+        </div>
+        <a href="#" id="imageModalLinkBtn" target="_blank" rel="noopener" class="btn btn-primary"
+          style="padding: 8px 18px; font-size: 0.88rem;">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> <span>Open Live Work / Project Link</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Box -->
+  <div class="toast-box" id="toastBox">
+    <i class="fa-solid fa-circle-check" style="color: #10B981; font-size: 1.3rem;"></i>
+    <span id="toastMsg">Inquiry sent successfully! We will get in touch within 2 hours.</span>
+  </div>
+
+  <!-- Floating Back to Top Button -->
+  <button class="back-to-top-btn" id="backToTopBtn" aria-label="Back to Top">
+    <i class="fa-solid fa-arrow-up"></i>
+  </button>
+
+  <!-- Razorpay Payment Success Modal -->
+  <div class="lightbox-modal" id="paymentSuccessModal">
+    <div class="lightbox-content-box"
+      style="max-width: 520px; text-align: center; padding: 36px 28px; background: var(--bg-card); border-radius: var(--radius-lg); border: 1.5px solid rgba(16, 185, 129, 0.5); box-shadow: 0 20px 50px rgba(0,0,0,0.5);">
+      <button class="modal-close-btn" id="payModalCloseBtn" aria-label="Close Modal" style="top: 16px; right: 16px;">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <div
+        style="width: 72px; height: 72px; background: rgba(16, 185, 129, 0.15); border: 2px solid #10B981; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 2rem; color: #10B981;">
+        <i class="fa-solid fa-check"></i>
+      </div>
+      <h3 style="font-size: 1.5rem; margin-bottom: 6px; color: var(--text-primary);">🎉 Payment & Registration Successful!</h3>
+      <p style="color: var(--text-secondary); font-size: 0.92rem; margin-bottom: 16px;" id="payModalDesc">Your order has been verified and registered in the FlipCut database.</p>
+
+      <!-- Unique User ID Card -->
+      <div style="background: rgba(99, 102, 241, 0.12); border: 1px dashed var(--brand-indigo); border-radius: var(--radius-md); padding: 10px 16px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between;">
+        <div style="text-align: left;">
+          <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; display: block;">Registered User ID</span>
+          <strong id="payModalUserId" style="font-family: monospace; font-size: 1.15rem; color: var(--brand-indigo); letter-spacing: 0.05em;">FC-PAY-00000</strong>
+        </div>
+        <button type="button" class="btn btn-secondary" onclick="copyModalUserId('payModalUserId')" style="padding: 6px 12px; font-size: 0.78rem;" title="Copy User ID">
+          <i class="fa-solid fa-copy"></i> <span>Copy ID</span>
+        </button>
+      </div>
+
+      <div
+        style="background: var(--bg-tertiary); border-radius: var(--radius-md); padding: 16px; text-align: left; font-size: 0.88rem; margin-bottom: 20px; border: 1px solid var(--border-subtle);">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span style="color: var(--text-muted);"><i class="fa-solid fa-user"></i> Client Name:</span>
+          <strong id="payModalClientName" style="color: var(--text-primary);">-</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span style="color: var(--text-muted);"><i class="fa-solid fa-clapperboard"></i> Package / Service:</span>
+          <strong id="payModalPlan" style="color: var(--text-primary);">-</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span style="color: var(--text-muted);"><i class="fa-solid fa-indian-rupee-sign"></i> Amount Paid:</span>
+          <strong id="payModalAmount" style="color: #10B981;">-</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span style="color: var(--text-muted);"><i class="fa-solid fa-receipt"></i> Razorpay Payment ID:</span>
+          <code id="payModalId" style="color: var(--brand-indigo); font-size: 0.82rem;">-</code>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span style="color: var(--text-muted);"><i class="fa-solid fa-calendar-check"></i> Registered Date:</span>
+          <span id="payModalDate" style="color: var(--text-primary); font-size: 0.85rem;">Today</span>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span style="color: var(--text-muted);"><i class="fa-solid fa-shield-check"></i> Database Status:</span>
+          <span style="color: #10B981; font-weight: 700;">● Verified & Saved to Backend</span>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 10px; flex-direction: column;">
+        <a href="#" target="_blank" rel="noopener" id="payModalWhatsAppBtn" class="btn btn-whatsapp"
+          style="width: 100%; padding: 12px; font-size: 0.95rem;">
+          <i class="fa-brands fa-whatsapp" style="font-size: 1.2rem;"></i>
+          <span>Confirm on WhatsApp with Lead Producer</span>
+        </a>
+        <button type="button" class="btn btn-primary" id="payModalOkBtn" style="width: 100%; padding: 12px;">
+          <span>Done & Return to Studio</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Project Brief Submission Success Popup Card -->
+  <div class="lightbox-modal" id="briefSuccessModal">
+    <div class="lightbox-content-box"
+      style="max-width: 520px; text-align: center; padding: 36px 28px; background: var(--bg-card); border-radius: var(--radius-lg); border: 1.5px solid rgba(16, 185, 129, 0.5); box-shadow: 0 25px 60px rgba(0,0,0,0.5);">
+      <button class="modal-close-btn" id="briefModalCloseBtn" aria-label="Close Modal" style="top: 16px; right: 16px;">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <div
+        style="width: 76px; height: 76px; background: rgba(16, 185, 129, 0.12); border: 2px solid #10B981; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 2.2rem; color: #10B981; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.25);">
+        <i class="fa-solid fa-circle-check"></i>
+      </div>
+      <h3 style="font-size: 1.55rem; margin-bottom: 6px; color: var(--text-primary);">🎉 Project Brief Registered!</h3>
+      <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5; margin-bottom: 16px;">
+        Thank you <strong id="briefSuccessClientName" class="text-gradient">Creator</strong>! Your project brief &
+        footage link have been saved with all filled entries in our backend database.
+      </p>
+
+      <!-- Unique User ID Card -->
+      <div style="background: rgba(99, 102, 241, 0.12); border: 1px dashed var(--brand-indigo); border-radius: var(--radius-md); padding: 10px 16px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between;">
+        <div style="text-align: left;">
+          <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; display: block;">Your Registered User ID</span>
+          <strong id="briefSuccessUserId" style="font-family: monospace; font-size: 1.15rem; color: var(--brand-indigo); letter-spacing: 0.05em;">FC-REG-00000</strong>
+        </div>
+        <button type="button" class="btn btn-secondary" onclick="copyModalUserId('briefSuccessUserId')" style="padding: 6px 12px; font-size: 0.78rem;" title="Copy User ID">
+          <i class="fa-solid fa-copy"></i> <span>Copy ID</span>
+        </button>
+      </div>
+
+      <div
+        style="background: var(--bg-tertiary); border-radius: var(--radius-md); padding: 16px; text-align: left; font-size: 0.88rem; margin-bottom: 20px; border: 1px solid var(--border-subtle);">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span style="color: var(--text-muted);"><i class="fa-solid fa-clapperboard"></i> Service:</span>
+          <strong id="briefSuccessService" style="color: var(--text-primary);">-</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span style="color: var(--text-muted);"><i class="fa-solid fa-indian-rupee-sign"></i> Budget Tier:</span>
+          <strong id="briefSuccessBudget" style="color: var(--brand-indigo);">-</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span style="color: var(--text-muted);"><i class="fa-solid fa-phone"></i> Mobile / WhatsApp:</span>
+          <strong id="briefSuccessPhone" style="color: var(--text-primary);">-</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span style="color: var(--text-muted);"><i class="fa-solid fa-envelope"></i> Email:</span>
+          <strong id="briefSuccessEmail" style="color: var(--text-primary);">-</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span style="color: var(--text-muted);"><i class="fa-solid fa-clock"></i> Response SLA:</span>
+          <span style="color: #10B981; font-weight: 700;">Within 2 Hours (via WhatsApp / Call)</span>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 10px; flex-direction: column;">
+        <a href="#" target="_blank" rel="noopener" id="briefSuccessWhatsAppBtn" class="btn btn-whatsapp"
+          style="width: 100%; padding: 12px; font-size: 0.95rem;">
+          <i class="fa-brands fa-whatsapp" style="font-size: 1.2rem;"></i>
+          <span>Chat Immediately on WhatsApp</span>
+        </a>
+        <button type="button" class="btn btn-primary" id="briefModalOkBtn" style="width: 100%; padding: 12px;">
+          <span>Awesome, Got It!</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Razorpay Official Checkout SDK -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+  <!-- JavaScript Modules -->
+  <script src="script.js?v=5.0"></script>
+</body>
+
+</html>

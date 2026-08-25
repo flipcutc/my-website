@@ -1,0 +1,16 @@
+{
+  "name": "flipcut-website",
+  "version": "1.0.0",
+  "description": "FlipCut Creation Luxury Website with local storage and optional cloud integrations",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "razorpay": "^2.9.8"
+  }
+}
