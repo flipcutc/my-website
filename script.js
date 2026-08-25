@@ -1718,32 +1718,12 @@ document.addEventListener('DOMContentLoaded', () => {
         order_id: orderData.order.id,
         prefill: {
           name: clientName,
-          contact: clientPhone,
-          method: "upi"
+          contact: clientPhone
         },
-        config: {
-          display: {
-            blocks: {
-              upi: {
-                name: "Pay via UPI (Google Pay, PhonePe, Paytm, QR)",
-                instruments: [
-                  { method: "upi" }
-                ]
-              },
-              other: {
-                name: "Cards & Netbanking",
-                instruments: [
-                  { method: "card" },
-                  { method: "netbanking" },
-                  { method: "wallet" }
-                ]
-              }
-            },
-            sequence: ["block.upi", "block.other"],
-            preferences: {
-              show_default_blocks: true
-            }
-          }
+        notes: {
+          packageName: packageName,
+          clientName: clientName,
+          clientPhone: clientPhone
         },
         theme: {
           color: "#4F46E5"

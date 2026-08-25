@@ -858,32 +858,12 @@
               prefill: {
                 name: name,
                 email: email,
-                contact: phone,
-                method: "upi"
+                contact: phone
               },
-              config: {
-                display: {
-                  blocks: {
-                    upi: {
-                      name: "Pay via UPI (Google Pay, PhonePe, Paytm, QR)",
-                      instruments: [
-                        { method: "upi" }
-                      ]
-                    },
-                    other: {
-                      name: "Cards & Netbanking",
-                      instruments: [
-                        { method: "card" },
-                        { method: "netbanking" },
-                        { method: "wallet" }
-                      ]
-                    }
-                  },
-                  sequence: ["block.upi", "block.other"],
-                  preferences: {
-                    show_default_blocks: true
-                  }
-                }
+              notes: {
+                packageName: `Webinar Pass (${websiteType})`,
+                clientName: name,
+                clientPhone: phone
               },
               theme: { color: "#4F46E5" },
               handler: async function(response) {
