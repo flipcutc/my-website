@@ -17,7 +17,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=3.1">
+  <link rel="stylesheet" href="styles.css">
 
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -683,7 +683,7 @@
   </div>
 
   <!-- Content Store & Razorpay SDK -->
-  <script src="content-store.js?v=3.1"></script>
+  <script src="content-store.js"></script>
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
   <!-- Script logic for Webinar registration & Razorpay Gate -->
@@ -816,83 +816,61 @@
         const email = document.getElementById('webinarEmail').value.trim();
         const websiteType = getSelectedWebsiteType();
 
-        showToast('Initiating Razorpay Payment (GPay, Netbanking, Cards)...', 'var(--brand-indigo)');
+        showToast('Opening Razorpay Payment Gateway (GPay, UPI, Cards)...', 'var(--brand-indigo)');
 
         try {
-          const apiBase = (typeof getContentApiBase === 'function') ? getContentApiBase() : '';
-          // Check config
-          const cfgRes = await fetch(`${apiBase}/api/payment/config`).catch(() => ({ ok: false }));
-          let cfg = { enabled: true, keyId: 'rzp_live_TTd5UPSpFLKLor' };
-          if (cfgRes && cfgRes.ok) {
-            try { cfg = await cfgRes.json(); } catch (_) {}
+          const liveKey = "rzp_live_TTd5UPSpFLKLor";
+          const amountInPaise = Math.round(Number(webinarFeeAmount || 199) * 100);
+
+          if (!window.Razorpay) {
+            showToast('Razorpay Gateway is loading, please wait 2 seconds and click again.', '#F59E0B');
+            return;
           }
 
-          if (cfg.enabled && cfg.keyId) {
-            // Create Order on backend using dynamic amount
-            const orderRes = await fetch(`${apiBase}/api/payment/create-order`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                amount: webinarFeeAmount,
-                packageName: `Webinar Pass (${websiteType})`,
-                clientName: name,
-                clientEmail: email,
-                clientPhone: phone
-              })
-            });
-
-            const orderData = await orderRes.json();
-            if (!orderData.success) {
-              showToast(`Order error: ${orderData.message}`, '#EF4444');
-              return;
-            }
-
-            const options = {
-              key: orderData.keyId,
-              amount: orderData.order.amount,
-              currency: orderData.order.currency,
-              name: "FlipCut Creation",
-              description: `Webinar Pass: ${websiteType} (₹${webinarFeeAmount})`,
-              image: "assets/logo.png",
-              order_id: orderData.order.id,
-              prefill: {
-                name: name,
-                email: email,
-                contact: phone
-              },
-              notes: {
-                packageName: `Webinar Pass (${websiteType})`,
-                clientName: name,
-                clientPhone: phone
-              },
-              theme: { color: "#4F46E5" },
-              handler: async function(response) {
-                verifiedPaymentId = response.razorpay_payment_id || `pay_sim_${Date.now()}`;
-                verifiedOrderId = response.razorpay_order_id || orderData.order.id;
-                unlockRegistrationSubmit();
+          const options = {
+            key: liveKey,
+            amount: amountInPaise,
+            currency: "INR",
+            name: "FlipCut Creation",
+            description: `Live Masterclass Pass - ${websiteType} (₹${webinarFeeAmount})`,
+            image: "assets/logo.png",
+            prefill: {
+              name: name,
+              email: email,
+              contact: phone
+            },
+            notes: {
+              service: "Webinar Masterclass Registration",
+              websiteType: websiteType,
+              amount: `₹${webinarFeeAmount}`
+            },
+            theme: {
+              color: "#4F46E5"
+            },
+            modal: {
+              ondismiss: function() {
+                showToast('Payment window closed. Please complete the ₹' + webinarFeeAmount + ' payment to unlock your pass.', '#EF4444');
               }
-            };
-
-            if (window.Razorpay) {
-              const rzp = new window.Razorpay(options);
-              rzp.open();
-            } else {
-              // Simulated test verification fallback
-              verifiedPaymentId = `pay_sim_${Date.now()}`;
-              unlockRegistrationSubmit();
+            },
+            handler: function(response) {
+              if (response && response.razorpay_payment_id) {
+                verifiedPaymentId = response.razorpay_payment_id;
+                unlockRegistrationSubmit();
+              } else {
+                showToast('Payment verification pending. Please try again.', '#EF4444');
+              }
             }
-          } else {
-            // Simulated Test Payment Mode (GPay / Netbanking Simulation)
-            setTimeout(() => {
-              verifiedPaymentId = `pay_test_${Date.now()}`;
-              unlockRegistrationSubmit();
-            }, 800);
-          }
+          };
+
+          const rzp = new window.Razorpay(options);
+          rzp.on('payment.failed', function(response) {
+            showToast(`❌ Payment Failed: ${response.error.description || 'Payment was not completed'}`, '#EF4444');
+          });
+          rzp.open();
 
         } catch (err) {
-          // Simulated smooth fallback for local dev
-          verifiedPaymentId = `pay_sim_${Date.now()}`;
-          unlockRegistrationSubmit();
+          console.error('Razorpay Error:', err);
+          showToast(`Payment Gateway Error: ${err.message}`, '#EF4444');
         }
       });
 
