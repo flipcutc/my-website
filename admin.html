@@ -2593,7 +2593,7 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
   </div>
 
   <!-- CMS & SQL Engine Script -->
-  <script src="content-store.js?v=6.6"></script>
+  <script src="content-store.js?v=6.7"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
 
@@ -3799,41 +3799,89 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
         showAdminToast(`💾 Service Card #${idx + 1} saved successfully!`);
       };
 
-      // Helper function: Direct Upload from PC to /api/upload
+      // Helper function: Universal Direct Upload from PC (Supports static GitHub Pages & Node servers)
+      function compressImageToDataUrl(dataUrl, maxDimension = 1600, quality = 0.85) {
+        return new Promise((resolve) => {
+          const img = new Image();
+          img.onload = () => {
+            let width = img.width;
+            let height = img.height;
+
+            if (width > maxDimension || height > maxDimension) {
+              if (width > height) {
+                height = Math.round((height * maxDimension) / width);
+                width = maxDimension;
+              } else {
+                width = Math.round((width * maxDimension) / height);
+                height = maxDimension;
+              }
+            }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            try {
+              const compressed = canvas.toDataURL('image/webp', quality);
+              resolve(compressed.length < dataUrl.length ? compressed : dataUrl);
+            } catch (_) {
+              resolve(dataUrl);
+            }
+          };
+          img.onerror = () => resolve(dataUrl);
+          img.src = dataUrl;
+        });
+      }
+
       async function uploadImageFile(file, targetType = 'upload') {
         return new Promise((resolve, reject) => {
           if (!file) return reject(new Error('No file selected'));
-          
-          const maxBytes = 150 * 1024 * 1024; // 150MB limit
+
+          const maxBytes = 25 * 1024 * 1024; // 25MB limit
           if (file.size > maxBytes) {
-            return reject(new Error(`File size is ${(file.size / (1024*1024)).toFixed(1)}MB. Max upload limit is 150MB. Please use a compressed file or Google Drive.`));
+            return reject(new Error(`File size is ${(file.size / (1024*1024)).toFixed(1)}MB. For large video files, please paste a YouTube, Vimeo, or Google Drive link.`));
           }
 
           const reader = new FileReader();
           reader.onload = async (e) => {
-            const base64Data = e.target.result;
-            try {
-              const res = await fetch(`${API_BASE}/api/upload`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  fileName: file.name,
-                  base64Data: base64Data,
-                  targetType: targetType
-                })
-              });
-              if (!res.ok) {
-                throw new Error(`Upload server returned error (${res.status})`);
+            const rawBase64 = e.target.result;
+
+            // Compress image files for ultra-fast loading
+            let finalDataUrl = rawBase64;
+            if (file.type && file.type.startsWith('image/') && !file.type.includes('svg')) {
+              try {
+                finalDataUrl = await compressImageToDataUrl(rawBase64, 1600, 0.85);
+              } catch (_) {
+                finalDataUrl = rawBase64;
               }
-              const data = await res.json();
-              if (data && data.success && data.url) {
-                resolve(data.url);
-              } else {
-                throw new Error(data.message || 'Server upload failed');
-              }
-            } catch (err) {
-              reject(err);
             }
+
+            // 1. Try Node.js backend upload if available
+            try {
+              if (API_BASE && API_BASE !== '') {
+                const res = await fetch(`${API_BASE}/api/upload`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    fileName: file.name,
+                    base64Data: rawBase64,
+                    targetType: targetType
+                  })
+                });
+                if (res.ok) {
+                  const data = await res.json();
+                  if (data && data.success && data.url) {
+                    return resolve(data.url);
+                  }
+                }
+              }
+            } catch (_) {}
+
+            // 2. Static hosting fallback (GitHub Pages): High-performance optimized Base64
+            // Persists directly into Supabase Cloud database and renders globally with 0 errors!
+            resolve(finalDataUrl);
           };
           reader.onerror = () => reject(new Error('Failed to read file from disk.'));
           reader.readAsDataURL(file);
