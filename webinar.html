@@ -688,7 +688,7 @@
   </div>
 
   <!-- Content Store & Razorpay SDK -->
-  <script src="content-store.js"></script>
+  <script src="content-store.js?v=6.2"></script>
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
   <!-- Script logic for Webinar registration & Razorpay Gate -->
@@ -745,55 +745,56 @@
         }
       }
 
-      // Fetch & Hydrate CMS Content
-      let siteContent = getSiteContent();
-      try {
-        if (typeof fetchAndSyncSiteContent === 'function') {
-          siteContent = await fetchAndSyncSiteContent();
-        }
-      } catch (err) {}
-
-      // Brand Logo Hydration
-      if (siteContent.brand) {
+      // Dynamic Webinar CMS Hydration Engine
+      function renderWebinarData(content) {
+        if (!content) return;
         const brandLogo = document.querySelector('.brand-logo-img');
-        if (brandLogo && siteContent.brand.logoUrl) brandLogo.src = siteContent.brand.logoUrl;
-        if (brandLogo && siteContent.brand.logoHeight) brandLogo.style.height = `${siteContent.brand.logoHeight}px`;
+        if (brandLogo && content.brand && content.brand.logoUrl) brandLogo.src = content.brand.logoUrl;
+        if (brandLogo && content.brand && content.brand.logoHeight) brandLogo.style.height = `${content.brand.logoHeight}px`;
+
+        const webinarCfg = content.webinar || {};
+        const price = (webinarCfg.price !== undefined && webinarCfg.price !== '') ? webinarCfg.price : '199';
+        const origPrice = webinarCfg.originalPrice || '999';
+
+        const setTxt = (id, text) => { const el = document.getElementById(id); if (el && text !== undefined) el.textContent = text; };
+        if (webinarCfg.badge) setTxt('webinarBadgePill', webinarCfg.badge);
+        if (webinarCfg.title) setTxt('webinarHeroTitle', webinarCfg.title);
+        if (webinarCfg.description) setTxt('webinarHeroDesc', webinarCfg.description);
+        if (webinarCfg.date) {
+          setTxt('webinarDateText', webinarCfg.date);
+          setTxt('webinarModalDateText', webinarCfg.date);
+        }
+        if (webinarCfg.duration) setTxt('webinarDurationText', webinarCfg.duration);
+        if (webinarCfg.seats) setTxt('webinarSeatsText', webinarCfg.seats);
+        if (webinarCfg.formTitle) setTxt('webinarFormTitle', webinarCfg.formTitle);
+        if (webinarCfg.formSubtitle) setTxt('webinarFormSubtitle', webinarCfg.formSubtitle);
+
+        setTxt('webinarTicketFeeText', `₹${price}`);
+        setTxt('webinarPriceDisplay', `₹${price}`);
+        setTxt('webinarOrigPriceDisplay', `₹${origPrice}`);
+        setTxt('btnPayRazorpayText', `Pay ₹${price} & Unlock Registration`);
+        setTxt('ticketPassAmountText', `₹${price} (Confirmed via Razorpay)`);
       }
 
-      const webinarCfg = siteContent.webinar || {
-        enabled: true,
-        badge: "Exclusive Live Masterclass Webinar",
-        title: "How to Build & Scale High-Converting Websites That Drive Real Sales",
-        description: "Join FlipCut Creation's lead architects for an interactive live session on building high-retention E-commerce, Portfolio, and Service sites with cinematic visual assets.",
-        date: "Saturday, 7:00 PM IST",
-        duration: "90 Minutes Live + Q&A",
-        seats: "Limited 100 Seats",
-        price: "199",
-        originalPrice: "999",
-        formTitle: "Fill Out Your Webinar Brief",
-        formSubtitle: "Enter your details, select your website type, and complete payment via GPay / Netbanking to unlock your pass.",
-        whatsappGroupMsg: "Hi FlipCut Team! I just registered for the Live Masterclass Webinar. Please add me to the VIP Group!"
-      };
+      // 1. Instant 0ms Pre-Hydration from local cache
+      let siteContent = getSiteContent();
+      renderWebinarData(siteContent);
 
-      // Hydrate UI elements
-      const setTxt = (id, text) => { const el = document.getElementById(id); if (el && text) el.textContent = text; };
-      setTxt('webinarBadgePill', webinarCfg.badge);
-      setTxt('webinarHeroTitle', webinarCfg.title);
-      setTxt('webinarHeroDesc', webinarCfg.description);
-      setTxt('webinarDateText', webinarCfg.date);
-      setTxt('webinarModalDateText', webinarCfg.date);
-      setTxt('webinarDurationText', webinarCfg.duration);
-      setTxt('webinarSeatsText', webinarCfg.seats);
-      setTxt('webinarTicketFeeText', `₹${webinarCfg.price}`);
-      setTxt('webinarFormTitle', webinarCfg.formTitle);
-      setTxt('webinarFormSubtitle', webinarCfg.formSubtitle);
-      setTxt('webinarPriceDisplay', `₹${webinarCfg.price}`);
-      setTxt('webinarOrigPriceDisplay', `₹${webinarCfg.originalPrice}`);
-      setTxt('btnPayRazorpayText', `Pay ₹${webinarCfg.price} & Unlock Registration`);
-      setTxt('ticketPassAmountText', `₹${webinarCfg.price} (Confirmed via Razorpay)`);
+      // 2. Real-time background sync from Supabase Cloud
+      if (typeof fetchAndSyncSiteContent === 'function') {
+        fetchAndSyncSiteContent().then(latestContent => {
+          if (latestContent) {
+            siteContent = latestContent;
+            renderWebinarData(latestContent);
+          }
+        }).catch(() => {});
+      }
 
-      // Current Price Amount Number
-      const webinarFeeAmount = parseInt(String(webinarCfg.price).replace(/[^0-9]/g, '')) || 199;
+      function getCurrentWebinarFee() {
+        const c = (typeof getSiteContent === 'function') ? getSiteContent() : siteContent;
+        const p = c?.webinar?.price;
+        return parseInt(String(p).replace(/[^0-9]/g, '')) || 199;
+      }
 
       // State variables
       let isPaymentCompleted = false;
@@ -846,7 +847,8 @@
 
         try {
           const liveKey = "rzp_live_TTd5UPSpFLKLor";
-          const amountInPaise = Math.round(Number(webinarFeeAmount || 199) * 100);
+          const currentFee = getCurrentWebinarFee();
+          const amountInPaise = Math.round(Number(currentFee) * 100);
 
           if (!window.Razorpay) {
             showToast('Razorpay Gateway is loading, please wait 2 seconds and click again.', '#F59E0B');

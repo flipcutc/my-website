@@ -23,6 +23,36 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   <style>
+    /* Toast Notification Pop-up in Admin Dashboard */
+    .toast-box {
+      position: fixed !important;
+      bottom: 32px !important;
+      right: 32px !important;
+      padding: 16px 26px !important;
+      background: var(--bg-surface, #10162B) !important;
+      border: 1.5px solid #10B981 !important;
+      border-radius: 14px !important;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 25px rgba(16, 185, 129, 0.35) !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 14px !important;
+      z-index: 9999999 !important;
+      transform: translateY(120px) !important;
+      opacity: 0 !important;
+      visibility: hidden !important;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+      pointer-events: none !important;
+      font-size: 0.95rem !important;
+      font-weight: 600 !important;
+      color: var(--text-primary, #F8FAFC) !important;
+    }
+    .toast-box.show {
+      transform: translateY(0) !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      pointer-events: auto !important;
+    }
+
     /* ==========================================================================
        SIDEBAR ADMIN DASHBOARD LAYOUT
        ========================================================================== */
@@ -2563,7 +2593,7 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
   </div>
 
   <!-- CMS & SQL Engine Script -->
-  <script src="content-store.js"></script>
+  <script src="content-store.js?v=6.2"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
 
