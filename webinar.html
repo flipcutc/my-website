@@ -17,7 +17,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=6.5">
+  <link rel="stylesheet" href="styles.css?v=6.6">
 
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -688,7 +688,7 @@
   </div>
 
   <!-- Content Store & Razorpay SDK -->
-  <script src="content-store.js?v=6.5"></script>
+  <script src="content-store.js?v=6.6"></script>
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
   <!-- Script logic for Webinar registration & Razorpay Gate -->
@@ -927,8 +927,8 @@
       };
 
       // Step 2: Final Submit
-      webinarForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
+      async function handleWebinarFinalSubmit(e) {
+        if (e) e.preventDefault();
         const webinarFeeAmount = getCurrentWebinarFee();
 
         if (!isPaymentCompleted) {
@@ -954,37 +954,64 @@
           amount: `₹${webinarFeeAmount}`,
           websiteType: websiteType,
           footage: `Website Type: ${websiteType}`,
-          paymentId: verifiedPaymentId,
-          orderId: verifiedOrderId,
+          paymentId: verifiedPaymentId || `pay_${Date.now()}`,
+          orderId: verifiedOrderId || '',
           paymentStatus: 'Paid & Verified',
           notes: `Webinar Registration Pass | User ID: ${generatedUserId} | Website Type: ${websiteType} | Payment ID: ${verifiedPaymentId}`,
           status: 'Booked / Paid'
         };
 
-        // Post to backend database
+        // 1. Direct push to Supabase Cloud Database (PostgreSQL)
+        try {
+          const supabaseLead = {
+            id: generatedUserId,
+            name: name,
+            email: email,
+            phone: phone,
+            service: 'Webinar Registration',
+            budget: `₹${webinarFeeAmount}`,
+            message: `Webinar Pass (${websiteType}) | Razorpay Payment ID: ${verifiedPaymentId}`,
+            status: 'Booked / Paid'
+          };
+          fetch('https://cznixvdphwbjdnnmapvb.supabase.co/rest/v1/leads', {
+            method: 'POST',
+            headers: {
+              apikey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6bml4dmRwaHdiamRubm1hcHZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTgwMTgsImV4cCI6MjEwMzEzNDAxOH0.dTLN1DCbUiBawZq8YlS5Bol-i81JFKhKpPKCboyocuQ',
+              Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6bml4dmRwaHdiamRubm1hcHZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTgwMTgsImV4cCI6MjEwMzEzNDAxOH0.dTLN1DCbUiBawZq8YlS5Bol-i81JFKhKpPKCboyocuQ',
+              'Content-Type': 'application/json',
+              Prefer: 'resolution=merge-duplicates,return=representation'
+            },
+            body: JSON.stringify(supabaseLead)
+          }).catch(() => {});
+        } catch (_) {}
+
+        // 2. Post to Node backend if available
         try {
           const apiBase = (typeof getContentApiBase === 'function') ? getContentApiBase() : '';
-          const res = await fetch(`${apiBase}/api/leads`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(leadPayload)
-          });
-          if (res.ok) {
-            const resData = await res.json();
-            if (resData.userId) generatedUserId = resData.userId;
+          if (apiBase) {
+            fetch(`${apiBase}/api/leads`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(leadPayload)
+            }).catch(() => {});
           }
-        } catch (err) {}
+        } catch (_) {}
 
-        leadPayload.userId = generatedUserId;
+        // 3. Save local cache
+        try {
+          const existing = JSON.parse(localStorage.getItem('flipcut_leads') || '[]');
+          existing.unshift({ ...leadPayload, id: Date.now(), date: new Date().toISOString().slice(0,10) });
+          localStorage.setItem('flipcut_leads', JSON.stringify(existing));
+        } catch (_) {}
 
-        // Save local cache
-        const existing = JSON.parse(localStorage.getItem('flipcut_leads') || '[]');
-        existing.unshift({ ...leadPayload, id: Date.now(), date: new Date().toISOString().slice(0,10) });
-        localStorage.setItem('flipcut_leads', JSON.stringify(existing));
-
-        // Display Ticket Modal
+        // 4. Display Digital Ticket Pass Confirmation Modal
         showTicketModal(name, websiteType, verifiedPaymentId, generatedUserId);
-      });
+      }
+
+      webinarForm.addEventListener('submit', handleWebinarFinalSubmit);
+      if (btnFinalSubmit) {
+        btnFinalSubmit.addEventListener('click', handleWebinarFinalSubmit);
+      }
 
       // Ticket Modal Display
       const ticketSuccessModal = document.getElementById('ticketSuccessModal');
@@ -998,15 +1025,26 @@
         const uidEl = document.getElementById('ticketUserId');
         if (uidEl) uidEl.textContent = uid;
 
-        document.getElementById('ticketClientName').textContent = name;
-        document.getElementById('ticketHolderName').textContent = name;
-        document.getElementById('ticketWebsiteType').textContent = websiteType;
-        document.getElementById('ticketPaymentId').textContent = payId || `pay_${Date.now()}`;
+        const currentFee = getCurrentWebinarFee();
+        const clientNameEl = document.getElementById('ticketClientName');
+        if (clientNameEl) clientNameEl.textContent = name;
+        
+        const holderNameEl = document.getElementById('ticketHolderName');
+        if (holderNameEl) holderNameEl.textContent = name;
+        
+        const typeEl = document.getElementById('ticketWebsiteType');
+        if (typeEl) typeEl.textContent = websiteType;
+        
+        const payIdEl = document.getElementById('ticketPaymentId');
+        if (payIdEl) payIdEl.textContent = payId || `pay_${Date.now()}`;
+
+        const passAmtEl = document.getElementById('ticketPassAmountText');
+        if (passAmtEl) passAmtEl.textContent = `₹${currentFee} (Confirmed via Razorpay)`;
 
         const waBtn = document.getElementById('ticketWhatsAppBtn');
         if (waBtn) {
-          const waNum = (siteContent.contact && siteContent.contact.whatsappNum) ? siteContent.contact.whatsappNum.replace(/[^0-9]/g, '') : '917010270151';
-          const defaultMsg = webinarCfg.whatsappGroupMsg || `Hi FlipCut Team! I just registered for the Live Webinar [User ID: ${uid}, Payment ID: ${payId}]. Please add me to the VIP Group!`;
+          const waNum = (siteContent?.contact?.whatsappNum) ? siteContent.contact.whatsappNum.replace(/[^0-9]/g, '') : '917010270151';
+          const defaultMsg = siteContent?.webinar?.whatsappGroupMsg || `Hi FlipCut Team! I just registered for the Live Webinar [User ID: ${uid}, Payment ID: ${payId}]. Please add me to the VIP Group!`;
           const msg = encodeURIComponent(`${defaultMsg} [User ID: ${uid}]`);
           waBtn.href = `https://wa.me/${waNum}?text=${msg}`;
         }
