@@ -17,7 +17,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=6.9">
+  <link rel="stylesheet" href="styles.css?v=7.0">
 
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -688,7 +688,7 @@
   </div>
 
   <!-- Content Store & Razorpay SDK -->
-  <script src="content-store.js?v=6.9"></script>
+  <script src="content-store.js?v=7.0"></script>
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
   <!-- Script logic for Webinar registration & Razorpay Gate -->
@@ -834,6 +834,20 @@
         return selected ? selected.value : 'E-commerce';
       }
 
+      // Pre-fill inputs from saved draft if available
+      try {
+        const savedDraft = JSON.parse(localStorage.getItem('flipcut_webinar_active_draft') || '{}');
+        if (savedDraft.name && document.getElementById('webinarName') && !document.getElementById('webinarName').value) {
+          document.getElementById('webinarName').value = savedDraft.name;
+        }
+        if (savedDraft.phone && document.getElementById('webinarPhone') && !document.getElementById('webinarPhone').value) {
+          document.getElementById('webinarPhone').value = savedDraft.phone;
+        }
+        if (savedDraft.email && document.getElementById('webinarEmail') && !document.getElementById('webinarEmail').value) {
+          document.getElementById('webinarEmail').value = savedDraft.email;
+        }
+      } catch (_) {}
+
       // Step 1: Pay via Razorpay
       btnPayRazorpay.addEventListener('click', async () => {
         if (!validateWebinarInputs()) return;
@@ -842,12 +856,18 @@
         const phone = document.getElementById('webinarPhone').value.trim();
         const email = document.getElementById('webinarEmail').value.trim();
         const websiteType = getSelectedWebsiteType();
+        const webinarFeeAmount = getCurrentWebinarFee();
+
+        try {
+          localStorage.setItem('flipcut_webinar_active_draft', JSON.stringify({
+            name, phone, email, websiteType, webinarFeeAmount, timestamp: Date.now()
+          }));
+        } catch (_) {}
 
         showToast('Opening Razorpay Payment Gateway (GPay, UPI, Cards)...', 'var(--brand-indigo)');
 
         try {
           const liveKey = "rzp_live_TTd5UPSpFLKLor";
-          const webinarFeeAmount = getCurrentWebinarFee();
           const amountInPaise = Math.round(Number(webinarFeeAmount) * 100);
 
           if (!window.Razorpay) {
@@ -883,19 +903,17 @@
             handler: async function(response) {
               if (response && response.razorpay_payment_id) {
                 verifiedPaymentId = response.razorpay_payment_id;
+                try { localStorage.setItem('flipcut_webinar_last_pay_id', verifiedPaymentId); } catch (_) {}
                 isPaymentCompleted = true;
                 unlockRegistrationSubmit();
-                try {
-                  await handleWebinarFinalSubmit();
-                } catch (submitErr) {
-                  console.error('Final submit note:', submitErr);
-                  showTicketModal(
-                    document.getElementById('webinarName').value.trim() || 'Valued Creator',
-                    getSelectedWebsiteType(),
-                    verifiedPaymentId,
-                    'FC-WEB-' + Math.floor(10000 + Math.random() * 90000)
-                  );
-                }
+
+                const generatedUserId = 'FC-WEB-' + Math.floor(10000 + Math.random() * 90000);
+
+                // 1. Show Ticket Pass Modal IMMEDIATELY (0ms lag)
+                showTicketModal(name, websiteType, verifiedPaymentId, generatedUserId);
+
+                // 2. Submit lead to Supabase Cloud Database permanently
+                await handleWebinarFinalSubmit(null, generatedUserId, verifiedPaymentId, name, phone, email, websiteType, webinarFeeAmount);
               } else {
                 showToast('Payment verification pending. Please try again.', '#EF4444');
               }
@@ -939,22 +957,21 @@
         }
       };
 
-      // Step 2: Final Submit
-      async function handleWebinarFinalSubmit(e) {
-        if (e) e.preventDefault();
-        const webinarFeeAmount = getCurrentWebinarFee();
+      // Step 2: Final Submit & Cloud Database Sync
+      async function handleWebinarFinalSubmit(e, explicitUid, explicitPayId, explicitName, explicitPhone, explicitEmail, explicitType, explicitAmount) {
+        if (e && e.preventDefault) e.preventDefault();
 
-        if (!isPaymentCompleted) {
-          showToast(`Please complete the ₹${webinarFeeAmount} Razorpay payment first to unlock submission.`, '#EF4444');
-          return;
-        }
+        const savedDraft = JSON.parse(localStorage.getItem('flipcut_webinar_active_draft') || '{}');
+        const webinarFeeAmount = explicitAmount || getCurrentWebinarFee();
+        const payId = explicitPayId || verifiedPaymentId || localStorage.getItem('flipcut_webinar_last_pay_id') || `pay_${Date.now()}`;
+        const name = explicitName || (document.getElementById('webinarName')?.value || savedDraft.name || 'Valued Creator').trim();
+        const phone = explicitPhone || (document.getElementById('webinarPhone')?.value || savedDraft.phone || '').trim();
+        const email = explicitEmail || (document.getElementById('webinarEmail')?.value || savedDraft.email || '').trim();
+        const websiteType = explicitType || getSelectedWebsiteType() || savedDraft.websiteType || 'E-commerce';
+        const generatedUserId = explicitUid || ('FC-WEB-' + Math.floor(10000 + Math.random() * 90000));
 
-        const name = document.getElementById('webinarName').value.trim();
-        const phone = document.getElementById('webinarPhone').value.trim();
-        const email = document.getElementById('webinarEmail').value.trim();
-        const websiteType = getSelectedWebsiteType();
-
-        let generatedUserId = 'FC-WEB-' + Math.floor(10000 + Math.random() * 90000);
+        // Display Ticket Modal synchronously
+        showTicketModal(name, websiteType, payId, generatedUserId);
 
         const leadPayload = {
           userId: generatedUserId,
@@ -967,14 +984,14 @@
           amount: `₹${webinarFeeAmount}`,
           websiteType: websiteType,
           footage: `Website Type: ${websiteType}`,
-          paymentId: verifiedPaymentId || `pay_${Date.now()}`,
+          paymentId: payId,
           orderId: verifiedOrderId || '',
           paymentStatus: 'Paid & Verified',
-          notes: `Webinar Registration Pass | User ID: ${generatedUserId} | Website Type: ${websiteType} | Payment ID: ${verifiedPaymentId}`,
+          notes: `Webinar Registration Pass | User ID: ${generatedUserId} | Website Type: ${websiteType} | Payment ID: ${payId}`,
           status: 'Booked / Paid'
         };
 
-        // 1. Direct push to Supabase Cloud Database (PostgreSQL)
+        // 1. Direct push to Supabase Cloud Database (PostgreSQL leads table)
         try {
           const supabaseLead = {
             id: generatedUserId,
@@ -983,7 +1000,7 @@
             phone: phone,
             service: 'Webinar Registration',
             budget: `₹${webinarFeeAmount}`,
-            message: `Webinar Pass (${websiteType}) | Razorpay Payment ID: ${verifiedPaymentId}`,
+            message: `Webinar Pass (${websiteType}) | Razorpay Payment ID: ${payId}`,
             status: 'Booked / Paid'
           };
           fetch('https://cznixvdphwbjdnnmapvb.supabase.co/rest/v1/leads', {
@@ -995,7 +1012,7 @@
               Prefer: 'resolution=merge-duplicates,return=representation'
             },
             body: JSON.stringify(supabaseLead)
-          }).catch(() => {});
+          }).catch((err) => console.warn('Supabase lead note:', err));
         } catch (_) {}
 
         // 2. Post to Node backend if available
@@ -1016,15 +1033,24 @@
           existing.unshift({ ...leadPayload, id: Date.now(), date: new Date().toISOString().slice(0,10) });
           localStorage.setItem('flipcut_leads', JSON.stringify(existing));
         } catch (_) {}
-
-        // 4. Display Digital Ticket Pass Confirmation Modal
-        showTicketModal(name, websiteType, verifiedPaymentId, generatedUserId);
       }
 
       webinarForm.addEventListener('submit', handleWebinarFinalSubmit);
       if (btnFinalSubmit) {
         btnFinalSubmit.addEventListener('click', handleWebinarFinalSubmit);
       }
+
+      // Check if user returned from UPI App / Razorpay Redirect with payment ID in URL
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlPaymentId = urlParams.get('razorpay_payment_id') || urlParams.get('payment_id');
+        if (urlPaymentId) {
+          verifiedPaymentId = urlPaymentId;
+          isPaymentCompleted = true;
+          unlockRegistrationSubmit();
+          handleWebinarFinalSubmit(null, null, urlPaymentId);
+        }
+      } catch (_) {}
 
       // Ticket Modal Display
       const ticketSuccessModal = document.getElementById('ticketSuccessModal');
