@@ -17,7 +17,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=7.1">
+  <link rel="stylesheet" href="styles.css?v=7.2">
 
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -594,6 +594,14 @@
             <span>Submit Webinar Registration</span>
           </button>
 
+          <!-- Instant Direct WhatsApp Support Pill -->
+          <div style="margin-top: 14px; text-align: center;">
+            <a id="btnWebinarWaSupport" href="https://wa.me/917010270151?text=Hi%20FlipCut%20Team!%20I%20have%20a%20question%20regarding%20the%20Webinar%20Masterclass%20Registration." target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #25D366; font-weight: 600; text-decoration: none; padding: 6px 14px; border-radius: 20px; background: rgba(37, 211, 102, 0.08); border: 1px solid rgba(37, 211, 102, 0.25); transition: all 0.2s ease;">
+              <i class="fa-brands fa-whatsapp" style="font-size: 1.05rem;"></i>
+              <span>Need Instant Help? WhatsApp +91 70102 70151</span>
+            </a>
+          </div>
+
         </div>
 
       </form>
@@ -688,7 +696,7 @@
   </div>
 
   <!-- Content Store & Razorpay SDK -->
-  <script src="content-store.js?v=7.1"></script>
+  <script src="content-store.js?v=7.2"></script>
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
   <!-- Script logic for Webinar registration & Razorpay Gate -->
@@ -922,13 +930,28 @@
 
           const rzp = new window.Razorpay(options);
           rzp.on('payment.failed', function(response) {
-            showToast(`❌ Payment Failed: ${response.error.description || 'Payment was not completed'}`, '#EF4444');
+            const errDesc = response?.error?.description || 'Payment was not completed';
+            showToast(`❌ Payment Issue: ${errDesc}`, '#EF4444');
+            const waSupport = document.getElementById('btnWebinarWaSupport');
+            if (waSupport) {
+              const msg = encodeURIComponent(`Hi FlipCut Team! I experienced an issue paying on your website: "${errDesc}". Please help me register! Name: ${name}, Phone: ${phone}`);
+              waSupport.href = `https://wa.me/917010270151?text=${msg}`;
+              waSupport.style.background = 'rgba(239, 68, 68, 0.12)';
+              waSupport.style.borderColor = '#EF4444';
+              waSupport.style.color = '#EF4444';
+              waSupport.innerHTML = `<i class="fa-brands fa-whatsapp"></i> <span>Report Issue via WhatsApp (+91 70102 70151)</span>`;
+            }
           });
           rzp.open();
 
         } catch (err) {
           console.error('Razorpay Error:', err);
           showToast(`Payment Gateway Error: ${err.message}`, '#EF4444');
+          const waSupport = document.getElementById('btnWebinarWaSupport');
+          if (waSupport) {
+            const msg = encodeURIComponent(`Hi FlipCut Team! Payment Gateway Error: "${err.message}". Name: ${name}, Phone: ${phone}`);
+            waSupport.href = `https://wa.me/917010270151?text=${msg}`;
+          }
         }
       });
 
