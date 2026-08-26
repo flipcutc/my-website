@@ -17,7 +17,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=6.4">
+  <link rel="stylesheet" href="styles.css?v=6.5">
 
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -688,7 +688,7 @@
   </div>
 
   <!-- Content Store & Razorpay SDK -->
-  <script src="content-store.js?v=6.4"></script>
+  <script src="content-store.js?v=6.5"></script>
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
   <!-- Script logic for Webinar registration & Razorpay Gate -->
@@ -847,8 +847,8 @@
 
         try {
           const liveKey = "rzp_live_TTd5UPSpFLKLor";
-          const currentFee = getCurrentWebinarFee();
-          const amountInPaise = Math.round(Number(currentFee) * 100);
+          const webinarFeeAmount = getCurrentWebinarFee();
+          const amountInPaise = Math.round(Number(webinarFeeAmount) * 100);
 
           if (!window.Razorpay) {
             showToast('Razorpay Gateway is loading, please wait 2 seconds and click again.', '#F59E0B');
@@ -929,6 +929,7 @@
       // Step 2: Final Submit
       webinarForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+        const webinarFeeAmount = getCurrentWebinarFee();
 
         if (!isPaymentCompleted) {
           showToast(`Please complete the ₹${webinarFeeAmount} Razorpay payment first to unlock submission.`, '#EF4444');
