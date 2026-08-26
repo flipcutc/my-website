@@ -1545,31 +1545,53 @@ document.addEventListener('DOMContentLoaded', () => {
         notes: notes
       };
 
-      // 1. Submit to Node Express Backend & Local Storage API
+      // 1. Submit directly to Supabase Cloud Database (PostgreSQL)
       let assignedUserId = 'FC-REG-' + Math.floor(10000 + Math.random() * 90000);
       try {
-        const apiBase = (typeof getContentApiBase === 'function') ? getContentApiBase() : '';
-        const response = await fetch(`${apiBase}/api/leads`, {
+        const supabaseLead = {
+          id: assignedUserId,
+          name: name,
+          email: email,
+          phone: phone,
+          service: serviceLabels[serviceType] || serviceType,
+          budget: budgetLabels[budget] || budget,
+          message: `Footage: ${footage || 'None'} | Notes: ${notes || 'None'}`,
+          status: 'New'
+        };
+        fetch('https://cznixvdphwbjdnnmapvb.supabase.co/rest/v1/leads', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...leadPayload, userId: assignedUserId })
-        });
-        if (response.ok) {
-          const resData = await response.json();
-          if (resData.userId) assignedUserId = resData.userId;
+          headers: {
+            apikey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6bml4dmRwaHdiamRubm1hcHZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTgwMTgsImV4cCI6MjEwMzEzNDAxOH0.dTLN1DCbUiBawZq8YlS5Bol-i81JFKhKpPKCboyocuQ',
+            Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6bml4dmRwaHdiamRubm1hcHZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTgwMTgsImV4cCI6MjEwMzEzNDAxOH0.dTLN1DCbUiBawZq8YlS5Bol-i81JFKhKpPKCboyocuQ',
+            'Content-Type': 'application/json',
+            Prefer: 'resolution=merge-duplicates,return=representation'
+          },
+          body: JSON.stringify(supabaseLead)
+        }).catch(() => {});
+      } catch (_) {}
+
+      // 2. Submit to Node Express Backend if active
+      try {
+        const apiBase = (typeof getContentApiBase === 'function') ? getContentApiBase() : '';
+        if (apiBase) {
+          fetch(`${apiBase}/api/leads`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...leadPayload, userId: assignedUserId })
+          }).catch(() => {});
         }
-      } catch (networkErr) {
-        console.warn('Backend API offline, saving to local cache:', networkErr);
-      }
+      } catch (_) {}
 
       leadPayload.userId = assignedUserId;
 
-      // 2. Also keep in LocalStorage for offline instant access
-      const existingLeads = JSON.parse(localStorage.getItem('flipcut_leads') || '[]');
-      existingLeads.unshift({ ...leadPayload, id: Date.now(), date: new Date().toISOString().slice(0, 10), status: 'New' });
-      localStorage.setItem('flipcut_leads', JSON.stringify(existingLeads));
+      // 3. Also keep in LocalStorage for offline instant access
+      try {
+        const existingLeads = JSON.parse(localStorage.getItem('flipcut_leads') || '[]');
+        existingLeads.unshift({ ...leadPayload, id: Date.now(), date: new Date().toISOString().slice(0, 10), status: 'New' });
+        localStorage.setItem('flipcut_leads', JSON.stringify(existingLeads));
+      } catch (_) {}
 
-      // 3. Trigger Luxury Success Popup Modal
+      // 4. Trigger Luxury Success Popup Modal
       showBriefSuccessModal(leadPayload);
       showToast(`🎉 Registration Successful! User ID: ${assignedUserId}`, '#10B981');
       inquiryForm.reset();
