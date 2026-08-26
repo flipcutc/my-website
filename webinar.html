@@ -17,7 +17,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=6.8">
+  <link rel="stylesheet" href="styles.css?v=6.9">
 
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -688,7 +688,7 @@
   </div>
 
   <!-- Content Store & Razorpay SDK -->
-  <script src="content-store.js?v=6.8"></script>
+  <script src="content-store.js?v=6.9"></script>
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
   <!-- Script logic for Webinar registration & Razorpay Gate -->
@@ -880,10 +880,22 @@
                 showToast('Payment window closed. Please complete the ₹' + webinarFeeAmount + ' payment to unlock your pass.', '#EF4444');
               }
             },
-            handler: function(response) {
+            handler: async function(response) {
               if (response && response.razorpay_payment_id) {
                 verifiedPaymentId = response.razorpay_payment_id;
+                isPaymentCompleted = true;
                 unlockRegistrationSubmit();
+                try {
+                  await handleWebinarFinalSubmit();
+                } catch (submitErr) {
+                  console.error('Final submit note:', submitErr);
+                  showTicketModal(
+                    document.getElementById('webinarName').value.trim() || 'Valued Creator',
+                    getSelectedWebsiteType(),
+                    verifiedPaymentId,
+                    'FC-WEB-' + Math.floor(10000 + Math.random() * 90000)
+                  );
+                }
               } else {
                 showToast('Payment verification pending. Please try again.', '#EF4444');
               }
@@ -907,7 +919,8 @@
         btnPayRazorpay.style.display = 'none';
         paymentVerifiedBanner.classList.add('active');
         btnFinalSubmit.style.display = 'flex';
-        showToast('✅ Payment Successful! Submit button unlocked below.', '#10B981');
+        btnFinalSubmit.removeAttribute('disabled');
+        showToast('✅ Payment Successful! Locking your seat...', '#10B981');
       }
 
       // Copy Ticket User ID Helper
@@ -1049,16 +1062,31 @@
           waBtn.href = `https://wa.me/${waNum}?text=${msg}`;
         }
 
+        ticketSuccessModal.style.display = 'flex';
+        ticketSuccessModal.style.opacity = '1';
+        ticketSuccessModal.style.visibility = 'visible';
+        ticketSuccessModal.style.zIndex = '9999999';
         ticketSuccessModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
       }
 
       function closeTicketModal() {
-        if (ticketSuccessModal) ticketSuccessModal.classList.remove('active');
-        window.location.href = 'index.html';
+        if (ticketSuccessModal) {
+          ticketSuccessModal.classList.remove('active');
+          ticketSuccessModal.style.display = 'none';
+          ticketSuccessModal.style.opacity = '0';
+          ticketSuccessModal.style.visibility = 'hidden';
+        }
+        document.body.style.overflow = '';
       }
 
       if (ticketModalCloseBtn) ticketModalCloseBtn.addEventListener('click', closeTicketModal);
-      if (ticketDoneBtn) ticketDoneBtn.addEventListener('click', closeTicketModal);
+      if (ticketDoneBtn) {
+        ticketDoneBtn.addEventListener('click', () => {
+          closeTicketModal();
+          window.location.href = 'index.html';
+        });
+      }
 
       // Mobile Navigation Drawer Handlers
       const mobileMenuBtn = document.getElementById('mobileMenuBtn');
