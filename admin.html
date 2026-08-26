@@ -2593,7 +2593,7 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
   </div>
 
   <!-- CMS & SQL Engine Script -->
-  <script src="content-store.js?v=6.2"></script>
+  <script src="content-store.js?v=6.3"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
 
@@ -4863,48 +4863,46 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
         if (!content) content = getSiteContent();
 
         const getCheck = (id, def = true) => { const el = document.getElementById(id); return el ? el.checked : def; };
-        const getVal = (id, def = '') => { 
+        const getVal = (id, currentVal = '') => { 
           const el = document.getElementById(id); 
-          if (!el) return def || '';
-          const v = el.value.trim();
-          if (v === '' && def !== undefined && def !== '') return def;
-          return el.value;
+          if (!el) return currentVal !== undefined ? currentVal : '';
+          return el.value !== undefined ? el.value : currentVal;
         };
 
         // Collect Comprehensive Section, Header & Card Visibility
         content.sectionsVisibility = {
           // 1. Header Controls
-          headerBadge: getCheck('toggleHeadBadge'),
-          headerThemeToggle: getCheck('toggleHeadTheme'),
-          headerCta: getCheck('toggleHeadCta'),
-          navWebinarPill: getCheck('toggleHeadWebinar'),
+          headerBadge: getCheck('toggleHeadBadge', content.sectionsVisibility?.headerBadge),
+          headerThemeToggle: getCheck('toggleHeadTheme', content.sectionsVisibility?.headerThemeToggle),
+          headerCta: getCheck('toggleHeadCta', content.sectionsVisibility?.headerCta),
+          navWebinarPill: getCheck('toggleHeadWebinar', content.sectionsVisibility?.navWebinarPill),
 
           // 2. All 13 Major Page Sections
-          hero: getCheck('toggleSecHero'),
-          runningBanner: getCheck('toggleSecRunningBanner'),
-          about: getCheck('toggleSecAbout'),
-          dailyPrompts: getCheck('toggleSecDailyPrompts'),
-          services: getCheck('toggleSecServices'),
-          workflow: getCheck('toggleSecWorkflow'),
-          portfolio: getCheck('toggleSecPortfolio'),
-          whyUs: getCheck('toggleSecWhyUs'),
-          pricing: getCheck('toggleSecPricing'),
-          testimonials: getCheck('toggleSecTestimonials'),
-          calculator: getCheck('toggleSecCalculator'),
-          contact: getCheck('toggleSecContact'),
-          footer: getCheck('toggleSecFooter'),
+          hero: getCheck('toggleSecHero', content.sectionsVisibility?.hero),
+          runningBanner: getCheck('toggleSecRunningBanner', content.sectionsVisibility?.runningBanner),
+          about: getCheck('toggleSecAbout', content.sectionsVisibility?.about),
+          dailyPrompts: getCheck('toggleSecDailyPrompts', content.sectionsVisibility?.dailyPrompts),
+          services: getCheck('toggleSecServices', content.sectionsVisibility?.services),
+          workflow: getCheck('toggleSecWorkflow', content.sectionsVisibility?.workflow),
+          portfolio: getCheck('toggleSecPortfolio', content.sectionsVisibility?.portfolio),
+          whyUs: getCheck('toggleSecWhyUs', content.sectionsVisibility?.whyUs),
+          pricing: getCheck('toggleSecPricing', content.sectionsVisibility?.pricing),
+          testimonials: getCheck('toggleSecTestimonials', content.sectionsVisibility?.testimonials),
+          calculator: getCheck('toggleSecCalculator', content.sectionsVisibility?.calculator),
+          contact: getCheck('toggleSecContact', content.sectionsVisibility?.contact),
+          footer: getCheck('toggleSecFooter', content.sectionsVisibility?.footer),
 
           // 3. Specific Cards & Feature Modules
-          heroStats: getCheck('toggleCardHeroStats'),
-          heroVideoCard: getCheck('toggleCardHeroVideo'),
-          aboutPillars: getCheck('toggleCardAboutPillars'),
-          beforeAfterSlider: getCheck('toggleCardBeforeAfter'),
-          portfolioFilters: getCheck('toggleCardPortfolioFilters'),
-          whyUsGrid: getCheck('toggleCardWhyUsGrid'),
-          techStack: getCheck('toggleCardTechStack'),
-          contactDriveLink: getCheck('toggleCardDriveLink'),
-          floatingWhatsApp: getCheck('toggleFloatingWa'),
-          backToTopBtn: getCheck('toggleBackToTop')
+          heroStats: getCheck('toggleCardHeroStats', content.sectionsVisibility?.heroStats),
+          heroVideoCard: getCheck('toggleCardHeroVideo', content.sectionsVisibility?.heroVideoCard),
+          aboutPillars: getCheck('toggleCardAboutPillars', content.sectionsVisibility?.aboutPillars),
+          beforeAfterSlider: getCheck('toggleCardBeforeAfter', content.sectionsVisibility?.beforeAfterSlider),
+          portfolioFilters: getCheck('toggleCardPortfolioFilters', content.sectionsVisibility?.portfolioFilters),
+          whyUsGrid: getCheck('toggleCardWhyUsGrid', content.sectionsVisibility?.whyUsGrid),
+          techStack: getCheck('toggleCardTechStack', content.sectionsVisibility?.techStack),
+          contactDriveLink: getCheck('toggleCardDriveLink', content.sectionsVisibility?.contactDriveLink),
+          floatingWhatsApp: getCheck('toggleFloatingWa', content.sectionsVisibility?.floatingWhatsApp),
+          backToTopBtn: getCheck('toggleBackToTop', content.sectionsVisibility?.backToTopBtn)
         };
 
         // Collect Running Banner Items
@@ -4926,44 +4924,44 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
 
         // Brand
         if (!content.brand) content.brand = {};
-        if (document.getElementById('cfgBrandName')) content.brand.name = getVal('cfgBrandName');
-        if (document.getElementById('cfgLogoUrl')) content.brand.logoUrl = getVal('cfgLogoUrl');
-        if (document.getElementById('cfgLogoHeight')) content.brand.logoHeight = parseInt(getVal('cfgLogoHeight')) || 46;
-        if (document.getElementById('cfgHeaderBadge')) content.brand.headerBadge = getVal('cfgHeaderBadge');
+        if (document.getElementById('cfgBrandName')) content.brand.name = getVal('cfgBrandName', content.brand.name);
+        if (document.getElementById('cfgLogoUrl')) content.brand.logoUrl = getVal('cfgLogoUrl', content.brand.logoUrl);
+        if (document.getElementById('cfgLogoHeight')) content.brand.logoHeight = parseInt(getVal('cfgLogoHeight', content.brand.logoHeight)) || 46;
+        if (document.getElementById('cfgHeaderBadge')) content.brand.headerBadge = getVal('cfgHeaderBadge', content.brand.headerBadge);
 
         // Hero
         if (!content.hero) content.hero = {};
-        if (document.getElementById('cfgHeroTitlePrefix')) content.hero.titlePrefix = getVal('cfgHeroTitlePrefix');
-        if (document.getElementById('cfgHeroTitleGrad')) content.hero.titleGradient = getVal('cfgHeroTitleGrad');
-        if (document.getElementById('cfgHeroTitleSuffix')) content.hero.titleSuffix = getVal('cfgHeroTitleSuffix');
-        if (document.getElementById('cfgHeroDesc')) content.hero.description = getVal('cfgHeroDesc');
-        if (document.getElementById('cfgHeroImg')) content.hero.videoPreviewImg = getVal('cfgHeroImg');
-        if (document.getElementById('cfgHeroVideoUrl')) content.hero.videoEmbedUrl = getVal('cfgHeroVideoUrl');
-        if (document.getElementById('cfgStat1Num')) content.hero.stat1Number = getVal('cfgStat1Num');
-        if (document.getElementById('cfgStat1Lbl')) content.hero.stat1Label = getVal('cfgStat1Lbl');
-        if (document.getElementById('cfgStat2Num')) content.hero.stat2Number = getVal('cfgStat2Num');
-        if (document.getElementById('cfgStat2Lbl')) content.hero.stat2Label = getVal('cfgStat2Lbl');
-        if (document.getElementById('cfgStat3Num')) content.hero.stat3Number = getVal('cfgStat3Num');
-        if (document.getElementById('cfgStat3Lbl')) content.hero.stat3Label = getVal('cfgStat3Lbl');
-        if (document.getElementById('cfgStat4Num')) content.hero.stat4Number = getVal('cfgStat4Num');
-        if (document.getElementById('cfgStat4Lbl')) content.hero.stat4Label = getVal('cfgStat4Lbl');
+        if (document.getElementById('cfgHeroTitlePrefix')) content.hero.titlePrefix = getVal('cfgHeroTitlePrefix', content.hero.titlePrefix);
+        if (document.getElementById('cfgHeroTitleGrad')) content.hero.titleGradient = getVal('cfgHeroTitleGrad', content.hero.titleGradient);
+        if (document.getElementById('cfgHeroTitleSuffix')) content.hero.titleSuffix = getVal('cfgHeroTitleSuffix', content.hero.titleSuffix);
+        if (document.getElementById('cfgHeroDesc')) content.hero.description = getVal('cfgHeroDesc', content.hero.description);
+        if (document.getElementById('cfgHeroImg')) content.hero.videoPreviewImg = getVal('cfgHeroImg', content.hero.videoPreviewImg);
+        if (document.getElementById('cfgHeroVideoUrl')) content.hero.videoEmbedUrl = getVal('cfgHeroVideoUrl', content.hero.videoEmbedUrl);
+        if (document.getElementById('cfgStat1Num')) content.hero.stat1Number = getVal('cfgStat1Num', content.hero.stat1Number);
+        if (document.getElementById('cfgStat1Lbl')) content.hero.stat1Label = getVal('cfgStat1Lbl', content.hero.stat1Label);
+        if (document.getElementById('cfgStat2Num')) content.hero.stat2Number = getVal('cfgStat2Num', content.hero.stat2Number);
+        if (document.getElementById('cfgStat2Lbl')) content.hero.stat2Label = getVal('cfgStat2Lbl', content.hero.stat2Label);
+        if (document.getElementById('cfgStat3Num')) content.hero.stat3Number = getVal('cfgStat3Num', content.hero.stat3Number);
+        if (document.getElementById('cfgStat3Lbl')) content.hero.stat3Label = getVal('cfgStat3Lbl', content.hero.stat3Label);
+        if (document.getElementById('cfgStat4Num')) content.hero.stat4Number = getVal('cfgStat4Num', content.hero.stat4Number);
+        if (document.getElementById('cfgStat4Lbl')) content.hero.stat4Label = getVal('cfgStat4Lbl', content.hero.stat4Label);
 
         // About
         if (!content.about) content.about = {};
-        if (document.getElementById('cfgAboutTitle')) content.about.title = getVal('cfgAboutTitle');
-        if (document.getElementById('cfgAboutDesc')) content.about.description = getVal('cfgAboutDesc');
-        if (document.getElementById('cfgPillar1Title')) content.about.pillar1Title = getVal('cfgPillar1Title');
-        if (document.getElementById('cfgPillar1Desc')) content.about.pillar1Desc = getVal('cfgPillar1Desc');
-        if (document.getElementById('cfgPillar2Title')) content.about.pillar2Title = getVal('cfgPillar2Title');
-        if (document.getElementById('cfgPillar2Desc')) content.about.pillar2Desc = getVal('cfgPillar2Desc');
-        if (document.getElementById('cfgPillar3Title')) content.about.pillar3Title = getVal('cfgPillar3Title');
-        if (document.getElementById('cfgPillar3Desc')) content.about.pillar3Desc = getVal('cfgPillar3Desc');
+        if (document.getElementById('cfgAboutTitle')) content.about.title = getVal('cfgAboutTitle', content.about.title);
+        if (document.getElementById('cfgAboutDesc')) content.about.description = getVal('cfgAboutDesc', content.about.description);
+        if (document.getElementById('cfgPillar1Title')) content.about.pillar1Title = getVal('cfgPillar1Title', content.about.pillar1Title);
+        if (document.getElementById('cfgPillar1Desc')) content.about.pillar1Desc = getVal('cfgPillar1Desc', content.about.pillar1Desc);
+        if (document.getElementById('cfgPillar2Title')) content.about.pillar2Title = getVal('cfgPillar2Title', content.about.pillar2Title);
+        if (document.getElementById('cfgPillar2Desc')) content.about.pillar2Desc = getVal('cfgPillar2Desc', content.about.pillar2Desc);
+        if (document.getElementById('cfgPillar3Title')) content.about.pillar3Title = getVal('cfgPillar3Title', content.about.pillar3Title);
+        if (document.getElementById('cfgPillar3Desc')) content.about.pillar3Desc = getVal('cfgPillar3Desc', content.about.pillar3Desc);
 
         // Daily Prompts
         if (!content.dailyPrompts) content.dailyPrompts = { items: [] };
-        if (document.getElementById('cfgPromptSubtitle')) content.dailyPrompts.subtitle = getVal('cfgPromptSubtitle');
-        if (document.getElementById('cfgPromptTitle')) content.dailyPrompts.title = getVal('cfgPromptTitle');
-        if (document.getElementById('cfgPromptDesc')) content.dailyPrompts.description = getVal('cfgPromptDesc');
+        if (document.getElementById('cfgPromptSubtitle')) content.dailyPrompts.subtitle = getVal('cfgPromptSubtitle', content.dailyPrompts.subtitle);
+        if (document.getElementById('cfgPromptTitle')) content.dailyPrompts.title = getVal('cfgPromptTitle', content.dailyPrompts.title);
+        if (document.getElementById('cfgPromptDesc')) content.dailyPrompts.description = getVal('cfgPromptDesc', content.dailyPrompts.description);
         document.querySelectorAll('.admin-prompt-title').forEach(input => { const idx = input.dataset.idx; if (content.dailyPrompts.items && content.dailyPrompts.items[idx]) content.dailyPrompts.items[idx].title = input.value; });
         document.querySelectorAll('.admin-prompt-tool').forEach(input => { const idx = input.dataset.idx; if (content.dailyPrompts.items && content.dailyPrompts.items[idx]) content.dailyPrompts.items[idx].tool = input.value; });
         document.querySelectorAll('.admin-prompt-date').forEach(input => { const idx = input.dataset.idx; if (content.dailyPrompts.items && content.dailyPrompts.items[idx]) content.dailyPrompts.items[idx].date = input.value; });
@@ -4972,9 +4970,9 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
 
         // Services
         if (!content.services) content.services = { items: [] };
-        if (document.getElementById('cfgServicesSubtitle')) content.services.subtitle = getVal('cfgServicesSubtitle');
-        if (document.getElementById('cfgServicesTitle')) content.services.title = getVal('cfgServicesTitle');
-        if (document.getElementById('cfgServicesDesc')) content.services.description = getVal('cfgServicesDesc');
+        if (document.getElementById('cfgServicesSubtitle')) content.services.subtitle = getVal('cfgServicesSubtitle', content.services.subtitle);
+        if (document.getElementById('cfgServicesTitle')) content.services.title = getVal('cfgServicesTitle', content.services.title);
+        if (document.getElementById('cfgServicesDesc')) content.services.description = getVal('cfgServicesDesc', content.services.description);
         document.querySelectorAll('.cms-service-card-item').forEach((card, idx) => {
           if (!content.services.items[idx]) {
             content.services.items[idx] = { id: 'srv_' + (idx + 1) };
@@ -5031,32 +5029,32 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
         const parseFeatures = (text) => (text || '').split('\n').map(l => l.trim()).filter(Boolean);
         if (document.getElementById('cfgPricingTitle')) {
           content.pricing = {
-            title: getVal('cfgPricingTitle'),
-            description: getVal('cfgPricingDesc'),
+            title: getVal('cfgPricingTitle', content.pricing?.title),
+            description: getVal('cfgPricingDesc', content.pricing?.description),
             starter: {
-              name: getVal('cfgPricingStarterName', 'Starter Creator'),
-              price: getVal('cfgPricingStarterPrice', '14,999'),
-              period: getVal('cfgPricingStarterPeriod', '/ month'),
-              desc: getVal('cfgPricingStarterDesc'),
-              features: parseFeatures(getVal('cfgPricingStarterFeatures')),
-              btnText: getVal('cfgPricingStarterBtn', 'Select Starter')
+              name: getVal('cfgPricingStarterName', content.pricing?.starter?.name || 'Starter Creator'),
+              price: getVal('cfgPricingStarterPrice', content.pricing?.starter?.price || '14,999'),
+              period: getVal('cfgPricingStarterPeriod', content.pricing?.starter?.period || '/ month'),
+              desc: getVal('cfgPricingStarterDesc', content.pricing?.starter?.desc || ''),
+              features: parseFeatures(getVal('cfgPricingStarterFeatures', (content.pricing?.starter?.features || []).join('\n'))),
+              btnText: getVal('cfgPricingStarterBtn', content.pricing?.starter?.btnText || 'Select Starter')
             },
             growth: {
-              popularBadge: getVal('cfgPricingGrowthBadge', 'Most Popular Choice'),
-              name: getVal('cfgPricingGrowthName', 'Pro Growth Tier'),
-              price: getVal('cfgPricingGrowthPrice', '34,999'),
-              period: getVal('cfgPricingGrowthPeriod', '/ month'),
-              desc: getVal('cfgPricingGrowthDesc'),
-              features: parseFeatures(getVal('cfgPricingGrowthFeatures')),
-              btnText: getVal('cfgPricingGrowthBtn', 'Select Pro Growth')
+              popularBadge: getVal('cfgPricingGrowthBadge', content.pricing?.growth?.popularBadge || 'Most Popular Choice'),
+              name: getVal('cfgPricingGrowthName', content.pricing?.growth?.name || 'Pro Growth Tier'),
+              price: getVal('cfgPricingGrowthPrice', content.pricing?.growth?.price || '34,999'),
+              period: getVal('cfgPricingGrowthPeriod', content.pricing?.growth?.period || '/ month'),
+              desc: getVal('cfgPricingGrowthDesc', content.pricing?.growth?.desc || ''),
+              features: parseFeatures(getVal('cfgPricingGrowthFeatures', (content.pricing?.growth?.features || []).join('\n'))),
+              btnText: getVal('cfgPricingGrowthBtn', content.pricing?.growth?.btnText || 'Select Pro Growth')
             },
             enterprise: {
-              name: getVal('cfgPricingEnterpriseName', 'Studio Enterprise'),
-              price: getVal('cfgPricingEnterprisePrice', '69,999'),
-              period: getVal('cfgPricingEnterprisePeriod', '/ month'),
-              desc: getVal('cfgPricingEnterpriseDesc'),
-              features: parseFeatures(getVal('cfgPricingEnterpriseFeatures')),
-              btnText: getVal('cfgPricingEnterpriseBtn', 'Contact Enterprise')
+              name: getVal('cfgPricingEnterpriseName', content.pricing?.enterprise?.name || 'Studio Enterprise'),
+              price: getVal('cfgPricingEnterprisePrice', content.pricing?.enterprise?.price || '69,999'),
+              period: getVal('cfgPricingEnterprisePeriod', content.pricing?.enterprise?.period || '/ month'),
+              desc: getVal('cfgPricingEnterpriseDesc', content.pricing?.enterprise?.desc || ''),
+              features: parseFeatures(getVal('cfgPricingEnterpriseFeatures', (content.pricing?.enterprise?.features || []).join('\n'))),
+              btnText: getVal('cfgPricingEnterpriseBtn', content.pricing?.enterprise?.btnText || 'Contact Enterprise')
             }
           };
         }
@@ -5065,15 +5063,15 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
         if (document.getElementById('cfgCalcReels')) {
           content.calculator = {
             baseRates: {
-              reels: parseFloat(getVal('cfgCalcReels')) || 1500,
-              youtube: parseFloat(getVal('cfgCalcYoutube')) || 4500,
-              commercial: parseFloat(getVal('cfgCalcCommercial')) || 9999,
-              motion: parseFloat(getVal('cfgCalcMotion')) || 6500
+              reels: parseFloat(getVal('cfgCalcReels', content.calculator?.baseRates?.reels)) || 1500,
+              youtube: parseFloat(getVal('cfgCalcYoutube', content.calculator?.baseRates?.youtube)) || 4500,
+              commercial: parseFloat(getVal('cfgCalcCommercial', content.calculator?.baseRates?.commercial)) || 9999,
+              motion: parseFloat(getVal('cfgCalcMotion', content.calculator?.baseRates?.motion)) || 6500
             },
             addons: {
-              thumb: parseFloat(getVal('cfgCalcAddonThumb')) || 499,
-              express: parseFloat(getVal('cfgCalcAddonExpress')) || 1499,
-              raw: parseFloat(getVal('cfgCalcAddonRaw')) || 999
+              thumb: parseFloat(getVal('cfgCalcAddonThumb', content.calculator?.addons?.thumb)) || 499,
+              express: parseFloat(getVal('cfgCalcAddonExpress', content.calculator?.addons?.express)) || 1499,
+              raw: parseFloat(getVal('cfgCalcAddonRaw', content.calculator?.addons?.raw)) || 999
             }
           };
         }
@@ -5089,56 +5087,56 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
         // Contact
         if (document.getElementById('cfgContactTitle')) {
           if (!content.contact) content.contact = {};
-          content.contact.title = getVal('cfgContactTitle');
-          content.contact.description = getVal('cfgContactDesc');
-          content.contact.submitBtnText = getVal('cfgContactSubmitText');
-          content.contact.whatsappBtnText = getVal('cfgContactWhatsappText');
+          content.contact.title = getVal('cfgContactTitle', content.contact.title);
+          content.contact.description = getVal('cfgContactDesc', content.contact.description);
+          content.contact.submitBtnText = getVal('cfgContactSubmitText', content.contact.submitBtnText);
+          content.contact.whatsappBtnText = getVal('cfgContactWhatsappText', content.contact.whatsappBtnText);
           content.contact.formLabels = {
-            nameLabel: getVal('cfgContactNameLbl', 'Your Name *'),
-            namePlaceholder: getVal('cfgContactNamePh', 'e.g. Rahul Sharma'),
-            emailLabel: getVal('cfgContactEmailLbl', 'Email Address *'),
-            emailPlaceholder: getVal('cfgContactEmailPh', 'rahul@creator.in'),
-            phoneLabel: getVal('cfgContactPhoneLbl', 'WhatsApp / Mobile Number *'),
-            phonePlaceholder: getVal('cfgContactPhonePh', '+91 98765 43210'),
-            serviceLabel: getVal('cfgContactSrvLbl', 'Service / Project Type'),
-            budgetLabel: getVal('cfgContactBudgetLbl', 'Estimated Budget (₹ INR)'),
-            footageLabel: getVal('cfgContactFootageLbl', 'Raw Footage / Reference Link'),
-            footagePlaceholder: getVal('cfgContactFootagePh', 'https://drive.google.com/drive/folders/...'),
-            driveLinkText: getVal('cfgContactDriveText', 'Open FlipCut 5TB Drive'),
-            driveLinkUrl: getVal('cfgContactDriveUrl', 'https://drive.google.com/drive/folders/1E71ZRh-3eImKRu49AcDaAyj5vqj9tuq6?usp=sharing'),
-            notesLabel: getVal('cfgContactNotesLbl', 'Project Details & Vision'),
-            notesPlaceholder: getVal('cfgContactNotesPh', 'Describe your vision, target audience, preferred editing style, and deadline...')
+            nameLabel: getVal('cfgContactNameLbl', content.contact.formLabels?.nameLabel || 'Your Name *'),
+            namePlaceholder: getVal('cfgContactNamePh', content.contact.formLabels?.namePlaceholder || 'e.g. Rahul Sharma'),
+            emailLabel: getVal('cfgContactEmailLbl', content.contact.formLabels?.emailLabel || 'Email Address *'),
+            emailPlaceholder: getVal('cfgContactEmailPh', content.contact.formLabels?.emailPlaceholder || 'rahul@creator.in'),
+            phoneLabel: getVal('cfgContactPhoneLbl', content.contact.formLabels?.phoneLabel || 'WhatsApp / Mobile Number *'),
+            phonePlaceholder: getVal('cfgContactPhonePh', content.contact.formLabels?.phonePlaceholder || '+91 98765 43210'),
+            serviceLabel: getVal('cfgContactSrvLbl', content.contact.formLabels?.serviceLabel || 'Service / Project Type'),
+            budgetLabel: getVal('cfgContactBudgetLbl', content.contact.formLabels?.budgetLabel || 'Estimated Budget (₹ INR)'),
+            footageLabel: getVal('cfgContactFootageLbl', content.contact.formLabels?.footageLabel || 'Raw Footage / Reference Link'),
+            footagePlaceholder: getVal('cfgContactFootagePh', content.contact.formLabels?.footagePlaceholder || 'https://drive.google.com/drive/folders/...'),
+            driveLinkText: getVal('cfgContactDriveText', content.contact.formLabels?.driveLinkText || 'Open FlipCut 5TB Drive'),
+            driveLinkUrl: getVal('cfgContactDriveUrl', content.contact.formLabels?.driveLinkUrl || 'https://drive.google.com/drive/folders/1E71ZRh-3eImKRu49AcDaAyj5vqj9tuq6?usp=sharing'),
+            notesLabel: getVal('cfgContactNotesLbl', content.contact.formLabels?.notesLabel || 'Project Details & Vision'),
+            notesPlaceholder: getVal('cfgContactNotesPh', content.contact.formLabels?.notesPlaceholder || 'Describe your vision, target audience, preferred editing style, and deadline...')
           };
           content.contact.budgetOptions = [
-            { value: "10k-25k", label: getVal('cfgContactBudget1', '₹10,000 - ₹25,000') },
-            { value: "25k-50k", label: getVal('cfgContactBudget2', '₹25,000 - ₹50,000') },
-            { value: "50k-100k", label: getVal('cfgContactBudget3', '₹50,000 - ₹1,00,000') },
-            { value: "100k+", label: getVal('cfgContactBudget4', '₹1,00,000+ (Custom Retainer)') }
+            { value: "10k-25k", label: getVal('cfgContactBudget1', content.contact.budgetOptions?.[0]?.label || '₹10,000 - ₹25,000') },
+            { value: "25k-50k", label: getVal('cfgContactBudget2', content.contact.budgetOptions?.[1]?.label || '₹25,000 - ₹50,000') },
+            { value: "50k-100k", label: getVal('cfgContactBudget3', content.contact.budgetOptions?.[2]?.label || '₹50,000 - ₹1,00,000') },
+            { value: "100k+", label: getVal('cfgContactBudget4', content.contact.budgetOptions?.[3]?.label || '₹1,00,000+ (Custom Retainer)') }
           ];
-          content.contact.email = getVal('cfgContactEmail');
-          content.contact.phone = getVal('cfgContactPhone');
-          content.contact.whatsappNum = getVal('cfgWhatsappNum');
-          content.contact.whatsappMessage = getVal('cfgWhatsappMsg');
-          content.contact.instagramHandle = getVal('cfgInstaHandle');
-          content.contact.youtubeChannel = getVal('cfgYoutubeChannel');
-          content.contact.copyrightText = getVal('cfgCopyrightText');
+          content.contact.email = getVal('cfgContactEmail', content.contact.email);
+          content.contact.phone = getVal('cfgContactPhone', content.contact.phone);
+          content.contact.whatsappNum = getVal('cfgWhatsappNum', content.contact.whatsappNum);
+          content.contact.whatsappMessage = getVal('cfgWhatsappMsg', content.contact.whatsappMessage);
+          content.contact.instagramHandle = getVal('cfgInstaHandle', content.contact.instagramHandle);
+          content.contact.youtubeChannel = getVal('cfgYoutubeChannel', content.contact.youtubeChannel);
+          content.contact.copyrightText = getVal('cfgCopyrightText', content.contact.copyrightText);
         }
 
         // Webinar Masterclass CMS
         if (document.getElementById('cfgWebinarTitle')) {
           if (!content.webinar) content.webinar = {};
-          content.webinar.enabled = (getVal('cfgWebinarEnabled') === 'true');
-          content.webinar.badge = getVal('cfgWebinarBadge', 'Exclusive Live Masterclass Webinar');
-          content.webinar.title = getVal('cfgWebinarTitle', 'How to Build & Scale High-Converting Websites That Drive Real Sales');
-          content.webinar.description = getVal('cfgWebinarDesc');
-          content.webinar.price = getVal('cfgWebinarPrice', '199');
-          content.webinar.originalPrice = getVal('cfgWebinarOrigPrice', '999');
-          content.webinar.date = getVal('cfgWebinarDate', 'Saturday, 7:00 PM IST');
-          content.webinar.duration = getVal('cfgWebinarDuration', '90 Minutes Live + Q&A');
-          content.webinar.seats = getVal('cfgWebinarSeats', 'Limited 100 Seats');
-          content.webinar.formTitle = getVal('cfgWebinarFormTitle', 'Fill Out Your Webinar Brief');
-          content.webinar.formSubtitle = getVal('cfgWebinarFormSubtitle');
-          content.webinar.whatsappGroupMsg = getVal('cfgWebinarWaMsg');
+          content.webinar.enabled = (getVal('cfgWebinarEnabled', content.webinar.enabled !== false ? 'true' : 'false') === 'true');
+          content.webinar.badge = getVal('cfgWebinarBadge', content.webinar.badge || 'Exclusive Live Masterclass Webinar');
+          content.webinar.title = getVal('cfgWebinarTitle', content.webinar.title || 'How to Build & Scale High-Converting Websites That Drive Real Sales');
+          content.webinar.description = getVal('cfgWebinarDesc', content.webinar.description || '');
+          content.webinar.price = getVal('cfgWebinarPrice', content.webinar.price || '199');
+          content.webinar.originalPrice = getVal('cfgWebinarOrigPrice', content.webinar.originalPrice || '999');
+          content.webinar.date = getVal('cfgWebinarDate', content.webinar.date || 'Saturday, 7:00 PM IST');
+          content.webinar.duration = getVal('cfgWebinarDuration', content.webinar.duration || '90 Minutes Live + Q&A');
+          content.webinar.seats = getVal('cfgWebinarSeats', content.webinar.seats || 'Limited 100 Seats');
+          content.webinar.formTitle = getVal('cfgWebinarFormTitle', content.webinar.formTitle || 'Fill Out Your Webinar Brief');
+          content.webinar.formSubtitle = getVal('cfgWebinarFormSubtitle', content.webinar.formSubtitle || '');
+          content.webinar.whatsappGroupMsg = getVal('cfgWebinarWaMsg', content.webinar.whatsappGroupMsg || '');
         }
       }
 
@@ -5156,7 +5154,7 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
         topSaveBtn.addEventListener('click', async () => {
           topSaveBtn.disabled = true;
           const origHtml = topSaveBtn.innerHTML;
-          topSaveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Publishing...</span>';
+          topSaveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Publishing to Cloud...</span>';
           try {
             await collectAndSaveCMS(true);
             topSaveBtn.innerHTML = '<i class="fa-solid fa-check"></i> <span>Published Live!</span>';
@@ -5177,31 +5175,17 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
       // Real-time Auto-Save Engine (Instant change + 400ms debounced input)
       let autoSaveTimer = null;
       document.addEventListener('input', (e) => {
-        if (e.target && (e.target.classList.contains('form-control') || e.target.type === 'checkbox' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA')) {
+        if (cmsInputsPopulated && e.target && (e.target.classList.contains('form-control') || e.target.type === 'checkbox' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA')) {
           clearTimeout(autoSaveTimer);
           autoSaveTimer = setTimeout(() => {
             collectAndSaveCMS(false);
-          }, 400);
+          }, 600);
         }
       });
 
       document.addEventListener('change', (e) => {
-        if (e.target && (e.target.classList.contains('form-control') || e.target.type === 'checkbox' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA')) {
+        if (cmsInputsPopulated && e.target && (e.target.classList.contains('form-control') || e.target.type === 'checkbox' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA')) {
           collectAndSaveCMS(false);
-        }
-      });
-
-      // Save on window unload / tab close
-      window.addEventListener('beforeunload', () => {
-        collectCMSFormData();
-        if (content) {
-          try {
-            localStorage.setItem('flipcut_site_content', JSON.stringify(content));
-            if (navigator.sendBeacon) {
-              const blob = new Blob([JSON.stringify(content)], { type: 'application/json' });
-              navigator.sendBeacon(`${API_BASE}/api/content`, blob);
-            }
-          } catch(e) {}
         }
       });
 
