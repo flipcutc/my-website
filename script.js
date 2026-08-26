@@ -521,7 +521,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* ==========================================================================
-     MOBILE NAVIGATION DRAWER
+     MOBILE NAVIGATION DRAWER & TOUCH HANDLERS
      ========================================================================== */
   const mobileMenuBtn = document.getElementById('mobileMenuBtn');
   const mobileNavDrawer = document.getElementById('mobileNavDrawer');
@@ -529,7 +529,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const mobileNavCloseBtn = document.getElementById('mobileNavCloseBtn');
   const mobileNavLinks = document.querySelectorAll('.mobile-nav-link, #mobileNavCta, #mobileNavWhatsapp');
 
-  function openMobileNav() {
+  function openMobileNav(e) {
+    if (e && e.cancelable && e.type !== 'click') e.preventDefault();
     if (mobileNavDrawer) mobileNavDrawer.classList.add('active');
     if (mobileNavBackdrop) mobileNavBackdrop.classList.add('active');
     if (mobileMenuBtn) {
@@ -540,7 +541,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.style.overflow = 'hidden';
   }
 
-  function closeMobileNav() {
+  function closeMobileNav(e) {
+    if (e && e.cancelable && e.type !== 'click') e.preventDefault();
     if (mobileNavDrawer) mobileNavDrawer.classList.remove('active');
     if (mobileNavBackdrop) mobileNavBackdrop.classList.remove('active');
     if (mobileMenuBtn) {
@@ -551,23 +553,31 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.style.overflow = '';
   }
 
-  function toggleMobileNav() {
+  function toggleMobileNav(e) {
+    if (e) e.stopPropagation();
     if (mobileNavDrawer && mobileNavDrawer.classList.contains('active')) {
-      closeMobileNav();
+      closeMobileNav(e);
     } else {
-      openMobileNav();
+      openMobileNav(e);
     }
   }
 
   if (mobileMenuBtn) {
-    mobileMenuBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      toggleMobileNav();
+    mobileMenuBtn.addEventListener('click', toggleMobileNav);
+    mobileMenuBtn.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      toggleMobileNav(e);
     });
   }
 
-  if (mobileNavCloseBtn) mobileNavCloseBtn.addEventListener('click', closeMobileNav);
-  if (mobileNavBackdrop) mobileNavBackdrop.addEventListener('click', closeMobileNav);
+  if (mobileNavCloseBtn) {
+    mobileNavCloseBtn.addEventListener('click', closeMobileNav);
+    mobileNavCloseBtn.addEventListener('touchend', closeMobileNav);
+  }
+  if (mobileNavBackdrop) {
+    mobileNavBackdrop.addEventListener('click', closeMobileNav);
+    mobileNavBackdrop.addEventListener('touchend', closeMobileNav);
+  }
 
   mobileNavLinks.forEach(link => {
     link.addEventListener('click', () => {
@@ -582,34 +592,50 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ==========================================================================
      1. THEME TOGGLE (Luxury White Mode Default / Dark Mode)
      ========================================================================== */
-  const themeToggleBtn = document.getElementById('themeToggleBtn');
+  const themeToggleBtns = document.querySelectorAll('.theme-toggle-btn');
   const htmlElement = document.documentElement;
 
-  const savedTheme = localStorage.getItem('flipcut_theme') || 'light';
-  if (savedTheme === 'dark') {
-    htmlElement.setAttribute('data-theme', 'dark');
-    if (themeToggleBtn) themeToggleBtn.innerHTML = '<i class="fa-solid fa-sun"></i>';
-  } else {
-    htmlElement.removeAttribute('data-theme');
-    if (themeToggleBtn) themeToggleBtn.innerHTML = '<i class="fa-solid fa-moon"></i>';
+  function updateThemeUI(isDark) {
+    if (isDark) {
+      htmlElement.setAttribute('data-theme', 'dark');
+      themeToggleBtns.forEach(btn => {
+        btn.innerHTML = '<i class="fa-solid fa-sun" style="color: #F59E0B;"></i>';
+        btn.setAttribute('title', 'Switch to Luxury Light Mode');
+        btn.setAttribute('aria-label', 'Switch to Luxury Light Mode');
+      });
+    } else {
+      htmlElement.removeAttribute('data-theme');
+      themeToggleBtns.forEach(btn => {
+        btn.innerHTML = '<i class="fa-solid fa-moon" style="color: #6366F1;"></i>';
+        btn.setAttribute('title', 'Switch to Cinematic Dark Mode');
+        btn.setAttribute('aria-label', 'Switch to Cinematic Dark Mode');
+      });
+    }
   }
 
-  if (themeToggleBtn) {
-    themeToggleBtn.addEventListener('click', () => {
-      const isDark = htmlElement.getAttribute('data-theme') === 'dark';
-      if (isDark) {
-        htmlElement.removeAttribute('data-theme');
+  const savedTheme = localStorage.getItem('flipcut_theme') || 'light';
+  updateThemeUI(savedTheme === 'dark');
+
+  themeToggleBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isCurrentlyDark = htmlElement.getAttribute('data-theme') === 'dark';
+      if (isCurrentlyDark) {
         localStorage.setItem('flipcut_theme', 'light');
-        themeToggleBtn.innerHTML = '<i class="fa-solid fa-moon"></i>';
-        showToast('Switched to Luxury White Mode ☀️');
+        updateThemeUI(false);
+        showToast('Switched to Luxury Light Mode ☀️');
       } else {
-        htmlElement.setAttribute('data-theme', 'dark');
         localStorage.setItem('flipcut_theme', 'dark');
-        themeToggleBtn.innerHTML = '<i class="fa-solid fa-sun"></i>';
+        updateThemeUI(true);
         showToast('Switched to Cinematic Dark Mode 🌙');
       }
     });
-  }
+
+    btn.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      btn.click();
+    });
+  });
 
   /* ==========================================================================
      2. STICKY HEADER & BACK-TO-TOP SCROLL LISTENER
