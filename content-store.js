@@ -507,42 +507,74 @@ if (typeof window !== 'undefined') {
   window.getContentApiBase = getContentApiBase;
 }
 
+const CLOUD_SUPABASE_URL = 'https://cznixvdphwbjdnnmapvb.supabase.co';
+const CLOUD_SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6bml4dmRwaHdiamRubm1hcHZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTgwMTgsImV4cCI6MjEwMzEzNDAxOH0.dTLN1DCbUiBawZq8YlS5Bol-i81JFKhKpPKCboyocuQ';
+
 /**
- * Asynchronously fetch latest saved site content from server / disk backup
+ * Asynchronously fetch latest saved site content from server / Supabase Cloud database
  * and synchronize to all storage layers with auto-healing.
  */
 async function fetchAndSyncSiteContent() {
+  // 1. Try Node.js backend if available
   try {
     const apiBase = getContentApiBase();
-    const res = await fetch(`${apiBase}/api/content`, { cache: 'no-store' });
-    if (res.ok) {
-      const json = await res.json();
-      if (json && json.success && json.data) {
-        const merged = deepMergeObjects(JSON.parse(JSON.stringify(DEFAULT_SITE_CONTENT)), json.data);
-        if (typeof localStorage !== 'undefined') {
-          try {
-            localStorage.setItem('flipcut_site_content', JSON.stringify(merged));
-            localStorage.setItem('flipcut_site_content_backup', JSON.stringify(merged));
-          } catch (_) {}
+    if (apiBase) {
+      const res = await fetch(`${apiBase}/api/content`, { cache: 'no-store' });
+      if (res.ok) {
+        const json = await res.json();
+        if (json && json.success && json.data) {
+          const merged = deepMergeObjects(JSON.parse(JSON.stringify(DEFAULT_SITE_CONTENT)), json.data);
+          if (typeof localStorage !== 'undefined') {
+            try {
+              localStorage.setItem('flipcut_site_content', JSON.stringify(merged));
+              localStorage.setItem('flipcut_site_content_backup', JSON.stringify(merged));
+            } catch (_) {}
+          }
+          return merged;
         }
-        if (typeof sessionStorage !== 'undefined') {
-          try { sessionStorage.setItem('flipcut_site_content', JSON.stringify(merged)); } catch (_) {}
-        }
-        return merged;
       }
     }
-  } catch (e) {
-    // Server not running or fetch failed; fallback to local
+  } catch (_) {}
+
+  // 2. Direct Cloud Fetch from Supabase PostgreSQL (Supports static hosting like GitHub Pages)
+  try {
+    const sbRes = await fetch(`${CLOUD_SUPABASE_URL}/rest/v1/leads?id=eq.CMS_SITE_CONTENT_LIVE&select=*`, {
+      headers: {
+        apikey: CLOUD_SUPABASE_KEY,
+        Authorization: `Bearer ${CLOUD_SUPABASE_KEY}`
+      },
+      cache: 'no-store'
+    });
+    if (sbRes.ok) {
+      const rows = await sbRes.json();
+      if (rows && rows.length > 0 && rows[0].message) {
+        const cloudData = JSON.parse(rows[0].message);
+        if (cloudData && typeof cloudData === 'object') {
+          const merged = deepMergeObjects(JSON.parse(JSON.stringify(DEFAULT_SITE_CONTENT)), cloudData);
+          if (typeof localStorage !== 'undefined') {
+            try {
+              localStorage.setItem('flipcut_site_content', JSON.stringify(merged));
+              localStorage.setItem('flipcut_site_content_backup', JSON.stringify(merged));
+            } catch (_) {}
+          }
+          return merged;
+        }
+      }
+    }
+  } catch (sbErr) {
+    console.warn('Supabase cloud fetch note:', sbErr);
   }
+
   return getSiteContent();
 }
 
 /**
- * Save updated site content to localStorage, backup layer, and server database / disk backup
+ * Save updated site content to localStorage, backup layer, Node backend, and Supabase Cloud Database
  */
 async function saveSiteContent(content) {
   let localSaved = false;
   let serverSaved = false;
+  let cloudSaved = false;
 
   try {
     const serialized = JSON.stringify(content);
@@ -558,22 +590,46 @@ async function saveSiteContent(content) {
     console.warn('localStorage quota warning:', localErr);
   }
 
-  // Sync to Node.js backend server (which writes site-content-backup.json permanently)
+  // 1. Sync to Node.js backend server if available
   try {
     const apiBase = getContentApiBase();
-    const res = await fetch(`${apiBase}/api/content`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(content)
-    });
-    if (res.ok) {
-      serverSaved = true;
+    if (apiBase) {
+      const res = await fetch(`${apiBase}/api/content`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(content)
+      });
+      if (res.ok) serverSaved = true;
     }
-  } catch (apiErr) {
-    console.warn('Could not sync to backend:', apiErr);
+  } catch (_) {}
+
+  // 2. Sync directly to Supabase Cloud Database (Instantly propagates to all visitors globally)
+  try {
+    const payload = {
+      id: 'CMS_SITE_CONTENT_LIVE',
+      name: 'CMS_CONFIG_STORE',
+      service: 'CMS_STORAGE',
+      message: JSON.stringify(content),
+      status: 'ACTIVE_CMS'
+    };
+    const sbRes = await fetch(`${CLOUD_SUPABASE_URL}/rest/v1/leads`, {
+      method: 'POST',
+      headers: {
+        apikey: CLOUD_SUPABASE_KEY,
+        Authorization: `Bearer ${CLOUD_SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates,return=representation'
+      },
+      body: JSON.stringify(payload)
+    });
+    if (sbRes.ok) {
+      cloudSaved = true;
+    }
+  } catch (cloudErr) {
+    console.warn('Supabase cloud save note:', cloudErr);
   }
 
-  return localSaved || serverSaved;
+  return localSaved || serverSaved || cloudSaved;
 }
 
 /**
