@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="fcFavBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0B0F19"/>
+      <stop offset="100%" stop-color="#1E1B4B"/>
+    </linearGradient>
+    <linearGradient id="fcFavGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00F0FF"/>
+      <stop offset="35%" stop-color="#3B82F6"/>
+      <stop offset="70%" stop-color="#8B5CF6"/>
+      <stop offset="100%" stop-color="#D946EF"/>
+    </linearGradient>
+    <filter id="fcFavGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="1.2" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Luxury Dark Rounded Squircle Background -->
+  <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#fcFavBg)" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
+
+  <!-- FC Monogram Emblem -->
+  <g transform="translate(10, 9) scale(0.69)">
+    <!-- Letter F -->
+    <path d="M 22 4 L 54 4 C 59 4 62 7 61 12 L 58 19 C 57 22 54 24 50 24 L 34 24 L 30 34 L 46 34 C 50 34 52 36 51 40 L 49 45 C 48 48 45 50 41 50 L 25 50 L 19 66 C 18 69 15 71 11 71 L 3 71 C -0.5 71 -1.8 68 0.2 64 L 17 8 C 18 5 20 4 22 4 Z" fill="url(#fcFavGrad)" filter="url(#fcFavGlow)"/>
+    
+    <!-- White Cinematic Cut Slice -->
+    <polygon points="36,0 43,0 27,56 20,56" fill="#FFFFFF" opacity="0.95"/>
+
+    <!-- Letter C -->
+    <path d="M 60 24 C 64 24 67 27 66 31 L 64 37 C 60 34 55 32 49 32 C 40 32 35 39 32 49 C 29 58 34 65 43 65 C 49 65 55 62 59 58 L 57 64 C 52 69 44 72 36 72 C 23 72 15 62 19 48 C 23 32 35 24 49 24 C 53 24 57 24 60 24 Z" fill="url(#fcFavGrad)"/>
+    
+    <!-- Spark Accent -->
+    <circle cx="62" cy="14" r="3.5" fill="#00F0FF"/>
+  </g>
+</svg>
