@@ -53,7 +53,7 @@
     rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=9.7">
+  <link rel="stylesheet" href="styles.css?v=9.8">
 
   <!-- FontAwesome Icons for clean UI symbols -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -63,22 +63,21 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- Dual Cloud Sync Engine (Firebase + Supabase) -->
-  <script src="firebase-sync.js?v=9.7"></script>
+  <script src="firebase-sync.js?v=9.8"></script>
 
   <!-- VIP User Profile Header Engine -->
-  <script src="user-profile.js?v=9.7"></script>
+  <script src="user-profile.js?v=9.8"></script>
 
   <!-- Content Store & Instant Fast Pre-Hydration -->
-  <script src="content-store.js?v=9.7"></script>
+  <script src="content-store.js?v=9.8"></script>
   <script>
     // Instant 0ms Pre-Hydration & Zero-Flicker Renderer
     (function() {
       try {
-        var isAnnDismissed = sessionStorage.getItem('flipcut_dismiss_top_ann') === '1';
         var raw = localStorage.getItem('flipcut_cms_draft') || localStorage.getItem('flipcut_site_content');
         if (raw) {
           var data = JSON.parse(raw);
-          if (data && (!data.sectionsVisibility || data.sectionsVisibility.topAnnouncement !== false) && (!data.topAnnouncement || data.topAnnouncement.enabled !== false) && !isAnnDismissed) {
+          if (data && (!data.sectionsVisibility || data.sectionsVisibility.topAnnouncement !== false) && (!data.topAnnouncement || data.topAnnouncement.enabled !== false)) {
             document.documentElement.classList.add('has-announcement');
           }
           var hideSelectors = [];
@@ -1247,7 +1246,7 @@
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
   <!-- JavaScript Modules -->
-  <script src="script.js?v=9.7"></script>
+  <script src="script.js?v=9.8"></script>
 </body>
 
 </html>

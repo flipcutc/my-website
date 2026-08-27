@@ -104,8 +104,7 @@ function hydratePageFromCMS(customContent) {
     };
 
     const isTopAnnActive = (!content.sectionsVisibility || content.sectionsVisibility.topAnnouncement !== false) &&
-                           (annData.enabled !== false) &&
-                           (sessionStorage.getItem('flipcut_dismiss_top_ann') !== '1');
+                           (annData.enabled !== false);
 
     if (topBar) {
       if (!isTopAnnActive) {
@@ -1817,7 +1816,6 @@ function hydratePageFromCMS(customContent) {
       topBar.classList.add('is-hidden');
       document.documentElement.classList.remove('has-announcement');
       document.body.classList.remove('has-announcement');
-      try { sessionStorage.setItem('flipcut_dismiss_top_ann', '1'); } catch (_) {}
     }
   };
 
