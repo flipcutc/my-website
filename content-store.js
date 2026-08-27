@@ -468,6 +468,7 @@ function deepMergeObjects(target, source) {
   }
   return output;
 }
+if (typeof window !== 'undefined') window.deepMergeObjects = deepMergeObjects;
 
 function formatMediaUrl(url, type) {
   if (!url) return '';
