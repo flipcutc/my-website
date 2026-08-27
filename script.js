@@ -5,12 +5,14 @@
 
 // Global Master Content
 let siteAppContent = (typeof getSiteContent === 'function') ? getSiteContent() : DEFAULT_SITE_CONTENT;
+let content = siteAppContent;
 
 // Real-Time 0ms Live Sync across tabs when Admin publishes
 if (typeof window !== 'undefined') {
   window.addEventListener('flipcut:cms-updated', (e) => {
     if (e && e.detail) {
       siteAppContent = e.detail;
+      content = siteAppContent;
       hydratePageFromCMS(siteAppContent);
     }
   });
@@ -21,6 +23,7 @@ if (typeof window !== 'undefined') {
       bc.onmessage = (msg) => {
         if (msg && msg.data && msg.data.content) {
           siteAppContent = msg.data.content;
+          content = siteAppContent;
           hydratePageFromCMS(siteAppContent);
         }
       };
@@ -32,7 +35,8 @@ if (typeof window !== 'undefined') {
    0. DYNAMIC CMS HYDRATION FROM CONTENT STORE (Instant Zero-Flicker Execution)
    ========================================================================== */
 function hydratePageFromCMS(customContent) {
-  const content = customContent || ((typeof getSiteContent === 'function') ? getSiteContent() : siteAppContent);
+  content = customContent || ((typeof getSiteContent === 'function') ? getSiteContent() : siteAppContent);
+  siteAppContent = content;
   if (!content) return;
 
     // 0. COMPREHENSIVE SECTIONS, HEADERS & CARDS VISIBILITY CONTROL
@@ -189,7 +193,7 @@ function hydratePageFromCMS(customContent) {
         if (dpTtl && content.dailyPrompts.title) dpTtl.textContent = content.dailyPrompts.title;
         if (dpDsc && content.dailyPrompts.description) dpDsc.textContent = content.dailyPrompts.description;
 
-        renderFrontendDailyPrompts();
+        renderFrontendDailyPrompts(content);
       }
     } catch (dpErr) {
       console.warn('Daily prompts hydration note:', dpErr);
@@ -281,7 +285,7 @@ function hydratePageFromCMS(customContent) {
         const pfSub = document.getElementById('portfolioSubtitle');
         if (pfSub && content.portfolio.subtitle) pfSub.textContent = content.portfolio.subtitle;
 
-        renderFrontendPortfolio();
+        renderFrontendPortfolio(content);
       }
     } catch (pfErr) {
       console.warn('Portfolio hydration note:', pfErr);
@@ -1064,10 +1068,11 @@ function hydratePageFromCMS(customContent) {
     }
   };
 
-  function renderFrontendDailyPrompts() {
+  function renderFrontendDailyPrompts(passedContent) {
+    const data = passedContent || content || siteAppContent || ((typeof getSiteContent === 'function') ? getSiteContent() : DEFAULT_SITE_CONTENT);
     const container = document.getElementById('dailyPromptContainer');
     if (!container) return;
-    if (!content || !content.dailyPrompts || !content.dailyPrompts.items || content.dailyPrompts.items.length === 0) {
+    if (!data || !data.dailyPrompts || !data.dailyPrompts.items || data.dailyPrompts.items.length === 0) {
       container.innerHTML = `
         <div style="text-align: center; padding: 40px; color: var(--text-muted); background: var(--bg-surface); border: 1px dashed var(--border-subtle); border-radius: var(--radius-lg);">
           <i class="fa-solid fa-wand-magic-sparkles" style="font-size: 2rem; margin-bottom: 12px; display: block; color: var(--brand-indigo);"></i>
@@ -1077,7 +1082,7 @@ function hydratePageFromCMS(customContent) {
       return;
     }
 
-    const items = content.dailyPrompts.items;
+    const items = data.dailyPrompts.items;
     const featured = items[0];
     const historyItems = items.slice(1);
 
@@ -1193,13 +1198,14 @@ function hydratePageFromCMS(customContent) {
     }
   };
 
-  function renderFrontendPortfolio() {
+  function renderFrontendPortfolio(passedContent) {
+    const data = passedContent || content || siteAppContent || ((typeof getSiteContent === 'function') ? getSiteContent() : DEFAULT_SITE_CONTENT);
     const portfolioGrid = document.getElementById('portfolioGrid');
     if (!portfolioGrid) return;
-    if (!content || !content.portfolio || !content.portfolio.items) return;
+    if (!data || !data.portfolio || !data.portfolio.items) return;
 
     portfolioGrid.innerHTML = '';
-    content.portfolio.items.forEach(item => {
+    data.portfolio.items.forEach(item => {
       const card = document.createElement('div');
       const isVertical = item.isVertical ? 'is-vertical' : '';
       let rawCategory = item.category || (item.isVertical ? 'reels' : (item.type === 'video' ? 'video' : (item.type === 'graphic' ? 'graphic' : (item.type === 'uiux' ? 'uiux' : 'clients'))));
