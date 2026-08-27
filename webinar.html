@@ -926,6 +926,44 @@
 
   <!-- Script logic for Webinar registration & Razorpay Gate -->
   <script>
+    // Dynamic Webinar CMS Hydration Engine (Top-Level 0ms Pre-Paint Execution)
+    function renderWebinarData(content) {
+      if (!content) content = (typeof getSiteContent === 'function') ? getSiteContent() : null;
+      if (!content) return;
+      const brandLogo = document.querySelector('.brand-logo-img');
+      if (brandLogo && content.brand && content.brand.logoUrl) brandLogo.src = content.brand.logoUrl;
+      if (brandLogo && content.brand && content.brand.logoHeight) brandLogo.style.height = `${content.brand.logoHeight}px`;
+
+      const webinarCfg = content.webinar || {};
+      const price = String(webinarCfg.price !== undefined && webinarCfg.price !== '' ? webinarCfg.price : '99').replace(/[^0-9]/g, '') || '99';
+      const origPrice = String(webinarCfg.originalPrice !== undefined && webinarCfg.originalPrice !== '' ? webinarCfg.originalPrice : '999').replace(/[^0-9]/g, '') || '999';
+
+      const setTxt = (id, text) => { const el = document.getElementById(id); if (el && text !== undefined) el.textContent = text; };
+      if (webinarCfg.badge) setTxt('webinarBadgePill', webinarCfg.badge);
+      if (webinarCfg.title) setTxt('webinarHeroTitle', webinarCfg.title);
+      if (webinarCfg.description) setTxt('webinarHeroDesc', webinarCfg.description);
+      if (webinarCfg.date) {
+        setTxt('webinarDateText', webinarCfg.date);
+        setTxt('webinarModalDateText', webinarCfg.date);
+      }
+      if (webinarCfg.duration) setTxt('webinarDurationText', webinarCfg.duration);
+      if (webinarCfg.seats) setTxt('webinarSeatsText', webinarCfg.seats);
+      if (webinarCfg.formTitle) setTxt('webinarFormTitle', webinarCfg.formTitle);
+      if (webinarCfg.formSubtitle) setTxt('webinarFormSubtitle', webinarCfg.formSubtitle);
+
+      setTxt('webinarTicketFeeText', `₹${price}`);
+      setTxt('webinarPriceDisplay', `₹${price}`);
+      setTxt('webinarOrigPriceDisplay', `₹${origPrice}`);
+      setTxt('btnPayRazorpayText', `Pay ₹${price} & Unlock Registration`);
+      setTxt('ticketPassAmountText', `₹${price} (Confirmed via Razorpay)`);
+    }
+    window.renderWebinarData = renderWebinarData;
+
+    // 0ms Instant Execution
+    try {
+      renderWebinarData();
+    } catch (_) {}
+
     document.addEventListener('DOMContentLoaded', async () => {
       
       // Theme Switcher Logic (Multi-Button & Mobile Drawer Support)
@@ -978,39 +1016,8 @@
         }
       }
 
-      // Dynamic Webinar CMS Hydration Engine
-      function renderWebinarData(content) {
-        if (!content) return;
-        const brandLogo = document.querySelector('.brand-logo-img');
-        if (brandLogo && content.brand && content.brand.logoUrl) brandLogo.src = content.brand.logoUrl;
-        if (brandLogo && content.brand && content.brand.logoHeight) brandLogo.style.height = `${content.brand.logoHeight}px`;
-
-        const webinarCfg = content.webinar || {};
-        const price = String(webinarCfg.price !== undefined && webinarCfg.price !== '' ? webinarCfg.price : '99').replace(/[^0-9]/g, '') || '99';
-        const origPrice = String(webinarCfg.originalPrice !== undefined && webinarCfg.originalPrice !== '' ? webinarCfg.originalPrice : '999').replace(/[^0-9]/g, '') || '999';
-
-        const setTxt = (id, text) => { const el = document.getElementById(id); if (el && text !== undefined) el.textContent = text; };
-        if (webinarCfg.badge) setTxt('webinarBadgePill', webinarCfg.badge);
-        if (webinarCfg.title) setTxt('webinarHeroTitle', webinarCfg.title);
-        if (webinarCfg.description) setTxt('webinarHeroDesc', webinarCfg.description);
-        if (webinarCfg.date) {
-          setTxt('webinarDateText', webinarCfg.date);
-          setTxt('webinarModalDateText', webinarCfg.date);
-        }
-        if (webinarCfg.duration) setTxt('webinarDurationText', webinarCfg.duration);
-        if (webinarCfg.seats) setTxt('webinarSeatsText', webinarCfg.seats);
-        if (webinarCfg.formTitle) setTxt('webinarFormTitle', webinarCfg.formTitle);
-        if (webinarCfg.formSubtitle) setTxt('webinarFormSubtitle', webinarCfg.formSubtitle);
-
-        setTxt('webinarTicketFeeText', `₹${price}`);
-        setTxt('webinarPriceDisplay', `₹${price}`);
-        setTxt('webinarOrigPriceDisplay', `₹${origPrice}`);
-        setTxt('btnPayRazorpayText', `Pay ₹${price} & Unlock Registration`);
-        setTxt('ticketPassAmountText', `₹${price} (Confirmed via Razorpay)`);
-      }
-
       // 1. Instant 0ms Pre-Hydration from local cache
-      let siteContent = getSiteContent();
+      let siteContent = (typeof getSiteContent === 'function') ? getSiteContent() : null;
       renderWebinarData(siteContent);
 
       // 2. Real-time background sync from Supabase Cloud

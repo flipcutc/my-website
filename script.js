@@ -3,16 +3,15 @@
  * Powers dynamic DOM hydration from Content Store, Indian Rupee (₹) pricing, and all interactions.
  */
 
-document.addEventListener('DOMContentLoaded', () => {
+// Global Master Content
+let siteAppContent = (typeof getSiteContent === 'function') ? getSiteContent() : DEFAULT_SITE_CONTENT;
 
-  // Load Content from Store
-  let content = (typeof getSiteContent === 'function') ? getSiteContent() : DEFAULT_SITE_CONTENT;
-
-  // Real-Time 0ms Live Sync across tabs when Admin publishes
+// Real-Time 0ms Live Sync across tabs when Admin publishes
+if (typeof window !== 'undefined') {
   window.addEventListener('flipcut:cms-updated', (e) => {
     if (e && e.detail) {
-      content = e.detail;
-      hydratePageFromCMS();
+      siteAppContent = e.detail;
+      hydratePageFromCMS(siteAppContent);
     }
   });
 
@@ -21,34 +20,20 @@ document.addEventListener('DOMContentLoaded', () => {
       const bc = new BroadcastChannel('flipcut_cms_channel');
       bc.onmessage = (msg) => {
         if (msg && msg.data && msg.data.content) {
-          content = msg.data.content;
-          hydratePageFromCMS();
+          siteAppContent = msg.data.content;
+          hydratePageFromCMS(siteAppContent);
         }
       };
     }
   } catch (_) {}
+}
 
-  /* ==========================================================================
-     TOAST NOTIFICATION HELPER
-     ========================================================================== */
-  function showToast(message, borderColor = 'var(--brand-indigo)') {
-    const toast = document.getElementById('toastBox');
-    const msg = document.getElementById('toastMsg');
-    if (!toast || !msg) return;
-    msg.textContent = message;
-    toast.style.borderColor = borderColor;
-    toast.classList.add('show');
-    clearTimeout(toast.toastTimeout);
-    toast.toastTimeout = setTimeout(() => {
-      toast.classList.remove('show');
-    }, 3500);
-  }
-
-  /* ==========================================================================
-     0. DYNAMIC CMS HYDRATION FROM CONTENT STORE
-     ========================================================================== */
-  function hydratePageFromCMS() {
-    if (!content) return;
+/* ==========================================================================
+   0. DYNAMIC CMS HYDRATION FROM CONTENT STORE (Instant Zero-Flicker Execution)
+   ========================================================================== */
+function hydratePageFromCMS(customContent) {
+  const content = customContent || ((typeof getSiteContent === 'function') ? getSiteContent() : siteAppContent);
+  if (!content) return;
 
     // 0. COMPREHENSIVE SECTIONS, HEADERS & CARDS VISIBILITY CONTROL
     if (content.sectionsVisibility) {
@@ -539,20 +524,50 @@ document.addEventListener('DOMContentLoaded', () => {
       const footerYt = document.getElementById('footerYoutubeLink');
       if (footerYt && content.contact.youtubeChannel) footerYt.textContent = content.contact.youtubeChannel;
     }
+
+    if (typeof document !== 'undefined' && document.body) {
+      document.body.classList.add('hydrated');
+    }
   }
 
-  hydratePageFromCMS();
-  document.body.classList.add('hydrated');
+  window.hydratePageFromCMS = hydratePageFromCMS;
 
-  // Asynchronously fetch latest server-persisted content and rehydrate if updated
-  if (typeof fetchAndSyncSiteContent === 'function') {
-    fetchAndSyncSiteContent().then(latestContent => {
-      if (latestContent) {
-        content = latestContent;
-        hydratePageFromCMS();
-      }
-    }).catch(() => {});
+  // Immediate synchronous execution on file load (0ms Pre-Paint)
+  try {
+    hydratePageFromCMS();
+  } catch (_) {}
+
+  /* ==========================================================================
+     TOAST NOTIFICATION HELPER
+     ========================================================================== */
+  function showToast(message, borderColor = 'var(--brand-indigo)') {
+    const toast = document.getElementById('toastBox');
+    const msg = document.getElementById('toastMsg');
+    if (!toast || !msg) return;
+    msg.textContent = message;
+    toast.style.borderColor = borderColor;
+    toast.classList.add('show');
+    clearTimeout(toast.toastTimeout);
+    toast.toastTimeout = setTimeout(() => {
+      toast.classList.remove('show');
+    }, 3500);
   }
+  window.showToast = showToast;
+
+  document.addEventListener('DOMContentLoaded', () => {
+
+    // 1. Re-run hydration on DOM ready to guarantee 100% element capture
+    hydratePageFromCMS();
+
+    // 2. Background Cloud fetch & silent sync
+    if (typeof fetchAndSyncSiteContent === 'function') {
+      fetchAndSyncSiteContent().then(latestContent => {
+        if (latestContent) {
+          siteAppContent = latestContent;
+          hydratePageFromCMS(latestContent);
+        }
+      }).catch(() => {});
+    }
 
   /* ==========================================================================
      MOBILE NAVIGATION DRAWER & TOUCH HANDLERS
