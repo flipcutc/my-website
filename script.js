@@ -401,7 +401,7 @@ function hydratePageFromCMS(customContent) {
           const gr = content.pricing.growth;
           const feats = (gr.features || []).map(f => `<li><i class="fa-solid fa-circle-check text-gradient"></i> ${f}</li>`).join('');
           const c2 = document.createElement('div');
-          c2.className = 'pricing-card featured-plan';
+          c2.className = 'pricing-card featured-plan is-active-mobile';
           c2.innerHTML = `
             <div class="pricing-badge-popular">${gr.popularBadge || 'Most Popular Choice'}</div>
             <div class="pricing-header">
@@ -444,6 +444,10 @@ function hydratePageFromCMS(customContent) {
             <button type="button" class="btn btn-secondary" onclick="window.startPlanCheckout('${ent.name || 'Studio Enterprise'}', '${ent.price || '69,999'}')" style="width: 100%; cursor: pointer;">${ent.btnText || 'Contact Enterprise'}</button>
           `;
           pricingGrid.appendChild(c3);
+        }
+
+        if (typeof window.switchPricingPlan === 'function') {
+          window.switchPricingPlan(window.__activePlanIndex !== undefined ? window.__activePlanIndex : 1);
         }
       }
     }
@@ -1820,6 +1824,7 @@ function hydratePageFromCMS(customContent) {
   };
 
   window.switchPricingPlan = function(index) {
+    window.__activePlanIndex = index;
     const tabs = document.querySelectorAll('.plan-tab-btn');
     const cards = document.querySelectorAll('#pricingGrid .pricing-card');
 
@@ -2223,5 +2228,10 @@ function hydratePageFromCMS(customContent) {
       showToast(`Payment error: ${err.message}`, '#EF4444');
     }
   };
+
+  // Initialize active mobile pricing plan (Pro Growth Tier)
+  if (typeof window.switchPricingPlan === 'function') {
+    window.switchPricingPlan(1);
+  }
 
 });
