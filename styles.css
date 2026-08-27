@@ -1793,6 +1793,10 @@ section {
   align-items: stretch;
 }
 
+.pricing-plan-tabs {
+  display: none;
+}
+
 .pricing-card {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
@@ -3092,27 +3096,100 @@ textarea.form-control {
     border-radius: 8px !important;
   }
 
+  .pricing-plan-tabs {
+    display: flex !important;
+    background: var(--bg-card);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-pill);
+    padding: 4px;
+    margin: 0 auto 20px auto;
+    max-width: 330px;
+    gap: 4px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  }
+
+  .plan-tab-btn {
+    flex: 1;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-family: var(--font-main);
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 8px 6px;
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .plan-tab-btn.active {
+    background: var(--grad-brand-horizontal);
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    font-weight: 700;
+  }
+
   .pricing-grid {
-    grid-template-columns: 1fr !important;
-    gap: 12px !important;
+    display: block !important;
+    margin: 0 auto !important;
+    max-width: 360px !important;
   }
 
   .pricing-card {
-    padding: 18px 16px !important;
-    border-radius: 16px !important;
+    display: none !important; /* Only active tab card shows on mobile */
+    padding: 22px 18px 18px !important;
+    border-radius: 20px !important;
+    transform: none !important;
+    box-shadow: var(--shadow-card) !important;
   }
 
-  .pricing-amount {
-    font-size: 1.75rem !important;
+  .pricing-card.is-active-mobile {
+    display: flex !important;
+    flex-direction: column !important;
+    animation: fadeInScale 0.25s ease-out;
   }
 
-  .pricing-features-list {
-    gap: 6px !important;
+  .pricing-header h3 {
+    font-size: 1.25rem !important;
+    margin-bottom: 4px !important;
+  }
+
+  .pricing-header p {
+    font-size: 0.82rem !important;
+    margin-bottom: 12px !important;
+  }
+
+  .pricing-price-wrap {
     margin-bottom: 14px !important;
+    padding-bottom: 14px !important;
   }
 
-  .pricing-features-list li {
-    font-size: 0.78rem !important;
+  .pricing-price-wrap .price-amount {
+    font-size: 2.1rem !important;
+  }
+
+  .pricing-feature-list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    margin-bottom: 18px !important;
+  }
+
+  .pricing-feature-list li {
+    font-size: 0.82rem !important;
+    line-height: 1.35 !important;
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+  }
+
+  .popular-badge,
+  .pricing-badge-popular {
+    top: -12px !important;
+    padding: 4px 14px !important;
+    font-size: 0.68rem !important;
   }
 
   .testimonials-grid {

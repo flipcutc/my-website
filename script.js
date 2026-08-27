@@ -1819,6 +1819,27 @@ function hydratePageFromCMS(customContent) {
     }
   };
 
+  window.switchPricingPlan = function(index) {
+    const tabs = document.querySelectorAll('.plan-tab-btn');
+    const cards = document.querySelectorAll('#pricingGrid .pricing-card');
+
+    tabs.forEach((tab, idx) => {
+      if (idx === index) {
+        tab.classList.add('active');
+      } else {
+        tab.classList.remove('active');
+      }
+    });
+
+    cards.forEach((card, idx) => {
+      if (idx === index) {
+        card.classList.add('is-active-mobile');
+      } else {
+        card.classList.remove('is-active-mobile');
+      }
+    });
+  };
+
   const inquiryForm = document.getElementById('projectInquiryForm');
 
   if (inquiryForm) {
