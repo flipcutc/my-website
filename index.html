@@ -53,7 +53,7 @@
     rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=9.2">
+  <link rel="stylesheet" href="styles.css?v=9.3">
 
   <!-- FontAwesome Icons for clean UI symbols -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -63,13 +63,13 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- Dual Cloud Sync Engine (Firebase + Supabase) -->
-  <script src="firebase-sync.js?v=9.2"></script>
+  <script src="firebase-sync.js?v=9.3"></script>
 
   <!-- VIP User Profile Header Engine -->
-  <script src="user-profile.js?v=9.2"></script>
+  <script src="user-profile.js?v=9.3"></script>
 
   <!-- Content Store & Instant Fast Pre-Hydration -->
-  <script src="content-store.js?v=9.2"></script>
+  <script src="content-store.js?v=9.3"></script>
   <script>
     // Instant 0ms Pre-Hydration & Zero-Flicker Renderer
     (function() {
@@ -1222,11 +1222,56 @@
     </div>
   </div>
 
+  <!-- User Guidance Validation Alert Modal (Anti-Dummy Popup) -->
+  <div class="lightbox-modal" id="validationAlertModal" role="dialog" aria-modal="true">
+    <div class="lightbox-content-box"
+      style="max-width: 480px; text-align: center; padding: 32px 24px; background: var(--bg-card); border-radius: var(--radius-lg); border: 1.5px solid rgba(239, 68, 68, 0.5); box-shadow: 0 25px 60px rgba(0,0,0,0.6);">
+      <button class="modal-close-btn" onclick="closeValidationGuideModal()" aria-label="Close Modal" style="top: 16px; right: 16px;">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <div
+        style="width: 70px; height: 70px; background: rgba(239, 68, 68, 0.12); border: 2px solid #EF4444; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 2rem; color: #EF4444; box-shadow: 0 10px 25px rgba(239, 68, 68, 0.25);">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <h3 style="font-size: 1.35rem; margin-bottom: 6px; color: var(--text-primary);">⚠️ Please Check Your Details</h3>
+      <p style="color: var(--text-secondary); font-size: 0.88rem; line-height: 1.45; margin-bottom: 16px;">
+        Dummy or incomplete contact information was detected. Please provide genuine, active details so our team can send your proposal & connect via WhatsApp.
+      </p>
+
+      <!-- Specific Detected Issue Box -->
+      <div class="validation-guide-box">
+        <strong id="validationAlertField" style="color: #EF4444; font-size: 0.88rem; display: block; margin-bottom: 4px;">
+          <i class="fa-solid fa-circle-exclamation"></i> Detected Issue:
+        </strong>
+        <span id="validationAlertMessage" style="color: var(--text-primary); font-size: 0.85rem; font-weight: 600; line-height: 1.35;">
+          Please enter a valid 10-digit mobile number.
+        </span>
+      </div>
+
+      <!-- Quick Guidance Checklist -->
+      <div style="background: var(--bg-tertiary); border-radius: var(--radius-md); padding: 12px 14px; margin-bottom: 20px; border: 1px solid var(--border-subtle);">
+        <div class="validation-guide-item">
+          <i class="fa-solid fa-phone" style="color: var(--brand-indigo); font-size: 0.95rem; margin-top: 2px;"></i>
+          <span><strong>Mobile Number:</strong> 10-digits starting with 6, 7, 8, or 9 (no 0000000000 or 9876543210).</span>
+        </div>
+        <div class="validation-guide-item">
+          <i class="fa-solid fa-envelope" style="color: var(--brand-indigo); font-size: 0.95rem; margin-top: 2px;"></i>
+          <span><strong>Email Address:</strong> Genuine Gmail, Outlook, or official email (no test@ or temporary mail).</span>
+        </div>
+      </div>
+
+      <button type="button" class="btn btn-primary" onclick="closeValidationGuideModal()" style="width: 100%; padding: 13px; justify-content: center; font-size: 0.95rem;">
+        <i class="fa-solid fa-pen-to-square"></i>
+        <span>Okay, Let Me Correct It</span>
+      </button>
+    </div>
+  </div>
+
   <!-- Razorpay Official Checkout SDK -->
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
   <!-- JavaScript Modules -->
-  <script src="script.js?v=9.2"></script>
+  <script src="script.js?v=9.3"></script>
 </body>
 
 </html>

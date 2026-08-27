@@ -1750,6 +1750,55 @@ function hydratePageFromCMS(customContent) {
     return { valid: true, clean };
   }
 
+  // =========================================================================
+  // USER GUIDANCE VALIDATION MODAL HANDLERS
+  // =========================================================================
+  window.showValidationGuideModal = function(field, message) {
+    const modal = document.getElementById('validationAlertModal');
+    const msgEl = document.getElementById('validationAlertMessage');
+    const fieldEl = document.getElementById('validationAlertField');
+    
+    if (msgEl) msgEl.textContent = message;
+    if (fieldEl) {
+      if (field === 'email') fieldEl.innerHTML = '<i class="fa-solid fa-envelope"></i> Email Address Issue:';
+      else if (field === 'phone') fieldEl.innerHTML = '<i class="fa-solid fa-phone"></i> Mobile / WhatsApp Issue:';
+      else if (field === 'name') fieldEl.innerHTML = '<i class="fa-solid fa-user"></i> Full Name Issue:';
+      else fieldEl.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Information Required:';
+    }
+
+    if (modal) {
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    window.__pendingInvalidField = field;
+  };
+
+  window.closeValidationGuideModal = function() {
+    const modal = document.getElementById('validationAlertModal');
+    if (modal) {
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+    
+    const field = window.__pendingInvalidField;
+    let targetInput = null;
+    if (field === 'name') {
+      targetInput = document.getElementById('clientName') || document.getElementById('webinarName');
+    } else if (field === 'email') {
+      targetInput = document.getElementById('clientEmail') || document.getElementById('webinarEmail');
+    } else if (field === 'phone') {
+      targetInput = document.getElementById('clientPhone') || document.getElementById('webinarPhone');
+    }
+    
+    if (targetInput) {
+      targetInput.focus();
+      targetInput.classList.add('input-highlight-error');
+      targetInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(() => targetInput.classList.remove('input-highlight-error'), 3500);
+    }
+  };
+
   const inquiryForm = document.getElementById('projectInquiryForm');
 
   if (inquiryForm) {
@@ -1775,28 +1824,24 @@ function hydratePageFromCMS(customContent) {
 
       const nameValidation = validateFullName(rawName);
       if (!nameValidation.valid) {
-        showToast(nameValidation.message, '#EF4444');
-        document.getElementById('clientName')?.focus();
+        showValidationGuideModal('name', nameValidation.message);
         return;
       }
 
       const emailValidation = validateEmailAddress(rawEmail);
       if (!emailValidation.valid) {
-        showToast(emailValidation.message, '#EF4444');
-        document.getElementById('clientEmail')?.focus();
+        showValidationGuideModal('email', emailValidation.message);
         return;
       }
 
       if (rawPhone) {
         const phoneValidation = validatePhoneNumber(rawPhone);
         if (!phoneValidation.valid) {
-          showToast(phoneValidation.message, '#EF4444');
-          document.getElementById('clientPhone')?.focus();
+          showValidationGuideModal('phone', phoneValidation.message);
           return;
         }
       } else {
-        showToast('Please provide your active 10-digit mobile / WhatsApp number.', '#EF4444');
-        document.getElementById('clientPhone')?.focus();
+        showValidationGuideModal('phone', 'Please provide your active 10-digit mobile / WhatsApp number.');
         return;
       }
 
