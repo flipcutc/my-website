@@ -190,6 +190,42 @@ const DEFAULT_SITE_CONTENT = {
       }
     ]
   },
+  "whyUs": {
+    "subtitle": "Why Choose FlipCut",
+    "title": "Built for Scale, Reliability & Quality",
+    "description": "Why modern creators and forward-thinking brands partner with our post-production team.",
+    "features": [
+      {
+        "icon": "fa-solid fa-headset",
+        "title": "Dedicated Lead Editor",
+        "desc": "You get an assigned lead editor who learns your brand tone and style for consistent visual identity."
+      },
+      {
+        "icon": "fa-solid fa-comments",
+        "title": "Private WhatsApp / Slack",
+        "desc": "Direct real-time communication with your production team without messy email chains."
+      },
+      {
+        "icon": "fa-solid fa-infinity",
+        "title": "Unlimited Revisions",
+        "desc": "We iterate rapidly until the cut matches your exact vision on all Retainer plans."
+      },
+      {
+        "icon": "fa-solid fa-hard-drive",
+        "title": "Project Files Included",
+        "desc": "Full access to Adobe Premiere, After Effects, and DaVinci project files on demand."
+      }
+    ],
+    "toolingTitle": "Industry Standard Creative Tooling",
+    "tools": [
+      { "icon": "fa-solid fa-film", "color": "#9999FF", "name": "Adobe Premiere Pro" },
+      { "icon": "fa-solid fa-cubes", "color": "#9999FF", "name": "Adobe After Effects" },
+      { "icon": "fa-solid fa-palette", "color": "#FF5500", "name": "DaVinci Resolve Studio" },
+      { "icon": "fa-solid fa-cube", "color": "#E87D0D", "name": "Blender 3D" },
+      { "icon": "fa-solid fa-wand-sparkles", "color": "#00D2FF", "name": "Topaz Video AI" },
+      { "icon": "fa-solid fa-robot", "color": "#7C3AED", "name": "Midjourney / AI Suite" }
+    ]
+  },
   "pricing": {
     "title": "Transparent Packages. Zero Hidden Fees.",
     "description": "Choose an agile per-project tier or secure dedicated retainer bandwidth for ongoing growth.",

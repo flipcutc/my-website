@@ -941,6 +941,11 @@
           </button>
         </li>
         <li>
+          <button class="tab-btn-vertical" data-tab="tab-why-us" data-title="Why Choose FlipCut & Creative Tooling CMS">
+            <span class="btn-inner"><i class="fa-solid fa-award" style="color: #F59E0B;"></i> Why Choose Us</span>
+          </button>
+        </li>
+        <li>
           <button class="tab-btn-vertical" data-tab="tab-pricing" data-title="Pricing & Retainer Plans (₹ INR)">
             <span class="btn-inner"><i class="fa-solid fa-indian-rupee-sign"></i> Pricing Plans (₹)</span>
           </button>
@@ -2242,6 +2247,75 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
       </div>
 
       <!-- ====================================================================
+           TAB: WHY CHOOSE US & CREATIVE TOOLING CMS
+           ==================================================================== -->
+      <div class="tab-pane" id="tab-why-us">
+        <!-- Section Header Settings -->
+        <div class="cms-card" style="margin-bottom: 24px;">
+          <div class="cms-header">
+            <div>
+              <h2><i class="fa-solid fa-award text-gradient"></i> Why Choose Us & Creative Tooling CMS</h2>
+              <p>Edit section subtitle, main title, description, the 4 feature cards, and the creative tooling stack.</p>
+            </div>
+            <div>
+              <button type="button" class="btn btn-primary" onclick="window.saveAdminDraft(true)" style="padding: 10px 20px; font-size: 0.88rem;">
+                <i class="fa-solid fa-floppy-disk"></i>
+                <span>Save Why Us Changes</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="cms-grid-2">
+            <div class="form-group">
+              <label>Section Subtitle</label>
+              <input type="text" id="cfgWhySubtitle" class="form-control" placeholder="Why Choose FlipCut">
+            </div>
+            <div class="form-group">
+              <label>Section Main Title</label>
+              <input type="text" id="cfgWhyTitle" class="form-control" placeholder="Built for Scale, Reliability & Quality">
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label>Section Description</label>
+            <textarea id="cfgWhyDesc" class="form-control" rows="2" placeholder="Why modern creators and forward-thinking brands partner with our post-production team."></textarea>
+          </div>
+        </div>
+
+        <!-- 4 Feature Value Props Editor -->
+        <div class="cms-card" style="margin-bottom: 24px;">
+          <div class="cms-header" style="margin-bottom: 16px;">
+            <div>
+              <h3><i class="fa-solid fa-layer-group text-gradient"></i> Why Choose Us Feature Cards (4 Cards)</h3>
+              <p>Customize each value proposition card with FontAwesome icon, title, and description.</p>
+            </div>
+          </div>
+
+          <div id="whyFeaturesContainer" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px;">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- Creative Tooling Tech Stack Editor -->
+        <div class="cms-card">
+          <div class="cms-header" style="margin-bottom: 16px;">
+            <div>
+              <h3><i class="fa-solid fa-cubes text-gradient"></i> Industry Standard Creative Tooling Badges</h3>
+              <p>Customize the creative software tooling header and tools list displayed at the bottom of the section.</p>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label>Tooling Stack Section Header</label>
+            <input type="text" id="cfgWhyToolingTitle" class="form-control" placeholder="Industry Standard Creative Tooling">
+          </div>
+
+          <div id="whyToolsContainer" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ====================================================================
            TAB 8: PRICING & CALCULATOR (INR ₹)
            ==================================================================== -->
       <div class="tab-pane" id="tab-pricing">
@@ -2950,6 +3024,59 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
           }
         });
 
+        // Why Choose Us & Creative Tooling
+        if (!content.whyUs) content.whyUs = {};
+        if (document.getElementById('cfgWhySubtitle')) content.whyUs.subtitle = getVal('cfgWhySubtitle', content.whyUs.subtitle || 'Why Choose FlipCut');
+        if (document.getElementById('cfgWhyTitle')) content.whyUs.title = getVal('cfgWhyTitle', content.whyUs.title || 'Built for Scale, Reliability & Quality');
+        if (document.getElementById('cfgWhyDesc')) content.whyUs.description = getVal('cfgWhyDesc', content.whyUs.description || '');
+        if (document.getElementById('cfgWhyToolingTitle')) content.whyUs.toolingTitle = getVal('cfgWhyToolingTitle', content.whyUs.toolingTitle || 'Industry Standard Creative Tooling');
+
+        if (!Array.isArray(content.whyUs.features) || content.whyUs.features.length === 0) {
+          content.whyUs.features = [
+            { icon: "fa-solid fa-headset", title: "Dedicated Lead Editor", desc: "You get an assigned lead editor who learns your brand tone and style for consistent visual identity." },
+            { icon: "fa-solid fa-comments", title: "Private WhatsApp / Slack", desc: "Direct real-time communication with your production team without messy email chains." },
+            { icon: "fa-solid fa-infinity", title: "Unlimited Revisions", desc: "We iterate rapidly until the cut matches your exact vision on all Retainer plans." },
+            { icon: "fa-solid fa-hard-drive", title: "Project Files Included", desc: "Full access to Adobe Premiere, After Effects, and DaVinci project files on demand." }
+          ];
+        }
+
+        document.querySelectorAll('.why-f-title').forEach(input => {
+          const idx = parseInt(input.dataset.idx);
+          if (!isNaN(idx) && content.whyUs.features[idx]) {
+            content.whyUs.features[idx].title = input.value.trim() || content.whyUs.features[idx].title;
+          }
+        });
+        document.querySelectorAll('.why-f-desc').forEach(input => {
+          const idx = parseInt(input.dataset.idx);
+          if (!isNaN(idx) && content.whyUs.features[idx]) {
+            content.whyUs.features[idx].desc = input.value.trim() || content.whyUs.features[idx].desc;
+          }
+        });
+        document.querySelectorAll('.why-f-icon').forEach(input => {
+          const idx = parseInt(input.dataset.idx);
+          if (!isNaN(idx) && content.whyUs.features[idx]) {
+            content.whyUs.features[idx].icon = input.value.trim() || content.whyUs.features[idx].icon;
+          }
+        });
+
+        if (!Array.isArray(content.whyUs.tools) || content.whyUs.tools.length === 0) {
+          content.whyUs.tools = [
+            { icon: "fa-solid fa-film", color: "#9999FF", name: "Adobe Premiere Pro" },
+            { icon: "fa-solid fa-cubes", color: "#9999FF", name: "Adobe After Effects" },
+            { icon: "fa-solid fa-palette", color: "#FF5500", name: "DaVinci Resolve Studio" },
+            { icon: "fa-solid fa-cube", color: "#E87D0D", name: "Blender 3D" },
+            { icon: "fa-solid fa-wand-sparkles", color: "#00D2FF", name: "Topaz Video AI" },
+            { icon: "fa-solid fa-robot", color: "#7C3AED", name: "Midjourney / AI Suite" }
+          ];
+        }
+
+        document.querySelectorAll('.why-t-name').forEach(input => {
+          const idx = parseInt(input.dataset.idx);
+          if (!isNaN(idx) && content.whyUs.tools[idx]) {
+            content.whyUs.tools[idx].name = input.value.trim() || content.whyUs.tools[idx].name;
+          }
+        });
+
         // Pricing
         const parseFeatures = (text) => (text || '').split('\n').map(l => l.trim()).filter(Boolean);
         if (document.getElementById('cfgPricingTitle')) {
@@ -3344,6 +3471,7 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
         if (tabId === 'tab-services') renderServicesEditor();
         if (tabId === 'tab-workflow') renderWorkflowEditor();
         if (tabId === 'tab-portfolio') renderPortfolioEditor();
+        if (tabId === 'tab-why-us') renderWhyUsEditor();
         if (tabId === 'tab-banner') renderBannerEditor();
         if (tabId === 'tab-testimonials') { renderTestimonialsEditor(); renderFaqEditor(); }
         if (tabId === 'tab-supabase') loadSupabaseConfig();
@@ -4222,6 +4350,14 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
             renderPortfolioEditor();
           }
 
+          if (content.whyUs) {
+            setVal('cfgWhySubtitle', content.whyUs.subtitle || 'Why Choose FlipCut');
+            setVal('cfgWhyTitle', content.whyUs.title || 'Built for Scale, Reliability & Quality');
+            setVal('cfgWhyDesc', content.whyUs.description || 'Why modern creators and forward-thinking brands partner with our post-production team.');
+            setVal('cfgWhyToolingTitle', content.whyUs.toolingTitle || 'Industry Standard Creative Tooling');
+            renderWhyUsEditor();
+          }
+
           if (content.pricing) {
             setVal('cfgPricingTitle', content.pricing.title);
             setVal('cfgPricingDesc', content.pricing.description);
@@ -4677,6 +4813,119 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
         await collectAndSaveCMS(false);
         renderWorkflowEditor();
         showAdminToast(`💾 Step ${idx + 1} saved successfully!`);
+      };
+
+      /* ====================================================================
+         WHY CHOOSE US & CREATIVE TOOLING CMS (ADMIN HANDLERS)
+         ==================================================================== */
+      function renderWhyUsEditor() {
+        const featContainer = document.getElementById('whyFeaturesContainer');
+        const toolsContainer = document.getElementById('whyToolsContainer');
+
+        if (!content.whyUs) content.whyUs = {};
+        if (!Array.isArray(content.whyUs.features) || content.whyUs.features.length === 0) {
+          if (typeof DEFAULT_SITE_CONTENT !== 'undefined' && DEFAULT_SITE_CONTENT.whyUs && Array.isArray(DEFAULT_SITE_CONTENT.whyUs.features)) {
+            content.whyUs.features = JSON.parse(JSON.stringify(DEFAULT_SITE_CONTENT.whyUs.features));
+          } else {
+            content.whyUs.features = [
+              { icon: "fa-solid fa-headset", title: "Dedicated Lead Editor", desc: "You get an assigned lead editor who learns your brand tone and style for consistent visual identity." },
+              { icon: "fa-solid fa-comments", title: "Private WhatsApp / Slack", desc: "Direct real-time communication with your production team without messy email chains." },
+              { icon: "fa-solid fa-infinity", title: "Unlimited Revisions", desc: "We iterate rapidly until the cut matches your exact vision on all Retainer plans." },
+              { icon: "fa-solid fa-hard-drive", title: "Project Files Included", desc: "Full access to Adobe Premiere, After Effects, and DaVinci project files on demand." }
+            ];
+          }
+        }
+
+        if (!Array.isArray(content.whyUs.tools) || content.whyUs.tools.length === 0) {
+          if (typeof DEFAULT_SITE_CONTENT !== 'undefined' && DEFAULT_SITE_CONTENT.whyUs && Array.isArray(DEFAULT_SITE_CONTENT.whyUs.tools)) {
+            content.whyUs.tools = JSON.parse(JSON.stringify(DEFAULT_SITE_CONTENT.whyUs.tools));
+          } else {
+            content.whyUs.tools = [
+              { icon: "fa-solid fa-film", color: "#9999FF", name: "Adobe Premiere Pro" },
+              { icon: "fa-solid fa-cubes", color: "#9999FF", name: "Adobe After Effects" },
+              { icon: "fa-solid fa-palette", color: "#FF5500", name: "DaVinci Resolve Studio" },
+              { icon: "fa-solid fa-cube", color: "#E87D0D", name: "Blender 3D" },
+              { icon: "fa-solid fa-wand-sparkles", color: "#00D2FF", name: "Topaz Video AI" },
+              { icon: "fa-solid fa-robot", color: "#7C3AED", name: "Midjourney / AI Suite" }
+            ];
+          }
+        }
+
+        if (featContainer) {
+          featContainer.innerHTML = '';
+          content.whyUs.features.forEach((feat, idx) => {
+            const card = document.createElement('div');
+            card.style.background = 'var(--bg-surface)';
+            card.style.border = '1px solid var(--border-subtle)';
+            card.style.borderRadius = 'var(--radius-lg)';
+            card.style.padding = '18px';
+            card.style.boxShadow = 'var(--shadow-subtle)';
+
+            card.innerHTML = `
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border-subtle);">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-size: 1.1rem; color: var(--brand-indigo);"><i class="${feat.icon || 'fa-solid fa-headset'}"></i></span>
+                  <strong style="color: var(--text-primary); font-size: 0.95rem;">Card #${idx + 1}: ${feat.title || 'Feature'}</strong>
+                </div>
+                <button type="button" class="btn btn-secondary" onclick="window.saveIndividualWhyFeature(${idx})" style="padding: 5px 12px; font-size: 0.78rem;">
+                  <i class="fa-solid fa-floppy-disk text-gradient"></i> <span>Save</span>
+                </button>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 10px;">
+                <div style="display: grid; grid-template-columns: 1fr 140px; gap: 10px;">
+                  <div class="form-group" style="margin: 0;">
+                    <label style="font-size: 0.8rem; font-weight: 700;">Feature Title</label>
+                    <input type="text" class="form-control why-f-title" data-idx="${idx}" value="${feat.title || ''}" placeholder="Feature Title">
+                  </div>
+                  <div class="form-group" style="margin: 0;">
+                    <label style="font-size: 0.8rem; font-weight: 700;">Icon Class</label>
+                    <input type="text" class="form-control why-f-icon" data-idx="${idx}" value="${feat.icon || 'fa-solid fa-headset'}" placeholder="fa-solid fa-...">
+                  </div>
+                </div>
+                <div class="form-group" style="margin: 0;">
+                  <label style="font-size: 0.8rem; font-weight: 700;">Feature Description</label>
+                  <textarea class="form-control why-f-desc" data-idx="${idx}" rows="2" style="font-size: 0.84rem; line-height: 1.4;" placeholder="Description...">${feat.desc || ''}</textarea>
+                </div>
+              </div>
+            `;
+            featContainer.appendChild(card);
+          });
+        }
+
+        if (toolsContainer) {
+          toolsContainer.innerHTML = '';
+          content.whyUs.tools.forEach((tool, idx) => {
+            const div = document.createElement('div');
+            div.style.background = 'var(--bg-surface)';
+            div.style.border = '1px solid var(--border-subtle)';
+            div.style.borderRadius = 'var(--radius-md)';
+            div.style.padding = '12px 14px';
+            div.style.display = 'flex';
+            div.style.alignItems = 'center';
+            div.style.gap = '10px';
+
+            div.innerHTML = `
+              <i class="${tool.icon || 'fa-solid fa-cube'}" style="color: ${tool.color || '#9999FF'}; font-size: 1.2rem;"></i>
+              <input type="text" class="form-control why-t-name" data-idx="${idx}" value="${tool.name || ''}" style="font-size: 0.84rem; padding: 6px 10px;" placeholder="Tool Name">
+            `;
+            toolsContainer.appendChild(div);
+          });
+        }
+      }
+      window.renderWhyUsEditor = renderWhyUsEditor;
+
+      window.saveIndividualWhyFeature = async function(idx) {
+        if (!content.whyUs || !content.whyUs.features || !content.whyUs.features[idx]) return;
+        const titleInput = document.querySelector(`.why-f-title[data-idx="${idx}"]`);
+        const descInput = document.querySelector(`.why-f-desc[data-idx="${idx}"]`);
+        const iconInput = document.querySelector(`.why-f-icon[data-idx="${idx}"]`);
+        if (titleInput) content.whyUs.features[idx].title = titleInput.value.trim();
+        if (descInput) content.whyUs.features[idx].desc = descInput.value.trim();
+        if (iconInput) content.whyUs.features[idx].icon = iconInput.value.trim();
+
+        await collectAndSaveCMS(false);
+        renderWhyUsEditor();
+        showAdminToast(`💾 Feature Card #${idx + 1} saved successfully!`);
       };
 
       // Helper function: Universal Direct Upload from PC (Supports static GitHub Pages & Node servers)

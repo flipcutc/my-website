@@ -291,6 +291,45 @@ function hydratePageFromCMS(customContent) {
       console.warn('Portfolio hydration note:', pfErr);
     }
 
+    // 5.1 Why Choose Us & Creative Tooling
+    try {
+      if (content.whyUs) {
+        const whySub = document.getElementById('whySubtitle');
+        const whyTtl = document.getElementById('whyTitle');
+        const whyDsc = document.getElementById('whyDesc');
+        if (whySub && content.whyUs.subtitle) whySub.textContent = content.whyUs.subtitle;
+        if (whyTtl && content.whyUs.title) whyTtl.textContent = content.whyUs.title;
+        if (whyDsc && content.whyUs.description) whyDsc.textContent = content.whyUs.description;
+
+        if (content.whyUs.features && Array.isArray(content.whyUs.features) && content.whyUs.features.length > 0) {
+          const grid = document.getElementById('whyUsGrid');
+          if (grid) {
+            grid.innerHTML = content.whyUs.features.map(f => `
+              <div class="why-feature-box">
+                <span class="why-icon text-gradient"><i class="${f.icon || 'fa-solid fa-headset'}"></i></span>
+                <h4>${f.title || ''}</h4>
+                <p>${f.desc || ''}</p>
+              </div>
+            `).join('');
+          }
+        }
+
+        const techTitle = document.getElementById('techStackTitle');
+        if (techTitle && content.whyUs.toolingTitle) techTitle.textContent = content.whyUs.toolingTitle;
+
+        if (content.whyUs.tools && Array.isArray(content.whyUs.tools) && content.whyUs.tools.length > 0) {
+          const badgesRow = document.getElementById('techBadgesRow');
+          if (badgesRow) {
+            badgesRow.innerHTML = content.whyUs.tools.map(t => `
+              <div class="tech-badge-item"><i class="${t.icon || 'fa-solid fa-cube'}" style="color: ${t.color || '#9999FF'};"></i> ${t.name || ''}</div>
+            `).join('');
+          }
+        }
+      }
+    } catch (whyErr) {
+      console.warn('Why Choose Us hydration note:', whyErr);
+    }
+
     // 6. Pricing Plans (INR ₹)
     if (content.pricing) {
       const prSub = document.getElementById('pricingSubtitle');
