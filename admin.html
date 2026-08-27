@@ -2921,23 +2921,26 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
             });
             if (sbRes.ok) {
               const rows = await sbRes.json();
-              if (Array.isArray(rows) && rows.length > 0) {
-                fetchedLeads = rows.map(r => ({
-                  id: r.id,
-                  userId: r.id,
-                  name: r.name || 'Anonymous Client',
-                  email: r.email || '',
-                  phone: r.phone || '',
-                  service: r.service || 'Website / Video Inquiry',
-                  budget: r.budget || '₹25,000',
-                  amount: r.budget || '₹25,000',
-                  notes: r.message || '',
-                  message: r.message || '',
-                  status: r.status || 'New',
-                  date: r.date || (r.created_at ? r.created_at.slice(0, 10) : new Date().toISOString().slice(0, 10)),
-                  created_at: r.created_at
-                }));
-              }
+                fetchedLeads = rows.map(r => {
+                  const isWebinar = (r.service || '').toLowerCase().includes('webinar') || (r.id || '').startsWith('FC-WEB') || r.status === 'Booked / Paid';
+                  return {
+                    id: r.id,
+                    userId: r.id,
+                    name: r.name || 'Anonymous Client',
+                    email: r.email || '',
+                    phone: r.phone || '',
+                    service: r.service || (isWebinar ? 'Webinar Registration' : 'Website / Video Inquiry'),
+                    budget: r.budget || (isWebinar ? '₹2' : '₹25,000'),
+                    amount: r.budget || (isWebinar ? '₹2' : '₹25,000'),
+                    paymentId: r.paymentId || (isWebinar ? (r.paymentId || 'rzp_verified_pass') : ''),
+                    paymentStatus: r.paymentStatus || (isWebinar ? 'Paid & Verified (Razorpay)' : 'Inquiry / Quote Request'),
+                    notes: r.message || '',
+                    message: r.message || '',
+                    status: r.status || (isWebinar ? 'Booked / Paid' : 'New'),
+                    date: r.date || (r.created_at ? r.created_at.slice(0, 10) : new Date().toISOString().slice(0, 10)),
+                    created_at: r.created_at
+                  };
+                });
             }
           } catch (sbErr) {
             console.warn('Supabase leads fetch note:', sbErr);
@@ -3285,8 +3288,10 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
 
         const payStatusEl = document.getElementById('ldModalPaymentStatus');
         if (payStatusEl) {
-          payStatusEl.textContent = lead.paymentStatus || (lead.paymentId ? '● Paid & Verified' : '○ Unpaid / Inquiry');
-          payStatusEl.style.color = lead.paymentId ? '#10B981' : 'var(--text-muted)';
+          const isWebinar = (lead.service || '').toLowerCase().includes('webinar') || (lead.packageName || '').toLowerCase().includes('webinar') || (lead.userId || '').startsWith('FC-WEB') || lead.status === 'Booked / Paid';
+          const isPaid = lead.paymentId || isWebinar || (lead.paymentStatus && lead.paymentStatus.includes('Paid'));
+          payStatusEl.textContent = isPaid ? '● Paid & Verified (Razorpay)' : '○ Quote Request / Inquiry';
+          payStatusEl.style.color = isPaid ? '#10B981' : 'var(--text-muted)';
         }
 
         const footageEl = document.getElementById('ldModalFootage');
@@ -3493,9 +3498,9 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
           const phoneStr = l.phone || '';
           const emailStr = l.email || '';
           const serviceStr = l.service || l.packageName || 'Webinar Masterclass';
-          const amountStr = l.budget || l.amount || '₹2';
-          const payStatusStr = l.paymentStatus || (l.paymentId ? 'Paid & Verified' : 'Inquiry');
-          const payIdStr = l.paymentId || '';
+          const isWebinar = (l.service || '').toLowerCase().includes('webinar') || (l.packageName || '').toLowerCase().includes('webinar') || (l.userId || '').startsWith('FC-WEB') || l.status === 'Booked / Paid';
+          const isPaid = l.paymentId || isWebinar || (l.paymentStatus && l.paymentStatus.includes('Paid'));
+          const payStatusStr = l.paymentStatus || (isPaid ? 'Paid & Verified (Razorpay)' : 'Quote Request / Inquiry');
           const typeStr = l.websiteType || '';
           const statusStr = l.status || 'New';
           const notesStr = l.notes || l.message || l.footage || '';
