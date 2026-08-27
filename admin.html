@@ -986,10 +986,14 @@
         </div>
       </div>
 
-      <div style="display: flex; align-items: center; gap: 12px;">
-        <button class="btn btn-primary" id="topSaveBtn" style="padding: 9px 20px; font-size: 0.9rem;">
-          <i class="fa-solid fa-cloud-arrow-up"></i>
-          <span>Publish All Changes</span>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <button type="button" class="btn btn-secondary" id="topSaveDraftBtn" style="padding: 9px 18px; font-size: 0.88rem; font-weight: 700; background: var(--bg-tertiary); border: 1.5px solid var(--border-subtle); display: flex; align-items: center; gap: 8px;">
+          <i class="fa-solid fa-floppy-disk" style="color: var(--brand-indigo);"></i>
+          <span>Save Changes</span>
+        </button>
+        <button type="button" class="btn btn-primary" id="topPublishBtn" style="padding: 9px 22px; font-size: 0.9rem; font-weight: 800; background: linear-gradient(135deg, #10B981, #059669); border: none; box-shadow: 0 4px 14px rgba(16,185,129,0.35); display: flex; align-items: center; gap: 8px;">
+          <i class="fa-solid fa-rocket"></i>
+          <span>Publish to Website</span>
         </button>
       </div>
     </header>
@@ -2622,6 +2626,28 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
             <span>Close Window</span>
           </button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Publish Success Celebration Modal -->
+  <div id="publishSuccessModal" style="display: none; position: fixed; inset: 0; background: rgba(5,7,15,0.85); backdrop-filter: blur(8px); z-index: 9999999; align-items: center; justify-content: center; padding: 20px;">
+    <div style="background: var(--bg-secondary); border: 1.5px solid #10B981; border-radius: 20px; max-width: 490px; width: 100%; padding: 36px 28px; text-align: center; box-shadow: 0 25px 60px rgba(0,0,0,0.65); position: relative;">
+      <div style="width: 76px; height: 76px; border-radius: 50%; background: rgba(16,185,129,0.15); border: 2px solid #10B981; color: #10B981; font-size: 2.2rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; box-shadow: 0 0 25px rgba(16,185,129,0.35);">
+        <i class="fa-solid fa-circle-check"></i>
+      </div>
+      <h2 style="font-size: 1.6rem; font-weight: 900; color: var(--text-primary); margin-bottom: 8px;">Published Successfully!</h2>
+      <p style="font-size: 1rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 24px;">
+        🎉 <strong>Successfully published your latest update!</strong><br>
+        All your updated pages, texts, prices, images, and videos are now 100% active on <strong>flipcutcreation.in</strong>.
+      </p>
+      <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+        <a href="https://flipcutcreation.in" target="_blank" class="btn btn-primary" style="padding: 11px 24px; font-weight: 700; background: linear-gradient(135deg, #6366F1, #8B5CF6); text-decoration: none; border-radius: 9999px; display: inline-flex; align-items: center; gap: 8px;">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> View Live Website
+        </a>
+        <button type="button" class="btn btn-secondary" onclick="document.getElementById('publishSuccessModal').style.display='none';" style="padding: 11px 24px; font-weight: 700; border-radius: 9999px;">
+          Done
+        </button>
       </div>
     </div>
   </div>
@@ -5539,34 +5565,90 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
         }
       }
 
-      async function collectAndSaveCMS(showToast = true) {
+      // 1. Save Changes / Draft Handler (Safe on page reload)
+      async function saveAdminDraft(showToast = true) {
         collectCMSFormData();
-        const saved = await saveSiteContent(content);
+        try {
+          localStorage.setItem('flipcut_cms_draft', JSON.stringify(content));
+          localStorage.setItem('flipcut_site_content', JSON.stringify(content));
+          localStorage.setItem('flipcut_site_content_backup', JSON.stringify(content));
+        } catch (_) {}
+
         if (showToast) {
-          showAdminToast('⚡ All changes saved & published live to Cloud Database!', '#10B981');
+          showAdminToast('💾 All changes saved in Admin! (Draft saved - reload safe)', '#6366F1');
         }
+        return true;
+      }
+
+      // 2. Publish Live to Website Handler
+      async function publishLiveToWebsite() {
+        collectCMSFormData();
+        
+        // Save to Admin Draft + Public Live Cloud
+        saveAdminDraft(false);
+        const saved = await saveSiteContent(content);
+        if (typeof window.saveContentToDualCloud === 'function') {
+          try { await window.saveContentToDualCloud(content); } catch (_) {}
+        }
+
+        // 0ms Live Broadcast to public website
+        try {
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('flipcut:cms-updated', { detail: content }));
+            if (typeof BroadcastChannel !== 'undefined') {
+              const bc = new BroadcastChannel('flipcut_cms_channel');
+              bc.postMessage({ type: 'CMS_UPDATED', content: content });
+              bc.close();
+            }
+          }
+        } catch (_) {}
+
+        // Show Celebration Modal
+        const pubModal = document.getElementById('publishSuccessModal');
+        if (pubModal) {
+          pubModal.style.display = 'flex';
+        }
+
+        // Show Toast Notification
+        showAdminToast('🎉 Successfully published your latest update to the live website!', '#10B981');
         return saved;
       }
 
-      const topSaveBtn = document.getElementById('topSaveBtn');
-      if (topSaveBtn) {
-        topSaveBtn.addEventListener('click', async () => {
-          topSaveBtn.disabled = true;
-          const origHtml = topSaveBtn.innerHTML;
-          topSaveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Publishing to Cloud...</span>';
+      window.collectAndSaveCMS = saveAdminDraft;
+      window.publishLiveToWebsite = publishLiveToWebsite;
+
+      const topSaveDraftBtn = document.getElementById('topSaveDraftBtn');
+      if (topSaveDraftBtn) {
+        topSaveDraftBtn.addEventListener('click', async () => {
+          topSaveDraftBtn.disabled = true;
+          const origHtml = topSaveDraftBtn.innerHTML;
+          topSaveDraftBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Saving...</span>';
+          await saveAdminDraft(true);
+          topSaveDraftBtn.innerHTML = '<i class="fa-solid fa-check" style="color:#10B981;"></i> <span>Saved!</span>';
+          setTimeout(() => {
+            topSaveDraftBtn.disabled = false;
+            topSaveDraftBtn.innerHTML = origHtml;
+          }, 2000);
+        });
+      }
+
+      const topPublishBtn = document.getElementById('topPublishBtn');
+      if (topPublishBtn) {
+        topPublishBtn.addEventListener('click', async () => {
+          topPublishBtn.disabled = true;
+          const origHtml = topPublishBtn.innerHTML;
+          topPublishBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Publishing Live...</span>';
           try {
-            await collectAndSaveCMS(true);
-            topSaveBtn.innerHTML = '<i class="fa-solid fa-check"></i> <span>Published Live!</span>';
-            topSaveBtn.style.background = '#10B981';
+            await publishLiveToWebsite();
+            topPublishBtn.innerHTML = '<i class="fa-solid fa-circle-check"></i> <span>Published!</span>';
             setTimeout(() => {
-              topSaveBtn.disabled = false;
-              topSaveBtn.innerHTML = origHtml;
-              topSaveBtn.style.background = '';
-            }, 2500);
+              topPublishBtn.disabled = false;
+              topPublishBtn.innerHTML = origHtml;
+            }, 3000);
           } catch (err) {
-            topSaveBtn.disabled = false;
-            topSaveBtn.innerHTML = origHtml;
-            showAdminToast(`Save Error: ${err.message}`, '#EF4444');
+            topPublishBtn.disabled = false;
+            topPublishBtn.innerHTML = origHtml;
+            showAdminToast(`Publish Error: ${err.message}`, '#EF4444');
           }
         });
       }

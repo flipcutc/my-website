@@ -480,7 +480,7 @@ function formatMediaUrl(url, type) {
 function getSiteContent() {
   try {
     if (typeof localStorage !== 'undefined') {
-      let saved = localStorage.getItem('flipcut_site_content') || localStorage.getItem('flipcut_site_content_backup');
+      let saved = localStorage.getItem('flipcut_cms_draft') || localStorage.getItem('flipcut_site_content') || localStorage.getItem('flipcut_site_content_backup');
       if (!saved && typeof sessionStorage !== 'undefined') {
         saved = sessionStorage.getItem('flipcut_site_content');
       }
