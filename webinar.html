@@ -570,9 +570,15 @@
       
       <!-- Form Box Container -->
       <div id="webinarFormContainer">
-        <div style="text-align: center; margin-bottom: 30px;">
+        <div style="text-align: center; margin-bottom: 25px;">
           <h2 style="font-size: 1.75rem; font-weight: 800; margin-bottom: 8px;" id="webinarFormTitle">Fill Out Your Webinar Brief</h2>
-          <p style="color: var(--text-muted); font-size: 0.92rem;" id="webinarFormSubtitle">Enter your details, select your website type, and complete payment via GPay / Netbanking to unlock your pass.</p>
+          <p style="color: var(--text-muted); font-size: 0.92rem; margin-bottom: 12px;" id="webinarFormSubtitle">Enter your details, select your website type, and complete payment via GPay / Netbanking to unlock your pass.</p>
+          <div style="display: inline-flex; align-items: center; gap: 8px; font-size: 0.88rem; background: rgba(99, 102, 241, 0.08); border: 1px dashed rgba(99, 102, 241, 0.35); padding: 6px 16px; border-radius: 20px;">
+            <span style="color: var(--text-secondary);">Already booked a pass?</span>
+            <button type="button" onclick="openFindPassModal()" style="background: none; border: none; color: var(--brand-indigo); font-weight: 700; cursor: pointer; text-decoration: underline; padding: 0; font-size: 0.88rem; display: inline-flex; align-items: center; gap: 4px;">
+              <i class="fa-solid fa-magnifying-glass"></i> Find / View Your Pass
+            </button>
+          </div>
         </div>
 
         <form id="webinarRegistrationForm">
@@ -777,7 +783,13 @@
           <span>Join VIP WhatsApp Group for Live Webinar Link</span>
         </a>
 
-        <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 8px;">
+        <div style="margin-top: 18px; padding-top: 14px; border-top: 1px dashed var(--border-medium); display: flex; justify-content: center; gap: 10px;">
+          <button type="button" onclick="showFreshRegistrationForm()" class="btn btn-secondary" style="font-size: 0.88rem; padding: 8px 16px;">
+            <i class="fa-solid fa-plus-circle"></i> <span>Register Another Attendee / New Pass</span>
+          </button>
+        </div>
+
+        <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 12px;">
           <i class="fa-solid fa-shield-halved text-gradient"></i> All details recorded permanently in FlipCut Master CRM.
         </p>
       </div>
@@ -795,6 +807,37 @@
       </a>
     </div>
   </footer>
+
+  <!-- Find / Retrieve My Pass Modal (No login/password needed) -->
+  <div class="lightbox-modal" id="findPassModal" style="display: none; align-items: center; justify-content: center; z-index: 99999999; backdrop-filter: blur(10px); background: rgba(0,0,0,0.7);">
+    <div class="lightbox-content-box" style="max-width: 480px; width: 90%; text-align: left; padding: 32px 28px; background: var(--bg-card); border-radius: var(--radius-xl); border: 1.5px solid var(--border-medium); box-shadow: 0 25px 60px rgba(0,0,0,0.6); position: relative;">
+      <button type="button" onclick="closeFindPassModal()" style="position: absolute; top: 18px; right: 18px; background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; line-height: 1;" aria-label="Close Modal">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div style="text-align: center; margin-bottom: 22px;">
+        <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(99, 102, 241, 0.12); border: 2px solid var(--brand-indigo); color: var(--brand-indigo); display: flex; align-items: center; justify-content: center; font-size: 1.75rem; margin: 0 auto 12px;">
+          <i class="fa-solid fa-id-card-clip"></i>
+        </div>
+        <h3 style="font-size: 1.4rem; font-weight: 800; margin-bottom: 6px; color: var(--text-primary);">Retrieve Your Digital Pass</h3>
+        <p style="font-size: 0.88rem; color: var(--text-secondary); margin: 0;">Enter your Mobile Number, Name, or User ID to restore your confirmed ticket pass instantly.</p>
+      </div>
+
+      <form id="findPassForm" onsubmit="handleFindPassSubmit(event)">
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label style="font-size: 0.88rem; font-weight: 700; margin-bottom: 6px; display: block; color: var(--text-primary);">Mobile Number / Name / User ID *</label>
+          <input type="text" id="findPassInput" class="form-control" placeholder="e.g. 7010270151 or Murugan or FC-WEB-51928" required style="font-size: 0.95rem; padding: 12px 14px;">
+        </div>
+
+        <div id="findPassFeedback" style="display: none; margin-bottom: 16px; padding: 12px 14px; border-radius: 8px; font-size: 0.88rem; line-height: 1.4;"></div>
+
+        <button type="submit" class="btn btn-primary" id="btnFindPassSubmit" style="width: 100%; justify-content: center; padding: 13px; font-size: 1rem; font-weight: 700;">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <span id="btnFindPassSubmitText">Find My Ticket Pass</span>
+        </button>
+      </form>
+    </div>
+  </div>
 
   <!-- Digital Ticket Pass Modal -->
   <div class="lightbox-modal" id="ticketSuccessModal">
@@ -1405,6 +1448,99 @@
           if (cardWrap) cardWrap.scrollIntoView({ behavior: 'smooth', block: 'center' });
         });
       }
+
+      // Auto-Detect Existing Registered Pass on Page Load (even on refresh / return)
+      try {
+        const existingProfile = (typeof window.getUserProfile === 'function') ? window.getUserProfile() : null;
+        if (existingProfile && existingProfile.userId && existingProfile.webinarRegistered) {
+          showTicketModal(existingProfile.name, existingProfile.websiteType, existingProfile.paymentId, existingProfile.userId);
+        }
+      } catch (_) {}
+
+      // Find Pass Modal Handlers
+      const findPassModal = document.getElementById('findPassModal');
+      const findPassFeedback = document.getElementById('findPassFeedback');
+      const btnFindPassSubmit = document.getElementById('btnFindPassSubmit');
+      const btnFindPassSubmitText = document.getElementById('btnFindPassSubmitText');
+
+      window.openFindPassModal = function() {
+        if (findPassModal) {
+          findPassModal.style.display = 'flex';
+          findPassModal.style.opacity = '1';
+          findPassModal.style.visibility = 'visible';
+          findPassModal.classList.add('active');
+          const inp = document.getElementById('findPassInput');
+          if (inp) {
+            inp.value = '';
+            setTimeout(() => inp.focus(), 150);
+          }
+          if (findPassFeedback) findPassFeedback.style.display = 'none';
+        }
+      };
+
+      window.closeFindPassModal = function() {
+        if (findPassModal) {
+          findPassModal.classList.remove('active');
+          findPassModal.style.display = 'none';
+          findPassModal.style.opacity = '0';
+          findPassModal.style.visibility = 'hidden';
+        }
+      };
+
+      window.handleFindPassSubmit = async function(e) {
+        if (e && e.preventDefault) e.preventDefault();
+        const query = document.getElementById('findPassInput')?.value?.trim();
+        if (!query) return;
+
+        if (btnFindPassSubmit) btnFindPassSubmit.setAttribute('disabled', 'true');
+        if (btnFindPassSubmitText) btnFindPassSubmitText.textContent = 'Searching Cloud Database...';
+        if (findPassFeedback) {
+          findPassFeedback.style.display = 'block';
+          findPassFeedback.style.background = 'rgba(99, 102, 241, 0.12)';
+          findPassFeedback.style.border = '1px solid var(--brand-indigo)';
+          findPassFeedback.style.color = 'var(--text-primary)';
+          findPassFeedback.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Searching registration records for "<strong>${query}</strong>"...`;
+        }
+
+        const result = (typeof window.lookupUserPass === 'function') 
+          ? await window.lookupUserPass(query)
+          : { success: false, message: 'Lookup engine unavailable.' };
+
+        if (btnFindPassSubmit) btnFindPassSubmit.removeAttribute('disabled');
+        if (btnFindPassSubmitText) btnFindPassSubmitText.textContent = 'Find My Ticket Pass';
+
+        if (result && result.success && result.lead) {
+          const lead = result.lead;
+          if (findPassFeedback) {
+            findPassFeedback.style.background = 'rgba(16, 185, 129, 0.15)';
+            findPassFeedback.style.border = '1.5px solid #10B981';
+            findPassFeedback.style.color = '#10B981';
+            findPassFeedback.innerHTML = `✅ <strong>Pass Found:</strong> ${lead.name} (${lead.userId})<br><span style="font-size:0.82rem; color:var(--text-primary);">Opening your Digital Ticket Pass now...</span>`;
+          }
+          setTimeout(() => {
+            closeFindPassModal();
+            showTicketModal(lead.name, lead.websiteType, lead.paymentId, lead.userId);
+            showToast(`🎉 Welcome back, ${lead.name}! Here is your Digital Ticket Pass.`, '#10B981');
+          }, 700);
+        } else {
+          if (findPassFeedback) {
+            findPassFeedback.style.background = 'rgba(239, 68, 68, 0.12)';
+            findPassFeedback.style.border = '1px solid #EF4444';
+            findPassFeedback.style.color = '#EF4444';
+            findPassFeedback.innerHTML = `❌ ${result?.message || 'No registered pass found for the entered details. Please check spelling or register below.'}`;
+          }
+        }
+      };
+
+      window.showFreshRegistrationForm = function() {
+        const formBox = document.getElementById('webinarFormContainer');
+        const inlinePass = document.getElementById('webinarInlineTicketPass');
+        if (formBox) formBox.style.display = 'block';
+        if (inlinePass) inlinePass.style.display = 'none';
+        const cardWrap = document.querySelector('.webinar-card-wrapper');
+        if (cardWrap) cardWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        showToast('Fresh Registration Form opened. Fill in details to book another pass.', 'var(--brand-indigo)');
+      };
 
       // Mobile Navigation Drawer Handlers
       const mobileMenuBtn = document.getElementById('mobileMenuBtn');
