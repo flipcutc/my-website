@@ -18,24 +18,36 @@ function applyDynamicFavicon(url) {
       try { link.remove(); } catch (_) {}
     });
 
-    const bustUrl = cleanUrl.includes('?') ? `${cleanUrl}&t=${Date.now()}` : `${cleanUrl}?t=${Date.now()}`;
+    let finalHref = cleanUrl;
+    let mimeType = 'image/png';
+
+    if (cleanUrl.startsWith('data:')) {
+      finalHref = cleanUrl; // Never append ?t= to data URIs
+      if (cleanUrl.includes('image/svg')) mimeType = 'image/svg+xml';
+      else if (cleanUrl.includes('image/x-icon') || cleanUrl.includes('image/vnd')) mimeType = 'image/x-icon';
+      else mimeType = 'image/png';
+    } else {
+      finalHref = cleanUrl.includes('?') ? `${cleanUrl}&t=${Date.now()}` : `${cleanUrl}?t=${Date.now()}`;
+      if (cleanUrl.toLowerCase().endsWith('.svg')) mimeType = 'image/svg+xml';
+      else if (cleanUrl.toLowerCase().endsWith('.ico')) mimeType = 'image/x-icon';
+      else mimeType = 'image/png';
+    }
 
     const linkIcon = document.createElement('link');
     linkIcon.rel = 'icon';
-    if (cleanUrl.endsWith('.svg')) linkIcon.type = 'image/svg+xml';
-    else if (cleanUrl.endsWith('.png')) linkIcon.type = 'image/png';
-    else if (cleanUrl.endsWith('.ico')) linkIcon.type = 'image/x-icon';
-    linkIcon.href = bustUrl;
+    linkIcon.type = mimeType;
+    linkIcon.href = finalHref;
     document.head.appendChild(linkIcon);
 
     const linkShortcut = document.createElement('link');
     linkShortcut.rel = 'shortcut icon';
-    linkShortcut.href = bustUrl;
+    linkShortcut.type = mimeType;
+    linkShortcut.href = finalHref;
     document.head.appendChild(linkShortcut);
 
     const linkApple = document.createElement('link');
     linkApple.rel = 'apple-touch-icon';
-    linkApple.href = bustUrl;
+    linkApple.href = finalHref;
     document.head.appendChild(linkApple);
   } catch (_) {}
 }
