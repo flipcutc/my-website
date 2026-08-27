@@ -309,6 +309,66 @@ async function publishCmsToDualCloud(content) {
   return true;
 }
 
+/**
+ * 6. Strict Anti-Duplicate Checker (One Email and One Phone Allowed Only Once)
+ */
+async function checkDuplicateLead(email, phone, currentService = '') {
+  const cleanEmail = (email || '').trim().toLowerCase();
+  let cleanPhone = (phone || '').trim().replace(/[\s\-\(\)\+]/g, '');
+  if (cleanPhone.startsWith('91') && cleanPhone.length === 12) cleanPhone = cleanPhone.substring(2);
+  if (cleanPhone.startsWith('0') && cleanPhone.length === 11) cleanPhone = cleanPhone.substring(1);
+
+  // 1. Check local storage cache first
+  try {
+    const localLeads = JSON.parse(localStorage.getItem('flipcut_leads') || '[]');
+    for (const lead of localLeads) {
+      if (!lead || lead.id === 'CMS_SITE_CONTENT_LIVE') continue;
+      const leadEmail = (lead.email || '').trim().toLowerCase();
+      let leadPhone = (lead.phone || '').trim().replace(/[\s\-\(\)\+]/g, '');
+      if (leadPhone.startsWith('91') && leadPhone.length === 12) leadPhone = leadPhone.substring(2);
+      if (leadPhone.startsWith('0') && leadPhone.length === 11) leadPhone = leadPhone.substring(1);
+
+      if (cleanEmail && leadEmail && cleanEmail === leadEmail) {
+        return { isDuplicate: true, matchedBy: 'email', existingLead: lead, userId: lead.id || lead.userId };
+      }
+      if (cleanPhone && leadPhone && cleanPhone === leadPhone) {
+        return { isDuplicate: true, matchedBy: 'phone', existingLead: lead, userId: lead.id || lead.userId };
+      }
+    }
+  } catch (_) {}
+
+  // 2. Check Supabase Cloud PostgreSQL REST API
+  try {
+    if (cleanEmail) {
+      const emailRes = await fetch(`${SUPABASE_SYNC_URL}/rest/v1/leads?email=ilike.${encodeURIComponent(cleanEmail)}&id=neq.CMS_SITE_CONTENT_LIVE&limit=1`, {
+        headers: { apikey: SUPABASE_SYNC_KEY, Authorization: 'Bearer ' + SUPABASE_SYNC_KEY }
+      });
+      if (emailRes.ok) {
+        const rows = await emailRes.json();
+        if (Array.isArray(rows) && rows.length > 0) {
+          return { isDuplicate: true, matchedBy: 'email', existingLead: rows[0], userId: rows[0].id };
+        }
+      }
+    }
+
+    if (cleanPhone && cleanPhone.length >= 10) {
+      const phoneRes = await fetch(`${SUPABASE_SYNC_URL}/rest/v1/leads?phone=ilike.%25${encodeURIComponent(cleanPhone)}%25&id=neq.CMS_SITE_CONTENT_LIVE&limit=1`, {
+        headers: { apikey: SUPABASE_SYNC_KEY, Authorization: 'Bearer ' + SUPABASE_SYNC_KEY }
+      });
+      if (phoneRes.ok) {
+        const rows = await phoneRes.json();
+        if (Array.isArray(rows) && rows.length > 0) {
+          return { isDuplicate: true, matchedBy: 'phone', existingLead: rows[0], userId: rows[0].id };
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('[Duplicate Check Note]', err.message);
+  }
+
+  return { isDuplicate: false };
+}
+
 // Attach to window object for global access
 if (typeof window !== 'undefined') {
   window.pushLeadToDualCloud = pushLeadToDualCloud;
@@ -316,5 +376,6 @@ if (typeof window !== 'undefined') {
   window.updateLeadStatusDualCloud = updateLeadStatusDualCloud;
   window.deleteLeadDualCloud = deleteLeadDualCloud;
   window.publishCmsToDualCloud = publishCmsToDualCloud;
+  window.checkDuplicateLead = checkDuplicateLead;
   window.FIREBASE_SYNC_CONFIG = FIREBASE_SYNC_CONFIG;
 }

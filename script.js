@@ -1849,6 +1849,19 @@ function hydratePageFromCMS(customContent) {
       const email = emailValidation.clean;
       const phone = validatePhoneNumber(rawPhone).clean || rawPhone;
 
+      // Anti-Duplicate Check (One Email and One Phone allowed only once)
+      if (typeof window.checkDuplicateLead === 'function') {
+        const dupResult = await window.checkDuplicateLead(email, phone);
+        if (dupResult && dupResult.isDuplicate) {
+          const matchedItem = dupResult.matchedBy === 'email' ? 'Email Address' : 'Mobile Number';
+          showValidationGuideModal(
+            dupResult.matchedBy,
+            `An inquiry with this ${matchedItem} is already registered under ID: ${dupResult.userId}! Our lead producer is already reviewing your brief and will contact you directly via WhatsApp. There is no need to submit duplicate entries.`
+          );
+          return;
+        }
+      }
+
       const serviceLabels = {
         'reels': 'Viral Short-Form (Reels / TikTok)',
         'youtube': 'YouTube Long-Form Storytelling',
