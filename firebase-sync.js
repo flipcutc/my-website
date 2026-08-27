@@ -78,6 +78,7 @@ async function pushLeadToDualCloud(lead) {
       };
       await fetch(SUPABASE_SYNC_URL + '/rest/v1/leads', {
         method: 'POST',
+        keepalive: true,
         headers: {
           apikey: SUPABASE_SYNC_KEY,
           Authorization: 'Bearer ' + SUPABASE_SYNC_KEY,
@@ -98,6 +99,18 @@ async function pushLeadToDualCloud(lead) {
     const filtered = existing.filter(item => (item.id || item.userId) !== userId);
     filtered.unshift({ ...leadPayload, date: new Date().toISOString().slice(0, 10) });
     localStorage.setItem('flipcut_leads', JSON.stringify(filtered));
+  } catch (_) {}
+
+  // 1D. Real-time Instant Broadcast to Admin Dashboard (0ms delay)
+  try {
+    if (typeof BroadcastChannel !== 'undefined') {
+      const bc = new BroadcastChannel('flipcut_leads_channel');
+      bc.postMessage({ type: 'NEW_LEAD', lead: leadPayload });
+      bc.close();
+    }
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('flipcut:new-lead', { detail: leadPayload }));
+    }
   } catch (_) {}
 
   await Promise.allSettled([firestorePromise, supabasePromise]);

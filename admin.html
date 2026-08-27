@@ -2826,7 +2826,7 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
         return 25000;
       }
 
-      async function fetchLeadsFromDatabase() {
+      async function fetchLeadsFromDatabase(silent = false) {
         let fetchedLeads = [];
 
         // 1. Fetch live leads via Dual Cloud Sync Engine (Google Firebase Firestore + Supabase Cloud)
@@ -2883,6 +2883,42 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
         renderCrmTable();
       }
 
+      // Real-time Lead Listener across Browser Tabs
+      try {
+        if (typeof BroadcastChannel !== 'undefined') {
+          const leadsChannel = new BroadcastChannel('flipcut_leads_channel');
+          leadsChannel.onmessage = (msg) => {
+            if (msg && msg.data && msg.data.lead) {
+              const newLead = msg.data.lead;
+              const uid = newLead.userId || newLead.id;
+              if (!currentLeads.some(l => (l.userId === uid || l.id === uid))) {
+                currentLeads.unshift(newLead);
+                populateMonthFilterOptions();
+                renderCrmTable();
+                showAdminToast(`🎉 New Lead / Pass: ${newLead.name} (${uid})`, '#10B981');
+              }
+            }
+          };
+        }
+        window.addEventListener('flipcut:new-lead', (e) => {
+          if (e && e.detail) {
+            const newLead = e.detail;
+            const uid = newLead.userId || newLead.id;
+            if (!currentLeads.some(l => (l.userId === uid || l.id === uid))) {
+              currentLeads.unshift(newLead);
+              populateMonthFilterOptions();
+              renderCrmTable();
+              showAdminToast(`🎉 New Registration: ${newLead.name} (${uid})`, '#10B981');
+            }
+          }
+        });
+      } catch (_) {}
+
+      // Auto-Sync from Cloud Database every 10 seconds in background
+      setInterval(() => {
+        fetchLeadsFromDatabase(true);
+      }, 10000);
+
       const crmTableBody = document.getElementById('crmTableBody');
       const crmSearchInput = document.getElementById('crmSearchInput');
       const crmStatusFilter = document.getElementById('crmStatusFilter');
@@ -2921,8 +2957,8 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
 
         const sortedMonths = Array.from(monthsSet).sort().reverse();
         crmMonthFilter.innerHTML = `
-          <option value="all">📅 All Time</option>
-          <option value="${thisMonthKey}" selected>📅 This Month (${formatMonthName(thisMonthKey)})</option>
+          <option value="all" selected>📅 All Time (All Leads)</option>
+          <option value="${thisMonthKey}">📅 This Month (${formatMonthName(thisMonthKey)})</option>
         `;
 
         sortedMonths.forEach(m => {
