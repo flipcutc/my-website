@@ -3,6 +3,17 @@
  * Powers dynamic DOM hydration from Content Store, Indian Rupee (₹) pricing, and all interactions.
  */
 
+// Version-Aware Intelligent Cache Purge
+const FLIPCUT_CURRENT_BUILD = '20260827_V9';
+try {
+  const lastBuild = localStorage.getItem('flipcut_build_ver');
+  if (lastBuild !== FLIPCUT_CURRENT_BUILD) {
+    localStorage.setItem('flipcut_build_ver', FLIPCUT_CURRENT_BUILD);
+    localStorage.removeItem('flipcut_site_content');
+    localStorage.removeItem('flipcut_cms_draft');
+  }
+} catch (_) {}
+
 // Global Master Content
 let siteAppContent = (typeof getSiteContent === 'function') ? getSiteContent() : DEFAULT_SITE_CONTENT;
 let content = siteAppContent;
