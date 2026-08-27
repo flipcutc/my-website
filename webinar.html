@@ -693,7 +693,7 @@
             <span style="font-size: 0.85rem; font-weight: 700; color: var(--brand-indigo); text-transform: uppercase; letter-spacing: 0.06em;">Registration Pass Fee</span>
             
             <div class="price-display-tag">
-              <span class="active-webinar-price" id="webinarPriceDisplay">₹2</span>
+              <span class="active-webinar-price" id="webinarPriceDisplay">₹99</span>
               <span class="orig-webinar-price" id="webinarOrigPriceDisplay">₹999</span>
             </div>
             
@@ -986,7 +986,7 @@
         if (brandLogo && content.brand && content.brand.logoHeight) brandLogo.style.height = `${content.brand.logoHeight}px`;
 
         const webinarCfg = content.webinar || {};
-        const price = String(webinarCfg.price !== undefined && webinarCfg.price !== '' ? webinarCfg.price : '199').replace(/[^0-9]/g, '') || '199';
+        const price = String(webinarCfg.price !== undefined && webinarCfg.price !== '' ? webinarCfg.price : '99').replace(/[^0-9]/g, '') || '99';
         const origPrice = String(webinarCfg.originalPrice !== undefined && webinarCfg.originalPrice !== '' ? webinarCfg.originalPrice : '999').replace(/[^0-9]/g, '') || '999';
 
         const setTxt = (id, text) => { const el = document.getElementById(id); if (el && text !== undefined) el.textContent = text; };
@@ -1045,7 +1045,7 @@
       function getCurrentWebinarFee() {
         const c = (typeof getSiteContent === 'function') ? getSiteContent() : siteContent;
         const p = c?.webinar?.price;
-        return parseInt(String(p).replace(/[^0-9]/g, '')) || 199;
+        return parseInt(String(p).replace(/[^0-9]/g, '')) || 99;
       }
 
       // State variables

@@ -436,7 +436,7 @@ const DEFAULT_SITE_CONTENT = {
     "date": "Saturday, 7:00 PM IST",
     "duration": "90 Minutes Live + Q&A",
     "seats": "Limited 100 Seats",
-    "price": "2",
+    "price": "99",
     "originalPrice": "999",
     "formTitle": "Fill Out Your Webinar Brief",
     "formSubtitle": "Enter your details, select your website type, and complete payment via GPay / Netbanking to unlock your pass.",
