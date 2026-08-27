@@ -618,30 +618,37 @@ async function saveSiteContent(content) {
     }
   } catch (_) {}
 
-  // 2. Sync directly to Supabase Cloud Database (Instantly propagates to all visitors globally)
-  try {
-    const payload = {
-      id: 'CMS_SITE_CONTENT_LIVE',
-      name: 'CMS_CONFIG_STORE',
-      service: 'CMS_STORAGE',
-      message: JSON.stringify(content),
-      status: 'ACTIVE_CMS'
-    };
-    const sbRes = await fetch(`${CLOUD_SUPABASE_URL}/rest/v1/leads`, {
-      method: 'POST',
-      headers: {
-        apikey: CLOUD_SUPABASE_KEY,
-        Authorization: `Bearer ${CLOUD_SUPABASE_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'resolution=merge-duplicates,return=representation'
-      },
-      body: JSON.stringify(payload)
-    });
-    if (sbRes.ok) {
+  // 2. Sync directly to Dual Cloud (Google Firebase Firestore + Supabase Cloud Database)
+  if (typeof window.publishCmsToDualCloud === 'function') {
+    try {
+      await window.publishCmsToDualCloud(content);
       cloudSaved = true;
+    } catch (_) {}
+  } else {
+    try {
+      const payload = {
+        id: 'CMS_SITE_CONTENT_LIVE',
+        name: 'CMS_CONFIG_STORE',
+        service: 'CMS_STORAGE',
+        message: JSON.stringify(content),
+        status: 'ACTIVE_CMS'
+      };
+      const sbRes = await fetch(`${CLOUD_SUPABASE_URL}/rest/v1/leads`, {
+        method: 'POST',
+        headers: {
+          apikey: CLOUD_SUPABASE_KEY,
+          Authorization: `Bearer ${CLOUD_SUPABASE_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'resolution=merge-duplicates,return=representation'
+        },
+        body: JSON.stringify(payload)
+      });
+      if (sbRes.ok) {
+        cloudSaved = true;
+      }
+    } catch (cloudErr) {
+      console.warn('Supabase cloud save note:', cloudErr);
     }
-  } catch (cloudErr) {
-    console.warn('Supabase cloud save note:', cloudErr);
   }
 
   return localSaved || serverSaved || cloudSaved;

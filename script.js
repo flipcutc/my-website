@@ -1545,30 +1545,43 @@ document.addEventListener('DOMContentLoaded', () => {
         notes: notes
       };
 
-      // 1. Submit directly to Supabase Cloud Database (PostgreSQL)
+      // 1. Submit directly to Dual Cloud (Google Firebase Firestore + Supabase Cloud)
       let assignedUserId = 'FC-REG-' + Math.floor(10000 + Math.random() * 90000);
-      try {
-        const supabaseLead = {
-          id: assignedUserId,
-          name: name,
-          email: email,
-          phone: phone,
+      leadPayload.userId = assignedUserId;
+      leadPayload.id = assignedUserId;
+
+      if (typeof window.pushLeadToDualCloud === 'function') {
+        window.pushLeadToDualCloud({
+          ...leadPayload,
           service: serviceLabels[serviceType] || serviceType,
           budget: budgetLabels[budget] || budget,
-          message: `Footage: ${footage || 'None'} | Notes: ${notes || 'None'}`,
-          status: 'New'
-        };
-        fetch('https://cznixvdphwbjdnnmapvb.supabase.co/rest/v1/leads', {
-          method: 'POST',
-          headers: {
-            apikey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6bml4dmRwaHdiamRubm1hcHZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTgwMTgsImV4cCI6MjEwMzEzNDAxOH0.dTLN1DCbUiBawZq8YlS5Bol-i81JFKhKpPKCboyocuQ',
-            Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6bml4dmRwaHdiamRubm1hcHZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTgwMTgsImV4cCI6MjEwMzEzNDAxOH0.dTLN1DCbUiBawZq8YlS5Bol-i81JFKhKpPKCboyocuQ',
-            'Content-Type': 'application/json',
-            Prefer: 'resolution=merge-duplicates,return=representation'
-          },
-          body: JSON.stringify(supabaseLead)
+          message: `Footage: ${footage || 'None'} | Notes: ${notes || 'None'}`
         }).catch(() => {});
-      } catch (_) {}
+      } else {
+        // Direct Fallback
+        try {
+          const supabaseLead = {
+            id: assignedUserId,
+            name: name,
+            email: email,
+            phone: phone,
+            service: serviceLabels[serviceType] || serviceType,
+            budget: budgetLabels[budget] || budget,
+            message: `Footage: ${footage || 'None'} | Notes: ${notes || 'None'}`,
+            status: 'New'
+          };
+          fetch('https://cznixvdphwbjdnnmapvb.supabase.co/rest/v1/leads', {
+            method: 'POST',
+            headers: {
+              apikey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6bml4dmRwaHdiamRubm1hcHZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTgwMTgsImV4cCI6MjEwMzEzNDAxOH0.dTLN1DCbUiBawZq8YlS5Bol-i81JFKhKpPKCboyocuQ',
+              Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6bml4dmRwaHdiamRubm1hcHZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTgwMTgsImV4cCI6MjEwMzEzNDAxOH0.dTLN1DCbUiBawZq8YlS5Bol-i81JFKhKpPKCboyocuQ',
+              'Content-Type': 'application/json',
+              Prefer: 'resolution=merge-duplicates,return=representation'
+            },
+            body: JSON.stringify(supabaseLead)
+          }).catch(() => {});
+        } catch (_) {}
+      }
 
       // 2. Submit to Node Express Backend if active
       try {

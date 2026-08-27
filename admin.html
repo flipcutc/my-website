@@ -2601,8 +2601,15 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
     <span id="adminToastMsg">Changes published to live website!</span>
   </div>
 
+  <!-- Firebase App & Firestore Compat SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <!-- Dual Cloud Sync Engine (Firebase + Supabase) -->
+  <script src="firebase-sync.js?v=8.0"></script>
+
   <!-- CMS & SQL Engine Script -->
-  <script src="content-store.js?v=7.4"></script>
+  <script src="content-store.js?v=8.0"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
 
@@ -2822,56 +2829,50 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
       async function fetchLeadsFromDatabase() {
         let fetchedLeads = [];
 
-        // 1. Fetch live leads directly from Supabase Cloud PostgreSQL Database
-        try {
-          const sbRes = await fetch(`${PERM_SUPABASE_URL}/rest/v1/leads?id=neq.CMS_SITE_CONTENT_LIVE&order=created_at.desc`, {
-            headers: {
-              apikey: PERM_SUPABASE_KEY,
-              Authorization: `Bearer ${PERM_SUPABASE_KEY}`
-            },
-            cache: 'no-store'
-          });
-          if (sbRes.ok) {
-            const rows = await sbRes.json();
-            if (Array.isArray(rows) && rows.length > 0) {
-              fetchedLeads = rows.map(r => ({
-                id: r.id,
-                userId: r.id,
-                name: r.name || 'Anonymous Client',
-                email: r.email || '',
-                phone: r.phone || '',
-                service: r.service || 'Website / Video Inquiry',
-                budget: r.budget || '₹25,000',
-                amount: r.budget || '₹25,000',
-                notes: r.message || '',
-                message: r.message || '',
-                status: r.status || 'New',
-                date: r.date || (r.created_at ? r.created_at.slice(0, 10) : new Date().toISOString().slice(0, 10)),
-                created_at: r.created_at
-              }));
-            }
-          }
-        } catch (sbErr) {
-          console.warn('Supabase leads fetch note:', sbErr);
+        // 1. Fetch live leads via Dual Cloud Sync Engine (Google Firebase Firestore + Supabase Cloud)
+        if (typeof window.fetchLeadsFromDualCloud === 'function') {
+          try {
+            fetchedLeads = await window.fetchLeadsFromDualCloud();
+          } catch (_) {}
         }
 
-        // 2. Try Node backend if available and merge
-        try {
-          const apiBase = (typeof getContentApiBase === 'function') ? getContentApiBase() : '';
-          if (apiBase) {
-            const response = await fetch(`${apiBase}/api/leads`);
-            if (response.ok) {
-              const resData = await response.json();
-              const serverLeads = resData.data || [];
-              if (serverLeads.length > 0 && fetchedLeads.length === 0) {
-                fetchedLeads = serverLeads;
+        // 2. Fallback to Supabase Cloud directly if needed
+        if (!fetchedLeads || fetchedLeads.length === 0) {
+          try {
+            const sbRes = await fetch(`${PERM_SUPABASE_URL}/rest/v1/leads?id=neq.CMS_SITE_CONTENT_LIVE&order=created_at.desc`, {
+              headers: {
+                apikey: PERM_SUPABASE_KEY,
+                Authorization: `Bearer ${PERM_SUPABASE_KEY}`
+              },
+              cache: 'no-store'
+            });
+            if (sbRes.ok) {
+              const rows = await sbRes.json();
+              if (Array.isArray(rows) && rows.length > 0) {
+                fetchedLeads = rows.map(r => ({
+                  id: r.id,
+                  userId: r.id,
+                  name: r.name || 'Anonymous Client',
+                  email: r.email || '',
+                  phone: r.phone || '',
+                  service: r.service || 'Website / Video Inquiry',
+                  budget: r.budget || '₹25,000',
+                  amount: r.budget || '₹25,000',
+                  notes: r.message || '',
+                  message: r.message || '',
+                  status: r.status || 'New',
+                  date: r.date || (r.created_at ? r.created_at.slice(0, 10) : new Date().toISOString().slice(0, 10)),
+                  created_at: r.created_at
+                }));
               }
             }
+          } catch (sbErr) {
+            console.warn('Supabase leads fetch note:', sbErr);
           }
-        } catch (_) {}
+        }
 
         // 3. Fallback or merge with local storage
-        if (fetchedLeads.length > 0) {
+        if (fetchedLeads && fetchedLeads.length > 0) {
           currentLeads = fetchedLeads;
           try { localStorage.setItem('flipcut_leads', JSON.stringify(currentLeads)); } catch (_) {}
         } else {
@@ -3246,18 +3247,23 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
             showAdminToast(`Updated status to "${nextStatus}"`);
           }
 
-          // Sync to Supabase Cloud
-          try {
-            fetch(`${PERM_SUPABASE_URL}/rest/v1/leads?id=eq.${encodeURIComponent(lead.id || lead.userId)}`, {
-              method: 'PATCH',
-              headers: {
-                apikey: PERM_SUPABASE_KEY,
-                Authorization: `Bearer ${PERM_SUPABASE_KEY}`,
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({ status: nextStatus })
-            }).catch(() => {});
-          } catch (_) {}
+          // Sync to Dual Cloud (Google Firebase Firestore + Supabase Cloud)
+          const targetLeadId = lead.id || lead.userId || id;
+          if (typeof window.updateLeadStatusDualCloud === 'function') {
+            window.updateLeadStatusDualCloud(targetLeadId, nextStatus).catch(() => {});
+          } else {
+            try {
+              fetch(`${PERM_SUPABASE_URL}/rest/v1/leads?id=eq.${encodeURIComponent(targetLeadId)}`, {
+                method: 'PATCH',
+                headers: {
+                  apikey: PERM_SUPABASE_KEY,
+                  Authorization: `Bearer ${PERM_SUPABASE_KEY}`,
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ status: nextStatus })
+              }).catch(() => {});
+            } catch (_) {}
+          }
 
           // Sync to Node backend
           try {
@@ -3278,16 +3284,20 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
 
       window.deleteCrmLead = async function(id) {
         if (confirm('Delete this inquiry from database?')) {
-          // Sync to Supabase Cloud
-          try {
-            fetch(`${PERM_SUPABASE_URL}/rest/v1/leads?id=eq.${encodeURIComponent(id)}`, {
-              method: 'DELETE',
-              headers: {
-                apikey: PERM_SUPABASE_KEY,
-                Authorization: `Bearer ${PERM_SUPABASE_KEY}`
-              }
-            }).catch(() => {});
-          } catch (_) {}
+          // Sync to Dual Cloud (Google Firebase Firestore + Supabase Cloud)
+          if (typeof window.deleteLeadDualCloud === 'function') {
+            window.deleteLeadDualCloud(id).catch(() => {});
+          } else {
+            try {
+              fetch(`${PERM_SUPABASE_URL}/rest/v1/leads?id=eq.${encodeURIComponent(id)}`, {
+                method: 'DELETE',
+                headers: {
+                  apikey: PERM_SUPABASE_KEY,
+                  Authorization: `Bearer ${PERM_SUPABASE_KEY}`
+                }
+              }).catch(() => {});
+            } catch (_) {}
+          }
 
           // Sync to Node backend
           try {
