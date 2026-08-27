@@ -1437,6 +1437,34 @@ section {
   box-shadow: 0 20px 40px -10px rgba(124, 58, 237, 0.35);
 }
 
+.portfolio-thumb-pill {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #FFFFFF;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  z-index: 6;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+}
+
+.portfolio-thumb-pill i {
+  color: var(--brand-indigo);
+  font-size: 0.75rem;
+}
+
 .reel-live-tag {
   position: absolute;
   top: 14px;
@@ -3042,6 +3070,35 @@ textarea.form-control {
     scrollbar-width: thin;
   }
 
+  .portfolio-thumb-pill {
+    top: 10px !important;
+    left: 10px !important;
+    font-size: 0.65rem !important;
+    padding: 3px 8px !important;
+  }
+
+  .portfolio-mobile-scroll-strip .portfolio-thumb-pill {
+    top: 8px !important;
+    left: 8px !important;
+    font-size: 0.62rem !important;
+    padding: 2px 7px !important;
+  }
+
+  .portfolio-first-item .portfolio-info {
+    padding: 16px 18px !important;
+  }
+
+  .portfolio-first-item .portfolio-tag {
+    font-size: 0.72rem !important;
+    margin-bottom: 4px !important;
+  }
+
+  .portfolio-first-item .portfolio-title,
+  .portfolio-first-item .portfolio-info h3 {
+    font-size: 1.05rem !important;
+    margin-bottom: 8px !important;
+  }
+
   .portfolio-mobile-scroll-strip .portfolio-item {
     flex: 0 0 215px !important;
     min-width: 215px !important;
@@ -3061,8 +3118,14 @@ textarea.form-control {
     padding: 12px 14px !important;
   }
 
+  .portfolio-mobile-scroll-strip .portfolio-item .portfolio-tag {
+    font-size: 0.65rem !important;
+    margin-bottom: 4px !important;
+  }
+
+  .portfolio-mobile-scroll-strip .portfolio-item .portfolio-title,
   .portfolio-mobile-scroll-strip .portfolio-item .portfolio-info h3 {
-    font-size: 0.9rem !important;
+    font-size: 0.88rem !important;
     line-height: 1.3 !important;
     white-space: nowrap !important;
     overflow: hidden !important;
@@ -3072,7 +3135,7 @@ textarea.form-control {
 
   .portfolio-mobile-scroll-strip .portfolio-item .portfolio-stats {
     gap: 8px !important;
-    font-size: 0.72rem !important;
+    font-size: 0.7rem !important;
   }
 
   .daily-prompt-card-featured {

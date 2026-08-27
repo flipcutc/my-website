@@ -1317,14 +1317,16 @@ function hydratePageFromCMS(customContent) {
     }
   };
 
-  function buildSinglePortfolioCard(item, isFirst) {
+  let allPortfolioCards = [];
+
+  function buildSinglePortfolioCard(item, idx) {
     const card = document.createElement('div');
     const isVertical = item.isVertical ? 'is-vertical' : '';
     let rawCategory = item.category || (item.isVertical ? 'reels' : (item.type === 'video' ? 'video' : (item.type === 'graphic' ? 'graphic' : (item.type === 'uiux' ? 'uiux' : 'clients'))));
     if (item.isVertical) rawCategory = 'reels';
     const category = rawCategory;
     
-    card.className = `portfolio-item ${isVertical}` + (isFirst ? ' portfolio-first-item' : '');
+    card.className = `portfolio-item ${isVertical}`;
     card.dataset.category = category;
     card.dataset.type = item.type || 'link';
     if (item.videoUrl) card.dataset.video = item.videoUrl;
@@ -1345,18 +1347,15 @@ function hydratePageFromCMS(customContent) {
       if (ytId) {
         mediaContent = `
           <iframe src="https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&mute=1&loop=1&playlist=${ytId}&controls=0&playsinline=1&modestbranding=1&rel=0" allow="autoplay; encrypted-media" playsinline allowfullscreen style="width:100%; height:100%; border:0; pointer-events:none;"></iframe>
-          <div class="reel-live-tag"><span class="reel-live-dot"></span> 9:16 REEL</div>
         `;
       } else if (videoSrc) {
         mediaContent = `
           <video class="vertical-reel-video" src="${videoSrc}" poster="${imgUrl}" autoplay loop muted playsinline preload="metadata"></video>
-          <div class="reel-live-tag"><span class="reel-live-dot"></span> 9:16 REEL</div>
           <button class="reel-sound-btn" onclick="event.stopPropagation(); window.toggleReelCardSound(this)" title="Toggle Sound"><i class="fa-solid fa-volume-xmark"></i></button>
         `;
       } else {
         mediaContent = `
           <img src="${imgUrl}" alt="${item.title || 'Viral Reel'}" loading="lazy">
-          <div class="reel-live-tag"><span class="reel-live-dot"></span> 9:16 REEL</div>
         `;
       }
       overlayIcon = '<div class="play-badge-icon" style="width:auto; padding:8px 16px; border-radius:var(--radius-pill); font-size:0.82rem; font-weight:700; gap:6px;"><i class="fa-solid fa-expand"></i> <span>Watch 4K</span></div>';
@@ -1365,12 +1364,10 @@ function hydratePageFromCMS(customContent) {
       if (videoSrc && (videoSrc.endsWith('.mp4') || videoSrc.endsWith('.webm') || videoSrc.includes('assets/'))) {
         mediaContent = `
           <video src="${videoSrc}" poster="${imgUrl}" muted playsinline preload="metadata" loop onmouseenter="this.play().catch(()=>{})" onmouseleave="this.pause()" style="width:100%; height:100%; object-fit:cover;"></video>
-          <div class="reel-live-tag" style="background: rgba(99, 102, 241, 0.85);"><i class="fa-solid fa-video"></i> 16:9 4K</div>
         `;
       } else {
         mediaContent = `
           <img src="${imgUrl}" alt="${item.title || 'Creative Project'}" loading="lazy">
-          <div class="reel-live-tag" style="background: rgba(99, 102, 241, 0.85);"><i class="fa-solid fa-video"></i> 16:9 4K</div>
         `;
       }
       overlayIcon = '<div class="play-badge-icon" style="width:auto; padding:10px 18px; border-radius:var(--radius-pill); font-size:0.85rem; font-weight:700; gap:6px;"><i class="fa-solid fa-play"></i> <span>Play 4K Video</span></div>';
@@ -1389,11 +1386,24 @@ function hydratePageFromCMS(customContent) {
       `;
     }
 
-    // Category Icon
+    // Category Icon & Label
     let catIcon = 'fa-solid fa-film';
-    if (category === 'graphic') catIcon = 'fa-solid fa-palette';
-    if (category === 'uiux') catIcon = 'fa-solid fa-laptop-code';
-    if (category === 'clients') catIcon = 'fa-solid fa-crown';
+    let catLabel = '16:9 Video';
+    if (item.isVertical || category === 'reels') {
+      catIcon = 'fa-solid fa-mobile-screen-button';
+      catLabel = '9:16 Reel';
+    } else if (category === 'graphic') {
+      catIcon = 'fa-solid fa-palette';
+      catLabel = 'Graphic Design';
+    } else if (category === 'uiux') {
+      catIcon = 'fa-solid fa-laptop-code';
+      catLabel = 'Web UI & UX';
+    } else if (category === 'clients') {
+      catIcon = 'fa-solid fa-crown';
+      catLabel = 'Client Project';
+    }
+
+    const displayTag = item.tag || catLabel;
 
     card.innerHTML = `
       <div class="portfolio-media-thumb">
@@ -1401,13 +1411,13 @@ function hydratePageFromCMS(customContent) {
         <div class="portfolio-overlay">
           ${overlayIcon}
         </div>
-        <span style="position: absolute; top: 14px; left: 14px; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(10px); color: #FFF; font-size: 0.72rem; font-weight: 700; padding: 4px 10px; border-radius: var(--radius-pill); text-transform: uppercase; letter-spacing: 0.06em; border: 1px solid rgba(255,255,255,0.15); z-index: 5;">
-          <i class="${catIcon}" style="color: var(--brand-indigo); margin-right: 4px;"></i> ${item.tag || (item.isVertical ? '9:16 REEL' : category.toUpperCase())}
+        <span class="portfolio-thumb-pill">
+          <i class="${catIcon}"></i> ${displayTag}
         </span>
       </div>
       <div class="portfolio-info">
-        <span class="portfolio-tag">${item.tag || (item.isVertical ? 'Viral Reel & Short' : '16:9 Video Master')}</span>
-        <h3>${item.title || 'Creative Showcase Project'}</h3>
+        <span class="portfolio-tag">${displayTag}</span>
+        <h3 class="portfolio-title">${item.title || 'Creative Showcase Project'}</h3>
         <div class="portfolio-stats">
           <span><i class="fa-solid fa-sparkles text-gradient"></i> ${item.views || '4K Master'}</span>
           <span><i class="fa-solid fa-arrow-trend-up"></i> ${item.stat2 || 'Production Ready'}</span>
@@ -1422,13 +1432,13 @@ function hydratePageFromCMS(customContent) {
       } else if ((item.type === 'link' || category === 'uiux' || category === 'clients') && item.linkUrl) {
         window.open(item.linkUrl, '_blank', 'noopener,noreferrer');
       } else if (item.image && (item.type === 'graphic' || item.type === 'image')) {
-        openImageModal(imgUrl, item.title, item.tag, item.linkUrl);
+        openImageModal(imgUrl, item.title, displayTag, item.linkUrl);
       } else if (item.videoUrl) {
         openVideoModal(formatMediaUrl(item.videoUrl, 'video'));
       } else if (item.linkUrl) {
         window.open(item.linkUrl, '_blank', 'noopener,noreferrer');
       } else if (item.image) {
-        openImageModal(imgUrl, item.title, item.tag, item.linkUrl);
+        openImageModal(imgUrl, item.title, displayTag, item.linkUrl);
       }
     });
 
@@ -1441,32 +1451,11 @@ function hydratePageFromCMS(customContent) {
     if (!portfolioGrid) return;
     if (!data || !data.portfolio || !data.portfolio.items) return;
 
-    portfolioGrid.innerHTML = '';
-    const items = data.portfolio.items;
-    if (items.length === 0) return;
-
-    // First featured card (stays on top in mobile view)
-    const firstCard = buildSinglePortfolioCard(items[0], true);
-    portfolioGrid.appendChild(firstCard);
-
-    // Remaining cards (cards 2..N) go into the horizontal scroll strip for mobile
-    if (items.length > 1) {
-      const sliderCue = document.createElement('div');
-      sliderCue.className = 'portfolio-mobile-slider-cue';
-      sliderCue.id = 'portfolioMobileSliderCue';
-      sliderCue.innerHTML = '<i class="fa-solid fa-arrows-left-right text-gradient"></i> <span>Swipe for more creations</span> <i class="fa-solid fa-arrow-right-long text-gradient"></i>';
-      portfolioGrid.appendChild(sliderCue);
-
-      const scrollStrip = document.createElement('div');
-      scrollStrip.className = 'portfolio-mobile-scroll-strip';
-      scrollStrip.id = 'portfolioMobileScrollStrip';
-
-      for (let i = 1; i < items.length; i++) {
-        const otherCard = buildSinglePortfolioCard(items[i], false);
-        scrollStrip.appendChild(otherCard);
-      }
-      portfolioGrid.appendChild(scrollStrip);
-    }
+    allPortfolioCards = [];
+    data.portfolio.items.forEach((item, idx) => {
+      const card = buildSinglePortfolioCard(item, idx);
+      allPortfolioCards.push({ card, item });
+    });
 
     applyActivePortfolioFilter();
 
@@ -1495,16 +1484,16 @@ function hydratePageFromCMS(customContent) {
     const grid = document.getElementById('portfolioGrid');
     if (!grid) return;
     const activeBtn = document.querySelector('.portfolio-filter-bar .filter-btn.active') || document.querySelector('.portfolio-filter-bar .filter-btn');
-    if (!activeBtn) return;
-    const filter = activeBtn.dataset.filter || 'reels';
+    const filter = activeBtn ? (activeBtn.dataset.filter || 'reels') : 'reels';
 
-    const items = grid.querySelectorAll('.portfolio-item');
-    let visibleCount = 0;
+    grid.innerHTML = '';
+
+    const matched = [];
     let onlyVertical = true;
 
-    items.forEach(item => {
-      const itemCat = item.dataset.category;
-      const isVert = item.classList.contains('is-vertical');
+    allPortfolioCards.forEach(({ card, item }) => {
+      const itemCat = card.dataset.category;
+      const isVert = card.classList.contains('is-vertical');
       let show = false;
 
       if (filter === 'all') {
@@ -1518,28 +1507,50 @@ function hydratePageFromCMS(customContent) {
       }
 
       if (show) {
-        item.style.display = 'flex';
-        visibleCount++;
+        card.style.display = 'flex';
+        matched.push(card);
         if (!isVert) onlyVertical = false;
       } else {
-        item.style.display = 'none';
+        card.style.display = 'none';
       }
     });
 
-    const cue = document.getElementById('portfolioMobileSliderCue');
-    const strip = document.getElementById('portfolioMobileScrollStrip');
-    if (cue && strip) {
-      const visibleInStrip = Array.from(strip.querySelectorAll('.portfolio-item')).filter(el => el.style.display !== 'none');
-      if (visibleInStrip.length > 0) {
-        cue.style.display = '';
-        strip.style.display = '';
-      } else {
-        cue.style.display = 'none';
-        strip.style.display = 'none';
-      }
+    if (matched.length === 0) {
+      grid.innerHTML = `
+        <div style="grid-column: 1 / -1; width: 100%; text-align: center; padding: 40px 20px; color: var(--text-muted);">
+          <i class="fa-solid fa-folder-open" style="font-size: 2.5rem; margin-bottom: 12px; opacity: 0.5;"></i>
+          <p>No creations available in this category yet.</p>
+        </div>
+      `;
+      return;
     }
 
-    if (filter === 'reels' || (visibleCount > 0 && onlyVertical)) {
+    // 1st Item is Featured (Normal on top in mobile)
+    const firstCard = matched[0];
+    firstCard.classList.add('portfolio-first-item');
+    grid.appendChild(firstCard);
+
+    // Remaining items (2..N) go into the horizontal scroll strip for mobile
+    if (matched.length > 1) {
+      const sliderCue = document.createElement('div');
+      sliderCue.className = 'portfolio-mobile-slider-cue';
+      sliderCue.id = 'portfolioMobileSliderCue';
+      sliderCue.innerHTML = '<i class="fa-solid fa-arrows-left-right text-gradient"></i> <span>Swipe for more works</span> <i class="fa-solid fa-arrow-right-long text-gradient"></i>';
+      grid.appendChild(sliderCue);
+
+      const scrollStrip = document.createElement('div');
+      scrollStrip.className = 'portfolio-mobile-scroll-strip';
+      scrollStrip.id = 'portfolioMobileScrollStrip';
+
+      for (let i = 1; i < matched.length; i++) {
+        const otherCard = matched[i];
+        otherCard.classList.remove('portfolio-first-item');
+        scrollStrip.appendChild(otherCard);
+      }
+      grid.appendChild(scrollStrip);
+    }
+
+    if (filter === 'reels' || (matched.length > 0 && onlyVertical)) {
       grid.classList.add('vertical-mode');
     } else {
       grid.classList.remove('vertical-mode');
