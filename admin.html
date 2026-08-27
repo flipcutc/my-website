@@ -1435,7 +1435,7 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
                 <p>Continuous infinite animated banner highlighting agency stats and tools</p>
               </div>
               <label class="switch-control">
-                <input type="checkbox" id="toggleSecRunningBanner" checked>
+                <input type="checkbox" id="toggleSecRunningBanner" checked onchange="window.syncBannerToggle(this.checked)">
                 <span class="switch-slider"></span>
               </label>
             </div>
@@ -1784,9 +1784,9 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
             <div class="form-group">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                 <label style="margin: 0;"><i class="fa-solid fa-ruler text-gradient"></i> Logo Display Size / Height</label>
-                <span id="logoHeightVal" style="font-weight: 800; color: var(--brand-indigo); font-size: 0.95rem; background: var(--bg-tertiary); padding: 2px 10px; border-radius: var(--radius-pill); border: 1px solid var(--border-subtle);">46px</span>
+                <span id="logoHeightVal" style="font-weight: 800; color: var(--brand-indigo); font-size: 0.95rem; background: var(--bg-tertiary); padding: 2px 10px; border-radius: var(--radius-pill); border: 1px solid var(--border-subtle);">60px</span>
               </div>
-              <input type="range" id="cfgLogoHeight" min="24" max="100" value="46" step="2" class="form-control" style="cursor: pointer; padding: 4px;">
+              <input type="range" id="cfgLogoHeight" min="24" max="140" value="60" step="2" class="form-control" style="cursor: pointer; padding: 4px;">
               <span style="font-size: 0.78rem; color: var(--text-muted); display: block; margin-top: 4px;">Slide to size logo across header & footer</span>
             </div>
           </div>
@@ -2958,8 +2958,16 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
         };
 
         // Collect Running Banner Items & Master Toggle
-        if (!content.runningBanner) content.runningBanner = { enabled: true, items: [] };
-        const bannerEnabled = getCheck('cfgBannerEnabled', getCheck('toggleSecRunningBanner', content.runningBanner?.enabled !== false));
+        const bannerToggle1 = document.getElementById('toggleSecRunningBanner');
+        const bannerToggle2 = document.getElementById('cfgBannerEnabled');
+        let bannerEnabled = true;
+        if (bannerToggle1 && !bannerToggle1.checked) bannerEnabled = false;
+        if (bannerToggle2 && !bannerToggle2.checked) bannerEnabled = false;
+        if (!bannerToggle1 && !bannerToggle2) {
+          bannerEnabled = (content.sectionsVisibility?.runningBanner !== false) && (content.runningBanner?.enabled !== false);
+        }
+
+        if (!content.runningBanner) content.runningBanner = { enabled: bannerEnabled, items: [] };
         content.runningBanner.enabled = bannerEnabled;
         content.sectionsVisibility.runningBanner = bannerEnabled;
 
@@ -4386,7 +4394,7 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
             setVal('cfgLogoUrl', content.brand.logoUrl);
             setVal('cfgFaviconUrl', content.brand.faviconUrl || 'assets/favicon.svg');
             setVal('cfgHeaderBadge', content.brand.headerBadge);
-            const h = content.brand.logoHeight || 46;
+            const h = content.brand.logoHeight || 60;
             const heightSlider = document.getElementById('cfgLogoHeight');
             const heightVal = document.getElementById('logoHeightVal');
             if (heightSlider) heightSlider.value = h;

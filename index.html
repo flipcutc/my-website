@@ -119,8 +119,12 @@
               css += '.brand-logo-img { content: url("' + data.brand.logoUrl + '") !important; }\n';
             }
             if (data.brand.logoHeight) {
-              css += '.brand-logo-img { height: ' + data.brand.logoHeight + 'px !important; }\n';
+              css += '.brand-logo-img { height: ' + data.brand.logoHeight + 'px !important; max-height: 140px !important; }\n';
+            } else {
+              css += '.brand-logo-img { height: 60px !important; max-height: 140px !important; }\n';
             }
+          } else {
+            css += '.brand-logo-img { height: 60px !important; max-height: 140px !important; }\n';
           }
           if (css) {
             var s = document.createElement('style');
@@ -258,7 +262,7 @@
   <aside class="mobile-nav-drawer" id="mobileNavDrawer" aria-label="Mobile Navigation">
     <div class="mobile-nav-header">
       <a href="#hero" class="mobile-brand-wrap" aria-label="FlipCut Creation Home">
-        <img src="assets/logo.png" alt="FlipCut Creation Logo" class="brand-logo-img" style="height: 46px;">
+        <img src="assets/logo.png" alt="FlipCut Creation Logo" class="brand-logo-img">
       </a>
       <div style="display: flex; align-items: center; gap: 10px;">
         <button class="theme-toggle-btn mobile-drawer-theme-btn" title="Toggle Theme" aria-label="Toggle Theme">
@@ -986,7 +990,7 @@
       <div class="footer-top-grid">
 
         <div class="footer-brand-info">
-          <img src="assets/logo.png" alt="FlipCut Creation Logo" class="brand-logo-img" style="height: 52px;">
+          <img src="assets/logo.png" alt="FlipCut Creation Logo" class="brand-logo-img">
           <p id="footerBrandDesc">Transforming raw footage into high-retention viral visual assets and cinematic films for world-class creators and brands.</p>
         </div>
 

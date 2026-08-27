@@ -441,8 +441,8 @@ section {
 }
 
 .brand-logo-img {
-  height: 46px;
-  max-height: 80px;
+  height: 60px;
+  max-height: 140px;
   width: auto;
   object-fit: contain;
   display: block;

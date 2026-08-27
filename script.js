@@ -116,11 +116,11 @@ function hydratePageFromCMS(customContent) {
     }
 
     const brandLogos = document.querySelectorAll('.brand-logo-img');
+    const customLogoHeight = (content.brand && content.brand.logoHeight) ? content.brand.logoHeight : 60;
     brandLogos.forEach(img => {
       if (content.brand && content.brand.logoUrl) img.src = content.brand.logoUrl;
-      if (content.brand && content.brand.logoHeight) {
-        img.style.height = `${content.brand.logoHeight}px`;
-      }
+      img.style.setProperty('height', `${customLogoHeight}px`, 'important');
+      img.style.maxHeight = '140px';
     });
 
     // Dynamic Favicon Update from CMS
