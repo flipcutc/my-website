@@ -3,8 +3,60 @@
  * Powers dynamic text, media, currency (INR), high-concurrency caching, and layout customization.
  */
 
-// Global Resilience & Zero-Crash Error-Shield for Millions of Concurrent Users
+/**
+ * Universal High-Resolution Dynamic Favicon Renderer
+ * Updates browser tab icons immediately across Home, Webinar, and Admin pages
+ */
+function applyDynamicFavicon(url) {
+  if (typeof document === 'undefined' || !url) return;
+  const cleanUrl = String(url).trim();
+  if (!cleanUrl) return;
+
+  try {
+    const existingLinks = document.querySelectorAll("link[rel*='icon'], link[rel*='apple-touch-icon']");
+    existingLinks.forEach(link => {
+      try { link.remove(); } catch (_) {}
+    });
+
+    const bustUrl = cleanUrl.includes('?') ? `${cleanUrl}&t=${Date.now()}` : `${cleanUrl}?t=${Date.now()}`;
+
+    const linkIcon = document.createElement('link');
+    linkIcon.rel = 'icon';
+    if (cleanUrl.endsWith('.svg')) linkIcon.type = 'image/svg+xml';
+    else if (cleanUrl.endsWith('.png')) linkIcon.type = 'image/png';
+    else if (cleanUrl.endsWith('.ico')) linkIcon.type = 'image/x-icon';
+    linkIcon.href = bustUrl;
+    document.head.appendChild(linkIcon);
+
+    const linkShortcut = document.createElement('link');
+    linkShortcut.rel = 'shortcut icon';
+    linkShortcut.href = bustUrl;
+    document.head.appendChild(linkShortcut);
+
+    const linkApple = document.createElement('link');
+    linkApple.rel = 'apple-touch-icon';
+    linkApple.href = bustUrl;
+    document.head.appendChild(linkApple);
+  } catch (_) {}
+}
+
 if (typeof window !== 'undefined') {
+  window.applyDynamicFavicon = applyDynamicFavicon;
+
+  // 0ms Instant Pre-Paint Favicon Hydration
+  (function() {
+    try {
+      const raw = localStorage.getItem('flipcut_cms_draft') || localStorage.getItem('flipcut_site_content');
+      if (raw) {
+        const data = JSON.parse(raw);
+        if (data && data.brand && data.brand.faviconUrl) {
+          applyDynamicFavicon(data.brand.faviconUrl);
+        }
+      }
+    } catch (_) {}
+  })();
+
+  // Global Resilience & Zero-Crash Error-Shield for Millions of Concurrent Users
   window.addEventListener('error', (event) => {
     if (event && event.message && (event.message.includes('Script error') || event.message.includes('ResizeObserver') || event.message.includes('FontAwesome'))) {
       if (event.preventDefault) event.preventDefault();

@@ -43,7 +43,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=10.6">
+  <link rel="stylesheet" href="styles.css?v=10.7">
   
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -2900,10 +2900,10 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- Dual Cloud Sync Engine (Firebase + Supabase) -->
-  <script src="firebase-sync.js?v=10.6"></script>
+  <script src="firebase-sync.js?v=10.7"></script>
 
   <!-- CMS & SQL Engine Script -->
-  <script src="content-store.js?v=10.6"></script>
+  <script src="content-store.js?v=10.7"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
 
@@ -4435,6 +4435,9 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
             if (previewFavicon) {
               previewFavicon.src = content.brand.faviconUrl || 'assets/favicon.svg';
             }
+            if (content.brand.faviconUrl && typeof window.applyDynamicFavicon === 'function') {
+              window.applyDynamicFavicon(content.brand.faviconUrl);
+            }
             const sidebarLogo = document.querySelector('.sidebar-brand img');
             if (sidebarLogo && content.brand.logoUrl) sidebarLogo.src = content.brand.logoUrl;
           }
@@ -5216,8 +5219,11 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
             document.getElementById('previewFaviconImg').src = uploadedUrl;
             if (!content.brand) content.brand = {};
             content.brand.faviconUrl = uploadedUrl;
+            if (typeof window.applyDynamicFavicon === 'function') {
+              window.applyDynamicFavicon(uploadedUrl);
+            }
             await collectAndSaveCMS(false);
-            showAdminToast('✅ Browser Tab Favicon uploaded & updated across live website!');
+            showAdminToast('✅ Browser Tab Favicon updated live across all pages!');
             if (status) status.textContent = `Uploaded: ${file.name}`;
           } catch (err) {
             showAdminToast(`Favicon upload failed: ${err.message}`, '#EF4444');

@@ -157,12 +157,11 @@ function hydratePageFromCMS(customContent) {
       img.style.maxHeight = '140px';
     });
 
-    // Dynamic Favicon Update from CMS
+    // Universal Dynamic Favicon Update from CMS
     if (content.brand && content.brand.faviconUrl) {
-      const favicons = document.querySelectorAll("link[rel*='icon'], link[rel='apple-touch-icon']");
-      favicons.forEach(fav => {
-        fav.href = content.brand.faviconUrl;
-      });
+      if (typeof window.applyDynamicFavicon === 'function') {
+        window.applyDynamicFavicon(content.brand.faviconUrl);
+      }
     }
 
     // 2. Hero Section
