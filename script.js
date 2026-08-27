@@ -149,8 +149,9 @@ function hydratePageFromCMS(customContent) {
       mobileNavWebinarSpan.textContent = `Live Masterclass Webinar (₹${webinarPrice})`;
     }
 
+    const customLogoHeight = (content.brand && content.brand.logoHeight) ? content.brand.logoHeight : 65;
+    document.documentElement.style.setProperty('--brand-logo-height', `${customLogoHeight}px`);
     const brandLogos = document.querySelectorAll('.brand-logo-img');
-    const customLogoHeight = (content.brand && content.brand.logoHeight) ? content.brand.logoHeight : 60;
     brandLogos.forEach(img => {
       if (content.brand && content.brand.logoUrl) img.src = content.brand.logoUrl;
       img.style.setProperty('height', `${customLogoHeight}px`, 'important');

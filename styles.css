@@ -441,12 +441,14 @@ section {
 }
 
 .brand-logo-img {
-  height: 60px;
+  height: var(--brand-logo-height, 65px);
   max-height: 140px;
   width: auto;
+  max-width: 280px;
   object-fit: contain;
   display: block;
-  transition: transform var(--transition-bounce);
+  filter: drop-shadow(0 2px 10px rgba(99, 102, 241, 0.15));
+  transition: transform var(--transition-bounce), height 0.2s ease;
 }
 
 .brand-logo-wrap:hover .brand-logo-img {
@@ -2674,9 +2676,9 @@ textarea.form-control {
   }
 
   .brand-logo-img {
-    height: 38px !important;
-    max-height: 44px !important;
-    max-width: 120px !important;
+    height: min(var(--brand-logo-height, 50px), 52px) !important;
+    max-height: 58px !important;
+    max-width: 190px !important;
     width: auto;
     object-fit: contain;
     display: block;
