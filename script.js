@@ -113,6 +113,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const headerBadgeText = document.getElementById('headerBadgeText');
     if (headerBadgeText && content.brand) headerBadgeText.textContent = content.brand.headerBadge || '';
 
+    const navWebinarLink = document.querySelector('#navWebinarItem a');
+    if (navWebinarLink && content.webinar) {
+      const p = content.webinar.price ? String(content.webinar.price).replace(/[^0-9]/g, '') : '199';
+      navWebinarLink.innerHTML = `<i class="fa-solid fa-ticket"></i> Webinar (₹${p})`;
+    }
+
     const brandLogos = document.querySelectorAll('.brand-logo-img');
     brandLogos.forEach(img => {
       if (content.brand && content.brand.logoUrl) img.src = content.brand.logoUrl;

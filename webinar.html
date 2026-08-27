@@ -986,8 +986,8 @@
         if (brandLogo && content.brand && content.brand.logoHeight) brandLogo.style.height = `${content.brand.logoHeight}px`;
 
         const webinarCfg = content.webinar || {};
-        const price = (webinarCfg.price !== undefined && webinarCfg.price !== '') ? webinarCfg.price : '199';
-        const origPrice = webinarCfg.originalPrice || '999';
+        const price = String(webinarCfg.price !== undefined && webinarCfg.price !== '' ? webinarCfg.price : '199').replace(/[^0-9]/g, '') || '199';
+        const origPrice = String(webinarCfg.originalPrice !== undefined && webinarCfg.originalPrice !== '' ? webinarCfg.originalPrice : '999').replace(/[^0-9]/g, '') || '999';
 
         const setTxt = (id, text) => { const el = document.getElementById(id); if (el && text !== undefined) el.textContent = text; };
         if (webinarCfg.badge) setTxt('webinarBadgePill', webinarCfg.badge);
