@@ -131,7 +131,14 @@ const DEFAULT_SITE_CONTENT = {
   "workflow": {
     "subtitle": "How We Work",
     "title": "A Frictionless 5-Step Production Pipeline",
-    "description": "From the moment you drop your raw files to final 4K delivery, experience a collaborative and stress-free process."
+    "description": "From the moment you drop your raw files to final 4K delivery, experience a collaborative and stress-free process.",
+    "steps": [
+      { "step": 1, "title": "Brief & Ingest", "desc": "Upload raw footage via Drive or Frame.io and specify your target platform and goals." },
+      { "step": 2, "title": "Rough Cut & Story", "desc": "We build the narrative skeleton, remove filler, and lock the rhythm and hook structure." },
+      { "step": 3, "title": "VFX, Color & Sound", "desc": "We infuse dynamic motion graphics, DaVinci color grading, and layered foley SFX." },
+      { "step": 4, "title": "Review & Polish", "desc": "Provide timestamped feedback directly on the video player with rapid same-day tweaks." },
+      { "step": 5, "title": "Master 4K Delivery", "desc": "Download pristine, render-optimized master files ready to publish and conquer feeds." }
+    ]
   },
   "portfolio": {
     "subtitle": "Featured Creations",

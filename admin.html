@@ -931,6 +931,11 @@
           </button>
         </li>
         <li>
+          <button class="tab-btn-vertical" data-tab="tab-workflow" data-title="How We Work (5-Step Production Pipeline CMS)">
+            <span class="btn-inner"><i class="fa-solid fa-list-ol" style="color: #6366F1;"></i> Workflow Pipeline</span>
+          </button>
+        </li>
+        <li>
           <button class="tab-btn-vertical" data-tab="tab-portfolio" data-title="Featured Portfolio Showcase">
             <span class="btn-inner"><i class="fa-solid fa-photo-film"></i> Portfolio Showcase</span>
           </button>
@@ -2011,6 +2016,56 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
       </div>
 
       <!-- ====================================================================
+           TAB: WORKFLOW & 5-STEP PRODUCTION PIPELINE CMS
+           ==================================================================== -->
+      <div class="tab-pane" id="tab-workflow">
+        <!-- Section Header Settings -->
+        <div class="cms-card" style="margin-bottom: 24px;">
+          <div class="cms-header">
+            <div>
+              <h2><i class="fa-solid fa-list-ol text-gradient"></i> How We Work (5-Step Production Pipeline CMS)</h2>
+              <p>Edit section subtitle, main title, description, and every step's title and description.</p>
+            </div>
+            <div>
+              <button type="button" class="btn btn-primary" onclick="window.saveAdminDraft(true)" style="padding: 10px 20px; font-size: 0.88rem;">
+                <i class="fa-solid fa-floppy-disk"></i>
+                <span>Save Workflow Changes</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="cms-grid-2">
+            <div class="form-group">
+              <label>Section Subtitle</label>
+              <input type="text" id="cfgWorkflowSubtitle" class="form-control" placeholder="How We Work">
+            </div>
+            <div class="form-group">
+              <label>Section Main Title</label>
+              <input type="text" id="cfgWorkflowTitle" class="form-control" placeholder="A Frictionless 5-Step Production Pipeline">
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label>Section Description</label>
+            <textarea id="cfgWorkflowDesc" class="form-control" rows="2" placeholder="From the moment you drop your raw files to final 4K delivery, experience a collaborative and stress-free process."></textarea>
+          </div>
+        </div>
+
+        <!-- 5 Step Cards Editor -->
+        <div class="cms-card">
+          <div class="cms-header" style="margin-bottom: 16px;">
+            <div>
+              <h3><i class="fa-solid fa-layer-group text-gradient"></i> Pipeline Production Steps (5 Steps)</h3>
+              <p>Customize each numbered step displayed on the homepage production workflow pipeline.</p>
+            </div>
+          </div>
+
+          <div id="workflowStepsContainer" style="display: flex; flex-direction: column; gap: 16px; margin-top: 16px;">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ====================================================================
            TAB 7: PORTFOLIO & CREATIVE WORKS SHOWCASE CMS
            ==================================================================== -->
       <div class="tab-pane" id="tab-portfolio">
@@ -2833,6 +2888,35 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
           };
         });
 
+        // Workflow Section & 5-Step Pipeline
+        if (!content.workflow) content.workflow = {};
+        if (document.getElementById('cfgWorkflowSubtitle')) content.workflow.subtitle = getVal('cfgWorkflowSubtitle', content.workflow.subtitle || 'How We Work');
+        if (document.getElementById('cfgWorkflowTitle')) content.workflow.title = getVal('cfgWorkflowTitle', content.workflow.title || 'A Frictionless 5-Step Production Pipeline');
+        if (document.getElementById('cfgWorkflowDesc')) content.workflow.description = getVal('cfgWorkflowDesc', content.workflow.description || '');
+
+        if (!Array.isArray(content.workflow.steps) || content.workflow.steps.length === 0) {
+          content.workflow.steps = [
+            { step: 1, title: "Brief & Ingest", desc: "Upload raw footage via Drive or Frame.io and specify your target platform and goals." },
+            { step: 2, title: "Rough Cut & Story", desc: "We build the narrative skeleton, remove filler, and lock the rhythm and hook structure." },
+            { step: 3, title: "VFX, Color & Sound", desc: "We infuse dynamic motion graphics, DaVinci color grading, and layered foley SFX." },
+            { step: 4, title: "Review & Polish", desc: "Provide timestamped feedback directly on the video player with rapid same-day tweaks." },
+            { step: 5, title: "Master 4K Delivery", desc: "Download pristine, render-optimized master files ready to publish and conquer feeds." }
+          ];
+        }
+
+        document.querySelectorAll('.wf-step-title').forEach(input => {
+          const idx = parseInt(input.dataset.idx);
+          if (!isNaN(idx) && content.workflow.steps[idx]) {
+            content.workflow.steps[idx].title = input.value.trim() || content.workflow.steps[idx].title;
+          }
+        });
+        document.querySelectorAll('.wf-step-desc').forEach(input => {
+          const idx = parseInt(input.dataset.idx);
+          if (!isNaN(idx) && content.workflow.steps[idx]) {
+            content.workflow.steps[idx].desc = input.value.trim() || content.workflow.steps[idx].desc;
+          }
+        });
+
         // Portfolio items
         if (!content.portfolio) content.portfolio = { items: [] };
         document.querySelectorAll('.pf-studio-card').forEach(card => {
@@ -3258,6 +3342,7 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
         // Trigger dynamic re-renders if necessary
         if (tabId === 'tab-daily-prompts') renderAdminDailyPrompts();
         if (tabId === 'tab-services') renderServicesEditor();
+        if (tabId === 'tab-workflow') renderWorkflowEditor();
         if (tabId === 'tab-portfolio') renderPortfolioEditor();
         if (tabId === 'tab-banner') renderBannerEditor();
         if (tabId === 'tab-testimonials') { renderTestimonialsEditor(); renderFaqEditor(); }
@@ -4126,6 +4211,13 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
             renderServicesEditor();
           }
 
+          if (content.workflow) {
+            setVal('cfgWorkflowSubtitle', content.workflow.subtitle || 'How We Work');
+            setVal('cfgWorkflowTitle', content.workflow.title || 'A Frictionless 5-Step Production Pipeline');
+            setVal('cfgWorkflowDesc', content.workflow.description || 'From the moment you drop your raw files to final 4K delivery, experience a collaborative and stress-free process.');
+            renderWorkflowEditor();
+          }
+
           if (content.portfolio) {
             renderPortfolioEditor();
           }
@@ -4516,6 +4608,75 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
         await collectAndSaveCMS(false);
         renderServicesEditor();
         showAdminToast(`💾 Service Card #${idx + 1} saved successfully!`);
+      };
+
+      /* ====================================================================
+         WORKFLOW & 5-STEP PIPELINE CMS (ADMIN HANDLERS)
+         ==================================================================== */
+      function renderWorkflowEditor() {
+        const container = document.getElementById('workflowStepsContainer');
+        if (!container) return;
+
+        if (!content.workflow) content.workflow = {};
+        if (!Array.isArray(content.workflow.steps) || content.workflow.steps.length === 0) {
+          if (typeof DEFAULT_SITE_CONTENT !== 'undefined' && DEFAULT_SITE_CONTENT.workflow && Array.isArray(DEFAULT_SITE_CONTENT.workflow.steps)) {
+            content.workflow.steps = JSON.parse(JSON.stringify(DEFAULT_SITE_CONTENT.workflow.steps));
+          } else {
+            content.workflow.steps = [
+              { step: 1, title: "Brief & Ingest", desc: "Upload raw footage via Drive or Frame.io and specify your target platform and goals." },
+              { step: 2, title: "Rough Cut & Story", desc: "We build the narrative skeleton, remove filler, and lock the rhythm and hook structure." },
+              { step: 3, title: "VFX, Color & Sound", desc: "We infuse dynamic motion graphics, DaVinci color grading, and layered foley SFX." },
+              { step: 4, title: "Review & Polish", desc: "Provide timestamped feedback directly on the video player with rapid same-day tweaks." },
+              { step: 5, title: "Master 4K Delivery", desc: "Download pristine, render-optimized master files ready to publish and conquer feeds." }
+            ];
+          }
+        }
+
+        container.innerHTML = '';
+        content.workflow.steps.forEach((stepItem, idx) => {
+          const card = document.createElement('div');
+          card.style.background = 'var(--bg-surface)';
+          card.style.border = '1px solid var(--border-subtle)';
+          card.style.borderRadius = 'var(--radius-lg)';
+          card.style.padding = '20px';
+          card.style.boxShadow = 'var(--shadow-subtle)';
+
+          card.innerHTML = `
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border-subtle);">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="background: var(--brand-indigo); color: #fff; width: 30px; height: 30px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem;">${idx + 1}</span>
+                <strong style="color: var(--text-primary); font-size: 1.05rem;">Step ${idx + 1}: ${stepItem.title || 'Pipeline Step'}</strong>
+              </div>
+              <button type="button" class="btn btn-secondary" onclick="window.saveIndividualWorkflowStep(${idx})" style="padding: 6px 14px; font-size: 0.8rem;">
+                <i class="fa-solid fa-floppy-disk text-gradient"></i> <span>Save Step</span>
+              </button>
+            </div>
+            <div style="display: grid; grid-template-columns: 280px 1fr; gap: 16px;">
+              <div class="form-group" style="margin: 0;">
+                <label style="font-size: 0.82rem; font-weight: 700;">Step Title *</label>
+                <input type="text" class="form-control wf-step-title" data-idx="${idx}" value="${stepItem.title || ''}" placeholder="e.g. Brief & Ingest">
+              </div>
+              <div class="form-group" style="margin: 0;">
+                <label style="font-size: 0.82rem; font-weight: 700;">Step Description *</label>
+                <textarea class="form-control wf-step-desc" data-idx="${idx}" rows="2" style="font-size: 0.88rem; line-height: 1.5;" placeholder="Detailed step description...">${stepItem.desc || ''}</textarea>
+              </div>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      }
+      window.renderWorkflowEditor = renderWorkflowEditor;
+
+      window.saveIndividualWorkflowStep = async function(idx) {
+        if (!content.workflow || !content.workflow.steps || !content.workflow.steps[idx]) return;
+        const titleInput = document.querySelector(`.wf-step-title[data-idx="${idx}"]`);
+        const descInput = document.querySelector(`.wf-step-desc[data-idx="${idx}"]`);
+        if (titleInput) content.workflow.steps[idx].title = titleInput.value.trim();
+        if (descInput) content.workflow.steps[idx].desc = descInput.value.trim();
+
+        await collectAndSaveCMS(false);
+        renderWorkflowEditor();
+        showAdminToast(`💾 Step ${idx + 1} saved successfully!`);
       };
 
       // Helper function: Universal Direct Upload from PC (Supports static GitHub Pages & Node servers)

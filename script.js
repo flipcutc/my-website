@@ -248,13 +248,32 @@ function hydratePageFromCMS(customContent) {
       console.warn('Services hydration note:', srvErr);
     }
 
-    // 4.1 Workflow Subtitle
+    // 4.1 Workflow 5-Step Pipeline
     try {
       if (content.workflow) {
         const wfSub = document.getElementById('workflowSubtitle');
+        const wfTtl = document.getElementById('workflowTitle') || document.querySelector('#workflow .section-header h2');
+        const wfDsc = document.getElementById('workflowDesc') || document.querySelector('#workflow .section-header p');
         if (wfSub && content.workflow.subtitle) wfSub.textContent = content.workflow.subtitle;
+        if (wfTtl && content.workflow.title) wfTtl.textContent = content.workflow.title;
+        if (wfDsc && content.workflow.description) wfDsc.textContent = content.workflow.description;
+
+        if (content.workflow.steps && Array.isArray(content.workflow.steps) && content.workflow.steps.length > 0) {
+          const track = document.getElementById('workflowStepsTrack') || document.querySelector('.workflow-steps-track');
+          if (track) {
+            track.innerHTML = content.workflow.steps.map((st, idx) => `
+              <div class="workflow-step-card">
+                <div class="step-number-bubble">${st.step || (idx + 1)}</div>
+                <h4>${st.title || 'Pipeline Step'}</h4>
+                <p>${st.desc || ''}</p>
+              </div>
+            `).join('');
+          }
+        }
       }
-    } catch (_) {}
+    } catch (wfErr) {
+      console.warn('Workflow hydration note:', wfErr);
+    }
 
     // 5. Portfolio Showcase
     try {
