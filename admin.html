@@ -1711,24 +1711,39 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
           </div>
 
           <div class="cms-grid-2">
-            <div class="form-group"><label>Agency Brand Name</label><input type="text" id="cfgBrandName" class="form-control"></div>
             <div class="form-group">
-              <label>Logo Asset URL / SVG Path</label>
+              <label>Header & Footer Brand Logo</label>
               <input type="text" id="cfgLogoUrl" class="form-control">
               <div class="image-upload-wrapper">
                 <div class="image-preview-box"><img id="previewLogoImg" src="assets/logo.png" alt="Logo Preview"></div>
                 <div style="flex: 1;">
                   <label class="btn-upload-pc">
-                    <i class="fa-solid fa-upload"></i> Choose Logo from PC
+                    <i class="fa-solid fa-upload"></i> Choose Main Logo from PC
                     <input type="file" id="uploadLogoFile" accept="image/*,.svg" style="display: none;">
                   </label>
                   <span style="font-size: 0.78rem; color: var(--text-muted); display: block; margin-top: 4px;" id="uploadLogoStatus">Upload PNG, SVG, or JPG directly from your PC</span>
                 </div>
               </div>
             </div>
+
+            <div class="form-group">
+              <label>Browser Tab Favicon Icon (Square Tab Icon)</label>
+              <input type="text" id="cfgFaviconUrl" class="form-control">
+              <div class="image-upload-wrapper">
+                <div class="image-preview-box" style="width: 48px; height: 48px; background: #0B0F19; border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden;"><img id="previewFaviconImg" src="assets/favicon.svg" alt="Favicon Preview" style="width: 34px; height: 34px; object-fit: contain;"></div>
+                <div style="flex: 1;">
+                  <label class="btn-upload-pc" style="background: linear-gradient(135deg, #00D2FF, #7C3AED); color: #fff;">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Choose Tab Icon from PC
+                    <input type="file" id="uploadFaviconFile" accept="image/*,.svg,.ico" style="display: none;">
+                  </label>
+                  <span style="font-size: 0.78rem; color: var(--text-muted); display: block; margin-top: 4px;" id="uploadFaviconStatus">Upload custom square PNG, SVG, or ICO for browser tab icon</span>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div class="cms-grid-2">
+          <div class="cms-grid-3">
+            <div class="form-group"><label>Agency Brand Name</label><input type="text" id="cfgBrandName" class="form-control"></div>
             <div class="form-group"><label>Header Status Pulse Badge</label><input type="text" id="cfgHeaderBadge" class="form-control"></div>
             
             <div class="form-group">
@@ -1737,7 +1752,7 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
                 <span id="logoHeightVal" style="font-weight: 800; color: var(--brand-indigo); font-size: 0.95rem; background: var(--bg-tertiary); padding: 2px 10px; border-radius: var(--radius-pill); border: 1px solid var(--border-subtle);">46px</span>
               </div>
               <input type="range" id="cfgLogoHeight" min="24" max="100" value="46" step="2" class="form-control" style="cursor: pointer; padding: 4px;">
-              <span style="font-size: 0.78rem; color: var(--text-muted); display: block; margin-top: 4px;">Slide to make your logo larger or smaller across header & footer (24px - 100px)</span>
+              <span style="font-size: 0.78rem; color: var(--text-muted); display: block; margin-top: 4px;">Slide to size logo across header & footer</span>
             </div>
           </div>
         </div>
@@ -3649,6 +3664,7 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
           if (content.brand) {
             setVal('cfgBrandName', content.brand.name);
             setVal('cfgLogoUrl', content.brand.logoUrl);
+            setVal('cfgFaviconUrl', content.brand.faviconUrl || 'assets/favicon.svg');
             setVal('cfgHeaderBadge', content.brand.headerBadge);
             const h = content.brand.logoHeight || 46;
             const heightSlider = document.getElementById('cfgLogoHeight');
@@ -3659,6 +3675,10 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
             if (previewLogo) {
               if (content.brand.logoUrl) previewLogo.src = content.brand.logoUrl;
               previewLogo.style.height = `${h}px`;
+            }
+            const previewFavicon = document.getElementById('previewFaviconImg');
+            if (previewFavicon) {
+              previewFavicon.src = content.brand.faviconUrl || 'assets/favicon.svg';
             }
             const sidebarLogo = document.querySelector('.sidebar-brand img');
             if (sidebarLogo && content.brand.logoUrl) sidebarLogo.src = content.brand.logoUrl;
@@ -4213,7 +4233,32 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
         });
       }
 
-      // 2. Hero Image Upload from PC Listener
+      // 2. Favicon / Browser Tab Icon Upload from PC Listener
+      const uploadFaviconFile = document.getElementById('uploadFaviconFile');
+      if (uploadFaviconFile) {
+        uploadFaviconFile.addEventListener('change', async (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+
+          const status = document.getElementById('uploadFaviconStatus');
+          if (status) status.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Uploading Favicon from PC...';
+
+          try {
+            const uploadedUrl = await uploadImageFile(file, 'favicon');
+            document.getElementById('cfgFaviconUrl').value = uploadedUrl;
+            document.getElementById('previewFaviconImg').src = uploadedUrl;
+            if (!content.brand) content.brand = {};
+            content.brand.faviconUrl = uploadedUrl;
+            await collectAndSaveCMS(false);
+            showAdminToast('✅ Browser Tab Favicon uploaded & updated across live website!');
+            if (status) status.textContent = `Uploaded: ${file.name}`;
+          } catch (err) {
+            showAdminToast(`Favicon upload failed: ${err.message}`, '#EF4444');
+          }
+        });
+      }
+
+      // 3. Hero Image Upload from PC Listener
       const uploadHeroImgFile = document.getElementById('uploadHeroImgFile');
       if (uploadHeroImgFile) {
         uploadHeroImgFile.addEventListener('change', async (e) => {
@@ -4238,11 +4283,15 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
       }
 
       // Input URL live preview listeners
-      document.getElementById('cfgLogoUrl').addEventListener('input', (e) => {
+      document.getElementById('cfgLogoUrl')?.addEventListener('input', (e) => {
         const preview = document.getElementById('previewLogoImg');
         if (preview && e.target.value) preview.src = e.target.value;
       });
-      document.getElementById('cfgHeroImg').addEventListener('input', (e) => {
+      document.getElementById('cfgFaviconUrl')?.addEventListener('input', (e) => {
+        const preview = document.getElementById('previewFaviconImg');
+        if (preview && e.target.value) preview.src = e.target.value;
+      });
+      document.getElementById('cfgHeroImg')?.addEventListener('input', (e) => {
         const preview = document.getElementById('previewHeroImg');
         if (preview && e.target.value) preview.src = e.target.value;
       });
@@ -5274,6 +5323,7 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
         if (!content.brand) content.brand = {};
         if (document.getElementById('cfgBrandName')) content.brand.name = getVal('cfgBrandName', content.brand.name);
         if (document.getElementById('cfgLogoUrl')) content.brand.logoUrl = getVal('cfgLogoUrl', content.brand.logoUrl);
+        if (document.getElementById('cfgFaviconUrl')) content.brand.faviconUrl = getVal('cfgFaviconUrl', content.brand.faviconUrl);
         if (document.getElementById('cfgLogoHeight')) content.brand.logoHeight = parseInt(getVal('cfgLogoHeight', content.brand.logoHeight)) || 46;
         if (document.getElementById('cfgHeaderBadge')) content.brand.headerBadge = getVal('cfgHeaderBadge', content.brand.headerBadge);
 

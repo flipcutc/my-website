@@ -23,6 +23,7 @@ const DEFAULT_SITE_CONTENT = {
     "name": "FlipCut Creation",
     "tagline": "CREATION",
     "logoUrl": "assets/logo.png",
+    "faviconUrl": "assets/favicon.svg",
     "logoHeight": 86,
     "headerBadge": "Open for Q3/Q4 Project Bookings & Retainers"
   },

@@ -121,6 +121,14 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
+    // Dynamic Favicon Update from CMS
+    if (content.brand && content.brand.faviconUrl) {
+      const favicons = document.querySelectorAll("link[rel*='icon'], link[rel='apple-touch-icon']");
+      favicons.forEach(fav => {
+        fav.href = content.brand.faviconUrl;
+      });
+    }
+
     // 2. Hero Section
     const heroTitle = document.getElementById('heroTitle');
     if (heroTitle && content.hero) {
