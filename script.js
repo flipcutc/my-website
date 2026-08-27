@@ -1317,6 +1317,124 @@ function hydratePageFromCMS(customContent) {
     }
   };
 
+  function buildSinglePortfolioCard(item, isFirst) {
+    const card = document.createElement('div');
+    const isVertical = item.isVertical ? 'is-vertical' : '';
+    let rawCategory = item.category || (item.isVertical ? 'reels' : (item.type === 'video' ? 'video' : (item.type === 'graphic' ? 'graphic' : (item.type === 'uiux' ? 'uiux' : 'clients'))));
+    if (item.isVertical) rawCategory = 'reels';
+    const category = rawCategory;
+    
+    card.className = `portfolio-item ${isVertical}` + (isFirst ? ' portfolio-first-item' : '');
+    card.dataset.category = category;
+    card.dataset.type = item.type || 'link';
+    if (item.videoUrl) card.dataset.video = item.videoUrl;
+    if (item.linkUrl) card.dataset.link = item.linkUrl;
+    if (item.image) card.dataset.image = formatMediaUrl(item.image, 'image');
+
+    const imgUrl = formatMediaUrl(item.image || 'assets/showcase-edit.jpg', 'image');
+    const videoSrc = item.videoUrl ? formatMediaUrl(item.videoUrl, 'video') : '';
+    const ytId = getYouTubeId(item.videoUrl || '');
+    const hasVideo = !!item.videoUrl;
+
+    // Determine Media Thumb Content
+    let mediaContent = '';
+    let overlayIcon = '<div class="play-badge-icon"><i class="fa-solid fa-play"></i></div>';
+
+    if (item.isVertical && (item.type === 'video' || category === 'video' || category === 'reels' || hasVideo)) {
+      // Vertical 9:16 Auto-Playing Reel in Loop!
+      if (ytId) {
+        mediaContent = `
+          <iframe src="https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&mute=1&loop=1&playlist=${ytId}&controls=0&playsinline=1&modestbranding=1&rel=0" allow="autoplay; encrypted-media" playsinline allowfullscreen style="width:100%; height:100%; border:0; pointer-events:none;"></iframe>
+          <div class="reel-live-tag"><span class="reel-live-dot"></span> 9:16 REEL</div>
+        `;
+      } else if (videoSrc) {
+        mediaContent = `
+          <video class="vertical-reel-video" src="${videoSrc}" poster="${imgUrl}" autoplay loop muted playsinline preload="metadata"></video>
+          <div class="reel-live-tag"><span class="reel-live-dot"></span> 9:16 REEL</div>
+          <button class="reel-sound-btn" onclick="event.stopPropagation(); window.toggleReelCardSound(this)" title="Toggle Sound"><i class="fa-solid fa-volume-xmark"></i></button>
+        `;
+      } else {
+        mediaContent = `
+          <img src="${imgUrl}" alt="${item.title || 'Viral Reel'}" loading="lazy">
+          <div class="reel-live-tag"><span class="reel-live-dot"></span> 9:16 REEL</div>
+        `;
+      }
+      overlayIcon = '<div class="play-badge-icon" style="width:auto; padding:8px 16px; border-radius:var(--radius-pill); font-size:0.82rem; font-weight:700; gap:6px;"><i class="fa-solid fa-expand"></i> <span>Watch 4K</span></div>';
+    } else if (hasVideo && (item.type === 'video' || category === 'video' || !item.linkUrl)) {
+      // Horizontal 16:9 Video
+      if (videoSrc && (videoSrc.endsWith('.mp4') || videoSrc.endsWith('.webm') || videoSrc.includes('assets/'))) {
+        mediaContent = `
+          <video src="${videoSrc}" poster="${imgUrl}" muted playsinline preload="metadata" loop onmouseenter="this.play().catch(()=>{})" onmouseleave="this.pause()" style="width:100%; height:100%; object-fit:cover;"></video>
+          <div class="reel-live-tag" style="background: rgba(99, 102, 241, 0.85);"><i class="fa-solid fa-video"></i> 16:9 4K</div>
+        `;
+      } else {
+        mediaContent = `
+          <img src="${imgUrl}" alt="${item.title || 'Creative Project'}" loading="lazy">
+          <div class="reel-live-tag" style="background: rgba(99, 102, 241, 0.85);"><i class="fa-solid fa-video"></i> 16:9 4K</div>
+        `;
+      }
+      overlayIcon = '<div class="play-badge-icon" style="width:auto; padding:10px 18px; border-radius:var(--radius-pill); font-size:0.85rem; font-weight:700; gap:6px;"><i class="fa-solid fa-play"></i> <span>Play 4K Video</span></div>';
+    } else {
+      // Graphic / UI/UX / Client / Web Card
+      if (item.type === 'link' || category === 'uiux' || category === 'clients' || (item.linkUrl && !item.videoUrl)) {
+        overlayIcon = '<div class="play-badge-icon" style="width:auto; padding:10px 18px; border-radius:var(--radius-pill); font-size:0.85rem; font-weight:700; gap:6px;"><i class="fa-solid fa-arrow-up-right-from-square"></i> <span>Open Live Project</span></div>';
+      } else if (item.type === 'graphic' || item.type === 'image') {
+        overlayIcon = '<div class="play-badge-icon" style="width:auto; padding:10px 18px; border-radius:var(--radius-pill); font-size:0.85rem; font-weight:700; gap:6px;"><i class="fa-solid fa-expand"></i> <span>View Visual</span></div>';
+      } else {
+        overlayIcon = '<div class="play-badge-icon"><i class="fa-solid fa-play"></i></div>';
+      }
+
+      mediaContent = `
+        <img src="${imgUrl}" alt="${item.title || 'Creative Project'}" loading="lazy">
+      `;
+    }
+
+    // Category Icon
+    let catIcon = 'fa-solid fa-film';
+    if (category === 'graphic') catIcon = 'fa-solid fa-palette';
+    if (category === 'uiux') catIcon = 'fa-solid fa-laptop-code';
+    if (category === 'clients') catIcon = 'fa-solid fa-crown';
+
+    card.innerHTML = `
+      <div class="portfolio-media-thumb">
+        ${mediaContent}
+        <div class="portfolio-overlay">
+          ${overlayIcon}
+        </div>
+        <span style="position: absolute; top: 14px; left: 14px; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(10px); color: #FFF; font-size: 0.72rem; font-weight: 700; padding: 4px 10px; border-radius: var(--radius-pill); text-transform: uppercase; letter-spacing: 0.06em; border: 1px solid rgba(255,255,255,0.15); z-index: 5;">
+          <i class="${catIcon}" style="color: var(--brand-indigo); margin-right: 4px;"></i> ${item.tag || (item.isVertical ? '9:16 REEL' : category.toUpperCase())}
+        </span>
+      </div>
+      <div class="portfolio-info">
+        <span class="portfolio-tag">${item.tag || (item.isVertical ? 'Viral Reel & Short' : '16:9 Video Master')}</span>
+        <h3>${item.title || 'Creative Showcase Project'}</h3>
+        <div class="portfolio-stats">
+          <span><i class="fa-solid fa-sparkles text-gradient"></i> ${item.views || '4K Master'}</span>
+          <span><i class="fa-solid fa-arrow-trend-up"></i> ${item.stat2 || 'Production Ready'}</span>
+        </div>
+      </div>
+    `;
+
+    // Click interaction
+    card.addEventListener('click', () => {
+      if (item.videoUrl && (item.type === 'video' || category === 'video' || category === 'reels' || !item.linkUrl)) {
+        openVideoModal(formatMediaUrl(item.videoUrl, 'video'));
+      } else if ((item.type === 'link' || category === 'uiux' || category === 'clients') && item.linkUrl) {
+        window.open(item.linkUrl, '_blank', 'noopener,noreferrer');
+      } else if (item.image && (item.type === 'graphic' || item.type === 'image')) {
+        openImageModal(imgUrl, item.title, item.tag, item.linkUrl);
+      } else if (item.videoUrl) {
+        openVideoModal(formatMediaUrl(item.videoUrl, 'video'));
+      } else if (item.linkUrl) {
+        window.open(item.linkUrl, '_blank', 'noopener,noreferrer');
+      } else if (item.image) {
+        openImageModal(imgUrl, item.title, item.tag, item.linkUrl);
+      }
+    });
+
+    return card;
+  }
+
   function renderFrontendPortfolio(passedContent) {
     const data = passedContent || content || siteAppContent || ((typeof getSiteContent === 'function') ? getSiteContent() : DEFAULT_SITE_CONTENT);
     const portfolioGrid = document.getElementById('portfolioGrid');
@@ -1324,123 +1442,31 @@ function hydratePageFromCMS(customContent) {
     if (!data || !data.portfolio || !data.portfolio.items) return;
 
     portfolioGrid.innerHTML = '';
-    data.portfolio.items.forEach(item => {
-      const card = document.createElement('div');
-      const isVertical = item.isVertical ? 'is-vertical' : '';
-      let rawCategory = item.category || (item.isVertical ? 'reels' : (item.type === 'video' ? 'video' : (item.type === 'graphic' ? 'graphic' : (item.type === 'uiux' ? 'uiux' : 'clients'))));
-      if (item.isVertical) rawCategory = 'reels';
-      const category = rawCategory;
-      
-      card.className = `portfolio-item ${isVertical}`;
-      card.dataset.category = category;
-      card.dataset.type = item.type || 'link';
-      if (item.videoUrl) card.dataset.video = item.videoUrl;
-      if (item.linkUrl) card.dataset.link = item.linkUrl;
-      if (item.image) card.dataset.image = formatMediaUrl(item.image, 'image');
+    const items = data.portfolio.items;
+    if (items.length === 0) return;
 
-      const imgUrl = formatMediaUrl(item.image || 'assets/showcase-edit.jpg', 'image');
-      const videoSrc = item.videoUrl ? formatMediaUrl(item.videoUrl, 'video') : '';
-      const ytId = getYouTubeId(item.videoUrl || '');
-      const hasVideo = !!item.videoUrl;
+    // First featured card (stays on top in mobile view)
+    const firstCard = buildSinglePortfolioCard(items[0], true);
+    portfolioGrid.appendChild(firstCard);
 
-      // Determine Media Thumb Content
-      let mediaContent = '';
-      let overlayIcon = '<div class="play-badge-icon"><i class="fa-solid fa-play"></i></div>';
+    // Remaining cards (cards 2..N) go into the horizontal scroll strip for mobile
+    if (items.length > 1) {
+      const sliderCue = document.createElement('div');
+      sliderCue.className = 'portfolio-mobile-slider-cue';
+      sliderCue.id = 'portfolioMobileSliderCue';
+      sliderCue.innerHTML = '<i class="fa-solid fa-arrows-left-right text-gradient"></i> <span>Swipe for more creations</span> <i class="fa-solid fa-arrow-right-long text-gradient"></i>';
+      portfolioGrid.appendChild(sliderCue);
 
-      if (item.isVertical && (item.type === 'video' || category === 'video' || category === 'reels' || hasVideo)) {
-        // Vertical 9:16 Auto-Playing Reel in Loop!
-        if (ytId) {
-          mediaContent = `
-            <iframe src="https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&mute=1&loop=1&playlist=${ytId}&controls=0&playsinline=1&modestbranding=1&rel=0" allow="autoplay; encrypted-media" playsinline allowfullscreen style="width:100%; height:100%; border:0; pointer-events:none;"></iframe>
-            <div class="reel-live-tag"><span class="reel-live-dot"></span> 9:16 REEL</div>
-          `;
-        } else if (videoSrc) {
-          mediaContent = `
-            <video class="vertical-reel-video" src="${videoSrc}" poster="${imgUrl}" autoplay loop muted playsinline preload="metadata"></video>
-            <div class="reel-live-tag"><span class="reel-live-dot"></span> 9:16 REEL</div>
-            <button class="reel-sound-btn" onclick="event.stopPropagation(); window.toggleReelCardSound(this)" title="Toggle Sound"><i class="fa-solid fa-volume-xmark"></i></button>
-          `;
-        } else {
-          mediaContent = `
-            <img src="${imgUrl}" alt="${item.title || 'Viral Reel'}" loading="lazy">
-            <div class="reel-live-tag"><span class="reel-live-dot"></span> 9:16 REEL</div>
-          `;
-        }
-        overlayIcon = '<div class="play-badge-icon" style="width:auto; padding:8px 16px; border-radius:var(--radius-pill); font-size:0.82rem; font-weight:700; gap:6px;"><i class="fa-solid fa-expand"></i> <span>Watch 4K</span></div>';
-      } else if (hasVideo && (item.type === 'video' || category === 'video' || !item.linkUrl)) {
-        // Horizontal 16:9 Video
-        if (videoSrc && (videoSrc.endsWith('.mp4') || videoSrc.endsWith('.webm') || videoSrc.includes('assets/'))) {
-          mediaContent = `
-            <video src="${videoSrc}" poster="${imgUrl}" muted playsinline preload="metadata" loop onmouseenter="this.play().catch(()=>{})" onmouseleave="this.pause()" style="width:100%; height:100%; object-fit:cover;"></video>
-            <div class="reel-live-tag" style="background: rgba(99, 102, 241, 0.85);"><i class="fa-solid fa-video"></i> 16:9 4K</div>
-          `;
-        } else {
-          mediaContent = `
-            <img src="${imgUrl}" alt="${item.title || 'Creative Project'}" loading="lazy">
-            <div class="reel-live-tag" style="background: rgba(99, 102, 241, 0.85);"><i class="fa-solid fa-video"></i> 16:9 4K</div>
-          `;
-        }
-        overlayIcon = '<div class="play-badge-icon" style="width:auto; padding:10px 18px; border-radius:var(--radius-pill); font-size:0.85rem; font-weight:700; gap:6px;"><i class="fa-solid fa-play"></i> <span>Play 4K Video</span></div>';
-      } else {
-        // Graphic / UI/UX / Client / Web Card
-        if (item.type === 'link' || category === 'uiux' || category === 'clients' || (item.linkUrl && !item.videoUrl)) {
-          overlayIcon = '<div class="play-badge-icon" style="width:auto; padding:10px 18px; border-radius:var(--radius-pill); font-size:0.85rem; font-weight:700; gap:6px;"><i class="fa-solid fa-arrow-up-right-from-square"></i> <span>Open Live Project</span></div>';
-        } else if (item.type === 'graphic' || item.type === 'image') {
-          overlayIcon = '<div class="play-badge-icon" style="width:auto; padding:10px 18px; border-radius:var(--radius-pill); font-size:0.85rem; font-weight:700; gap:6px;"><i class="fa-solid fa-expand"></i> <span>View Visual</span></div>';
-        } else {
-          overlayIcon = '<div class="play-badge-icon"><i class="fa-solid fa-play"></i></div>';
-        }
+      const scrollStrip = document.createElement('div');
+      scrollStrip.className = 'portfolio-mobile-scroll-strip';
+      scrollStrip.id = 'portfolioMobileScrollStrip';
 
-        mediaContent = `
-          <img src="${imgUrl}" alt="${item.title || 'Creative Project'}" loading="lazy">
-        `;
+      for (let i = 1; i < items.length; i++) {
+        const otherCard = buildSinglePortfolioCard(items[i], false);
+        scrollStrip.appendChild(otherCard);
       }
-
-      // Category Icon
-      let catIcon = 'fa-solid fa-film';
-      if (category === 'graphic') catIcon = 'fa-solid fa-palette';
-      if (category === 'uiux') catIcon = 'fa-solid fa-laptop-code';
-      if (category === 'clients') catIcon = 'fa-solid fa-crown';
-
-      card.innerHTML = `
-        <div class="portfolio-media-thumb">
-          ${mediaContent}
-          <div class="portfolio-overlay">
-            ${overlayIcon}
-          </div>
-          <span style="position: absolute; top: 14px; left: 14px; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(10px); color: #FFF; font-size: 0.72rem; font-weight: 700; padding: 4px 10px; border-radius: var(--radius-pill); text-transform: uppercase; letter-spacing: 0.06em; border: 1px solid rgba(255,255,255,0.15); z-index: 5;">
-            <i class="${catIcon}" style="color: var(--brand-indigo); margin-right: 4px;"></i> ${item.tag || (item.isVertical ? '9:16 REEL' : category.toUpperCase())}
-          </span>
-        </div>
-        <div class="portfolio-info">
-          <span class="portfolio-tag">${item.tag || (item.isVertical ? 'Viral Reel & Short' : '16:9 Video Master')}</span>
-          <h3>${item.title || 'Creative Showcase Project'}</h3>
-          <div class="portfolio-stats">
-            <span><i class="fa-solid fa-sparkles text-gradient"></i> ${item.views || '4K Master'}</span>
-            <span><i class="fa-solid fa-arrow-trend-up"></i> ${item.stat2 || 'Production Ready'}</span>
-          </div>
-        </div>
-      `;
-
-      // Click interaction
-      card.addEventListener('click', () => {
-        if (item.videoUrl && (item.type === 'video' || category === 'video' || category === 'reels' || !item.linkUrl)) {
-          openVideoModal(formatMediaUrl(item.videoUrl, 'video'));
-        } else if ((item.type === 'link' || category === 'uiux' || category === 'clients') && item.linkUrl) {
-          window.open(item.linkUrl, '_blank', 'noopener,noreferrer');
-        } else if (item.image && (item.type === 'graphic' || item.type === 'image')) {
-          openImageModal(imgUrl, item.title, item.tag, item.linkUrl);
-        } else if (item.videoUrl) {
-          openVideoModal(formatMediaUrl(item.videoUrl, 'video'));
-        } else if (item.linkUrl) {
-          window.open(item.linkUrl, '_blank', 'noopener,noreferrer');
-        } else if (item.image) {
-          openImageModal(imgUrl, item.title, item.tag, item.linkUrl);
-        }
-      });
-
-      portfolioGrid.appendChild(card);
-    });
+      portfolioGrid.appendChild(scrollStrip);
+    }
 
     applyActivePortfolioFilter();
 
@@ -1499,6 +1525,19 @@ function hydratePageFromCMS(customContent) {
         item.style.display = 'none';
       }
     });
+
+    const cue = document.getElementById('portfolioMobileSliderCue');
+    const strip = document.getElementById('portfolioMobileScrollStrip');
+    if (cue && strip) {
+      const visibleInStrip = Array.from(strip.querySelectorAll('.portfolio-item')).filter(el => el.style.display !== 'none');
+      if (visibleInStrip.length > 0) {
+        cue.style.display = '';
+        strip.style.display = '';
+      } else {
+        cue.style.display = 'none';
+        strip.style.display = 'none';
+      }
+    }
 
     if (filter === 'reels' || (visibleCount > 0 && onlyVertical)) {
       grid.classList.add('vertical-mode');
