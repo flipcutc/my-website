@@ -95,9 +95,9 @@
 
     const cardWaBtn = document.getElementById('cardProfileWhatsAppBtn');
     if (cardWaBtn) {
-      const waNum = '917010270151';
-      const msg = encodeURIComponent(`Hi FlipCut Team! Here is my Registered Webinar Pass [User ID: ${profile.userId}, Payment ID: ${profile.paymentId || 'Confirmed'}]. Please add me to the VIP Group!`);
-      cardWaBtn.href = `https://wa.me/${waNum}?text=${msg}`;
+      const siteContent = (typeof getSiteContent === 'function') ? getSiteContent() : null;
+      const groupLink = siteContent?.webinar?.whatsappGroupLink || 'https://chat.whatsapp.com/B5hdxy7LbkNCrWRsHMtW8h';
+      cardWaBtn.href = groupLink;
     }
   }
 

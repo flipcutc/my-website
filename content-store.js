@@ -439,6 +439,7 @@ const DEFAULT_SITE_CONTENT = {
     "originalPrice": "999",
     "formTitle": "Fill Out Your Webinar Brief",
     "formSubtitle": "Enter your details, select your website type, and complete payment via GPay / Netbanking to unlock your pass.",
+    "whatsappGroupLink": "https://chat.whatsapp.com/B5hdxy7LbkNCrWRsHMtW8h",
     "whatsappGroupMsg": "Hi FlipCut Team! I just registered for the Live Masterclass Webinar. Please add me to the VIP Group!"
   }
 };

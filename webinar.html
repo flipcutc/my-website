@@ -1328,9 +1328,8 @@
         const uid = userId || ('FC-WEB-' + Math.floor(10000 + Math.random() * 90000));
         const currentFee = getCurrentWebinarFee();
         const paymentId = payId || `pay_${Date.now()}`;
-        const waNum = (siteContent?.contact?.whatsappNum) ? siteContent.contact.whatsappNum.replace(/[^0-9]/g, '') : '917010270151';
-        const defaultMsg = siteContent?.webinar?.whatsappGroupMsg || `Hi FlipCut Team! I just registered for the Live Webinar [User ID: ${uid}, Payment ID: ${paymentId}]. Please add me to the VIP Group!`;
-        const waUrl = `https://wa.me/${waNum}?text=${encodeURIComponent(`${defaultMsg} [User ID: ${uid}]`)}`;
+        const groupInviteLink = siteContent?.webinar?.whatsappGroupLink || 'https://chat.whatsapp.com/B5hdxy7LbkNCrWRsHMtW8h';
+        const waUrl = groupInviteLink;
 
         // Force remove any remaining Razorpay container / iframe
         document.querySelectorAll('.razorpay-container, iframe[name^="razorpay"], .razorpay-backdrop').forEach(el => {
