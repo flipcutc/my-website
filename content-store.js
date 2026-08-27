@@ -471,6 +471,22 @@ const DEFAULT_SITE_CONTENT = {
     "youtubeChannel": "FlipCut Official",
     "copyrightText": "© 2026 FlipCut Creation. All rights reserved. Precision Engineered Post-Production."
   },
+  "footer": {
+    "brandDesc": "Transforming raw footage into high-retention viral visual assets and cinematic films for world-class creators and brands.",
+    "navTitle": "Navigation",
+    "servicesTitle": "Services",
+    "connectTitle": "Connect",
+    "email": "flipcutcreation@gmail.com",
+    "instagramUrl": "https://www.instagram.com/flipcut_creation/",
+    "instagramHandle": "https://www.instagram.com/flipcut_creation/",
+    "youtubeUrl": "https://www.youtube.com/@flipcutcreation",
+    "youtubeChannel": "https://www.youtube.com/@flipcutcreation",
+    "whatsappNum": "+91 70102 70151",
+    "whatsappUrl": "https://wa.me/917010270151",
+    "whatsappText": "WhatsApp Chat",
+    "copyrightText": "© 2026 FlipCut Creation. All rights reserved. Precision Engineered Post-Production.",
+    "tagline": "Designed in Luxury White Mode"
+  },
   "webinar": {
     "enabled": true,
     "badge": "Exclusive Live Masterclass Webinar",

@@ -572,20 +572,67 @@ function hydratePageFromCMS(customContent) {
         if (mobileNavWhatsapp) mobileNavWhatsapp.href = waUrl;
       }
 
-      const footerCopy = document.getElementById('footerCopyrightText');
-      if (footerCopy && content.contact.copyrightText) footerCopy.textContent = content.contact.copyrightText;
+      // Legacy contact footer overrides
+      if (content.contact.copyrightText) {
+        const footerCopy = document.getElementById('footerCopyrightText');
+        if (footerCopy) footerCopy.textContent = content.contact.copyrightText;
+      }
+    }
+
+    // 10. Footer Section CMS Hydration
+    try {
+      const footerData = content.footer || {};
+      const contactData = content.contact || {};
+
+      const footerDesc = document.getElementById('footerBrandDesc');
+      if (footerDesc && footerData.brandDesc) footerDesc.textContent = footerData.brandDesc;
+
+      const navTtl = document.getElementById('footerNavTitle');
+      if (navTtl && footerData.navTitle) navTtl.textContent = footerData.navTitle;
+
+      const srvTtl = document.getElementById('footerServicesTitle');
+      if (srvTtl && footerData.servicesTitle) srvTtl.textContent = footerData.servicesTitle;
+
+      const connTtl = document.getElementById('footerConnectTitle');
+      if (connTtl && footerData.connectTitle) connTtl.textContent = footerData.connectTitle;
 
       const footerEmail = document.getElementById('footerEmailLink');
-      if (footerEmail && content.contact.email) {
-        footerEmail.textContent = content.contact.email;
-        footerEmail.href = `mailto:${content.contact.email}`;
+      const emailVal = footerData.email || contactData.email;
+      if (footerEmail && emailVal) {
+        footerEmail.innerHTML = `<i class="fa-solid fa-envelope"></i> ${emailVal}`;
+        footerEmail.href = `mailto:${emailVal}`;
       }
 
+      const footerInstaAnchor = document.getElementById('footerInstagramAnchor');
       const footerInsta = document.getElementById('footerInstagramLink');
-      if (footerInsta && content.contact.instagramHandle) footerInsta.textContent = content.contact.instagramHandle;
+      const instaHandle = footerData.instagramHandle || footerData.instagramUrl || contactData.instagramHandle;
+      const instaUrl = footerData.instagramUrl || (instaHandle && instaHandle.startsWith('http') ? instaHandle : (instaHandle ? `https://instagram.com/${instaHandle.replace('@', '')}` : 'https://instagram.com'));
+      if (footerInsta && instaHandle) footerInsta.textContent = instaHandle;
+      if (footerInstaAnchor && instaUrl) footerInstaAnchor.href = instaUrl;
 
+      const footerYtAnchor = document.getElementById('footerYoutubeAnchor');
       const footerYt = document.getElementById('footerYoutubeLink');
-      if (footerYt && content.contact.youtubeChannel) footerYt.textContent = content.contact.youtubeChannel;
+      const ytChannel = footerData.youtubeChannel || footerData.youtubeUrl || contactData.youtubeChannel;
+      const ytUrl = footerData.youtubeUrl || (ytChannel && ytChannel.startsWith('http') ? ytChannel : (ytChannel ? `https://youtube.com/${ytChannel.replace('@', '')}` : 'https://youtube.com'));
+      if (footerYt && ytChannel) footerYt.textContent = ytChannel;
+      if (footerYtAnchor && ytUrl) footerYtAnchor.href = ytUrl;
+
+      const footerWaAnchor = document.getElementById('footerWhatsappAnchor');
+      const footerWa = document.getElementById('footerWhatsappLink');
+      const waText = footerData.whatsappText || 'WhatsApp Chat';
+      const waNum = footerData.whatsappNum || contactData.whatsappNum;
+      const waUrl = footerData.whatsappUrl || (waNum ? `https://wa.me/${String(waNum).replace(/[^0-9]/g, '')}` : 'https://wa.me/917010270151');
+      if (footerWa) footerWa.textContent = waText;
+      if (footerWaAnchor) footerWaAnchor.href = waUrl;
+
+      const footerCopy = document.getElementById('footerCopyrightText');
+      const copyVal = footerData.copyrightText || contactData.copyrightText;
+      if (footerCopy && copyVal) footerCopy.textContent = copyVal;
+
+      const footerTagline = document.getElementById('footerTaglineText');
+      if (footerTagline && footerData.tagline) footerTagline.textContent = footerData.tagline;
+    } catch (ftErr) {
+      console.warn('Footer hydration note:', ftErr);
     }
 
     if (typeof document !== 'undefined' && document.body) {

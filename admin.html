@@ -2664,6 +2664,56 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
 
           <div class="form-group"><label>Footer Copyright Text</label><input type="text" id="cfgCopyrightText" class="form-control"></div>
         </div>
+
+        <!-- Card 3: Complete Website Footer CMS -->
+        <div class="cms-card">
+          <div class="cms-header">
+            <div>
+              <h2><i class="fa-solid fa-shoe-prints text-gradient"></i> Website Footer CMS & Column Content</h2>
+              <p>Customize footer brand description, column titles, social connect links, copyright, and bottom tagline.</p>
+            </div>
+            <div>
+              <button type="button" class="btn btn-primary" onclick="window.saveAdminDraft(true)" style="padding: 10px 20px; font-size: 0.88rem;">
+                <i class="fa-solid fa-floppy-disk"></i>
+                <span>Save Footer Changes</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Footer Left Brand Description (Under Logo)</label>
+            <textarea id="cfgFooterBrandDesc" class="form-control" rows="2" placeholder="Transforming raw footage into high-retention viral visual assets and cinematic films for world-class creators and brands."></textarea>
+          </div>
+
+          <h3 style="margin: 20px 0 12px; font-size: 1.1rem;"><i class="fa-solid fa-table-columns text-gradient"></i> Footer Column Header Titles</h3>
+          <div class="cms-grid-3" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;">
+            <div class="form-group"><label>Column 2 Title</label><input type="text" id="cfgFooterNavTitle" class="form-control" placeholder="Navigation"></div>
+            <div class="form-group"><label>Column 3 Title</label><input type="text" id="cfgFooterServicesTitle" class="form-control" placeholder="Services"></div>
+            <div class="form-group"><label>Column 4 Title</label><input type="text" id="cfgFooterConnectTitle" class="form-control" placeholder="Connect"></div>
+          </div>
+
+          <h3 style="margin: 20px 0 12px; font-size: 1.1rem;"><i class="fa-solid fa-share-nodes text-gradient"></i> Column 4 Connect Links & Social Profiles</h3>
+          <div class="cms-grid-2">
+            <div class="form-group"><label>Contact Email (Text & mailto link)</label><input type="email" id="cfgFooterEmail" class="form-control" placeholder="flipcutcreation@gmail.com"></div>
+            <div class="form-group"><label>WhatsApp Link URL</label><input type="text" id="cfgFooterWhatsappUrl" class="form-control" placeholder="https://wa.me/917010270151"></div>
+          </div>
+
+          <div class="cms-grid-2">
+            <div class="form-group"><label>Instagram Profile URL</label><input type="url" id="cfgFooterInstaUrl" class="form-control" placeholder="https://www.instagram.com/flipcut_creation/"></div>
+            <div class="form-group"><label>Instagram Display Text / Handle</label><input type="text" id="cfgFooterInstaText" class="form-control" placeholder="https://www.instagram.com/flipcut_creation/"></div>
+          </div>
+
+          <div class="cms-grid-2">
+            <div class="form-group"><label>YouTube Channel URL</label><input type="url" id="cfgFooterYtUrl" class="form-control" placeholder="https://www.youtube.com/@flipcutcreation"></div>
+            <div class="form-group"><label>YouTube Display Text</label><input type="text" id="cfgFooterYtText" class="form-control" placeholder="https://www.youtube.com/@flipcutcreation"></div>
+          </div>
+
+          <h3 style="margin: 20px 0 12px; font-size: 1.1rem;"><i class="fa-solid fa-copyright text-gradient"></i> Footer Bottom Row Bar</h3>
+          <div class="cms-grid-2">
+            <div class="form-group"><label>Copyright Text (Bottom Left)</label><input type="text" id="cfgFooterCopyright" class="form-control" placeholder="© 2026 FlipCut Creation. All rights reserved. Precision Engineered Post-Production."></div>
+            <div class="form-group"><label>Tagline / Mode Text (Bottom Right)</label><input type="text" id="cfgFooterTagline" class="form-control" placeholder="Designed in Luxury White Mode"></div>
+          </div>
+        </div>
       </div>
 
     </main>
@@ -3198,6 +3248,21 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
           content.contact.youtubeChannel = getVal('cfgYoutubeChannel', content.contact.youtubeChannel);
           content.contact.copyrightText = getVal('cfgCopyrightText', content.contact.copyrightText);
         }
+
+        // Website Footer CMS Data
+        if (!content.footer) content.footer = {};
+        if (document.getElementById('cfgFooterBrandDesc')) content.footer.brandDesc = getVal('cfgFooterBrandDesc', content.footer.brandDesc || 'Transforming raw footage into high-retention viral visual assets and cinematic films for world-class creators and brands.');
+        if (document.getElementById('cfgFooterNavTitle')) content.footer.navTitle = getVal('cfgFooterNavTitle', content.footer.navTitle || 'Navigation');
+        if (document.getElementById('cfgFooterServicesTitle')) content.footer.servicesTitle = getVal('cfgFooterServicesTitle', content.footer.servicesTitle || 'Services');
+        if (document.getElementById('cfgFooterConnectTitle')) content.footer.connectTitle = getVal('cfgFooterConnectTitle', content.footer.connectTitle || 'Connect');
+        if (document.getElementById('cfgFooterEmail')) content.footer.email = getVal('cfgFooterEmail', content.footer.email || content.contact?.email || 'flipcutcreation@gmail.com');
+        if (document.getElementById('cfgFooterWhatsappUrl')) content.footer.whatsappUrl = getVal('cfgFooterWhatsappUrl', content.footer.whatsappUrl || 'https://wa.me/917010270151');
+        if (document.getElementById('cfgFooterInstaUrl')) content.footer.instagramUrl = getVal('cfgFooterInstaUrl', content.footer.instagramUrl || 'https://www.instagram.com/flipcut_creation/');
+        if (document.getElementById('cfgFooterInstaText')) content.footer.instagramHandle = getVal('cfgFooterInstaText', content.footer.instagramHandle || 'https://www.instagram.com/flipcut_creation/');
+        if (document.getElementById('cfgFooterYtUrl')) content.footer.youtubeUrl = getVal('cfgFooterYtUrl', content.footer.youtubeUrl || 'https://www.youtube.com/@flipcutcreation');
+        if (document.getElementById('cfgFooterYtText')) content.footer.youtubeChannel = getVal('cfgFooterYtText', content.footer.youtubeChannel || 'https://www.youtube.com/@flipcutcreation');
+        if (document.getElementById('cfgFooterCopyright')) content.footer.copyrightText = getVal('cfgFooterCopyright', content.footer.copyrightText || '© 2026 FlipCut Creation. All rights reserved. Precision Engineered Post-Production.');
+        if (document.getElementById('cfgFooterTagline')) content.footer.tagline = getVal('cfgFooterTagline', content.footer.tagline || 'Designed in Luxury White Mode');
 
         // Webinar Masterclass CMS
         if (!content.webinar) content.webinar = {};
@@ -4470,6 +4535,34 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
             setVal('cfgInstaHandle', content.contact.instagramHandle);
             setVal('cfgYoutubeChannel', content.contact.youtubeChannel);
             setVal('cfgCopyrightText', content.contact.copyrightText);
+          }
+
+          if (content.footer) {
+            setVal('cfgFooterBrandDesc', content.footer.brandDesc || 'Transforming raw footage into high-retention viral visual assets and cinematic films for world-class creators and brands.');
+            setVal('cfgFooterNavTitle', content.footer.navTitle || 'Navigation');
+            setVal('cfgFooterServicesTitle', content.footer.servicesTitle || 'Services');
+            setVal('cfgFooterConnectTitle', content.footer.connectTitle || 'Connect');
+            setVal('cfgFooterEmail', content.footer.email || content.contact?.email || 'flipcutcreation@gmail.com');
+            setVal('cfgFooterWhatsappUrl', content.footer.whatsappUrl || 'https://wa.me/917010270151');
+            setVal('cfgFooterInstaUrl', content.footer.instagramUrl || 'https://www.instagram.com/flipcut_creation/');
+            setVal('cfgFooterInstaText', content.footer.instagramHandle || 'https://www.instagram.com/flipcut_creation/');
+            setVal('cfgFooterYtUrl', content.footer.youtubeUrl || 'https://www.youtube.com/@flipcutcreation');
+            setVal('cfgFooterYtText', content.footer.youtubeChannel || 'https://www.youtube.com/@flipcutcreation');
+            setVal('cfgFooterCopyright', content.footer.copyrightText || '© 2026 FlipCut Creation. All rights reserved. Precision Engineered Post-Production.');
+            setVal('cfgFooterTagline', content.footer.tagline || 'Designed in Luxury White Mode');
+          } else {
+            setVal('cfgFooterBrandDesc', 'Transforming raw footage into high-retention viral visual assets and cinematic films for world-class creators and brands.');
+            setVal('cfgFooterNavTitle', 'Navigation');
+            setVal('cfgFooterServicesTitle', 'Services');
+            setVal('cfgFooterConnectTitle', 'Connect');
+            setVal('cfgFooterEmail', content.contact?.email || 'flipcutcreation@gmail.com');
+            setVal('cfgFooterWhatsappUrl', 'https://wa.me/917010270151');
+            setVal('cfgFooterInstaUrl', 'https://www.instagram.com/flipcut_creation/');
+            setVal('cfgFooterInstaText', 'https://www.instagram.com/flipcut_creation/');
+            setVal('cfgFooterYtUrl', 'https://www.youtube.com/@flipcutcreation');
+            setVal('cfgFooterYtText', 'https://www.youtube.com/@flipcutcreation');
+            setVal('cfgFooterCopyright', content.contact?.copyrightText || '© 2026 FlipCut Creation. All rights reserved. Precision Engineered Post-Production.');
+            setVal('cfgFooterTagline', 'Designed in Luxury White Mode');
           }
 
           if (content.webinar) {
