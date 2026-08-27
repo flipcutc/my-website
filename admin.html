@@ -2701,6 +2701,369 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
       let currentLeads = [];
       let cmsInputsPopulated = false;
 
+      function collectCMSFormData() {
+        if (!content) content = getSiteContent();
+
+        const getCheck = (id, def = true) => { const el = document.getElementById(id); return el ? el.checked : def; };
+        const getVal = (id, currentVal = '') => { 
+          const el = document.getElementById(id); 
+          if (!el) return currentVal !== undefined ? currentVal : '';
+          const v = el.value !== undefined ? el.value.trim() : '';
+          return v !== '' ? v : currentVal;
+        };
+
+        // Collect Comprehensive Section, Header & Card Visibility
+        content.sectionsVisibility = {
+          // 1. Header Controls
+          headerBadge: getCheck('toggleHeadBadge', content.sectionsVisibility?.headerBadge),
+          headerThemeToggle: getCheck('toggleHeadTheme', content.sectionsVisibility?.headerThemeToggle),
+          headerCta: getCheck('toggleHeadCta', content.sectionsVisibility?.headerCta),
+          navWebinarPill: getCheck('toggleHeadWebinar', content.sectionsVisibility?.navWebinarPill),
+
+          // 2. All 13 Major Page Sections
+          hero: getCheck('toggleSecHero', content.sectionsVisibility?.hero),
+          runningBanner: getCheck('toggleSecRunningBanner', content.sectionsVisibility?.runningBanner),
+          about: getCheck('toggleSecAbout', content.sectionsVisibility?.about),
+          dailyPrompts: getCheck('toggleSecDailyPrompts', content.sectionsVisibility?.dailyPrompts),
+          services: getCheck('toggleSecServices', content.sectionsVisibility?.services),
+          workflow: getCheck('toggleSecWorkflow', content.sectionsVisibility?.workflow),
+          portfolio: getCheck('toggleSecPortfolio', content.sectionsVisibility?.portfolio),
+          whyUs: getCheck('toggleSecWhyUs', content.sectionsVisibility?.whyUs),
+          pricing: getCheck('toggleSecPricing', content.sectionsVisibility?.pricing),
+          testimonials: getCheck('toggleSecTestimonials', content.sectionsVisibility?.testimonials),
+          calculator: getCheck('toggleSecCalculator', content.sectionsVisibility?.calculator),
+          contact: getCheck('toggleSecContact', content.sectionsVisibility?.contact),
+          footer: getCheck('toggleSecFooter', content.sectionsVisibility?.footer),
+
+          // 3. Specific Cards & Feature Modules
+          heroStats: getCheck('toggleCardHeroStats', content.sectionsVisibility?.heroStats),
+          heroVideoCard: getCheck('toggleCardHeroVideo', content.sectionsVisibility?.heroVideoCard),
+          aboutPillars: getCheck('toggleCardAboutPillars', content.sectionsVisibility?.aboutPillars),
+          beforeAfterSlider: getCheck('toggleCardBeforeAfter', content.sectionsVisibility?.beforeAfterSlider),
+          portfolioFilters: getCheck('toggleCardPortfolioFilters', content.sectionsVisibility?.portfolioFilters),
+          whyUsGrid: getCheck('toggleCardWhyUsGrid', content.sectionsVisibility?.whyUsGrid),
+          techStack: getCheck('toggleCardTechStack', content.sectionsVisibility?.techStack),
+          contactDriveLink: getCheck('toggleCardDriveLink', content.sectionsVisibility?.contactDriveLink),
+          floatingWhatsApp: getCheck('toggleFloatingWa', content.sectionsVisibility?.floatingWhatsApp),
+          backToTopBtn: getCheck('toggleBackToTop', content.sectionsVisibility?.backToTopBtn)
+        };
+
+        // Collect Running Banner Items
+        if (!content.runningBanner) content.runningBanner = { enabled: true, items: [] };
+        const bannerIcons = document.querySelectorAll('.banner-icon');
+        const bannerTexts = document.querySelectorAll('.banner-text');
+        if (bannerTexts.length > 0) {
+          content.runningBanner.items = [];
+          bannerIcons.forEach((iconInput, idx) => {
+            const textInput = bannerTexts[idx];
+            if (textInput && textInput.value.trim()) {
+              content.runningBanner.items.push({
+                icon: iconInput.value.trim() || 'fa-solid fa-bolt',
+                text: textInput.value.trim()
+              });
+            }
+          });
+        }
+
+        // Brand
+        if (!content.brand) content.brand = {};
+        if (document.getElementById('cfgBrandName')) content.brand.name = getVal('cfgBrandName', content.brand.name);
+        if (document.getElementById('cfgLogoUrl')) content.brand.logoUrl = getVal('cfgLogoUrl', content.brand.logoUrl);
+        if (document.getElementById('cfgFaviconUrl')) content.brand.faviconUrl = getVal('cfgFaviconUrl', content.brand.faviconUrl);
+        if (document.getElementById('cfgLogoHeight')) content.brand.logoHeight = parseInt(getVal('cfgLogoHeight', content.brand.logoHeight)) || 46;
+        if (document.getElementById('cfgHeaderBadge')) content.brand.headerBadge = getVal('cfgHeaderBadge', content.brand.headerBadge);
+
+        // Hero
+        if (!content.hero) content.hero = {};
+        if (document.getElementById('cfgHeroTitlePrefix')) content.hero.titlePrefix = getVal('cfgHeroTitlePrefix', content.hero.titlePrefix);
+        if (document.getElementById('cfgHeroTitleGrad')) content.hero.titleGradient = getVal('cfgHeroTitleGrad', content.hero.titleGradient);
+        if (document.getElementById('cfgHeroTitleSuffix')) content.hero.titleSuffix = getVal('cfgHeroTitleSuffix', content.hero.titleSuffix);
+        if (document.getElementById('cfgHeroDesc')) content.hero.description = getVal('cfgHeroDesc', content.hero.description);
+        if (document.getElementById('cfgHeroImg')) content.hero.videoPreviewImg = getVal('cfgHeroImg', content.hero.videoPreviewImg);
+        if (document.getElementById('cfgHeroVideoUrl')) content.hero.videoEmbedUrl = getVal('cfgHeroVideoUrl', content.hero.videoEmbedUrl);
+        if (document.getElementById('cfgStat1Num')) content.hero.stat1Number = getVal('cfgStat1Num', content.hero.stat1Number);
+        if (document.getElementById('cfgStat1Lbl')) content.hero.stat1Label = getVal('cfgStat1Lbl', content.hero.stat1Label);
+        if (document.getElementById('cfgStat2Num')) content.hero.stat2Number = getVal('cfgStat2Num', content.hero.stat2Number);
+        if (document.getElementById('cfgStat2Lbl')) content.hero.stat2Label = getVal('cfgStat2Lbl', content.hero.stat2Label);
+        if (document.getElementById('cfgStat3Num')) content.hero.stat3Number = getVal('cfgStat3Num', content.hero.stat3Number);
+        if (document.getElementById('cfgStat3Lbl')) content.hero.stat3Label = getVal('cfgStat3Lbl', content.hero.stat3Label);
+        if (document.getElementById('cfgStat4Num')) content.hero.stat4Number = getVal('cfgStat4Num', content.hero.stat4Number);
+        if (document.getElementById('cfgStat4Lbl')) content.hero.stat4Label = getVal('cfgStat4Lbl', content.hero.stat4Label);
+
+        // About
+        if (!content.about) content.about = {};
+        if (document.getElementById('cfgAboutTitle')) content.about.title = getVal('cfgAboutTitle', content.about.title);
+        if (document.getElementById('cfgAboutDesc')) content.about.description = getVal('cfgAboutDesc', content.about.description);
+        if (document.getElementById('cfgPillar1Title')) content.about.pillar1Title = getVal('cfgPillar1Title', content.about.pillar1Title);
+        if (document.getElementById('cfgPillar1Desc')) content.about.pillar1Desc = getVal('cfgPillar1Desc', content.about.pillar1Desc);
+        if (document.getElementById('cfgPillar2Title')) content.about.pillar2Title = getVal('cfgPillar2Title', content.about.pillar2Title);
+        if (document.getElementById('cfgPillar2Desc')) content.about.pillar2Desc = getVal('cfgPillar2Desc', content.about.pillar2Desc);
+        if (document.getElementById('cfgPillar3Title')) content.about.pillar3Title = getVal('cfgPillar3Title', content.about.pillar3Title);
+        if (document.getElementById('cfgPillar3Desc')) content.about.pillar3Desc = getVal('cfgPillar3Desc', content.about.pillar3Desc);
+
+        // Daily Prompts
+        if (!content.dailyPrompts) content.dailyPrompts = { items: [] };
+        if (document.getElementById('cfgPromptSubtitle')) content.dailyPrompts.subtitle = getVal('cfgPromptSubtitle', content.dailyPrompts.subtitle);
+        if (document.getElementById('cfgPromptTitle')) content.dailyPrompts.title = getVal('cfgPromptTitle', content.dailyPrompts.title);
+        if (document.getElementById('cfgPromptDesc')) content.dailyPrompts.description = getVal('cfgPromptDesc', content.dailyPrompts.description);
+        document.querySelectorAll('.admin-prompt-title').forEach(input => { const idx = input.dataset.idx; if (content.dailyPrompts.items && content.dailyPrompts.items[idx]) content.dailyPrompts.items[idx].title = input.value; });
+        document.querySelectorAll('.admin-prompt-tool').forEach(input => { const idx = input.dataset.idx; if (content.dailyPrompts.items && content.dailyPrompts.items[idx]) content.dailyPrompts.items[idx].tool = input.value; });
+        document.querySelectorAll('.admin-prompt-date').forEach(input => { const idx = input.dataset.idx; if (content.dailyPrompts.items && content.dailyPrompts.items[idx]) content.dailyPrompts.items[idx].date = input.value; });
+        document.querySelectorAll('.admin-prompt-text').forEach(input => { const idx = input.dataset.idx; if (content.dailyPrompts.items && content.dailyPrompts.items[idx]) content.dailyPrompts.items[idx].prompt = input.value; });
+        document.querySelectorAll('.admin-prompt-img').forEach(input => { const idx = input.dataset.idx; if (content.dailyPrompts.items && content.dailyPrompts.items[idx]) content.dailyPrompts.items[idx].image = input.value; });
+
+        // Services
+        if (!content.services) content.services = { items: [] };
+        if (document.getElementById('cfgServicesSubtitle')) content.services.subtitle = getVal('cfgServicesSubtitle', content.services.subtitle);
+        if (document.getElementById('cfgServicesTitle')) content.services.title = getVal('cfgServicesTitle', content.services.title);
+        if (document.getElementById('cfgServicesDesc')) content.services.description = getVal('cfgServicesDesc', content.services.description);
+        document.querySelectorAll('.cms-service-card-item').forEach((card, idx) => {
+          if (!content.services.items[idx]) {
+            content.services.items[idx] = { id: 'srv_' + (idx + 1) };
+          }
+          const badge = card.querySelector('.srv-badge')?.value || '';
+          const icon = card.querySelector('.srv-icon')?.value || 'fa-solid fa-wand-magic-sparkles';
+          const title = card.querySelector('.srv-title')?.value || '';
+          const desc = card.querySelector('.srv-desc')?.value || '';
+          const featuresRaw = card.querySelector('.srv-features')?.value || '';
+          const features = featuresRaw.split('\n').map(f => f.trim()).filter(Boolean);
+          const btnText = card.querySelector('.srv-btn-text')?.value || '';
+          const btnLink = card.querySelector('.srv-btn-link')?.value || '#contact';
+
+          content.services.items[idx] = {
+            ...content.services.items[idx],
+            badge, icon, title, desc, features, btnText, btnLink
+          };
+        });
+
+        // Portfolio items
+        if (!content.portfolio) content.portfolio = { items: [] };
+        document.querySelectorAll('.pf-studio-card').forEach(card => {
+          const idx = parseInt(card.dataset.idx);
+          if (!isNaN(idx) && content.portfolio.items && content.portfolio.items[idx]) {
+            const titleInput = card.querySelector('.pf-title');
+            const catInput = card.querySelector('.pf-cat');
+            const aspectInput = card.querySelector('.pf-aspect');
+            const typeInput = card.querySelector('.pf-type');
+            const tagInput = card.querySelector('.pf-tag');
+            const linkInput = card.querySelector('.pf-link');
+            const videoInput = card.querySelector('.pf-video');
+            const imgInput = card.querySelector('.pf-img');
+            const viewsInput = card.querySelector('.pf-views');
+            const stat2Input = card.querySelector('.pf-stat2');
+
+            if (titleInput) content.portfolio.items[idx].title = titleInput.value;
+            if (catInput) content.portfolio.items[idx].category = catInput.value;
+            if (aspectInput) content.portfolio.items[idx].isVertical = (aspectInput.value === 'vertical');
+            if (typeInput) content.portfolio.items[idx].type = typeInput.value;
+            if (tagInput) content.portfolio.items[idx].tag = tagInput.value;
+            if (linkInput) content.portfolio.items[idx].linkUrl = linkInput.value;
+            if (videoInput) content.portfolio.items[idx].videoUrl = videoInput.value;
+            if (imgInput) content.portfolio.items[idx].image = imgInput.value;
+            if (viewsInput) content.portfolio.items[idx].views = viewsInput.value;
+            if (stat2Input) content.portfolio.items[idx].stat2 = stat2Input.value;
+
+            if (videoInput && videoInput.value && (!typeInput || typeInput.value === 'link')) {
+              content.portfolio.items[idx].type = 'video';
+            }
+          }
+        });
+
+        // Pricing
+        const parseFeatures = (text) => (text || '').split('\n').map(l => l.trim()).filter(Boolean);
+        if (document.getElementById('cfgPricingTitle')) {
+          content.pricing = {
+            title: getVal('cfgPricingTitle', content.pricing?.title),
+            description: getVal('cfgPricingDesc', content.pricing?.description),
+            starter: {
+              name: getVal('cfgPricingStarterName', content.pricing?.starter?.name || 'Starter Creator'),
+              price: getVal('cfgPricingStarterPrice', content.pricing?.starter?.price || '14,999'),
+              period: getVal('cfgPricingStarterPeriod', content.pricing?.starter?.period || '/ month'),
+              desc: getVal('cfgPricingStarterDesc', content.pricing?.starter?.desc || ''),
+              features: parseFeatures(getVal('cfgPricingStarterFeatures', (content.pricing?.starter?.features || []).join('\n'))),
+              btnText: getVal('cfgPricingStarterBtn', content.pricing?.starter?.btnText || 'Select Starter')
+            },
+            growth: {
+              popularBadge: getVal('cfgPricingGrowthBadge', content.pricing?.growth?.popularBadge || 'Most Popular Choice'),
+              name: getVal('cfgPricingGrowthName', content.pricing?.growth?.name || 'Pro Growth Tier'),
+              price: getVal('cfgPricingGrowthPrice', content.pricing?.growth?.price || '34,999'),
+              period: getVal('cfgPricingGrowthPeriod', content.pricing?.growth?.period || '/ month'),
+              desc: getVal('cfgPricingGrowthDesc', content.pricing?.growth?.desc || ''),
+              features: parseFeatures(getVal('cfgPricingGrowthFeatures', (content.pricing?.growth?.features || []).join('\n'))),
+              btnText: getVal('cfgPricingGrowthBtn', content.pricing?.growth?.btnText || 'Select Pro Growth')
+            },
+            enterprise: {
+              name: getVal('cfgPricingEnterpriseName', content.pricing?.enterprise?.name || 'Studio Enterprise'),
+              price: getVal('cfgPricingEnterprisePrice', content.pricing?.enterprise?.price || '69,999'),
+              period: getVal('cfgPricingEnterprisePeriod', content.pricing?.enterprise?.period || '/ month'),
+              desc: getVal('cfgPricingEnterpriseDesc', content.pricing?.enterprise?.desc || ''),
+              features: parseFeatures(getVal('cfgPricingEnterpriseFeatures', (content.pricing?.enterprise?.features || []).join('\n'))),
+              btnText: getVal('cfgPricingEnterpriseBtn', content.pricing?.enterprise?.btnText || 'Contact Enterprise')
+            }
+          };
+        }
+
+        // Calculator
+        if (document.getElementById('cfgCalcReels')) {
+          content.calculator = {
+            baseRates: {
+              reels: parseFloat(getVal('cfgCalcReels', content.calculator?.baseRates?.reels)) || 1500,
+              youtube: parseFloat(getVal('cfgCalcYoutube', content.calculator?.baseRates?.youtube)) || 4500,
+              commercial: parseFloat(getVal('cfgCalcCommercial', content.calculator?.baseRates?.commercial)) || 9999,
+              motion: parseFloat(getVal('cfgCalcMotion', content.calculator?.baseRates?.motion)) || 6500
+            },
+            addons: {
+              thumb: parseFloat(getVal('cfgCalcAddonThumb', content.calculator?.addons?.thumb)) || 499,
+              express: parseFloat(getVal('cfgCalcAddonExpress', content.calculator?.addons?.express)) || 1499,
+              raw: parseFloat(getVal('cfgCalcAddonRaw', content.calculator?.addons?.raw)) || 999
+            }
+          };
+        }
+
+        // Testimonials & FAQ
+        document.querySelectorAll('.t-name').forEach(input => { const idx = input.dataset.idx; if (content.testimonials && content.testimonials.items && content.testimonials.items[idx]) content.testimonials.items[idx].author = input.value; });
+        document.querySelectorAll('.t-role').forEach(input => { const idx = input.dataset.idx; if (content.testimonials && content.testimonials.items && content.testimonials.items[idx]) content.testimonials.items[idx].role = input.value; });
+        document.querySelectorAll('.t-quote').forEach(input => { const idx = input.dataset.idx; if (content.testimonials && content.testimonials.items && content.testimonials.items[idx]) content.testimonials.items[idx].quote = input.value; });
+
+        document.querySelectorAll('.faq-q').forEach(input => { const idx = input.dataset.idx; if (content.faq && content.faq.items && content.faq.items[idx]) content.faq.items[idx].q = input.value; });
+        document.querySelectorAll('.faq-a').forEach(input => { const idx = input.dataset.idx; if (content.faq && content.faq.items && content.faq.items[idx]) content.faq.items[idx].a = input.value; });
+
+        // Contact
+        if (document.getElementById('cfgContactTitle')) {
+          if (!content.contact) content.contact = {};
+          content.contact.title = getVal('cfgContactTitle', content.contact.title);
+          content.contact.description = getVal('cfgContactDesc', content.contact.description);
+          content.contact.submitBtnText = getVal('cfgContactSubmitText', content.contact.submitBtnText);
+          content.contact.whatsappBtnText = getVal('cfgContactWhatsappText', content.contact.whatsappBtnText);
+          content.contact.formLabels = {
+            nameLabel: getVal('cfgContactNameLbl', content.contact.formLabels?.nameLabel || 'Your Name *'),
+            namePlaceholder: getVal('cfgContactNamePh', content.contact.formLabels?.namePlaceholder || 'e.g. Rahul Sharma'),
+            emailLabel: getVal('cfgContactEmailLbl', content.contact.formLabels?.emailLabel || 'Email Address *'),
+            emailPlaceholder: getVal('cfgContactEmailPh', content.contact.formLabels?.emailPlaceholder || 'rahul@creator.in'),
+            phoneLabel: getVal('cfgContactPhoneLbl', content.contact.formLabels?.phoneLabel || 'WhatsApp / Mobile Number *'),
+            phonePlaceholder: getVal('cfgContactPhonePh', content.contact.formLabels?.phonePlaceholder || '+91 98765 43210'),
+            serviceLabel: getVal('cfgContactSrvLbl', content.contact.formLabels?.serviceLabel || 'Service / Project Type'),
+            budgetLabel: getVal('cfgContactBudgetLbl', content.contact.formLabels?.budgetLabel || 'Estimated Budget (₹ INR)'),
+            footageLabel: getVal('cfgContactFootageLbl', content.contact.formLabels?.footageLabel || 'Raw Footage / Reference Link'),
+            footagePlaceholder: getVal('cfgContactFootagePh', content.contact.formLabels?.footagePlaceholder || 'https://drive.google.com/drive/folders/...'),
+            driveLinkText: getVal('cfgContactDriveText', content.contact.formLabels?.driveLinkText || 'Open FlipCut 5TB Drive'),
+            driveLinkUrl: getVal('cfgContactDriveUrl', content.contact.formLabels?.driveLinkUrl || 'https://drive.google.com/drive/folders/1E71ZRh-3eImKRu49AcDaAyj5vqj9tuq6?usp=sharing'),
+            notesLabel: getVal('cfgContactNotesLbl', content.contact.formLabels?.notesLabel || 'Project Details & Vision'),
+            notesPlaceholder: getVal('cfgContactNotesPh', content.contact.formLabels?.notesPlaceholder || 'Describe your vision, target audience, preferred editing style, and deadline...')
+          };
+          content.contact.budgetOptions = [
+            { value: "10k-25k", label: getVal('cfgContactBudget1', content.contact.budgetOptions?.[0]?.label || '₹10,000 - ₹25,000') },
+            { value: "25k-50k", label: getVal('cfgContactBudget2', content.contact.budgetOptions?.[1]?.label || '₹25,000 - ₹50,000') },
+            { value: "50k-100k", label: getVal('cfgContactBudget3', content.contact.budgetOptions?.[2]?.label || '₹50,000 - ₹1,00,000') },
+            { value: "100k+", label: getVal('cfgContactBudget4', content.contact.budgetOptions?.[3]?.label || '₹1,00,000+ (Custom Retainer)') }
+          ];
+          content.contact.email = getVal('cfgContactEmail', content.contact.email);
+          content.contact.phone = getVal('cfgContactPhone', content.contact.phone);
+          content.contact.whatsappNum = getVal('cfgWhatsappNum', content.contact.whatsappNum);
+          content.contact.whatsappMessage = getVal('cfgWhatsappMsg', content.contact.whatsappMessage);
+          content.contact.instagramHandle = getVal('cfgInstaHandle', content.contact.instagramHandle);
+          content.contact.youtubeChannel = getVal('cfgYoutubeChannel', content.contact.youtubeChannel);
+          content.contact.copyrightText = getVal('cfgCopyrightText', content.contact.copyrightText);
+        }
+
+        // Webinar Masterclass CMS
+        if (!content.webinar) content.webinar = {};
+        const priceEl = document.getElementById('cfgWebinarPrice');
+        if (priceEl && priceEl.value && priceEl.value.trim()) {
+          content.webinar.price = priceEl.value.trim().replace(/[^0-9]/g, '') || content.webinar.price || '99';
+        } else if (!content.webinar.price) {
+          content.webinar.price = '99';
+        }
+
+        const origPriceEl = document.getElementById('cfgWebinarOrigPrice');
+        if (origPriceEl && origPriceEl.value && origPriceEl.value.trim()) {
+          content.webinar.originalPrice = origPriceEl.value.trim().replace(/[^0-9]/g, '') || content.webinar.originalPrice || '999';
+        } else if (!content.webinar.originalPrice) {
+          content.webinar.originalPrice = '999';
+        }
+
+        if (document.getElementById('cfgWebinarTitle')) {
+          content.webinar.enabled = (getVal('cfgWebinarEnabled', content.webinar.enabled !== false ? 'true' : 'false') === 'true');
+          content.webinar.badge = getVal('cfgWebinarBadge', content.webinar.badge || 'Exclusive Live Masterclass Webinar');
+          content.webinar.title = getVal('cfgWebinarTitle', content.webinar.title || 'How to Build & Scale High-Converting Websites That Drive Real Sales');
+          content.webinar.description = getVal('cfgWebinarDesc', content.webinar.description || '');
+          content.webinar.date = getVal('cfgWebinarDate', content.webinar.date || 'Saturday, 7:00 PM IST');
+          content.webinar.duration = getVal('cfgWebinarDuration', content.webinar.duration || '90 Minutes Live + Q&A');
+          content.webinar.seats = getVal('cfgWebinarSeats', content.webinar.seats || 'Limited 100 Seats');
+          content.webinar.formTitle = getVal('cfgWebinarFormTitle', content.webinar.formTitle || 'Fill Out Your Webinar Brief');
+          content.webinar.formSubtitle = getVal('cfgWebinarFormSubtitle', content.webinar.formSubtitle || '');
+          content.webinar.whatsappGroupLink = getVal('cfgWebinarWaGroupLink', content.webinar.whatsappGroupLink || 'https://chat.whatsapp.com/B5hdxy7LbkNCrWRsHMtW8h');
+          content.webinar.whatsappGroupMsg = getVal('cfgWebinarWaMsg', content.webinar.whatsappGroupMsg || '');
+        }
+      }
+
+      // 1. Save Changes / Draft Handler (Safe on page reload)
+      async function saveAdminDraft(showToast = true) {
+        collectCMSFormData();
+        try {
+          localStorage.setItem('flipcut_cms_draft', JSON.stringify(content));
+          localStorage.setItem('flipcut_site_content', JSON.stringify(content));
+          localStorage.setItem('flipcut_site_content_backup', JSON.stringify(content));
+        } catch (_) {}
+
+        if (showToast) {
+          showAdminToast('💾 All changes saved to Cloud & Local Storage! (100% Reload Safe)', '#10B981');
+        }
+
+        // Save immediately to Dual Cloud (Supabase + Firebase) so reload NEVER loses it!
+        try {
+          if (typeof saveSiteContent === 'function') {
+            await saveSiteContent(content);
+          }
+          if (typeof window.saveContentToDualCloud === 'function') {
+            await window.saveContentToDualCloud(content);
+          }
+        } catch (err) {
+          console.warn('Cloud save note:', err);
+        }
+        return true;
+      }
+
+      // 2. Publish Live to Website Handler
+      async function publishLiveToWebsite() {
+        collectCMSFormData();
+        
+        // Show Celebration Modal immediately
+        const pubModal = document.getElementById('publishSuccessModal');
+        if (pubModal) {
+          pubModal.style.display = 'flex';
+        }
+
+        // Show Toast Notification immediately
+        showAdminToast('🎉 Successfully published your latest update to the live website!', '#10B981');
+
+        // Save to Admin Draft + Public Live Cloud
+        await saveAdminDraft(false);
+
+        // 0ms Live Broadcast to public website
+        try {
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('flipcut:cms-updated', { detail: content }));
+            if (typeof BroadcastChannel !== 'undefined') {
+              const bc = new BroadcastChannel('flipcut_cms_channel');
+              bc.postMessage({ type: 'CMS_UPDATED', content: content });
+              bc.close();
+            }
+          }
+        } catch (_) {}
+
+        return true;
+      }
+
+      async function collectAndSaveCMS(showToast = true) {
+        return await saveAdminDraft(showToast);
+      }
+
+      window.collectCMSFormData = collectCMSFormData;
+      window.saveAdminDraft = saveAdminDraft;
+      window.collectAndSaveCMS = collectAndSaveCMS;
+      window.publishLiveToWebsite = publishLiveToWebsite;
+
       const PERM_SUPABASE_URL = 'https://cznixvdphwbjdnnmapvb.supabase.co';
       const PERM_SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6bml4dmRwaHdiamRubm1hcHZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTgwMTgsImV4cCI6MjEwMzEzNDAxOH0.dTLN1DCbUiBawZq8YlS5Bol-i81JFKhKpPKCboyocuQ';
 
@@ -5292,364 +5655,6 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
         content.faq.items.push({ q: 'New Question Title?', a: 'Detailed answer.' });
         renderFaqEditor();
       });
-
-      function collectCMSFormData() {
-        if (!content) content = getSiteContent();
-
-        const getCheck = (id, def = true) => { const el = document.getElementById(id); return el ? el.checked : def; };
-        const getVal = (id, currentVal = '') => { 
-          const el = document.getElementById(id); 
-          if (!el) return currentVal !== undefined ? currentVal : '';
-          const v = el.value !== undefined ? el.value.trim() : '';
-          return v !== '' ? v : currentVal;
-        };
-
-        // Collect Comprehensive Section, Header & Card Visibility
-        content.sectionsVisibility = {
-          // 1. Header Controls
-          headerBadge: getCheck('toggleHeadBadge', content.sectionsVisibility?.headerBadge),
-          headerThemeToggle: getCheck('toggleHeadTheme', content.sectionsVisibility?.headerThemeToggle),
-          headerCta: getCheck('toggleHeadCta', content.sectionsVisibility?.headerCta),
-          navWebinarPill: getCheck('toggleHeadWebinar', content.sectionsVisibility?.navWebinarPill),
-
-          // 2. All 13 Major Page Sections
-          hero: getCheck('toggleSecHero', content.sectionsVisibility?.hero),
-          runningBanner: getCheck('toggleSecRunningBanner', content.sectionsVisibility?.runningBanner),
-          about: getCheck('toggleSecAbout', content.sectionsVisibility?.about),
-          dailyPrompts: getCheck('toggleSecDailyPrompts', content.sectionsVisibility?.dailyPrompts),
-          services: getCheck('toggleSecServices', content.sectionsVisibility?.services),
-          workflow: getCheck('toggleSecWorkflow', content.sectionsVisibility?.workflow),
-          portfolio: getCheck('toggleSecPortfolio', content.sectionsVisibility?.portfolio),
-          whyUs: getCheck('toggleSecWhyUs', content.sectionsVisibility?.whyUs),
-          pricing: getCheck('toggleSecPricing', content.sectionsVisibility?.pricing),
-          testimonials: getCheck('toggleSecTestimonials', content.sectionsVisibility?.testimonials),
-          calculator: getCheck('toggleSecCalculator', content.sectionsVisibility?.calculator),
-          contact: getCheck('toggleSecContact', content.sectionsVisibility?.contact),
-          footer: getCheck('toggleSecFooter', content.sectionsVisibility?.footer),
-
-          // 3. Specific Cards & Feature Modules
-          heroStats: getCheck('toggleCardHeroStats', content.sectionsVisibility?.heroStats),
-          heroVideoCard: getCheck('toggleCardHeroVideo', content.sectionsVisibility?.heroVideoCard),
-          aboutPillars: getCheck('toggleCardAboutPillars', content.sectionsVisibility?.aboutPillars),
-          beforeAfterSlider: getCheck('toggleCardBeforeAfter', content.sectionsVisibility?.beforeAfterSlider),
-          portfolioFilters: getCheck('toggleCardPortfolioFilters', content.sectionsVisibility?.portfolioFilters),
-          whyUsGrid: getCheck('toggleCardWhyUsGrid', content.sectionsVisibility?.whyUsGrid),
-          techStack: getCheck('toggleCardTechStack', content.sectionsVisibility?.techStack),
-          contactDriveLink: getCheck('toggleCardDriveLink', content.sectionsVisibility?.contactDriveLink),
-          floatingWhatsApp: getCheck('toggleFloatingWa', content.sectionsVisibility?.floatingWhatsApp),
-          backToTopBtn: getCheck('toggleBackToTop', content.sectionsVisibility?.backToTopBtn)
-        };
-
-        // Collect Running Banner Items
-        if (!content.runningBanner) content.runningBanner = { enabled: true, items: [] };
-        const bannerIcons = document.querySelectorAll('.banner-icon');
-        const bannerTexts = document.querySelectorAll('.banner-text');
-        if (bannerTexts.length > 0) {
-          content.runningBanner.items = [];
-          bannerIcons.forEach((iconInput, idx) => {
-            const textInput = bannerTexts[idx];
-            if (textInput && textInput.value.trim()) {
-              content.runningBanner.items.push({
-                icon: iconInput.value.trim() || 'fa-solid fa-bolt',
-                text: textInput.value.trim()
-              });
-            }
-          });
-        }
-
-        // Brand
-        if (!content.brand) content.brand = {};
-        if (document.getElementById('cfgBrandName')) content.brand.name = getVal('cfgBrandName', content.brand.name);
-        if (document.getElementById('cfgLogoUrl')) content.brand.logoUrl = getVal('cfgLogoUrl', content.brand.logoUrl);
-        if (document.getElementById('cfgFaviconUrl')) content.brand.faviconUrl = getVal('cfgFaviconUrl', content.brand.faviconUrl);
-        if (document.getElementById('cfgLogoHeight')) content.brand.logoHeight = parseInt(getVal('cfgLogoHeight', content.brand.logoHeight)) || 46;
-        if (document.getElementById('cfgHeaderBadge')) content.brand.headerBadge = getVal('cfgHeaderBadge', content.brand.headerBadge);
-
-        // Hero
-        if (!content.hero) content.hero = {};
-        if (document.getElementById('cfgHeroTitlePrefix')) content.hero.titlePrefix = getVal('cfgHeroTitlePrefix', content.hero.titlePrefix);
-        if (document.getElementById('cfgHeroTitleGrad')) content.hero.titleGradient = getVal('cfgHeroTitleGrad', content.hero.titleGradient);
-        if (document.getElementById('cfgHeroTitleSuffix')) content.hero.titleSuffix = getVal('cfgHeroTitleSuffix', content.hero.titleSuffix);
-        if (document.getElementById('cfgHeroDesc')) content.hero.description = getVal('cfgHeroDesc', content.hero.description);
-        if (document.getElementById('cfgHeroImg')) content.hero.videoPreviewImg = getVal('cfgHeroImg', content.hero.videoPreviewImg);
-        if (document.getElementById('cfgHeroVideoUrl')) content.hero.videoEmbedUrl = getVal('cfgHeroVideoUrl', content.hero.videoEmbedUrl);
-        if (document.getElementById('cfgStat1Num')) content.hero.stat1Number = getVal('cfgStat1Num', content.hero.stat1Number);
-        if (document.getElementById('cfgStat1Lbl')) content.hero.stat1Label = getVal('cfgStat1Lbl', content.hero.stat1Label);
-        if (document.getElementById('cfgStat2Num')) content.hero.stat2Number = getVal('cfgStat2Num', content.hero.stat2Number);
-        if (document.getElementById('cfgStat2Lbl')) content.hero.stat2Label = getVal('cfgStat2Lbl', content.hero.stat2Label);
-        if (document.getElementById('cfgStat3Num')) content.hero.stat3Number = getVal('cfgStat3Num', content.hero.stat3Number);
-        if (document.getElementById('cfgStat3Lbl')) content.hero.stat3Label = getVal('cfgStat3Lbl', content.hero.stat3Label);
-        if (document.getElementById('cfgStat4Num')) content.hero.stat4Number = getVal('cfgStat4Num', content.hero.stat4Number);
-        if (document.getElementById('cfgStat4Lbl')) content.hero.stat4Label = getVal('cfgStat4Lbl', content.hero.stat4Label);
-
-        // About
-        if (!content.about) content.about = {};
-        if (document.getElementById('cfgAboutTitle')) content.about.title = getVal('cfgAboutTitle', content.about.title);
-        if (document.getElementById('cfgAboutDesc')) content.about.description = getVal('cfgAboutDesc', content.about.description);
-        if (document.getElementById('cfgPillar1Title')) content.about.pillar1Title = getVal('cfgPillar1Title', content.about.pillar1Title);
-        if (document.getElementById('cfgPillar1Desc')) content.about.pillar1Desc = getVal('cfgPillar1Desc', content.about.pillar1Desc);
-        if (document.getElementById('cfgPillar2Title')) content.about.pillar2Title = getVal('cfgPillar2Title', content.about.pillar2Title);
-        if (document.getElementById('cfgPillar2Desc')) content.about.pillar2Desc = getVal('cfgPillar2Desc', content.about.pillar2Desc);
-        if (document.getElementById('cfgPillar3Title')) content.about.pillar3Title = getVal('cfgPillar3Title', content.about.pillar3Title);
-        if (document.getElementById('cfgPillar3Desc')) content.about.pillar3Desc = getVal('cfgPillar3Desc', content.about.pillar3Desc);
-
-        // Daily Prompts
-        if (!content.dailyPrompts) content.dailyPrompts = { items: [] };
-        if (document.getElementById('cfgPromptSubtitle')) content.dailyPrompts.subtitle = getVal('cfgPromptSubtitle', content.dailyPrompts.subtitle);
-        if (document.getElementById('cfgPromptTitle')) content.dailyPrompts.title = getVal('cfgPromptTitle', content.dailyPrompts.title);
-        if (document.getElementById('cfgPromptDesc')) content.dailyPrompts.description = getVal('cfgPromptDesc', content.dailyPrompts.description);
-        document.querySelectorAll('.admin-prompt-title').forEach(input => { const idx = input.dataset.idx; if (content.dailyPrompts.items && content.dailyPrompts.items[idx]) content.dailyPrompts.items[idx].title = input.value; });
-        document.querySelectorAll('.admin-prompt-tool').forEach(input => { const idx = input.dataset.idx; if (content.dailyPrompts.items && content.dailyPrompts.items[idx]) content.dailyPrompts.items[idx].tool = input.value; });
-        document.querySelectorAll('.admin-prompt-date').forEach(input => { const idx = input.dataset.idx; if (content.dailyPrompts.items && content.dailyPrompts.items[idx]) content.dailyPrompts.items[idx].date = input.value; });
-        document.querySelectorAll('.admin-prompt-text').forEach(input => { const idx = input.dataset.idx; if (content.dailyPrompts.items && content.dailyPrompts.items[idx]) content.dailyPrompts.items[idx].prompt = input.value; });
-        document.querySelectorAll('.admin-prompt-img').forEach(input => { const idx = input.dataset.idx; if (content.dailyPrompts.items && content.dailyPrompts.items[idx]) content.dailyPrompts.items[idx].image = input.value; });
-
-        // Services
-        if (!content.services) content.services = { items: [] };
-        if (document.getElementById('cfgServicesSubtitle')) content.services.subtitle = getVal('cfgServicesSubtitle', content.services.subtitle);
-        if (document.getElementById('cfgServicesTitle')) content.services.title = getVal('cfgServicesTitle', content.services.title);
-        if (document.getElementById('cfgServicesDesc')) content.services.description = getVal('cfgServicesDesc', content.services.description);
-        document.querySelectorAll('.cms-service-card-item').forEach((card, idx) => {
-          if (!content.services.items[idx]) {
-            content.services.items[idx] = { id: 'srv_' + (idx + 1) };
-          }
-          const badge = card.querySelector('.srv-badge')?.value || '';
-          const icon = card.querySelector('.srv-icon')?.value || 'fa-solid fa-wand-magic-sparkles';
-          const title = card.querySelector('.srv-title')?.value || '';
-          const desc = card.querySelector('.srv-desc')?.value || '';
-          const featuresRaw = card.querySelector('.srv-features')?.value || '';
-          const features = featuresRaw.split('\n').map(f => f.trim()).filter(Boolean);
-          const btnText = card.querySelector('.srv-btn-text')?.value || '';
-          const btnLink = card.querySelector('.srv-btn-link')?.value || '#contact';
-
-          content.services.items[idx] = {
-            ...content.services.items[idx],
-            badge, icon, title, desc, features, btnText, btnLink
-          };
-        });
-
-        // Portfolio items
-        if (!content.portfolio) content.portfolio = { items: [] };
-        document.querySelectorAll('.pf-studio-card').forEach(card => {
-          const idx = parseInt(card.dataset.idx);
-          if (!isNaN(idx) && content.portfolio.items && content.portfolio.items[idx]) {
-            const titleInput = card.querySelector('.pf-title');
-            const catInput = card.querySelector('.pf-cat');
-            const aspectInput = card.querySelector('.pf-aspect');
-            const typeInput = card.querySelector('.pf-type');
-            const tagInput = card.querySelector('.pf-tag');
-            const linkInput = card.querySelector('.pf-link');
-            const videoInput = card.querySelector('.pf-video');
-            const imgInput = card.querySelector('.pf-img');
-            const viewsInput = card.querySelector('.pf-views');
-            const stat2Input = card.querySelector('.pf-stat2');
-
-            if (titleInput) content.portfolio.items[idx].title = titleInput.value;
-            if (catInput) content.portfolio.items[idx].category = catInput.value;
-            if (aspectInput) content.portfolio.items[idx].isVertical = (aspectInput.value === 'vertical');
-            if (typeInput) content.portfolio.items[idx].type = typeInput.value;
-            if (tagInput) content.portfolio.items[idx].tag = tagInput.value;
-            if (linkInput) content.portfolio.items[idx].linkUrl = linkInput.value;
-            if (videoInput) content.portfolio.items[idx].videoUrl = videoInput.value;
-            if (imgInput) content.portfolio.items[idx].image = imgInput.value;
-            if (viewsInput) content.portfolio.items[idx].views = viewsInput.value;
-            if (stat2Input) content.portfolio.items[idx].stat2 = stat2Input.value;
-
-            if (videoInput && videoInput.value && (!typeInput || typeInput.value === 'link')) {
-              content.portfolio.items[idx].type = 'video';
-            }
-          }
-        });
-
-        // Pricing
-        const parseFeatures = (text) => (text || '').split('\n').map(l => l.trim()).filter(Boolean);
-        if (document.getElementById('cfgPricingTitle')) {
-          content.pricing = {
-            title: getVal('cfgPricingTitle', content.pricing?.title),
-            description: getVal('cfgPricingDesc', content.pricing?.description),
-            starter: {
-              name: getVal('cfgPricingStarterName', content.pricing?.starter?.name || 'Starter Creator'),
-              price: getVal('cfgPricingStarterPrice', content.pricing?.starter?.price || '14,999'),
-              period: getVal('cfgPricingStarterPeriod', content.pricing?.starter?.period || '/ month'),
-              desc: getVal('cfgPricingStarterDesc', content.pricing?.starter?.desc || ''),
-              features: parseFeatures(getVal('cfgPricingStarterFeatures', (content.pricing?.starter?.features || []).join('\n'))),
-              btnText: getVal('cfgPricingStarterBtn', content.pricing?.starter?.btnText || 'Select Starter')
-            },
-            growth: {
-              popularBadge: getVal('cfgPricingGrowthBadge', content.pricing?.growth?.popularBadge || 'Most Popular Choice'),
-              name: getVal('cfgPricingGrowthName', content.pricing?.growth?.name || 'Pro Growth Tier'),
-              price: getVal('cfgPricingGrowthPrice', content.pricing?.growth?.price || '34,999'),
-              period: getVal('cfgPricingGrowthPeriod', content.pricing?.growth?.period || '/ month'),
-              desc: getVal('cfgPricingGrowthDesc', content.pricing?.growth?.desc || ''),
-              features: parseFeatures(getVal('cfgPricingGrowthFeatures', (content.pricing?.growth?.features || []).join('\n'))),
-              btnText: getVal('cfgPricingGrowthBtn', content.pricing?.growth?.btnText || 'Select Pro Growth')
-            },
-            enterprise: {
-              name: getVal('cfgPricingEnterpriseName', content.pricing?.enterprise?.name || 'Studio Enterprise'),
-              price: getVal('cfgPricingEnterprisePrice', content.pricing?.enterprise?.price || '69,999'),
-              period: getVal('cfgPricingEnterprisePeriod', content.pricing?.enterprise?.period || '/ month'),
-              desc: getVal('cfgPricingEnterpriseDesc', content.pricing?.enterprise?.desc || ''),
-              features: parseFeatures(getVal('cfgPricingEnterpriseFeatures', (content.pricing?.enterprise?.features || []).join('\n'))),
-              btnText: getVal('cfgPricingEnterpriseBtn', content.pricing?.enterprise?.btnText || 'Contact Enterprise')
-            }
-          };
-        }
-
-        // Calculator
-        if (document.getElementById('cfgCalcReels')) {
-          content.calculator = {
-            baseRates: {
-              reels: parseFloat(getVal('cfgCalcReels', content.calculator?.baseRates?.reels)) || 1500,
-              youtube: parseFloat(getVal('cfgCalcYoutube', content.calculator?.baseRates?.youtube)) || 4500,
-              commercial: parseFloat(getVal('cfgCalcCommercial', content.calculator?.baseRates?.commercial)) || 9999,
-              motion: parseFloat(getVal('cfgCalcMotion', content.calculator?.baseRates?.motion)) || 6500
-            },
-            addons: {
-              thumb: parseFloat(getVal('cfgCalcAddonThumb', content.calculator?.addons?.thumb)) || 499,
-              express: parseFloat(getVal('cfgCalcAddonExpress', content.calculator?.addons?.express)) || 1499,
-              raw: parseFloat(getVal('cfgCalcAddonRaw', content.calculator?.addons?.raw)) || 999
-            }
-          };
-        }
-
-        // Testimonials & FAQ
-        document.querySelectorAll('.t-name').forEach(input => { const idx = input.dataset.idx; if (content.testimonials && content.testimonials.items && content.testimonials.items[idx]) content.testimonials.items[idx].author = input.value; });
-        document.querySelectorAll('.t-role').forEach(input => { const idx = input.dataset.idx; if (content.testimonials && content.testimonials.items && content.testimonials.items[idx]) content.testimonials.items[idx].role = input.value; });
-        document.querySelectorAll('.t-quote').forEach(input => { const idx = input.dataset.idx; if (content.testimonials && content.testimonials.items && content.testimonials.items[idx]) content.testimonials.items[idx].quote = input.value; });
-
-        document.querySelectorAll('.faq-q').forEach(input => { const idx = input.dataset.idx; if (content.faq && content.faq.items && content.faq.items[idx]) content.faq.items[idx].q = input.value; });
-        document.querySelectorAll('.faq-a').forEach(input => { const idx = input.dataset.idx; if (content.faq && content.faq.items && content.faq.items[idx]) content.faq.items[idx].a = input.value; });
-
-        // Contact
-        if (document.getElementById('cfgContactTitle')) {
-          if (!content.contact) content.contact = {};
-          content.contact.title = getVal('cfgContactTitle', content.contact.title);
-          content.contact.description = getVal('cfgContactDesc', content.contact.description);
-          content.contact.submitBtnText = getVal('cfgContactSubmitText', content.contact.submitBtnText);
-          content.contact.whatsappBtnText = getVal('cfgContactWhatsappText', content.contact.whatsappBtnText);
-          content.contact.formLabels = {
-            nameLabel: getVal('cfgContactNameLbl', content.contact.formLabels?.nameLabel || 'Your Name *'),
-            namePlaceholder: getVal('cfgContactNamePh', content.contact.formLabels?.namePlaceholder || 'e.g. Rahul Sharma'),
-            emailLabel: getVal('cfgContactEmailLbl', content.contact.formLabels?.emailLabel || 'Email Address *'),
-            emailPlaceholder: getVal('cfgContactEmailPh', content.contact.formLabels?.emailPlaceholder || 'rahul@creator.in'),
-            phoneLabel: getVal('cfgContactPhoneLbl', content.contact.formLabels?.phoneLabel || 'WhatsApp / Mobile Number *'),
-            phonePlaceholder: getVal('cfgContactPhonePh', content.contact.formLabels?.phonePlaceholder || '+91 98765 43210'),
-            serviceLabel: getVal('cfgContactSrvLbl', content.contact.formLabels?.serviceLabel || 'Service / Project Type'),
-            budgetLabel: getVal('cfgContactBudgetLbl', content.contact.formLabels?.budgetLabel || 'Estimated Budget (₹ INR)'),
-            footageLabel: getVal('cfgContactFootageLbl', content.contact.formLabels?.footageLabel || 'Raw Footage / Reference Link'),
-            footagePlaceholder: getVal('cfgContactFootagePh', content.contact.formLabels?.footagePlaceholder || 'https://drive.google.com/drive/folders/...'),
-            driveLinkText: getVal('cfgContactDriveText', content.contact.formLabels?.driveLinkText || 'Open FlipCut 5TB Drive'),
-            driveLinkUrl: getVal('cfgContactDriveUrl', content.contact.formLabels?.driveLinkUrl || 'https://drive.google.com/drive/folders/1E71ZRh-3eImKRu49AcDaAyj5vqj9tuq6?usp=sharing'),
-            notesLabel: getVal('cfgContactNotesLbl', content.contact.formLabels?.notesLabel || 'Project Details & Vision'),
-            notesPlaceholder: getVal('cfgContactNotesPh', content.contact.formLabels?.notesPlaceholder || 'Describe your vision, target audience, preferred editing style, and deadline...')
-          };
-          content.contact.budgetOptions = [
-            { value: "10k-25k", label: getVal('cfgContactBudget1', content.contact.budgetOptions?.[0]?.label || '₹10,000 - ₹25,000') },
-            { value: "25k-50k", label: getVal('cfgContactBudget2', content.contact.budgetOptions?.[1]?.label || '₹25,000 - ₹50,000') },
-            { value: "50k-100k", label: getVal('cfgContactBudget3', content.contact.budgetOptions?.[2]?.label || '₹50,000 - ₹1,00,000') },
-            { value: "100k+", label: getVal('cfgContactBudget4', content.contact.budgetOptions?.[3]?.label || '₹1,00,000+ (Custom Retainer)') }
-          ];
-          content.contact.email = getVal('cfgContactEmail', content.contact.email);
-          content.contact.phone = getVal('cfgContactPhone', content.contact.phone);
-          content.contact.whatsappNum = getVal('cfgWhatsappNum', content.contact.whatsappNum);
-          content.contact.whatsappMessage = getVal('cfgWhatsappMsg', content.contact.whatsappMessage);
-          content.contact.instagramHandle = getVal('cfgInstaHandle', content.contact.instagramHandle);
-          content.contact.youtubeChannel = getVal('cfgYoutubeChannel', content.contact.youtubeChannel);
-          content.contact.copyrightText = getVal('cfgCopyrightText', content.contact.copyrightText);
-        }
-
-        // Webinar Masterclass CMS
-        if (!content.webinar) content.webinar = {};
-        const priceEl = document.getElementById('cfgWebinarPrice');
-        if (priceEl && priceEl.value && priceEl.value.trim()) {
-          content.webinar.price = priceEl.value.trim().replace(/[^0-9]/g, '') || content.webinar.price || '99';
-        } else if (!content.webinar.price) {
-          content.webinar.price = '99';
-        }
-
-        const origPriceEl = document.getElementById('cfgWebinarOrigPrice');
-        if (origPriceEl && origPriceEl.value && origPriceEl.value.trim()) {
-          content.webinar.originalPrice = origPriceEl.value.trim().replace(/[^0-9]/g, '') || content.webinar.originalPrice || '999';
-        } else if (!content.webinar.originalPrice) {
-          content.webinar.originalPrice = '999';
-        }
-
-        if (document.getElementById('cfgWebinarTitle')) {
-          content.webinar.enabled = (getVal('cfgWebinarEnabled', content.webinar.enabled !== false ? 'true' : 'false') === 'true');
-          content.webinar.badge = getVal('cfgWebinarBadge', content.webinar.badge || 'Exclusive Live Masterclass Webinar');
-          content.webinar.title = getVal('cfgWebinarTitle', content.webinar.title || 'How to Build & Scale High-Converting Websites That Drive Real Sales');
-          content.webinar.description = getVal('cfgWebinarDesc', content.webinar.description || '');
-          content.webinar.date = getVal('cfgWebinarDate', content.webinar.date || 'Saturday, 7:00 PM IST');
-          content.webinar.duration = getVal('cfgWebinarDuration', content.webinar.duration || '90 Minutes Live + Q&A');
-          content.webinar.seats = getVal('cfgWebinarSeats', content.webinar.seats || 'Limited 100 Seats');
-          content.webinar.formTitle = getVal('cfgWebinarFormTitle', content.webinar.formTitle || 'Fill Out Your Webinar Brief');
-          content.webinar.formSubtitle = getVal('cfgWebinarFormSubtitle', content.webinar.formSubtitle || '');
-          content.webinar.whatsappGroupLink = getVal('cfgWebinarWaGroupLink', content.webinar.whatsappGroupLink || 'https://chat.whatsapp.com/B5hdxy7LbkNCrWRsHMtW8h');
-          content.webinar.whatsappGroupMsg = getVal('cfgWebinarWaMsg', content.webinar.whatsappGroupMsg || '');
-        }
-      }
-
-      // 1. Save Changes / Draft Handler (Safe on page reload)
-      async function saveAdminDraft(showToast = true) {
-        collectCMSFormData();
-        try {
-          localStorage.setItem('flipcut_cms_draft', JSON.stringify(content));
-          localStorage.setItem('flipcut_site_content', JSON.stringify(content));
-          localStorage.setItem('flipcut_site_content_backup', JSON.stringify(content));
-        } catch (_) {}
-
-        if (showToast) {
-          showAdminToast('💾 All changes saved to Cloud & Local Storage! (100% Reload Safe)', '#10B981');
-        }
-
-        // Save immediately to Dual Cloud (Supabase + Firebase) so reload NEVER loses it!
-        try {
-          if (typeof saveSiteContent === 'function') {
-            await saveSiteContent(content);
-          }
-          if (typeof window.saveContentToDualCloud === 'function') {
-            await window.saveContentToDualCloud(content);
-          }
-        } catch (err) {
-          console.warn('Cloud save note:', err);
-        }
-        return true;
-      }
-
-      // 2. Publish Live to Website Handler
-      async function publishLiveToWebsite() {
-        collectCMSFormData();
-        
-        // Show Celebration Modal immediately
-        const pubModal = document.getElementById('publishSuccessModal');
-        if (pubModal) {
-          pubModal.style.display = 'flex';
-        }
-
-        // Show Toast Notification immediately
-        showAdminToast('🎉 Successfully published your latest update to the live website!', '#10B981');
-
-        // Save to Admin Draft + Public Live Cloud
-        await saveAdminDraft(false);
-
-        // 0ms Live Broadcast to public website
-        try {
-          if (typeof window !== 'undefined') {
-            window.dispatchEvent(new CustomEvent('flipcut:cms-updated', { detail: content }));
-            if (typeof BroadcastChannel !== 'undefined') {
-              const bc = new BroadcastChannel('flipcut_cms_channel');
-              bc.postMessage({ type: 'CMS_UPDATED', content: content });
-              bc.close();
-            }
-          }
-        } catch (_) {}
-
-        return true;
-      }
-
-      window.saveAdminDraft = saveAdminDraft;
-      window.publishLiveToWebsite = publishLiveToWebsite;
-      window.collectAndSaveCMS = saveAdminDraft;
 
       const topSaveDraftBtn = document.getElementById('topSaveDraftBtn');
       if (topSaveDraftBtn) {
