@@ -43,7 +43,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=9.1">
+  <link rel="stylesheet" href="styles.css?v=9.2">
 
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -53,13 +53,13 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- Dual Cloud Sync Engine (Firebase + Supabase) -->
-  <script src="firebase-sync.js?v=9.1"></script>
+  <script src="firebase-sync.js?v=9.2"></script>
 
   <!-- VIP User Profile Header Engine -->
-  <script src="user-profile.js?v=9.1"></script>
+  <script src="user-profile.js?v=9.2"></script>
 
   <!-- Content Store & Instant Zero-Flicker Pre-Hydration -->
-  <script src="content-store.js?v=9.1"></script>
+  <script src="content-store.js?v=9.2"></script>
   <script>
     (function() {
       try {
@@ -1068,6 +1068,87 @@
       const paymentVerifiedBanner = document.getElementById('paymentVerifiedBanner');
       const webinarForm = document.getElementById('webinarRegistrationForm');
 
+      // =========================================================================
+      // STRICT ANTI-DUMMY VALIDATION SUITE (Emails & Phone Numbers)
+      // =========================================================================
+      function validateFullName(name) {
+        if (!name || typeof name !== 'string') return { valid: false, message: 'Please enter your Full Name.' };
+        const clean = name.trim();
+        if (clean.length < 2) return { valid: false, message: 'Name must be at least 2 characters long.' };
+        if (/^\d+$/.test(clean)) return { valid: false, message: 'Name cannot contain only numbers.' };
+        const dummyNames = ['test', 'testing', 'admin', 'asdf', 'qwerty', 'dummy', 'fake', 'null', 'demo', 'sample', 'user', 'abc', 'xyz'];
+        if (dummyNames.includes(clean.toLowerCase())) {
+          return { valid: false, message: 'Please enter your real, genuine full name.' };
+        }
+        return { valid: true, clean };
+      }
+
+      function validatePhoneNumber(phone) {
+        if (!phone || typeof phone !== 'string') return { valid: false, message: 'Please enter your 10-digit mobile number.' };
+        let clean = phone.trim().replace(/[\s\-\(\)\+]/g, '');
+        if (clean.startsWith('91') && clean.length === 12) clean = clean.substring(2);
+        if (clean.startsWith('0') && clean.length === 11) clean = clean.substring(1);
+        
+        if (!/^\d{10}$/.test(clean)) {
+          return { valid: false, message: 'Please enter a valid 10-digit mobile number.' };
+        }
+        if (!/^[6-9]/.test(clean)) {
+          return { valid: false, message: 'Mobile number must start with 6, 7, 8, or 9.' };
+        }
+        if (/^(\d)\1{9}$/.test(clean)) {
+          return { valid: false, message: 'Dummy or repeating phone number is not allowed.' };
+        }
+        const sequentialPatterns = [
+          '0123456789', '1234567890', '9876543210', '0987654321', '2345678901',
+          '1122334455', '1212121212', '1231231234', '9898989898', '9998887776'
+        ];
+        if (sequentialPatterns.includes(clean)) {
+          return { valid: false, message: 'Dummy sequential phone number is not allowed.' };
+        }
+        const uniqueCount = new Set(clean.split('')).size;
+        if (uniqueCount < 4) {
+          return { valid: false, message: 'Please enter a genuine, active mobile number.' };
+        }
+        return { valid: true, clean };
+      }
+
+      function validateEmailAddress(email) {
+        if (!email || typeof email !== 'string') return { valid: false, message: 'Please enter your email address.' };
+        const clean = email.trim().toLowerCase();
+        
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (!emailRegex.test(clean) || clean.includes('..') || clean.length > 100) {
+          return { valid: false, message: 'Please enter a valid email address.' };
+        }
+        
+        const parts = clean.split('@');
+        const user = parts[0];
+        const domain = parts[1];
+        
+        const dummyUsers = [
+          'test', 'testing', 'dummy', 'fake', 'asdf', 'qwerty', '123', '12345', 'sample',
+          'demo', 'user', 'admin', 'null', 'none', 'no', 'abc', 'xyz', 'aaa', 'bbb', 'ccc',
+          'test1', 'test2', 'example', 'tester', 'temp', 'junk', 'fakeuser', 'nomail'
+        ];
+        if (dummyUsers.includes(user)) {
+          return { valid: false, message: 'Dummy test emails are not allowed. Please enter your real email.' };
+        }
+        
+        const dummyDomains = [
+          'test.com', 'example.com', 'dummy.com', 'sample.com', 'fake.com', 'test.in', 'dummy.in',
+          'abc.com', 'xyz.com', 'mailinator.com', 'tempmail.com', '10minutemail.com', 'guerrillamail.com',
+          'trashmail.com', 'throwawaymail.com', 'yopmail.com', 'temp-mail.org', 'fakeinbox.com',
+          'dispostable.com', 'sharklasers.com', 'getairmail.com', 'mohmal.com', 'generator.email',
+          'inboxbear.com', 'crazymailing.com', 'burnermail.io', 'dropmail.me', 'fakemailgenerator.com',
+          'mytemp.email', 'emailondeck.com', 'trashmail.net', 'tempmail.net', 'tempmailaddress.com'
+        ];
+        if (dummyDomains.includes(domain)) {
+          return { valid: false, message: 'Temporary/disposable emails are not allowed. Please enter a genuine email.' };
+        }
+        
+        return { valid: true, clean };
+      }
+
       function validateWebinarInputs() {
         const honeypot = document.getElementById('webinarHoneypot')?.value;
         if (honeypot) {
@@ -1075,25 +1156,31 @@
           return false;
         }
 
-        const name = document.getElementById('webinarName').value.trim();
-        const phone = document.getElementById('webinarPhone').value.trim();
-        const email = document.getElementById('webinarEmail').value.trim();
+        const rawName = document.getElementById('webinarName').value.trim();
+        const rawPhone = document.getElementById('webinarPhone').value.trim();
+        const rawEmail = document.getElementById('webinarEmail').value.trim();
 
-        if (!name) {
-          showToast('Please enter your Full Name.', '#EF4444');
+        const nameVal = validateFullName(rawName);
+        if (!nameVal.valid) {
+          showToast(nameVal.message, '#EF4444');
           document.getElementById('webinarName').focus();
           return false;
         }
-        if (!phone) {
-          showToast('Please enter your WhatsApp / Mobile Number.', '#EF4444');
-          document.getElementById('webinarPhone').focus();
-          return false;
-        }
-        if (!email) {
-          showToast('Please enter a valid Email Address.', '#EF4444');
+
+        const emailVal = validateEmailAddress(rawEmail);
+        if (!emailVal.valid) {
+          showToast(emailVal.message, '#EF4444');
           document.getElementById('webinarEmail').focus();
           return false;
         }
+
+        const phoneVal = validatePhoneNumber(rawPhone);
+        if (!phoneVal.valid) {
+          showToast(phoneVal.message, '#EF4444');
+          document.getElementById('webinarPhone').focus();
+          return false;
+        }
+
         return true;
       }
 

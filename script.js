@@ -1669,15 +1669,96 @@ function hydratePageFromCMS(customContent) {
   /* ==========================================================================
      8. CONTACT FORM SUBMISSION & SQL DATABASE SYNC
      ========================================================================== */
+  // =========================================================================
+  // STRICT ANTI-DUMMY VALIDATION SUITE (Emails & Phone Numbers)
+  // =========================================================================
+  function validateFullName(name) {
+    if (!name || typeof name !== 'string') return { valid: false, message: 'Please enter your Full Name.' };
+    const clean = name.trim();
+    if (clean.length < 2) return { valid: false, message: 'Name must be at least 2 characters long.' };
+    if (/^\d+$/.test(clean)) return { valid: false, message: 'Name cannot contain only numbers.' };
+    const dummyNames = ['test', 'testing', 'admin', 'asdf', 'qwerty', 'dummy', 'fake', 'null', 'demo', 'sample', 'user', 'abc', 'xyz'];
+    if (dummyNames.includes(clean.toLowerCase())) {
+      return { valid: false, message: 'Please enter your real, genuine full name.' };
+    }
+    return { valid: true, clean };
+  }
+
+  function validatePhoneNumber(phone) {
+    if (!phone || typeof phone !== 'string') return { valid: false, message: 'Please enter your 10-digit mobile number.' };
+    let clean = phone.trim().replace(/[\s\-\(\)\+]/g, '');
+    if (clean.startsWith('91') && clean.length === 12) clean = clean.substring(2);
+    if (clean.startsWith('0') && clean.length === 11) clean = clean.substring(1);
+    
+    if (!/^\d{10}$/.test(clean)) {
+      return { valid: false, message: 'Please enter a valid 10-digit mobile number.' };
+    }
+    if (!/^[6-9]/.test(clean)) {
+      return { valid: false, message: 'Mobile number must start with 6, 7, 8, or 9.' };
+    }
+    if (/^(\d)\1{9}$/.test(clean)) {
+      return { valid: false, message: 'Dummy or repeating phone number is not allowed.' };
+    }
+    const sequentialPatterns = [
+      '0123456789', '1234567890', '9876543210', '0987654321', '2345678901',
+      '1122334455', '1212121212', '1231231234', '9898989898', '9998887776'
+    ];
+    if (sequentialPatterns.includes(clean)) {
+      return { valid: false, message: 'Dummy sequential phone number is not allowed.' };
+    }
+    const uniqueCount = new Set(clean.split('')).size;
+    if (uniqueCount < 4) {
+      return { valid: false, message: 'Please enter a genuine, active mobile number.' };
+    }
+    return { valid: true, clean };
+  }
+
+  function validateEmailAddress(email) {
+    if (!email || typeof email !== 'string') return { valid: false, message: 'Please enter your email address.' };
+    const clean = email.trim().toLowerCase();
+    
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(clean) || clean.includes('..') || clean.length > 100) {
+      return { valid: false, message: 'Please enter a valid email address.' };
+    }
+    
+    const parts = clean.split('@');
+    const user = parts[0];
+    const domain = parts[1];
+    
+    const dummyUsers = [
+      'test', 'testing', 'dummy', 'fake', 'asdf', 'qwerty', '123', '12345', 'sample',
+      'demo', 'user', 'admin', 'null', 'none', 'no', 'abc', 'xyz', 'aaa', 'bbb', 'ccc',
+      'test1', 'test2', 'example', 'tester', 'temp', 'junk', 'fakeuser', 'nomail'
+    ];
+    if (dummyUsers.includes(user)) {
+      return { valid: false, message: 'Dummy test emails are not allowed. Please enter your real email.' };
+    }
+    
+    const dummyDomains = [
+      'test.com', 'example.com', 'dummy.com', 'sample.com', 'fake.com', 'test.in', 'dummy.in',
+      'abc.com', 'xyz.com', 'mailinator.com', 'tempmail.com', '10minutemail.com', 'guerrillamail.com',
+      'trashmail.com', 'throwawaymail.com', 'yopmail.com', 'temp-mail.org', 'fakeinbox.com',
+      'dispostable.com', 'sharklasers.com', 'getairmail.com', 'mohmal.com', 'generator.email',
+      'inboxbear.com', 'crazymailing.com', 'burnermail.io', 'dropmail.me', 'fakemailgenerator.com',
+      'mytemp.email', 'emailondeck.com', 'trashmail.net', 'tempmail.net', 'tempmailaddress.com'
+    ];
+    if (dummyDomains.includes(domain)) {
+      return { valid: false, message: 'Temporary/disposable emails are not allowed. Please enter a genuine email.' };
+    }
+    
+    return { valid: true, clean };
+  }
+
   const inquiryForm = document.getElementById('projectInquiryForm');
 
   if (inquiryForm) {
     inquiryForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      const name = document.getElementById('clientName').value.trim();
-      const email = document.getElementById('clientEmail').value.trim();
-      const phone = document.getElementById('clientPhone') ? document.getElementById('clientPhone').value.trim() : '';
+      const rawName = document.getElementById('clientName').value.trim();
+      const rawEmail = document.getElementById('clientEmail').value.trim();
+      const rawPhone = document.getElementById('clientPhone') ? document.getElementById('clientPhone').value.trim() : '';
       const serviceType = document.getElementById('projectTypeSelect').value;
       const budget = document.getElementById('projectBudget').value;
       const footage = document.getElementById('projectFootageUrl').value.trim();
@@ -1692,10 +1773,36 @@ function hydratePageFromCMS(customContent) {
         return;
       }
 
-      if (!name || !email) {
-        showToast('Please provide your name and email address.', '#EF4444');
+      const nameValidation = validateFullName(rawName);
+      if (!nameValidation.valid) {
+        showToast(nameValidation.message, '#EF4444');
+        document.getElementById('clientName')?.focus();
         return;
       }
+
+      const emailValidation = validateEmailAddress(rawEmail);
+      if (!emailValidation.valid) {
+        showToast(emailValidation.message, '#EF4444');
+        document.getElementById('clientEmail')?.focus();
+        return;
+      }
+
+      if (rawPhone) {
+        const phoneValidation = validatePhoneNumber(rawPhone);
+        if (!phoneValidation.valid) {
+          showToast(phoneValidation.message, '#EF4444');
+          document.getElementById('clientPhone')?.focus();
+          return;
+        }
+      } else {
+        showToast('Please provide your active 10-digit mobile / WhatsApp number.', '#EF4444');
+        document.getElementById('clientPhone')?.focus();
+        return;
+      }
+
+      const name = nameValidation.clean;
+      const email = emailValidation.clean;
+      const phone = validatePhoneNumber(rawPhone).clean || rawPhone;
 
       const serviceLabels = {
         'reels': 'Viral Short-Form (Reels / TikTok)',
