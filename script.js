@@ -98,13 +98,15 @@ function hydratePageFromCMS(customContent) {
     const annData = content.topAnnouncement || {
       enabled: true,
       badge: '🔥 LIVE MASTERCLASS',
-      text: 'Exclusive Web Creation & Scaling Masterclass at <strong>₹99 Only!</strong>',
+      text: 'Exclusive Web Creation & Scaling Masterclass at <strong>₹199 Only!</strong>',
       btnText: 'Book Ticket Pass',
       btnUrl: 'webinar.html'
     };
 
     const isTopAnnActive = (!content.sectionsVisibility || content.sectionsVisibility.topAnnouncement !== false) &&
                            (annData.enabled !== false);
+
+    const webinarPrice = (content.webinar && content.webinar.price) ? String(content.webinar.price).replace(/[^0-9]/g, '') : '199';
 
     if (topBar) {
       if (!isTopAnnActive) {
@@ -121,7 +123,11 @@ function hydratePageFromCMS(customContent) {
         const btnText = document.getElementById('topAnnouncementBtnText');
 
         if (badgeText && annData.badge) badgeText.textContent = annData.badge;
-        if (textEl && annData.text) textEl.innerHTML = annData.text;
+        if (textEl) {
+          let rawText = annData.text || 'Exclusive Web Creation & Scaling Masterclass at <strong>₹199 Only!</strong>';
+          rawText = rawText.replace(/₹\s*\d+/g, '₹' + webinarPrice);
+          textEl.innerHTML = rawText;
+        }
         if (btnEl && annData.btnUrl) btnEl.href = annData.btnUrl;
         if (btnText && annData.btnText) btnText.textContent = annData.btnText;
       }
@@ -131,10 +137,16 @@ function hydratePageFromCMS(customContent) {
     const headerBadgeText = document.getElementById('headerBadgeText');
     if (headerBadgeText && content.brand) headerBadgeText.textContent = content.brand.headerBadge || '';
 
+    // Desktop Nav Link
     const navWebinarLink = document.querySelector('#navWebinarItem a');
-    if (navWebinarLink && content.webinar) {
-      const p = content.webinar.price ? String(content.webinar.price).replace(/[^0-9]/g, '') : '199';
-      navWebinarLink.innerHTML = `<i class="fa-solid fa-ticket"></i> Webinar (₹${p})`;
+    if (navWebinarLink) {
+      navWebinarLink.innerHTML = `<i class="fa-solid fa-ticket"></i> Webinar (₹${webinarPrice})`;
+    }
+
+    // Mobile Nav Drawer Link
+    const mobileNavWebinarSpan = document.querySelector('.mobile-nav-links a[href="webinar.html"] span');
+    if (mobileNavWebinarSpan) {
+      mobileNavWebinarSpan.textContent = `Live Masterclass Webinar (₹${webinarPrice})`;
     }
 
     const brandLogos = document.querySelectorAll('.brand-logo-img');

@@ -338,7 +338,7 @@ const DEFAULT_SITE_CONTENT = {
   "topAnnouncement": {
     "enabled": true,
     "badge": "🔥 LIVE MASTERCLASS",
-    "text": "Exclusive Web Creation & Scaling Masterclass at <strong>₹99 Only!</strong>",
+    "text": "Exclusive Web Creation & Scaling Masterclass at <strong>₹199 Only!</strong>",
     "btnText": "Book Ticket Pass",
     "btnUrl": "webinar.html"
   },
@@ -464,7 +464,7 @@ const DEFAULT_SITE_CONTENT = {
     "date": "Saturday, 7:00 PM IST",
     "duration": "90 Minutes Live + Q&A",
     "seats": "Limited 100 Seats",
-    "price": "99",
+    "price": "199",
     "originalPrice": "999",
     "formTitle": "Fill Out Your Webinar Brief",
     "formSubtitle": "Enter your details, select your website type, and complete payment via GPay / Netbanking to unlock your pass.",

@@ -56,7 +56,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=10.5">
+  <link rel="stylesheet" href="styles.css?v=10.6">
 
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -66,13 +66,13 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- Dual Cloud Sync Engine (Firebase + Supabase) -->
-  <script src="firebase-sync.js?v=10.5"></script>
+  <script src="firebase-sync.js?v=10.6"></script>
 
   <!-- VIP User Profile Header Engine -->
-  <script src="user-profile.js?v=10.5"></script>
+  <script src="user-profile.js?v=10.6"></script>
 
   <!-- Content Store & Instant Zero-Flicker Pre-Hydration -->
-  <script src="content-store.js?v=10.5"></script>
+  <script src="content-store.js?v=10.6"></script>
   <script>
     (function() {
       try {
@@ -520,7 +520,7 @@
           <span id="topAnnouncementBadgeText">🔥 LIMITED 100 SEATS</span>
         </span>
         <span class="announcement-text" id="topAnnouncementText">
-          Live Masterclass Webinar Pass Registration at <strong>₹99 Only!</strong>
+          Live Masterclass Webinar Pass Registration at <strong>₹199 Only!</strong>
         </span>
       </div>
       <div class="announcement-action-wrap">
@@ -1122,6 +1122,11 @@
       setTxt('webinarOrigPriceDisplay', `₹${origPrice}`);
       setTxt('btnPayRazorpayText', `Pay ₹${price} & Unlock Registration`);
       setTxt('ticketPassAmountText', `₹${price} (Confirmed via Razorpay)`);
+
+      const annTextEl = document.getElementById('topAnnouncementText');
+      if (annTextEl) {
+        annTextEl.innerHTML = `Live Masterclass Webinar Pass Registration at <strong>₹${price} Only!</strong>`;
+      }
     }
     window.renderWebinarData = renderWebinarData;
 
