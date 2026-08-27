@@ -3458,70 +3458,160 @@ textarea.form-control {
 }
 
 /* ==========================================================================
-   RUNNING MARQUEE TICKER BANNER (INFINITE SCROLL)
+   TOP ANNOUNCEMENT & OFFER STATIC BANNER (Above Header Luxury Bar)
    ========================================================================== */
-.running-banner-section {
+.top-announcement-bar {
+  background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 50%, #ec4899 100%);
+  color: #ffffff;
+  padding: 8px 0;
+  font-size: 0.85rem;
+  font-weight: 500;
   position: relative;
-  background: var(--bg-surface);
-  border-top: 1px solid var(--border-subtle);
-  border-bottom: 1px solid var(--border-subtle);
-  padding: 16px 0;
-  overflow: hidden;
-  user-select: none;
-  z-index: 50;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+  z-index: 1100;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  transition: all var(--transition-smooth);
 }
 
-.running-banner-track {
-  display: flex;
-  width: max-content;
-  gap: 0;
-  animation: marqueeScroll 28s linear infinite;
+.top-announcement-bar.is-hidden {
+  display: none !important;
 }
 
-.running-banner-track:hover {
-  animation-play-state: paused;
-}
-
-.marquee-group {
+.top-announcement-container {
   display: flex;
   align-items: center;
-  gap: 36px;
-  padding-right: 36px;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.announcement-content-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+  justify-content: center;
+  text-align: center;
+}
+
+.announcement-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: var(--radius-pill);
+  padding: 2px 9px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+  color: #fff;
+}
+
+.live-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10B981;
+  box-shadow: 0 0 8px #10B981;
+  animation: livePulse 1.5s infinite ease-in-out;
+}
+
+@keyframes livePulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.6; }
+}
+
+.announcement-text {
+  color: #ffffff;
+  font-size: 0.84rem;
+  letter-spacing: 0.01em;
+}
+
+.announcement-text strong {
+  color: #fef08a;
+  font-weight: 800;
+}
+
+.announcement-action-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   flex-shrink: 0;
 }
 
-.marquee-item {
+.announcement-cta-btn {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  font-family: var(--font-heading);
-  font-size: 0.85rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-primary);
+  gap: 5px;
+  background: #ffffff;
+  color: #4338ca !important;
+  font-weight: 700;
+  font-size: 0.76rem;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all var(--transition-fast);
   white-space: nowrap;
 }
 
-.marquee-item i {
-  font-size: 1rem;
-  color: var(--brand-indigo);
+.announcement-cta-btn:hover {
+  transform: translateY(-1px) scale(1.02);
+  background: #f8fafc;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-.marquee-divider {
-  color: var(--text-dim);
-  opacity: 0.5;
-  font-size: 0.8rem;
+.announcement-close-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.88rem;
+  cursor: pointer;
+  padding: 2px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: color var(--transition-fast);
 }
 
-@keyframes marqueeScroll {
-  from {
-    transform: translateX(0);
+.announcement-close-btn:hover {
+  color: #ffffff;
+}
+
+@media (max-width: 768px) {
+  .top-announcement-bar {
+    padding: 6px 0;
   }
-
-  to {
-    transform: translateX(-50%);
+  .top-announcement-container {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    gap: 6px;
+    justify-content: center;
+  }
+  .announcement-content-wrap {
+    gap: 6px;
+    justify-content: center;
+  }
+  .announcement-live-badge {
+    font-size: 0.65rem;
+    padding: 1px 7px;
+  }
+  .announcement-text {
+    font-size: 0.74rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 190px;
+  }
+  .announcement-cta-btn {
+    padding: 3px 8px;
+    font-size: 0.7rem;
+  }
+  .announcement-close-btn {
+    display: none;
   }
 }
 

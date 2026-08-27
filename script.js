@@ -64,10 +64,10 @@ function hydratePageFromCMS(customContent) {
       setVis('headerCtaBtn', sv.headerCta);
       setVis('navWebinarItem', sv.navWebinarPill);
 
-      // 2. All 13 Major Page Sections
-      const isBannerOn = (sv.runningBanner !== false) && (!content.runningBanner || content.runningBanner.enabled !== false);
+      // 2. All Major Page Sections
+      const isTopAnnOn = (sv.topAnnouncement !== false) && (!content.topAnnouncement || content.topAnnouncement.enabled !== false);
+      setVis('topAnnouncementBar', isTopAnnOn);
       setVis('hero', sv.hero);
-      setVis('runningBannerSection', isBannerOn);
       setVis('about', sv.about);
       setVis('dailyPrompts', sv.dailyPrompts !== undefined ? sv.dailyPrompts : true);
       setVis('services', sv.services);
@@ -93,26 +93,34 @@ function hydratePageFromCMS(customContent) {
       setVis('backToTopBtn', sv.backToTopBtn);
     }
 
-    // 0.1 RUNNING MARQUEE TICKER BANNER
-    const bannerSec = document.getElementById('runningBannerSection');
-    const isBannerActive = (!content.sectionsVisibility || content.sectionsVisibility.runningBanner !== false) &&
-                           (!content.runningBanner || content.runningBanner.enabled !== false);
-    if (!isBannerActive && bannerSec) {
-      bannerSec.style.display = 'none';
-    } else if (isBannerActive && bannerSec && content.runningBanner && content.runningBanner.items && content.runningBanner.items.length > 0) {
-      bannerSec.style.display = '';
-      const bannerTrack = document.getElementById('runningBannerTrack');
-      if (bannerTrack) {
-        const createGroupHtml = () => {
-          return content.runningBanner.items.map(item => `
-            <div class="marquee-item"><i class="${item.icon || 'fa-solid fa-bolt'} text-gradient"></i> ${item.text}</div>
-            <span class="marquee-divider">✦</span>
-          `).join('');
-        };
+    // 0.1 TOP ANNOUNCEMENT & OFFER STATIC BANNER
+    const topBar = document.getElementById('topAnnouncementBar');
+    const annData = content.topAnnouncement || {
+      enabled: true,
+      badge: '🔥 LIVE MASTERCLASS',
+      text: 'Exclusive Web Creation & Scaling Masterclass at <strong>₹99 Only!</strong>',
+      btnText: 'Book Ticket Pass',
+      btnUrl: 'webinar.html'
+    };
 
-        const group1 = `<div class="marquee-group">${createGroupHtml()}</div>`;
-        const group2 = `<div class="marquee-group" aria-hidden="true">${createGroupHtml()}</div>`;
-        bannerTrack.innerHTML = group1 + group2;
+    const isTopAnnActive = (!content.sectionsVisibility || content.sectionsVisibility.topAnnouncement !== false) &&
+                           (annData.enabled !== false) &&
+                           (sessionStorage.getItem('flipcut_dismiss_top_ann') !== '1');
+
+    if (topBar) {
+      if (!isTopAnnActive) {
+        topBar.classList.add('is-hidden');
+      } else {
+        topBar.classList.remove('is-hidden');
+        const badgeText = document.getElementById('topAnnouncementBadgeText');
+        const textEl = document.getElementById('topAnnouncementText');
+        const btnEl = document.getElementById('topAnnouncementCtaBtn');
+        const btnText = document.getElementById('topAnnouncementBtnText');
+
+        if (badgeText && annData.badge) badgeText.textContent = annData.badge;
+        if (textEl && annData.text) textEl.innerHTML = annData.text;
+        if (btnEl && annData.btnUrl) btnEl.href = annData.btnUrl;
+        if (btnText && annData.btnText) btnText.textContent = annData.btnText;
       }
     }
 
@@ -1796,6 +1804,14 @@ function hydratePageFromCMS(customContent) {
       targetInput.classList.add('input-highlight-error');
       targetInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
       setTimeout(() => targetInput.classList.remove('input-highlight-error'), 3500);
+    }
+  };
+
+  window.dismissTopAnnouncement = function() {
+    const topBar = document.getElementById('topAnnouncementBar');
+    if (topBar) {
+      topBar.classList.add('is-hidden');
+      try { sessionStorage.setItem('flipcut_dismiss_top_ann', '1'); } catch (_) {}
     }
   };
 

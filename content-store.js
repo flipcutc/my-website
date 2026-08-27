@@ -335,51 +335,20 @@ const DEFAULT_SITE_CONTENT = {
       }
     ]
   },
-  "runningBanner": {
+  "topAnnouncement": {
     "enabled": true,
-    "speed": "normal",
-    "items": [
-      {
-        "icon": "fa-solid fa-bolt",
-        "text": "50M+ ORGANIC VIEWS GENERATED"
-      },
-      {
-        "icon": "fa-solid fa-palette",
-        "text": "DAVINCI RESOLVE 4K COLOR GRADING"
-      },
-      {
-        "icon": "fa-solid fa-clock-rotate-left",
-        "text": "24-48H GUARANTEED TURNAROUND"
-      },
-      {
-        "icon": "fa-brands fa-tiktok",
-        "text": "VIRAL REELS & SHORTS HOOK OPTIMIZATION"
-      },
-      {
-        "icon": "fa-solid fa-cube",
-        "text": "BESPOKE 3D MOTION GRAPHICS & VFX"
-      },
-      {
-        "icon": "fa-brands fa-google-drive",
-        "text": "5TB HIGH-SPEED CLOUD STORAGE"
-      },
-      {
-        "icon": "fa-brands fa-whatsapp",
-        "text": "DIRECT 1-ON-1 WHATSAPP COLLABORATION"
-      },
-      {
-        "icon": "fa-solid fa-crown",
-        "text": "TOP 1% RETENTION STORYTELLING"
-      }
-    ]
+    "badge": "🔥 LIVE MASTERCLASS",
+    "text": "Exclusive Web Creation & Scaling Masterclass at <strong>₹99 Only!</strong>",
+    "btnText": "Book Ticket Pass",
+    "btnUrl": "webinar.html"
   },
   "sectionsVisibility": {
+    "topAnnouncement": true,
     "headerBadge": true,
     "headerThemeToggle": true,
     "headerCta": true,
     "navWebinarPill": true,
     "hero": true,
-    "runningBanner": true,
     "about": true,
     "dailyPrompts": true,
     "services": true,

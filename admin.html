@@ -37,7 +37,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=9.5">
+  <link rel="stylesheet" href="styles.css?v=9.6">
   
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -904,8 +904,8 @@
           </button>
         </li>
         <li>
-          <button class="tab-btn-vertical" data-tab="tab-banner" data-title="Frontend Running Ticker Banner CMS">
-            <span class="btn-inner"><i class="fa-solid fa-bullhorn" style="color:#00D2FF;"></i> Running Banner</span>
+          <button class="tab-btn-vertical" data-tab="tab-banner" data-title="Top Header Announcement & Live Webinar Banner CMS">
+            <span class="btn-inner"><i class="fa-solid fa-bullhorn text-gradient" style="color:#EC4899;"></i> Top Offer Banner</span>
           </button>
         </li>
         <li>
@@ -1431,11 +1431,11 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
 
             <div class="visibility-row">
               <div class="visibility-info">
-                <h4><i class="fa-solid fa-bullhorn" style="color:#00D2FF;"></i> Running Marquee Ticker Banner</h4>
-                <p>Continuous infinite animated banner highlighting agency stats and tools</p>
+                <h4><i class="fa-solid fa-bullhorn" style="color:#EC4899;"></i> Top Announcement & Live Webinar Banner</h4>
+                <p>Luxury colorful static banner positioned above the header for offers & webinar registrations</p>
               </div>
               <label class="switch-control">
-                <input type="checkbox" id="toggleSecRunningBanner" checked onchange="window.syncBannerToggle(this.checked)">
+                <input type="checkbox" id="toggleSecTopAnnouncement" checked onchange="window.syncTopAnnToggle(this.checked)">
                 <span class="switch-slider"></span>
               </label>
             </div>
@@ -1692,43 +1692,57 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
       </div>
 
       <!-- ====================================================================
-           TAB: RUNNING MARQUEE TICKER BANNER CMS
+           TAB 3: TOP HEADER ANNOUNCEMENT & LIVE WEBINAR BANNER CMS
            ==================================================================== -->
       <div class="tab-pane" id="tab-banner">
         <div class="cms-card">
           <div class="cms-header">
             <div>
-              <h2><i class="fa-solid fa-scroll text-gradient"></i> Frontend Running Ticker Banner CMS</h2>
-              <p>Customize or toggle the animated infinite marquee banner running on your website.</p>
+              <h2><i class="fa-solid fa-bullhorn text-gradient"></i> Top Header Announcement & Live Webinar Banner</h2>
+              <p>Customize the static high-converting colorful banner displayed at the very top of the website (above header).</p>
             </div>
             <div style="display: flex; gap: 10px; align-items: center;">
-              <button class="btn btn-secondary" id="addBannerItemBtn" style="padding: 8px 16px;">
-                <i class="fa-solid fa-plus"></i> Add Ticker Phrase
-              </button>
               <button type="button" class="btn btn-primary" onclick="window.saveAdminDraft(true)" style="padding: 8px 16px;">
                 <i class="fa-solid fa-floppy-disk"></i> Save Banner
               </button>
             </div>
           </div>
 
-          <!-- Master Visibility Toggle Card for Running Banner -->
+          <!-- Master Visibility Toggle Card -->
           <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 14px 18px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between;">
             <div>
               <strong style="color: var(--text-primary); font-size: 0.95rem; display: block; margin-bottom: 2px;">
-                <i class="fa-solid fa-eye text-gradient"></i> Display Running Ticker Banner on Website
+                <i class="fa-solid fa-eye text-gradient"></i> Display Top Announcement Banner on Website
               </strong>
               <span style="font-size: 0.82rem; color: var(--text-muted);">
-                Turn this switch OFF to completely hide the marquee ticker from the live website.
+                Turn this switch OFF to completely hide the top static banner.
               </span>
             </div>
             <label class="toggle-switch">
-              <input type="checkbox" id="cfgBannerEnabled" checked onchange="window.syncBannerToggle(this.checked)">
+              <input type="checkbox" id="cfgTopAnnEnabled" checked onchange="window.syncTopAnnToggle(this.checked)">
               <span class="toggle-slider"></span>
             </label>
           </div>
 
-          <div id="bannerItemsEditorContainer" style="display: flex; flex-direction: column; gap: 14px;">
-            <!-- Rendered by JS -->
+          <div class="cms-grid-2" style="margin-bottom: 16px;">
+            <div class="form-group">
+              <label>Banner Glowing Badge Text</label>
+              <input type="text" id="cfgTopAnnBadge" class="form-control" placeholder="🔥 LIVE MASTERCLASS">
+            </div>
+            <div class="form-group">
+              <label>CTA Button Text</label>
+              <input type="text" id="cfgTopAnnBtnText" class="form-control" placeholder="Book Ticket Pass">
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label>Offer Headline / Announcement Message (HTML allowed, e.g. &lt;strong&gt;₹99 Only!&lt;/strong&gt;)</label>
+            <input type="text" id="cfgTopAnnText" class="form-control" placeholder="Exclusive Web Creation & Scaling Masterclass at <strong>₹99 Only!</strong>">
+          </div>
+
+          <div class="form-group">
+            <label>CTA Button Link URL</label>
+            <input type="text" id="cfgTopAnnBtnUrl" class="form-control" placeholder="webinar.html">
           </div>
         </div>
       </div>
@@ -2872,10 +2886,10 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- Dual Cloud Sync Engine (Firebase + Supabase) -->
-  <script src="firebase-sync.js?v=9.5"></script>
+  <script src="firebase-sync.js?v=9.6"></script>
 
   <!-- CMS & SQL Engine Script -->
-  <script src="content-store.js?v=9.5"></script>
+  <script src="content-store.js?v=9.6"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
 
@@ -2929,9 +2943,9 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
           headerCta: getCheck('toggleHeadCta', content.sectionsVisibility?.headerCta),
           navWebinarPill: getCheck('toggleHeadWebinar', content.sectionsVisibility?.navWebinarPill),
 
-          // 2. All 13 Major Page Sections
+          // 2. All Major Page Sections
+          topAnnouncement: getCheck('toggleSecTopAnnouncement', content.sectionsVisibility?.topAnnouncement),
           hero: getCheck('toggleSecHero', content.sectionsVisibility?.hero),
-          runningBanner: getCheck('toggleSecRunningBanner', content.sectionsVisibility?.runningBanner),
           about: getCheck('toggleSecAbout', content.sectionsVisibility?.about),
           dailyPrompts: getCheck('toggleSecDailyPrompts', content.sectionsVisibility?.dailyPrompts),
           services: getCheck('toggleSecServices', content.sectionsVisibility?.services),
@@ -2957,34 +2971,29 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
           backToTopBtn: getCheck('toggleBackToTop', content.sectionsVisibility?.backToTopBtn)
         };
 
-        // Collect Running Banner Items & Master Toggle
-        const bannerToggle1 = document.getElementById('toggleSecRunningBanner');
-        const bannerToggle2 = document.getElementById('cfgBannerEnabled');
-        let bannerEnabled = true;
-        if (bannerToggle1 && !bannerToggle1.checked) bannerEnabled = false;
-        if (bannerToggle2 && !bannerToggle2.checked) bannerEnabled = false;
-        if (!bannerToggle1 && !bannerToggle2) {
-          bannerEnabled = (content.sectionsVisibility?.runningBanner !== false) && (content.runningBanner?.enabled !== false);
+        // Collect Top Header Announcement & Live Webinar Banner
+        const topAnnToggle1 = document.getElementById('toggleSecTopAnnouncement');
+        const topAnnToggle2 = document.getElementById('cfgTopAnnEnabled');
+        let topAnnEnabled = true;
+        if (topAnnToggle1 && !topAnnToggle1.checked) topAnnEnabled = false;
+        if (topAnnToggle2 && !topAnnToggle2.checked) topAnnEnabled = false;
+        if (!topAnnToggle1 && !topAnnToggle2) {
+          topAnnEnabled = (content.sectionsVisibility?.topAnnouncement !== false) && (content.topAnnouncement?.enabled !== false);
         }
 
-        if (!content.runningBanner) content.runningBanner = { enabled: bannerEnabled, items: [] };
-        content.runningBanner.enabled = bannerEnabled;
-        content.sectionsVisibility.runningBanner = bannerEnabled;
+        const topAnnBadge = document.getElementById('cfgTopAnnBadge')?.value.trim() || '🔥 LIVE MASTERCLASS';
+        const topAnnText = document.getElementById('cfgTopAnnText')?.value.trim() || 'Exclusive Web Creation & Scaling Masterclass at <strong>₹99 Only!</strong>';
+        const topAnnBtnText = document.getElementById('cfgTopAnnBtnText')?.value.trim() || 'Book Ticket Pass';
+        const topAnnBtnUrl = document.getElementById('cfgTopAnnBtnUrl')?.value.trim() || 'webinar.html';
 
-        const bannerIcons = document.querySelectorAll('.banner-icon');
-        const bannerTexts = document.querySelectorAll('.banner-text');
-        if (bannerTexts.length > 0) {
-          content.runningBanner.items = [];
-          bannerIcons.forEach((iconInput, idx) => {
-            const textInput = bannerTexts[idx];
-            if (textInput && textInput.value.trim()) {
-              content.runningBanner.items.push({
-                icon: iconInput.value.trim() || 'fa-solid fa-bolt',
-                text: textInput.value.trim()
-              });
-            }
-          });
-        }
+        content.topAnnouncement = {
+          enabled: topAnnEnabled,
+          badge: topAnnBadge,
+          text: topAnnText,
+          btnText: topAnnBtnText,
+          btnUrl: topAnnBtnUrl
+        };
+        content.sectionsVisibility.topAnnouncement = topAnnEnabled;
 
         // Brand
         if (!content.brand) content.brand = {};
@@ -4357,9 +4366,9 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
             setCheck('toggleHeadCta', sv.headerCta);
             setCheck('toggleHeadWebinar', sv.navWebinarPill);
 
-            // 2. All 13 Major Page Sections
+            // 2. All Major Page Sections
+            setCheck('toggleSecTopAnnouncement', sv.topAnnouncement);
             setCheck('toggleSecHero', sv.hero);
-            setCheck('toggleSecRunningBanner', sv.runningBanner);
             setCheck('toggleSecAbout', sv.about);
             setCheck('toggleSecDailyPrompts', sv.dailyPrompts !== undefined ? sv.dailyPrompts : true);
             setCheck('toggleSecServices', sv.services);
@@ -4384,8 +4393,6 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
             setCheck('toggleFloatingWa', sv.floatingWhatsApp);
             setCheck('toggleBackToTop', sv.backToTopBtn);
           }
-
-          renderBannerEditor();
 
           const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
 
@@ -4624,77 +4631,34 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
             if (statusSelect) statusSelect.value = content.webinar.enabled !== false ? 'true' : 'false';
           }
 
+          // Top Header Announcement & Live Webinar Banner CMS Inputs
+          if (content.topAnnouncement) {
+            const ann = content.topAnnouncement;
+            const isEn = (ann.enabled !== false) && (content.sectionsVisibility?.topAnnouncement !== false);
+            setCheck('cfgTopAnnEnabled', isEn);
+            setVal('cfgTopAnnBadge', ann.badge || '🔥 LIVE MASTERCLASS');
+            setVal('cfgTopAnnText', ann.text || 'Exclusive Web Creation & Scaling Masterclass at <strong>₹99 Only!</strong>');
+            setVal('cfgTopAnnBtnText', ann.btnText || 'Book Ticket Pass');
+            setVal('cfgTopAnnBtnUrl', ann.btnUrl || 'webinar.html');
+          }
+
           cmsInputsPopulated = true;
         } catch (err) {
           console.error('Error in populateAllCmsInputs:', err);
         }
       }
 
-      function renderBannerEditor() {
-        const container = document.getElementById('bannerItemsEditorContainer');
-        const toggle = document.getElementById('cfgBannerEnabled');
-        if (toggle && content.runningBanner) {
-          const isEn = (content.runningBanner.enabled !== false) && (content.sectionsVisibility?.runningBanner !== false);
-          toggle.checked = isEn;
-        }
-        if (!container) return;
-        if (!content.runningBanner) {
-          content.runningBanner = {
-            enabled: true,
-            items: [
-              { icon: "fa-solid fa-bolt", text: "50M+ ORGANIC VIEWS GENERATED" },
-              { icon: "fa-solid fa-palette", text: "DAVINCI RESOLVE 4K COLOR GRADING" },
-              { icon: "fa-solid fa-clock-rotate-left", text: "24-48H GUARANTEED TURNAROUND" },
-              { icon: "fa-brands fa-tiktok", text: "VIRAL REELS & SHORTS HOOK OPTIMIZATION" }
-            ]
-          };
-        }
-        container.innerHTML = '';
-        content.runningBanner.items.forEach((item, idx) => {
-          const div = document.createElement('div');
-          div.style.background = 'var(--bg-tertiary)';
-          div.style.padding = '14px 18px';
-          div.style.borderRadius = 'var(--radius-md)';
-          div.style.display = 'flex';
-          div.style.alignItems = 'center';
-          div.style.gap = '14px';
-          div.innerHTML = `
-            <div style="width: 140px;">
-              <input type="text" class="form-control banner-icon" value="${item.icon || 'fa-solid fa-bolt'}" data-idx="${idx}" placeholder="FontAwesome Icon">
-            </div>
-            <div style="flex: 1;">
-              <input type="text" class="form-control banner-text" value="${item.text}" data-idx="${idx}" placeholder="Ticker text phrase">
-            </div>
-            <button class="action-btn-sm delete-btn" onclick="removeBannerItem(${idx})" title="Delete Phrase">
-              <i class="fa-solid fa-trash"></i>
-            </button>
-          `;
-          container.appendChild(div);
-        });
-      }
-
-      window.syncBannerToggle = function(checked) {
-        if (!content.runningBanner) content.runningBanner = { enabled: true, items: [] };
-        content.runningBanner.enabled = checked;
+      window.syncTopAnnToggle = function(checked) {
+        if (!content.topAnnouncement) content.topAnnouncement = { enabled: true };
+        content.topAnnouncement.enabled = checked;
         if (!content.sectionsVisibility) content.sectionsVisibility = {};
-        content.sectionsVisibility.runningBanner = checked;
+        content.sectionsVisibility.topAnnouncement = checked;
 
-        const globalToggle = document.getElementById('toggleSecRunningBanner');
-        if (globalToggle) globalToggle.checked = checked;
+        const toggle1 = document.getElementById('toggleSecTopAnnouncement');
+        const toggle2 = document.getElementById('cfgTopAnnEnabled');
+        if (toggle1) toggle1.checked = checked;
+        if (toggle2) toggle2.checked = checked;
       };
-
-      window.removeBannerItem = function(idx) {
-        if (content.runningBanner && content.runningBanner.items) {
-          content.runningBanner.items.splice(idx, 1);
-          renderBannerEditor();
-        }
-      };
-
-      document.getElementById('addBannerItemBtn').addEventListener('click', () => {
-        if (!content.runningBanner) content.runningBanner = { enabled: true, items: [] };
-        content.runningBanner.items.push({ icon: 'fa-solid fa-crown', text: 'NEW ANNOUNCEMENT TICKER PHRASE' });
-        renderBannerEditor();
-      });
 
       /* ====================================================================
          CORE SERVICES CMS (ADMIN HANDLERS)

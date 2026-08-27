@@ -53,7 +53,7 @@
     rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=9.5">
+  <link rel="stylesheet" href="styles.css?v=9.6">
 
   <!-- FontAwesome Icons for clean UI symbols -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -63,13 +63,13 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- Dual Cloud Sync Engine (Firebase + Supabase) -->
-  <script src="firebase-sync.js?v=9.5"></script>
+  <script src="firebase-sync.js?v=9.6"></script>
 
   <!-- VIP User Profile Header Engine -->
-  <script src="user-profile.js?v=9.5"></script>
+  <script src="user-profile.js?v=9.6"></script>
 
   <!-- Content Store & Instant Fast Pre-Hydration -->
-  <script src="content-store.js?v=9.5"></script>
+  <script src="content-store.js?v=9.6"></script>
   <script>
     // Instant 0ms Pre-Hydration & Zero-Flicker Renderer
     (function() {
@@ -80,8 +80,8 @@
           var hideSelectors = [];
           if (data && data.sectionsVisibility) {
             var sv = data.sectionsVisibility;
+            if (sv.topAnnouncement === false || (data.topAnnouncement && data.topAnnouncement.enabled === false)) hideSelectors.push('#topAnnouncementBar');
             if (sv.hero === false) hideSelectors.push('#hero');
-            if (sv.runningBanner === false || (data.runningBanner && data.runningBanner.enabled === false)) hideSelectors.push('#runningBannerSection');
             if (sv.about === false) hideSelectors.push('#about');
             if (sv.dailyPrompts === false) hideSelectors.push('#dailyPrompts');
             if (sv.services === false) hideSelectors.push('#services');
@@ -109,8 +109,8 @@
             if (sv.contactDriveLink === false) hideSelectors.push('#contactDriveLink');
             if (sv.floatingWhatsApp === false) hideSelectors.push('#mobileFloatingWa');
             if (sv.backToTopBtn === false) hideSelectors.push('#backToTopBtn');
-          } else if (data && data.runningBanner && data.runningBanner.enabled === false) {
-            hideSelectors.push('#runningBannerSection');
+          } else if (data && data.topAnnouncement && data.topAnnouncement.enabled === false) {
+            hideSelectors.push('#topAnnouncementBar');
           }
 
           var css = '';
@@ -149,6 +149,32 @@
   <div class="bg-ambient-orb orb-3"></div>
   <div class="bg-ambient-orb orb-4"></div>
   <div class="bg-grid-mesh"></div>
+
+  <!-- ==========================================================================
+       TOP ANNOUNCEMENT & OFFER STATIC BANNER (Above Header Luxury Bar)
+       ========================================================================== -->
+  <div class="top-announcement-bar" id="topAnnouncementBar">
+    <div class="container top-announcement-container">
+      <div class="announcement-content-wrap">
+        <span class="announcement-live-badge" id="topAnnouncementBadge">
+          <span class="live-pulse-dot"></span>
+          <span id="topAnnouncementBadgeText">🔥 LIVE MASTERCLASS</span>
+        </span>
+        <span class="announcement-text" id="topAnnouncementText">
+          Exclusive Web Creation & Scaling Masterclass at <strong>₹99 Only!</strong>
+        </span>
+      </div>
+      <div class="announcement-action-wrap">
+        <a href="webinar.html" class="announcement-cta-btn" id="topAnnouncementCtaBtn">
+          <span id="topAnnouncementBtnText">Book Ticket Pass</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </a>
+        <button type="button" class="announcement-close-btn" onclick="dismissTopAnnouncement()" aria-label="Close Announcement">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- ==========================================================================
        HEADER & NAVIGATION BAR (Frosted Luxury Crystal Glass)
@@ -403,60 +429,6 @@
         </div>
       </div>
 
-    </div>
-  </section>
-
-  <!-- ==========================================================================
-       RUNNING MARQUEE TICKER BANNER (INFINITE SCROLL)
-       ========================================================================== -->
-  <section class="running-banner-section" id="runningBannerSection">
-    <div class="running-banner-track" id="runningBannerTrack">
-      <!-- Group 1 -->
-      <div class="marquee-group">
-        <div class="marquee-item"><i class="fa-solid fa-bolt text-gradient"></i> 50M+ Organic Views Generated</div>
-        <span class="marquee-divider">✦</span>
-        <div class="marquee-item"><i class="fa-solid fa-palette text-gradient"></i> DaVinci Resolve 4K Color Grading
-        </div>
-        <span class="marquee-divider">✦</span>
-        <div class="marquee-item"><i class="fa-solid fa-clock-rotate-left text-gradient"></i> 24-48h Guaranteed
-          Turnaround</div>
-        <span class="marquee-divider">✦</span>
-        <div class="marquee-item"><i class="fa-brands fa-tiktok text-gradient"></i> Viral Reels & Shorts Hook
-          Optimization</div>
-        <span class="marquee-divider">✦</span>
-        <div class="marquee-item"><i class="fa-solid fa-cube text-gradient"></i> Bespoke 3D Motion Graphics & VFX</div>
-        <span class="marquee-divider">✦</span>
-        <div class="marquee-item"><i class="fa-brands fa-google-drive" style="color:#34A853;"></i> 5TB High-Speed Cloud
-          Storage</div>
-        <span class="marquee-divider">✦</span>
-        <div class="marquee-item"><i class="fa-brands fa-whatsapp text-gradient"></i> Direct 1-on-1 WhatsApp
-          Collaboration</div>
-        <span class="marquee-divider">✦</span>
-        <div class="marquee-item"><i class="fa-solid fa-crown text-gradient"></i> Top 1% Retention Pacing</div>
-      </div>
-      <!-- Group 2 (Duplicated for seamless infinite loop) -->
-      <div class="marquee-group" aria-hidden="true">
-        <div class="marquee-item"><i class="fa-solid fa-bolt text-gradient"></i> 50M+ Organic Views Generated</div>
-        <span class="marquee-divider">✦</span>
-        <div class="marquee-item"><i class="fa-solid fa-palette text-gradient"></i> DaVinci Resolve 4K Color Grading
-        </div>
-        <span class="marquee-divider">✦</span>
-        <div class="marquee-item"><i class="fa-solid fa-clock-rotate-left text-gradient"></i> 24-48h Guaranteed
-          Turnaround</div>
-        <span class="marquee-divider">✦</span>
-        <div class="marquee-item"><i class="fa-brands fa-tiktok text-gradient"></i> Viral Reels & Shorts Hook
-          Optimization</div>
-        <span class="marquee-divider">✦</span>
-        <div class="marquee-item"><i class="fa-solid fa-cube text-gradient"></i> Bespoke 3D Motion Graphics & VFX</div>
-        <span class="marquee-divider">✦</span>
-        <div class="marquee-item"><i class="fa-brands fa-google-drive" style="color:#34A853;"></i> 5TB High-Speed Cloud
-          Storage</div>
-        <span class="marquee-divider">✦</span>
-        <div class="marquee-item"><i class="fa-brands fa-whatsapp text-gradient"></i> Direct 1-on-1 WhatsApp
-          Collaboration</div>
-        <span class="marquee-divider">✦</span>
-        <div class="marquee-item"><i class="fa-solid fa-crown text-gradient"></i> Top 1% Retention Pacing</div>
-      </div>
     </div>
   </section>
 
@@ -1271,7 +1243,7 @@
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
   <!-- JavaScript Modules -->
-  <script src="script.js?v=9.5"></script>
+  <script src="script.js?v=9.6"></script>
 </body>
 
 </html>
