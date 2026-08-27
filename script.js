@@ -1534,6 +1534,15 @@ document.addEventListener('DOMContentLoaded', () => {
       const budget = document.getElementById('projectBudget').value;
       const footage = document.getElementById('projectFootageUrl').value.trim();
       const notes = document.getElementById('projectNotes').value.trim();
+      const honeypot = document.getElementById('inquiryHoneypot')?.value;
+
+      // Anti-Bot & Automated Script Trap
+      if (honeypot) {
+        console.warn('Bot detected and neutralized.');
+        showToast('Brief sent successfully!', '#10B981');
+        inquiryForm.reset();
+        return;
+      }
 
       if (!name || !email) {
         showToast('Please provide your name and email address.', '#EF4444');

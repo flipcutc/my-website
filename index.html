@@ -822,6 +822,8 @@
         <!-- Contact Form -->
         <div class="contact-form-card">
           <form id="projectInquiryForm">
+            <!-- Anti-Bot Honeypot Security Field (Traps automated spam bots & scrapers) -->
+            <input type="text" name="_hp_security_check" id="inquiryHoneypot" style="display:none !important; position:absolute; left:-9999px;" tabindex="-1" autocomplete="off">
             <div class="form-row-2">
               <div class="form-group">
                 <label for="clientName" id="lblClientName">Your Name *</label>

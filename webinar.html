@@ -582,6 +582,8 @@
         </div>
 
         <form id="webinarRegistrationForm">
+          <!-- Anti-Bot Honeypot Security Field (Invisible to human users, traps automated scrapers & hackers) -->
+          <input type="text" name="_hp_security_check" id="webinarHoneypot" style="display:none !important; position:absolute; left:-9999px;" tabindex="-1" autocomplete="off">
 
           <!-- 1. Personal Details -->
           <div class="form-row-2">
@@ -1052,6 +1054,12 @@
       const webinarForm = document.getElementById('webinarRegistrationForm');
 
       function validateWebinarInputs() {
+        const honeypot = document.getElementById('webinarHoneypot')?.value;
+        if (honeypot) {
+          console.warn('Bot submission blocked.');
+          return false;
+        }
+
         const name = document.getElementById('webinarName').value.trim();
         const phone = document.getElementById('webinarPhone').value.trim();
         const email = document.getElementById('webinarEmail').value.trim();

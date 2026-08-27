@@ -2701,19 +2701,87 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
       const adminPinInput = document.getElementById('adminPinInput');
       const adminLogoutBtn = document.getElementById('adminLogoutBtn');
 
-      if (sessionStorage.getItem('flipcut_admin_authed') === 'true') {
-        authOverlay.style.display = 'none';
+      // Secure Cryptographic SHA-256 Hash Verification (One-way hash - original PIN is never stored in plain text)
+      const MASTER_PIN_HASH = '921bad2b769a8eaf32afe2c6436cd39284a12a8de86677c5ba546edae8f0c729';
+
+      async function computeSha256(str) {
+        const buffer = new TextEncoder().encode(str);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
       }
 
-      adminAuthForm.addEventListener('submit', (e) => {
+      function getLockoutState() {
+        try {
+          const lockTime = parseInt(localStorage.getItem('flipcut_admin_lockout_until') || '0', 10);
+          const failedCount = parseInt(localStorage.getItem('flipcut_admin_failed_attempts') || '0', 10);
+          return { lockTime, failedCount };
+        } catch (_) {
+          return { lockTime: 0, failedCount: 0 };
+        }
+      }
+
+      function checkLockout() {
+        const { lockTime } = getLockoutState();
+        const now = Date.now();
+        if (lockTime > now) {
+          const remainingSec = Math.ceil((lockTime - now) / 1000);
+          const mins = Math.floor(remainingSec / 60);
+          const secs = remainingSec % 60;
+          const timeStr = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+          showAdminToast(`🔒 Security Lockout Active: Too many failed attempts. Please wait ${timeStr}.`, '#EF4444');
+          if (adminPinInput) adminPinInput.setAttribute('disabled', 'true');
+          return true;
+        } else {
+          if (adminPinInput) adminPinInput.removeAttribute('disabled');
+          return false;
+        }
+      }
+
+      if (sessionStorage.getItem('flipcut_admin_authed') === 'true') {
+        authOverlay.style.display = 'none';
+      } else {
+        checkLockout();
+      }
+
+      adminAuthForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+        if (checkLockout()) return;
+
         const pin = adminPinInput.value.trim();
-        if (pin === '242631') {
+        if (!pin) return;
+
+        const inputHash = await computeSha256(pin);
+
+        if (inputHash === MASTER_PIN_HASH) {
+          // Reset failed attempts on success
+          try {
+            localStorage.removeItem('flipcut_admin_failed_attempts');
+            localStorage.removeItem('flipcut_admin_lockout_until');
+          } catch (_) {}
+
           sessionStorage.setItem('flipcut_admin_authed', 'true');
           authOverlay.style.display = 'none';
-          showAdminToast('Dashboard unlocked! Welcome back, Admin.');
+          showAdminToast('Dashboard unlocked! Welcome back, Admin.', '#10B981');
         } else {
-          showAdminToast('Incorrect 6-digit Master PIN. Please try again.', '#EF4444');
+          let { failedCount } = getLockoutState();
+          failedCount += 1;
+          try {
+            localStorage.setItem('flipcut_admin_failed_attempts', String(failedCount));
+          } catch (_) {}
+
+          if (failedCount >= 5) {
+            // Lock out for 5 minutes (300,000 ms)
+            const lockoutUntil = Date.now() + (5 * 60 * 1000);
+            try {
+              localStorage.setItem('flipcut_admin_lockout_until', String(lockoutUntil));
+            } catch (_) {}
+            checkLockout();
+          } else {
+            const remaining = 5 - failedCount;
+            showAdminToast(`Incorrect Master PIN. ${remaining} attempt(s) remaining before security lockout.`, '#EF4444');
+          }
+
           adminPinInput.value = '';
           adminPinInput.focus();
         }
@@ -3067,8 +3135,18 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
           if (lead.status === 'Completed') statusClass = 'status-completed';
           if (lead.status === 'Booked / Paid') statusClass = 'status-completed';
 
-          const leadUid = lead.userId || (lead.paymentId ? 'FC-PAY-' + String(lead.id).slice(-5) : 'FC-REG-' + String(lead.id).slice(-5));
-          const clientPhoneDisplay = lead.phone ? `<a href="tel:${lead.phone}" style="color:var(--text-primary); font-weight:600; text-decoration:none;"><i class="fa-solid fa-phone" style="font-size:0.75rem; color:#10B981; margin-right:4px;"></i> ${lead.phone}</a>` : '<span style="color:var(--text-dim);">-</span>';
+          const leadUid = escapeHtml(lead.userId || (lead.paymentId ? 'FC-PAY-' + String(lead.id).slice(-5) : 'FC-REG-' + String(lead.id).slice(-5)));
+          const safeName = escapeHtml(lead.name || 'Anonymous');
+          const safeEmail = escapeHtml(lead.email || '');
+          const safePhone = escapeHtml(lead.phone || '');
+          const safeService = escapeHtml(lead.service || lead.packageName || 'Video Project');
+          const safeType = escapeHtml(lead.websiteType || '');
+          const safeBudget = escapeHtml(lead.budget || lead.amount || '₹25,000');
+          const safePaymentId = escapeHtml(lead.paymentId || '');
+          const safeDate = escapeHtml(lead.date || (lead.created_at ? lead.created_at.slice(0,10) : 'Today'));
+          const safeTime = escapeHtml(lead.time || '');
+
+          const clientPhoneDisplay = safePhone ? `<a href="tel:${safePhone}" style="color:var(--text-primary); font-weight:600; text-decoration:none;"><i class="fa-solid fa-phone" style="font-size:0.75rem; color:#10B981; margin-right:4px;"></i> ${safePhone}</a>` : '<span style="color:var(--text-dim);">-</span>';
           const waNum = lead.phone ? lead.phone.replace(/[^0-9]/g, '') : (content.contact ? content.contact.whatsappNum.replace(/[^0-9]/g, '') : '919999999999');
 
           tr.innerHTML = `
@@ -3078,29 +3156,29 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
               </span>
             </td>
             <td>
-              <div style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); white-space: nowrap;">${lead.date || (lead.created_at ? lead.created_at.slice(0,10) : 'Today')}</div>
-              <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 3px; white-space: nowrap;">${lead.time || ''}</div>
+              <div style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); white-space: nowrap;">${safeDate}</div>
+              <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 3px; white-space: nowrap;">${safeTime}</div>
             </td>
             <td>
-              <strong style="font-size: 1.05rem; color: var(--text-primary); white-space: nowrap;">${lead.name || 'Anonymous'}</strong>
+              <strong style="font-size: 1.05rem; color: var(--text-primary); white-space: nowrap;">${safeName}</strong>
             </td>
             <td>
               <div style="font-size: 0.95rem; font-weight: 600; white-space: nowrap;">${clientPhoneDisplay}</div>
             </td>
             <td>
-              <a href="mailto:${lead.email || ''}" style="color: var(--brand-indigo); font-size: 0.92rem; font-weight: 600; text-decoration: none; white-space: nowrap;">${lead.email || '-'}</a>
+              <a href="mailto:${safeEmail}" style="color: var(--brand-indigo); font-size: 0.92rem; font-weight: 600; text-decoration: none; white-space: nowrap;">${safeEmail || '-'}</a>
             </td>
             <td>
-              <div style="font-size: 0.98rem; font-weight: 800; color: var(--text-primary);">${lead.service || lead.packageName || 'Video Project'}</div>
-              ${lead.websiteType ? `<span style="font-size: 0.8rem; font-weight: 700; color: var(--brand-indigo); background: rgba(99, 102, 241, 0.12); padding: 2px 8px; border-radius: 6px; margin-top: 4px; display: inline-block;">[${lead.websiteType}]</span>` : ''}
+              <div style="font-size: 0.98rem; font-weight: 800; color: var(--text-primary);">${safeService}</div>
+              ${safeType ? `<span style="font-size: 0.8rem; font-weight: 700; color: var(--brand-indigo); background: rgba(99, 102, 241, 0.12); padding: 2px 8px; border-radius: 6px; margin-top: 4px; display: inline-block;">[${safeType}]</span>` : ''}
             </td>
             <td>
-              <strong style="color: #10B981; font-size: 1.15rem; font-weight: 900; white-space: nowrap;">${lead.budget || lead.amount || '₹25,000+'}</strong>
-              ${lead.paymentId ? `<div style="font-size: 0.78rem; color: var(--brand-indigo); font-family: monospace; margin-top: 3px; white-space: nowrap;" title="${lead.paymentId}">💳 ${lead.paymentId.slice(0, 16)}</div>` : ''}
+              <strong style="color: #10B981; font-size: 1.15rem; font-weight: 900; white-space: nowrap;">${safeBudget}</strong>
+              ${safePaymentId ? `<div style="font-size: 0.78rem; color: var(--brand-indigo); font-family: monospace; margin-top: 3px; white-space: nowrap;" title="${safePaymentId}">💳 ${safePaymentId.slice(0, 16)}</div>` : ''}
             </td>
             <td>
               <span class="status-badge ${statusClass}" onclick="cycleCrmStatus('${lead.id}')" title="Click to cycle status">
-                ● ${lead.status || 'New'}
+                ● ${escapeHtml(lead.status || 'New')}
               </span>
             </td>
             <td>
