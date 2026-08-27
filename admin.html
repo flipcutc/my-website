@@ -1777,22 +1777,19 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
 
           <div class="form-group"><label>Hero Description Paragraph</label><textarea id="cfgHeroDesc" class="form-control" rows="3"></textarea></div>
 
-          <div class="cms-grid-2">
-            <div class="form-group">
-              <label>Showreel Preview Thumbnail Image URL</label>
-              <input type="text" id="cfgHeroImg" class="form-control">
-              <div class="image-upload-wrapper">
-                <div class="image-preview-box"><img id="previewHeroImg" src="assets/showcase-edit.jpg" alt="Hero Preview"></div>
-                <div style="flex: 1;">
-                  <label class="btn-upload-pc">
-                    <i class="fa-solid fa-upload"></i> Choose Hero Image from PC
-                    <input type="file" id="uploadHeroImgFile" accept="image/*" style="display: none;">
-                  </label>
-                  <span style="font-size: 0.78rem; color: var(--text-muted); display: block; margin-top: 4px;" id="uploadHeroStatus">Upload 1920x1080 thumbnail from your PC</span>
-                </div>
+          <div class="form-group" style="margin-bottom: 20px;">
+            <label>Hero Showcase Visual Image (Pure Showcase Card)</label>
+            <div class="image-upload-wrapper" style="margin-top: 8px;">
+              <div class="image-preview-box" style="width: 140px; height: 85px;"><img id="previewHeroImg" src="assets/showcase-edit.jpg" alt="Hero Showcase Preview"></div>
+              <div style="flex: 1;">
+                <label class="btn-upload-pc">
+                  <i class="fa-solid fa-upload"></i> Choose Hero Showcase Image from PC
+                  <input type="file" id="uploadHeroImgFile" accept="image/*" style="display: none;">
+                </label>
+                <span style="font-size: 0.78rem; color: var(--text-muted); display: block; margin-top: 4px;" id="uploadHeroStatus">Pure luxury showcase visual card &bull; Direct PC Upload (No video link needed)</span>
+                <input type="text" id="cfgHeroImg" class="form-control" style="margin-top: 8px; font-size: 0.82rem;" placeholder="assets/showcase-edit.jpg">
               </div>
             </div>
-            <div class="form-group"><label>Showreel Video Embed URL (YouTube/Vimeo)</label><input type="url" id="cfgHeroVideoUrl" class="form-control"></div>
           </div>
 
           <h3 style="margin: 24px 0 14px; font-size: 1.1rem;">Hero Live Metric Counters</h3>

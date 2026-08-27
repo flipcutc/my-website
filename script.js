@@ -149,12 +149,6 @@ function hydratePageFromCMS(customContent) {
     if (heroStat4Num && content.hero) heroStat4Num.textContent = content.hero.stat4Number || '500+';
     if (heroStat4Lbl && content.hero) heroStat4Lbl.textContent = content.hero.stat4Label || 'Videos Delivered';
 
-    const heroPlayBtn = document.getElementById('heroPlayBtn');
-    if (heroPlayBtn && content.hero) {
-      const vid = content.hero.videoEmbedUrl || 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ';
-      heroPlayBtn.dataset.video = formatMediaUrl(vid, 'video');
-    }
-
     const heroPreviewImgEl = document.getElementById('heroVideoPreviewImg') || document.querySelector('.video-screen-frame img');
     if (heroPreviewImgEl && content.hero && content.hero.videoPreviewImg) {
       heroPreviewImgEl.src = formatMediaUrl(content.hero.videoPreviewImg, 'image');
@@ -1452,13 +1446,6 @@ function hydratePageFromCMS(customContent) {
       videoModal.classList.remove('active');
       document.body.style.overflow = '';
     }
-  }
-
-  if (heroPlayBtn) {
-    heroPlayBtn.addEventListener('click', () => {
-      const vidUrl = heroPlayBtn.dataset.video || (content.hero ? content.hero.videoEmbedUrl : 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ');
-      openVideoModal(formatMediaUrl(vidUrl, 'video'));
-    });
   }
 
   if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeVideoModal);
