@@ -8,6 +8,26 @@ document.addEventListener('DOMContentLoaded', () => {
   // Load Content from Store
   let content = (typeof getSiteContent === 'function') ? getSiteContent() : DEFAULT_SITE_CONTENT;
 
+  // Real-Time 0ms Live Sync across tabs when Admin publishes
+  window.addEventListener('flipcut:cms-updated', (e) => {
+    if (e && e.detail) {
+      content = e.detail;
+      hydratePageFromCMS();
+    }
+  });
+
+  try {
+    if (typeof BroadcastChannel !== 'undefined') {
+      const bc = new BroadcastChannel('flipcut_cms_channel');
+      bc.onmessage = (msg) => {
+        if (msg && msg.data && msg.data.content) {
+          content = msg.data.content;
+          hydratePageFromCMS();
+        }
+      };
+    }
+  } catch (_) {}
+
   /* ==========================================================================
      TOAST NOTIFICATION HELPER
      ========================================================================== */

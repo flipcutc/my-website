@@ -651,6 +651,18 @@ async function saveSiteContent(content) {
     }
   }
 
+  // 3. Real-time Instant Broadcast to all open tabs & windows (0ms latency live update)
+  try {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('flipcut:cms-updated', { detail: content }));
+      if (typeof BroadcastChannel !== 'undefined') {
+        const bc = new BroadcastChannel('flipcut_cms_channel');
+        bc.postMessage({ type: 'CMS_UPDATED', content: content });
+        bc.close();
+      }
+    }
+  } catch (_) {}
+
   return localSaved || serverSaved || cloudSaved;
 }
 

@@ -26,7 +26,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=7.4">
+  <link rel="stylesheet" href="styles.css?v=8.0">
 
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -37,6 +37,9 @@
 
   <!-- Dual Cloud Sync Engine (Firebase + Supabase) -->
   <script src="firebase-sync.js?v=8.0"></script>
+
+  <!-- VIP User Profile Header Engine -->
+  <script src="user-profile.js?v=8.0"></script>
 
   <!-- Content Store & Instant Zero-Flicker Pre-Hydration -->
   <script src="content-store.js?v=8.0"></script>
@@ -413,6 +416,75 @@
       </nav>
 
       <div class="nav-actions">
+        <!-- VIP User Profile Badge & Dropdown Card (Auto-Activates on Webinar Registration / Payment) -->
+        <div class="user-profile-badge-wrap" id="headerUserProfileWrap" style="display: none;">
+          <button type="button" class="user-profile-pill-btn" id="headerUserProfileBtn" aria-label="View User Pass Profile">
+            <span class="user-avatar-circle">
+              <i class="fa-solid fa-crown"></i>
+            </span>
+            <span class="user-profile-pill-info">
+              <strong id="headerUserUidText" class="user-uid-label">FC-WEB-00000</strong>
+              <span class="user-pass-badge"><i class="fa-solid fa-circle-check"></i> VIP Pass</span>
+            </span>
+            <i class="fa-solid fa-chevron-down pill-chevron"></i>
+          </button>
+
+          <!-- Floating VIP Profile Details Card -->
+          <div class="user-profile-card-dropdown" id="headerUserProfileDropdown">
+            <div class="profile-card-header">
+              <div class="profile-card-avatar">
+                <i class="fa-solid fa-user-check"></i>
+              </div>
+              <div class="profile-card-title-group">
+                <h4 id="cardProfileName">Valued Creator</h4>
+                <span class="profile-vip-tag"><i class="fa-solid fa-star"></i> Verified Webinar Pass Holder</span>
+              </div>
+            </div>
+
+            <div class="profile-card-body">
+              <div class="profile-detail-row">
+                <span class="detail-label"><i class="fa-solid fa-id-card"></i> User Pass ID:</span>
+                <strong id="cardProfileUid" class="detail-value text-gradient font-mono">FC-WEB-00000</strong>
+              </div>
+
+              <div class="profile-detail-row">
+                <span class="detail-label"><i class="fa-solid fa-phone"></i> Mobile / WhatsApp:</span>
+                <span id="cardProfilePhone" class="detail-value">+91 00000 00000</span>
+              </div>
+
+              <div class="profile-detail-row">
+                <span class="detail-label"><i class="fa-solid fa-envelope"></i> Email:</span>
+                <span id="cardProfileEmail" class="detail-value">user@creator.in</span>
+              </div>
+
+              <div class="profile-detail-row">
+                <span class="detail-label"><i class="fa-solid fa-ticket"></i> Pass Type:</span>
+                <span id="cardProfilePassType" class="detail-value" style="color: var(--brand-indigo); font-weight: 700;">Webinar Live Pass</span>
+              </div>
+
+              <div class="profile-detail-row">
+                <span class="detail-label"><i class="fa-solid fa-receipt"></i> Payment:</span>
+                <strong id="cardProfilePaymentStatus" class="detail-value" style="color: #10B981;">✅ ₹2 Confirmed (Razorpay)</strong>
+              </div>
+            </div>
+
+            <div class="profile-card-actions">
+              <a href="#" id="cardProfileWhatsAppBtn" target="_blank" rel="noopener" class="btn btn-whatsapp" style="width: 100%; justify-content: center; padding: 10px 14px; font-size: 0.92rem; margin-bottom: 8px;">
+                <i class="fa-brands fa-whatsapp" style="font-size: 1.1rem;"></i>
+                <span>Join VIP WhatsApp Group</span>
+              </a>
+              <div style="display: flex; gap: 8px;">
+                <button type="button" class="btn btn-secondary" onclick="document.getElementById('ticketSuccessModal') && (document.getElementById('ticketSuccessModal').style.display='flex', document.getElementById('ticketSuccessModal').classList.add('active'))" style="flex: 1; justify-content: center; padding: 8px 12px; font-size: 0.82rem;">
+                  <i class="fa-solid fa-ticket"></i> View Pass
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="logoutUserProfile()" style="padding: 8px 12px; font-size: 0.82rem; color: #EF4444;" title="Sign out / Clear profile">
+                  <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Back to Home Button -->
         <a href="index.html" class="btn btn-secondary back-home-btn" title="Back to Homepage">
           <i class="fa-solid fa-arrow-left"></i>
@@ -892,6 +964,25 @@
         }).catch(() => {});
       }
 
+      // Real-time instant live sync when Admin publishes changes (0ms delay)
+      window.addEventListener('flipcut:cms-updated', (e) => {
+        if (e && e.detail) {
+          siteContent = e.detail;
+          renderWebinarData(siteContent);
+        }
+      });
+      try {
+        if (typeof BroadcastChannel !== 'undefined') {
+          const bc = new BroadcastChannel('flipcut_cms_channel');
+          bc.onmessage = (msg) => {
+            if (msg && msg.data && msg.data.content) {
+              siteContent = msg.data.content;
+              renderWebinarData(siteContent);
+            }
+          };
+        }
+      } catch (_) {}
+
       function getCurrentWebinarFee() {
         const c = (typeof getSiteContent === 'function') ? getSiteContent() : siteContent;
         const p = c?.webinar?.price;
@@ -1089,6 +1180,19 @@
 
         // Display Ticket Modal synchronously
         showTicketModal(name, websiteType, payId, generatedUserId);
+
+        // Create / Update VIP User Profile in Header across all pages
+        if (typeof window.saveUserProfile === 'function') {
+          window.saveUserProfile({
+            userId: generatedUserId,
+            name: name,
+            email: email,
+            phone: phone,
+            websiteType: websiteType,
+            paymentId: payId,
+            amount: `₹${webinarFeeAmount}`
+          });
+        }
 
         const leadPayload = {
           userId: generatedUserId,
