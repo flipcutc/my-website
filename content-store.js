@@ -713,6 +713,47 @@ function resetSiteContentToDefaults() {
   return DEFAULT_SITE_CONTENT;
 }
 
+/**
+ * Instant Zero-Stale Cache Purge Engine
+ * Automatically deletes outdated caches, dead Service Workers, and obsolete temp keys immediately
+ */
+(function() {
+  if (typeof window === 'undefined') return;
+  const CURRENT_APP_VERSION = '10.6';
+  const savedVer = localStorage.getItem('flipcut_app_version');
+
+  // Purge all legacy caches and obsolete junk keys if version bumped or on load
+  try {
+    // 1. Unregister obsolete service workers if any existed
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(regs => {
+        regs.forEach(r => r.unregister());
+      }).catch(() => {});
+    }
+
+    // 2. Clear obsolete browser CacheStorage
+    if ('caches' in window) {
+      caches.keys().then(keys => {
+        keys.forEach(k => caches.delete(k));
+      }).catch(() => {});
+    }
+
+    // 3. Clean up obsolete localStorage temporary junk keys
+    const junkPrefixes = ['temp_', 'old_', 'test_', 'debug_', 'cache_'];
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const k = localStorage.key(i);
+      if (k && junkPrefixes.some(p => k.startsWith(p))) {
+        localStorage.removeItem(k);
+      }
+    }
+
+    // 4. Record current fresh app version
+    if (savedVer !== CURRENT_APP_VERSION) {
+      localStorage.setItem('flipcut_app_version', CURRENT_APP_VERSION);
+    }
+  } catch (_) {}
+})();
+
 if (typeof module !== 'undefined') {
   module.exports = {
     DEFAULT_SITE_CONTENT,
@@ -722,3 +763,4 @@ if (typeof module !== 'undefined') {
     resetSiteContentToDefaults
   };
 }
+

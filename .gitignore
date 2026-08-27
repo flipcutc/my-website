@@ -14,9 +14,14 @@ backups/
 leads-backup.json
 site-content-backup.json
 
+# Firebase caches
+.firebase/
+.firebase/*
+
 # OS & Editor temp files
 .DS_Store
 Thumbs.db
 *.tmp
+*.log
 .vscode/
 .idea/
