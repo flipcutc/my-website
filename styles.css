@@ -2589,10 +2589,9 @@ textarea.form-control {
   }
 
   .brand-logo-img {
-    height: 50px !important;
-    max-height: 56px !important;
-    max-width: 200px !important;
-    width: auto !important;
+    max-height: 60px;
+    max-width: 200px;
+    width: auto;
     object-fit: contain;
     display: block;
   }
@@ -3105,9 +3104,8 @@ textarea.form-control {
   }
 
   .brand-logo-img {
-    height: 46px !important;
-    max-height: 50px !important;
-    max-width: 180px !important;
+    max-height: 50px;
+    max-width: 180px;
   }
 
   .hero-title {

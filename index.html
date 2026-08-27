@@ -71,14 +71,14 @@
     // Instant 0ms Pre-Hydration & Zero-Flicker Renderer
     (function() {
       try {
-        var raw = localStorage.getItem('flipcut_site_content');
+        var raw = localStorage.getItem('flipcut_cms_draft') || localStorage.getItem('flipcut_site_content');
         if (raw) {
           var data = JSON.parse(raw);
           var hideSelectors = [];
           if (data && data.sectionsVisibility) {
             var sv = data.sectionsVisibility;
             if (sv.hero === false) hideSelectors.push('#hero');
-            if (sv.runningBanner === false) hideSelectors.push('#runningBannerSection');
+            if (sv.runningBanner === false || (data.runningBanner && data.runningBanner.enabled === false)) hideSelectors.push('#runningBannerSection');
             if (sv.about === false) hideSelectors.push('#about');
             if (sv.dailyPrompts === false) hideSelectors.push('#dailyPrompts');
             if (sv.services === false) hideSelectors.push('#services');
@@ -106,14 +106,21 @@
             if (sv.contactDriveLink === false) hideSelectors.push('#contactDriveLink');
             if (sv.floatingWhatsApp === false) hideSelectors.push('#mobileFloatingWa');
             if (sv.backToTopBtn === false) hideSelectors.push('#backToTopBtn');
+          } else if (data && data.runningBanner && data.runningBanner.enabled === false) {
+            hideSelectors.push('#runningBannerSection');
           }
 
           var css = '';
           if (hideSelectors.length > 0) {
             css += hideSelectors.join(', ') + ' { display: none !important; }\n';
           }
-          if (data && data.brand && data.brand.logoUrl) {
-            css += '.brand-logo-img { content: url("' + data.brand.logoUrl + '") !important; }\n';
+          if (data && data.brand) {
+            if (data.brand.logoUrl) {
+              css += '.brand-logo-img { content: url("' + data.brand.logoUrl + '") !important; }\n';
+            }
+            if (data.brand.logoHeight) {
+              css += '.brand-logo-img { height: ' + data.brand.logoHeight + 'px !important; }\n';
+            }
           }
           if (css) {
             var s = document.createElement('style');

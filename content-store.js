@@ -24,7 +24,7 @@ const DEFAULT_SITE_CONTENT = {
     "tagline": "CREATION",
     "logoUrl": "assets/logo.png",
     "faviconUrl": "assets/favicon.svg",
-    "logoHeight": 86,
+    "logoHeight": 46,
     "headerBadge": "Open for Q3/Q4 Project Bookings & Retainers"
   },
   "hero": {

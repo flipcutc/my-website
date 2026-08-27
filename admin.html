@@ -1698,12 +1698,33 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
         <div class="cms-card">
           <div class="cms-header">
             <div>
-              <h2>Frontend Running Ticker Banner CMS</h2>
-              <p>Customize the animated infinite marquee banner running on your website.</p>
+              <h2><i class="fa-solid fa-scroll text-gradient"></i> Frontend Running Ticker Banner CMS</h2>
+              <p>Customize or toggle the animated infinite marquee banner running on your website.</p>
             </div>
-            <button class="btn btn-secondary" id="addBannerItemBtn" style="padding: 8px 16px;">
-              <i class="fa-solid fa-plus"></i> Add Ticker Phrase
-            </button>
+            <div style="display: flex; gap: 10px; align-items: center;">
+              <button class="btn btn-secondary" id="addBannerItemBtn" style="padding: 8px 16px;">
+                <i class="fa-solid fa-plus"></i> Add Ticker Phrase
+              </button>
+              <button type="button" class="btn btn-primary" onclick="window.saveAdminDraft(true)" style="padding: 8px 16px;">
+                <i class="fa-solid fa-floppy-disk"></i> Save Banner
+              </button>
+            </div>
+          </div>
+
+          <!-- Master Visibility Toggle Card for Running Banner -->
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 14px 18px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between;">
+            <div>
+              <strong style="color: var(--text-primary); font-size: 0.95rem; display: block; margin-bottom: 2px;">
+                <i class="fa-solid fa-eye text-gradient"></i> Display Running Ticker Banner on Website
+              </strong>
+              <span style="font-size: 0.82rem; color: var(--text-muted);">
+                Turn this switch OFF to completely hide the marquee ticker from the live website.
+              </span>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="cfgBannerEnabled" checked onchange="window.syncBannerToggle(this.checked)">
+              <span class="toggle-slider"></span>
+            </label>
           </div>
 
           <div id="bannerItemsEditorContainer" style="display: flex; flex-direction: column; gap: 14px;">
@@ -2874,8 +2895,12 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
           backToTopBtn: getCheck('toggleBackToTop', content.sectionsVisibility?.backToTopBtn)
         };
 
-        // Collect Running Banner Items
+        // Collect Running Banner Items & Master Toggle
         if (!content.runningBanner) content.runningBanner = { enabled: true, items: [] };
+        const bannerEnabled = getCheck('cfgBannerEnabled', getCheck('toggleSecRunningBanner', content.runningBanner?.enabled !== false));
+        content.runningBanner.enabled = bannerEnabled;
+        content.sectionsVisibility.runningBanner = bannerEnabled;
+
         const bannerIcons = document.querySelectorAll('.banner-icon');
         const bannerTexts = document.querySelectorAll('.banner-text');
         if (bannerTexts.length > 0) {
@@ -4472,6 +4497,11 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
 
       function renderBannerEditor() {
         const container = document.getElementById('bannerItemsEditorContainer');
+        const toggle = document.getElementById('cfgBannerEnabled');
+        if (toggle && content.runningBanner) {
+          const isEn = (content.runningBanner.enabled !== false) && (content.sectionsVisibility?.runningBanner !== false);
+          toggle.checked = isEn;
+        }
         if (!container) return;
         if (!content.runningBanner) {
           content.runningBanner = {
@@ -4507,6 +4537,16 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
           container.appendChild(div);
         });
       }
+
+      window.syncBannerToggle = function(checked) {
+        if (!content.runningBanner) content.runningBanner = { enabled: true, items: [] };
+        content.runningBanner.enabled = checked;
+        if (!content.sectionsVisibility) content.sectionsVisibility = {};
+        content.sectionsVisibility.runningBanner = checked;
+
+        const globalToggle = document.getElementById('toggleSecRunningBanner');
+        if (globalToggle) globalToggle.checked = checked;
+      };
 
       window.removeBannerItem = function(idx) {
         if (content.runningBanner && content.runningBanner.items) {

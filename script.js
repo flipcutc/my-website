@@ -54,8 +54,9 @@ function hydratePageFromCMS(customContent) {
       setVis('navWebinarItem', sv.navWebinarPill);
 
       // 2. All 13 Major Page Sections
+      const isBannerOn = (sv.runningBanner !== false) && (!content.runningBanner || content.runningBanner.enabled !== false);
       setVis('hero', sv.hero);
-      setVis('runningBannerSection', sv.runningBanner);
+      setVis('runningBannerSection', isBannerOn);
       setVis('about', sv.about);
       setVis('dailyPrompts', sv.dailyPrompts !== undefined ? sv.dailyPrompts : true);
       setVis('services', sv.services);
@@ -82,7 +83,13 @@ function hydratePageFromCMS(customContent) {
     }
 
     // 0.1 RUNNING MARQUEE TICKER BANNER
-    if (content.runningBanner && content.runningBanner.items && content.runningBanner.items.length > 0) {
+    const bannerSec = document.getElementById('runningBannerSection');
+    const isBannerActive = (!content.sectionsVisibility || content.sectionsVisibility.runningBanner !== false) &&
+                           (!content.runningBanner || content.runningBanner.enabled !== false);
+    if (!isBannerActive && bannerSec) {
+      bannerSec.style.display = 'none';
+    } else if (isBannerActive && bannerSec && content.runningBanner && content.runningBanner.items && content.runningBanner.items.length > 0) {
+      bannerSec.style.display = '';
       const bannerTrack = document.getElementById('runningBannerTrack');
       if (bannerTrack) {
         const createGroupHtml = () => {
@@ -1427,6 +1434,7 @@ function hydratePageFromCMS(customContent) {
     }
   }
 
+  renderFrontendDailyPrompts();
   renderFrontendPortfolio();
 
   // Category Filtering Setup
