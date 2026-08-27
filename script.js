@@ -110,8 +110,12 @@ function hydratePageFromCMS(customContent) {
     if (topBar) {
       if (!isTopAnnActive) {
         topBar.classList.add('is-hidden');
+        document.documentElement.classList.remove('has-announcement');
+        document.body.classList.remove('has-announcement');
       } else {
         topBar.classList.remove('is-hidden');
+        document.documentElement.classList.add('has-announcement');
+        document.body.classList.add('has-announcement');
         const badgeText = document.getElementById('topAnnouncementBadgeText');
         const textEl = document.getElementById('topAnnouncementText');
         const btnEl = document.getElementById('topAnnouncementCtaBtn');
@@ -1811,6 +1815,8 @@ function hydratePageFromCMS(customContent) {
     const topBar = document.getElementById('topAnnouncementBar');
     if (topBar) {
       topBar.classList.add('is-hidden');
+      document.documentElement.classList.remove('has-announcement');
+      document.body.classList.remove('has-announcement');
       try { sessionStorage.setItem('flipcut_dismiss_top_ann', '1'); } catch (_) {}
     }
   };
