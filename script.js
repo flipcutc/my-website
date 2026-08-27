@@ -1575,34 +1575,36 @@ function hydratePageFromCMS(customContent) {
   });
 
   /* ==========================================================================
-     7. INTERACTIVE FAQ ACCORDION
+     7. INTERACTIVE FAQ ACCORDION (Universal Event Delegation)
      ========================================================================== */
-  const faqItems = document.querySelectorAll('.faq-item');
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.faq-question-btn');
+    if (!btn) return;
+    const item = btn.closest('.faq-item');
+    if (!item) return;
 
-  faqItems.forEach(item => {
-    const btn = item.querySelector('.faq-question-btn');
+    e.preventDefault();
+    const wrap = item.closest('.faq-accordion-wrap') || document.getElementById('faqAccordionWrap');
     const answer = item.querySelector('.faq-answer');
+    const isActive = item.classList.contains('active');
 
-    if (btn && answer) {
-      btn.addEventListener('click', () => {
-        const isActive = item.classList.contains('active');
-
-        faqItems.forEach(otherItem => {
-          if (otherItem !== item) {
-            otherItem.classList.remove('active');
-            const otherAnswer = otherItem.querySelector('.faq-answer');
-            if (otherAnswer) otherAnswer.style.maxHeight = null;
-          }
-        });
-
-        if (isActive) {
-          item.classList.remove('active');
-          answer.style.maxHeight = null;
-        } else {
-          item.classList.add('active');
-          answer.style.maxHeight = `${answer.scrollHeight + 20}px`;
+    if (wrap) {
+      const allItems = wrap.querySelectorAll('.faq-item');
+      allItems.forEach(otherItem => {
+        if (otherItem !== item) {
+          otherItem.classList.remove('active');
+          const otherAnswer = otherItem.querySelector('.faq-answer');
+          if (otherAnswer) otherAnswer.style.maxHeight = null;
         }
       });
+    }
+
+    if (isActive) {
+      item.classList.remove('active');
+      if (answer) answer.style.maxHeight = null;
+    } else {
+      item.classList.add('active');
+      if (answer) answer.style.maxHeight = `${answer.scrollHeight + 30}px`;
     }
   });
 
