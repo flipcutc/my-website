@@ -2623,6 +2623,18 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
             <div class="form-group"><label>Project Notes Placeholder</label><input type="text" id="cfgContactNotesPh" class="form-control" placeholder="Describe your vision, target audience, preferred editing style, and deadline..."></div>
           </div>
 
+          <h3 style="margin: 20px 0 12px; font-size: 1.1rem;"><i class="fa-solid fa-clapperboard text-gradient"></i> Service / Project Type Dropdown Options (5 Options)</h3>
+          <div class="cms-grid-2">
+            <div class="form-group"><label>Option 1 (Reels / TikTok)</label><input type="text" id="cfgContactSrvOpt1" class="form-control" placeholder="Viral Short-Form (Reels / TikTok)"></div>
+            <div class="form-group"><label>Option 2 (YouTube Long-Form)</label><input type="text" id="cfgContactSrvOpt2" class="form-control" placeholder="YouTube Long-Form Production"></div>
+            <div class="form-group"><label>Option 3 (Commercial / Brand Film)</label><input type="text" id="cfgContactSrvOpt3" class="form-control" placeholder="Commercial / Brand Film"></div>
+            <div class="form-group"><label>Option 4 (Motion Graphics & 3D)</label><input type="text" id="cfgContactSrvOpt4" class="form-control" placeholder="Motion Graphics & 3D Visuals"></div>
+          </div>
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label>Option 5 (Monthly Retainer)</label>
+            <input type="text" id="cfgContactSrvOpt5" class="form-control" placeholder="Monthly Retainer Bandwidth">
+          </div>
+
           <h3 style="margin: 20px 0 12px; font-size: 1.1rem;"><i class="fa-solid fa-indian-rupee-sign text-gradient"></i> Estimated Budget Dropdown Amounts (₹ INR)</h3>
           <div class="cms-grid-2">
             <div class="form-group"><label>Budget Tier 1</label><input type="text" id="cfgContactBudget1" class="form-control" placeholder="₹10,000 - ₹25,000"></div>
@@ -3234,6 +3246,13 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
             notesLabel: getVal('cfgContactNotesLbl', content.contact.formLabels?.notesLabel || 'Project Details & Vision'),
             notesPlaceholder: getVal('cfgContactNotesPh', content.contact.formLabels?.notesPlaceholder || 'Describe your vision, target audience, preferred editing style, and deadline...')
           };
+          content.contact.serviceOptions = [
+            { value: "reels", label: getVal('cfgContactSrvOpt1', content.contact.serviceOptions?.[0]?.label || 'Viral Short-Form (Reels / TikTok)') },
+            { value: "youtube", label: getVal('cfgContactSrvOpt2', content.contact.serviceOptions?.[1]?.label || 'YouTube Long-Form Production') },
+            { value: "commercial", label: getVal('cfgContactSrvOpt3', content.contact.serviceOptions?.[2]?.label || 'Commercial / Brand Film') },
+            { value: "motion", label: getVal('cfgContactSrvOpt4', content.contact.serviceOptions?.[3]?.label || 'Motion Graphics & 3D Visuals') },
+            { value: "retainer", label: getVal('cfgContactSrvOpt5', content.contact.serviceOptions?.[4]?.label || 'Monthly Retainer Bandwidth') }
+          ];
           content.contact.budgetOptions = [
             { value: "10k-25k", label: getVal('cfgContactBudget1', content.contact.budgetOptions?.[0]?.label || '₹10,000 - ₹25,000') },
             { value: "25k-50k", label: getVal('cfgContactBudget2', content.contact.budgetOptions?.[1]?.label || '₹25,000 - ₹50,000') },
@@ -4516,6 +4535,21 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
               setVal('cfgContactDriveUrl', fl.driveLinkUrl || 'https://drive.google.com/drive/folders/1E71ZRh-3eImKRu49AcDaAyj5vqj9tuq6?usp=sharing');
               setVal('cfgContactNotesLbl', fl.notesLabel || 'Project Details & Vision');
               setVal('cfgContactNotesPh', fl.notesPlaceholder || 'Describe your vision, target audience, preferred editing style, and deadline...');
+            }
+
+            if (content.contact.serviceOptions && Array.isArray(content.contact.serviceOptions)) {
+              const s = content.contact.serviceOptions;
+              setVal('cfgContactSrvOpt1', s[0] ? s[0].label : 'Viral Short-Form (Reels / TikTok)');
+              setVal('cfgContactSrvOpt2', s[1] ? s[1].label : 'YouTube Long-Form Production');
+              setVal('cfgContactSrvOpt3', s[2] ? s[2].label : 'Commercial / Brand Film');
+              setVal('cfgContactSrvOpt4', s[3] ? s[3].label : 'Motion Graphics & 3D Visuals');
+              setVal('cfgContactSrvOpt5', s[4] ? s[4].label : 'Monthly Retainer Bandwidth');
+            } else {
+              setVal('cfgContactSrvOpt1', 'Viral Short-Form (Reels / TikTok)');
+              setVal('cfgContactSrvOpt2', 'YouTube Long-Form Production');
+              setVal('cfgContactSrvOpt3', 'Commercial / Brand Film');
+              setVal('cfgContactSrvOpt4', 'Motion Graphics & 3D Visuals');
+              setVal('cfgContactSrvOpt5', 'Monthly Retainer Bandwidth');
             }
 
             if (content.contact.budgetOptions && Array.isArray(content.contact.budgetOptions)) {
