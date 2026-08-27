@@ -987,11 +987,11 @@
       </div>
 
       <div style="display: flex; align-items: center; gap: 10px;">
-        <button type="button" class="btn btn-secondary" id="topSaveDraftBtn" style="padding: 9px 18px; font-size: 0.88rem; font-weight: 700; background: var(--bg-tertiary); border: 1.5px solid var(--border-subtle); display: flex; align-items: center; gap: 8px;">
+        <button type="button" class="btn btn-secondary" id="topSaveDraftBtn" onclick="window.saveAdminDraft && window.saveAdminDraft(true)" style="padding: 9px 18px; font-size: 0.88rem; font-weight: 700; background: var(--bg-tertiary); border: 1.5px solid var(--border-subtle); display: flex; align-items: center; gap: 8px;">
           <i class="fa-solid fa-floppy-disk" style="color: var(--brand-indigo);"></i>
           <span>Save Changes</span>
         </button>
-        <button type="button" class="btn btn-primary" id="topPublishBtn" style="padding: 9px 22px; font-size: 0.9rem; font-weight: 800; background: linear-gradient(135deg, #10B981, #059669); border: none; box-shadow: 0 4px 14px rgba(16,185,129,0.35); display: flex; align-items: center; gap: 8px;">
+        <button type="button" class="btn btn-primary" id="topPublishBtn" onclick="window.publishLiveToWebsite && window.publishLiveToWebsite()" style="padding: 9px 22px; font-size: 0.9rem; font-weight: 800; background: linear-gradient(135deg, #10B981, #059669); border: none; box-shadow: 0 4px 14px rgba(16,185,129,0.35); display: flex; align-items: center; gap: 8px;">
           <i class="fa-solid fa-rocket"></i>
           <span>Publish to Website</span>
         </button>
@@ -2670,6 +2670,28 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
   <script>
     document.addEventListener('DOMContentLoaded', () => {
 
+      // 1. Toast Notification Engine (Global and immediate)
+      function showAdminToast(msg, color = '#10B981') {
+        const toast = document.getElementById('adminToastBox');
+        const text = document.getElementById('adminToastMsg');
+        if (toast && text) {
+          text.textContent = msg;
+          toast.style.borderColor = color;
+          toast.classList.add('show');
+          toast.style.opacity = '1';
+          toast.style.visibility = 'visible';
+          toast.style.transform = 'translateY(0)';
+          clearTimeout(toast._toastTimer);
+          toast._toastTimer = setTimeout(() => {
+            toast.classList.remove('show');
+            toast.style.opacity = '0';
+            toast.style.visibility = 'hidden';
+            toast.style.transform = 'translateY(120px)';
+          }, 3500);
+        }
+      }
+      window.showAdminToast = showAdminToast;
+
       const API_BASE = (window.location.protocol.startsWith('http') && (window.location.port === '8080' || window.location.port === ''))
         ? ''
         : (window.location.protocol.startsWith('http') ? `http://${window.location.hostname}:8080` : 'http://localhost:8080');
@@ -2678,20 +2700,6 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
       let content = getSiteContent();
       let currentLeads = [];
       let cmsInputsPopulated = false;
-
-      // 1. Populate immediately on startup from local storage (0ms)
-      populateAllCmsInputs();
-      cmsInputsPopulated = true;
-
-      // 2. Automatically sync from Cloud database on startup
-      if (typeof fetchAndSyncSiteContent === 'function') {
-        fetchAndSyncSiteContent().then(latestContent => {
-          if (latestContent) {
-            content = deepMergeObjects(content, latestContent);
-            populateAllCmsInputs();
-          }
-        }).catch(err => console.warn('Could not sync content on start:', err));
-      }
 
       const PERM_SUPABASE_URL = 'https://cznixvdphwbjdnnmapvb.supabase.co';
       const PERM_SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6bml4dmRwaHdiamRubm1hcHZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTgwMTgsImV4cCI6MjEwMzEzNDAxOH0.dTLN1DCbUiBawZq8YlS5Bol-i81JFKhKpPKCboyocuQ';
@@ -5590,6 +5598,10 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
           localStorage.setItem('flipcut_site_content_backup', JSON.stringify(content));
         } catch (_) {}
 
+        if (showToast) {
+          showAdminToast('💾 All changes saved to Cloud & Local Storage! (100% Reload Safe)', '#10B981');
+        }
+
         // Save immediately to Dual Cloud (Supabase + Firebase) so reload NEVER loses it!
         try {
           if (typeof saveSiteContent === 'function') {
@@ -5598,10 +5610,8 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
           if (typeof window.saveContentToDualCloud === 'function') {
             await window.saveContentToDualCloud(content);
           }
-        } catch (_) {}
-
-        if (showToast) {
-          showAdminToast('💾 All changes saved to Cloud & Local Storage! (100% Reload Safe)', '#10B981');
+        } catch (err) {
+          console.warn('Cloud save note:', err);
         }
         return true;
       }
@@ -5610,6 +5620,15 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
       async function publishLiveToWebsite() {
         collectCMSFormData();
         
+        // Show Celebration Modal immediately
+        const pubModal = document.getElementById('publishSuccessModal');
+        if (pubModal) {
+          pubModal.style.display = 'flex';
+        }
+
+        // Show Toast Notification immediately
+        showAdminToast('🎉 Successfully published your latest update to the live website!', '#10B981');
+
         // Save to Admin Draft + Public Live Cloud
         await saveAdminDraft(false);
 
@@ -5625,19 +5644,12 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
           }
         } catch (_) {}
 
-        // Show Celebration Modal
-        const pubModal = document.getElementById('publishSuccessModal');
-        if (pubModal) {
-          pubModal.style.display = 'flex';
-        }
-
-        // Show Toast Notification
-        showAdminToast('🎉 Successfully published your latest update to the live website!', '#10B981');
         return true;
       }
 
-      window.collectAndSaveCMS = saveAdminDraft;
+      window.saveAdminDraft = saveAdminDraft;
       window.publishLiveToWebsite = publishLiveToWebsite;
+      window.collectAndSaveCMS = saveAdminDraft;
 
       const topSaveDraftBtn = document.getElementById('topSaveDraftBtn');
       if (topSaveDraftBtn) {
@@ -6087,25 +6099,16 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
       loadSupabaseConfig();
       // =========================================================================
       populateAllCmsInputs();
+      cmsInputsPopulated = true;
 
-      function showAdminToast(msg, color = 'var(--brand-indigo)') {
-        const toast = document.getElementById('adminToastBox');
-        const text = document.getElementById('adminToastMsg');
-        if (toast && text) {
-          text.textContent = msg;
-          toast.style.borderColor = color;
-          toast.classList.add('show');
-          toast.style.opacity = '1';
-          toast.style.visibility = 'visible';
-          toast.style.transform = 'translateY(0)';
-          clearTimeout(toast._toastTimer);
-          toast._toastTimer = setTimeout(() => {
-            toast.classList.remove('show');
-            toast.style.opacity = '0';
-            toast.style.visibility = 'hidden';
-            toast.style.transform = 'translateY(120px)';
-          }, 3500);
-        }
+      // Automatically sync latest published content from Cloud database
+      if (typeof fetchAndSyncSiteContent === 'function') {
+        fetchAndSyncSiteContent().then(latestContent => {
+          if (latestContent) {
+            content = deepMergeObjects(content, latestContent);
+            populateAllCmsInputs();
+          }
+        }).catch(err => console.warn('Could not sync content on start:', err));
       }
 
     });
