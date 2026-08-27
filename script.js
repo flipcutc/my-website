@@ -2153,129 +2153,163 @@ function hydratePageFromCMS(customContent) {
     paymentSuccessModal.classList.add('active');
   }
 
-  window.startPlanCheckout = async function(packageName, amount) {
+  window.startPlanCheckout = async function(packageName, rawAmount) {
     try {
-      const apiBase = (typeof getContentApiBase === 'function') ? getContentApiBase() : '';
-      // 1. Check if Razorpay is configured on server
-      let cfg = { enabled: true, keyId: 'rzp_live_TTd5UPSpFLKLor' };
-      try {
-        const cfgRes = await fetch(`${apiBase}/api/payment/config`);
-        if (cfgRes.ok) cfg = await cfgRes.json();
-      } catch (_) {}
+      const cleanPkg = packageName || 'Retainer Plan';
+      const cleanAmtStr = (rawAmount || '').toString().replace(/[^0-9]/g, '');
+      const numAmount = parseInt(cleanAmtStr, 10) || 14999;
 
-      if (!cfg.enabled || !cfg.keyId) {
-        // If not configured yet, smooth scroll to contact form with pre-filled message
+      // If Studio Enterprise or custom plan, smooth scroll to contact form with pre-filled message
+      if (cleanPkg.toLowerCase().includes('enterprise') || cleanPkg.toLowerCase().includes('custom')) {
+        const contactSec = document.getElementById('contact');
+        if (contactSec) {
+          contactSec.scrollIntoView({ behavior: 'smooth' });
+          const servEl = document.getElementById('projectService');
+          if (servEl) servEl.value = 'retainer';
+          const notesEl = document.getElementById('projectNotes');
+          if (notesEl) notesEl.value = `Hi FlipCut Studio! I want to book the ${cleanPkg} (₹${rawAmount}/month). Please get in touch for custom onboarding.`;
+          const budgetEl = document.getElementById('projectBudget');
+          if (budgetEl) budgetEl.value = '50k-100k';
+          const nameEl = document.getElementById('clientName');
+          if (nameEl) nameEl.focus();
+        }
+        showToast(`Selected ${cleanPkg}! Please enter your contact details below to finalize booking.`, 'var(--brand-indigo)');
+        return;
+      }
+
+      // Check for user profile or form input
+      let clientName = '';
+      let clientPhone = '';
+      let clientEmail = '';
+
+      if (window.userProfile) {
+        clientName = window.userProfile.name || '';
+        clientPhone = window.userProfile.phone || '';
+        clientEmail = window.userProfile.email || '';
+      }
+      if (!clientName) {
+        const nInput = document.getElementById('clientName');
+        if (nInput && nInput.value.trim()) clientName = nInput.value.trim();
+      }
+      if (!clientPhone) {
+        const pInput = document.getElementById('clientPhone');
+        if (pInput && pInput.value.trim()) clientPhone = pInput.value.trim();
+      }
+      if (!clientEmail) {
+        const eInput = document.getElementById('clientEmail');
+        if (eInput && eInput.value.trim()) clientEmail = eInput.value.trim();
+      }
+
+      // Get Razorpay Key from CMS content or default live key
+      const razorpayKey = (content && content.paymentGateway && content.paymentGateway.razorpayKeyId) ? content.paymentGateway.razorpayKeyId : 'rzp_live_TTd5UPSpFLKLor';
+
+      // Check if Razorpay SDK is loaded
+      if (typeof window.Razorpay !== 'function') {
+        await new Promise((resolve) => {
+          const script = document.createElement('script');
+          script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+          script.onload = resolve;
+          script.onerror = resolve;
+          document.head.appendChild(script);
+        });
+      }
+
+      if (typeof window.Razorpay !== 'function') {
+        // Fallback: smooth scroll to contact with prefill
         const contactSec = document.getElementById('contact');
         if (contactSec) {
           contactSec.scrollIntoView({ behavior: 'smooth' });
           const notesEl = document.getElementById('projectNotes');
-          if (notesEl) notesEl.value = `Hi FlipCut Studio! I want to book the ${packageName} plan (₹${amount}/month). Please get in touch.`;
-          const budgetEl = document.getElementById('projectBudget');
-          if (budgetEl) budgetEl.value = '50k-100k';
+          if (notesEl) notesEl.value = `Hi FlipCut Studio! I want to book the ${cleanPkg} (₹${rawAmount}/month). Please get in touch.`;
         }
-        showToast(`Selected ${packageName}! Please submit your contact details below to finalize booking.`, 'var(--brand-indigo)');
+        showToast(`Selected ${cleanPkg}! Please submit your details below.`, 'var(--brand-indigo)');
         return;
       }
 
-      // Prompt client name & phone for seamless receipting (optional quick prompt)
-      let clientName = prompt(`Enter your name or brand for ${packageName} booking:`, '');
-      if (clientName === null) return; // User cancelled
-      clientName = clientName.trim() || 'FlipCut Creator';
+      showToast('Opening secure Razorpay checkout...', 'var(--brand-indigo)');
 
-      let clientPhone = prompt('Enter your WhatsApp number for invoice & project onboarding:', '');
-      if (clientPhone === null) return;
-      clientPhone = clientPhone.trim();
-
-      showToast('Initiating secure Razorpay checkout...', 'var(--brand-indigo)');
-
-      // 2. Create Order on backend
-      const orderRes = await fetch(`${apiBase}/api/payment/create-order`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          amount: amount,
-          packageName: packageName,
-          clientName: clientName,
-          clientPhone: clientPhone
-        })
-      });
-
-      const orderData = await orderRes.json();
-      if (!orderData.success) {
-        showToast(`Checkout Error: ${orderData.message}`, '#EF4444');
-        return;
-      }
-
-      // 3. Open Razorpay Checkout Popup
       const options = {
-        key: orderData.keyId,
-        amount: orderData.order.amount,
-        currency: orderData.order.currency,
+        key: razorpayKey,
+        amount: numAmount * 100, // in paise
+        currency: "INR",
         name: "FlipCut Creation",
-        description: `Booking: ${packageName} (₹${amount})`,
+        description: `Booking: ${cleanPkg} (₹${rawAmount})`,
         image: "assets/logo.png",
-        order_id: orderData.order.id,
         prefill: {
-          name: clientName,
-          contact: clientPhone
+          name: clientName || '',
+          contact: clientPhone || '',
+          email: clientEmail || ''
         },
         notes: {
-          packageName: packageName,
-          clientName: clientName,
-          clientPhone: clientPhone
+          packageName: cleanPkg,
+          amount: `₹${rawAmount}`
         },
         theme: {
-          color: "#4F46E5"
-        },
-        handler: async function(response) {
-          // 4. Verify Signature on Backend
-          let generatedUserId = 'FC-PAY-' + Math.floor(10000 + Math.random() * 90000);
-          try {
-            const verifyRes = await fetch(`${apiBase}/api/payment/verify`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_signature: response.razorpay_signature,
-                leadData: {
-                  name: clientName,
-                  phone: clientPhone,
-                  service: packageName,
-                  amount: amount,
-                  packageName: packageName
-                }
-              })
-            });
-
-            const verifyData = await verifyRes.json();
-            if (verifyData.success) {
-              if (verifyData.userId) generatedUserId = verifyData.userId;
-              showPaymentSuccessModal(packageName, amount, response.razorpay_payment_id, response.razorpay_order_id, clientName, clientPhone, generatedUserId);
-            } else {
-              showToast('Payment verification failed. Please contact support.', '#EF4444');
-            }
-          } catch (e) {
-            showPaymentSuccessModal(packageName, amount, response.razorpay_payment_id, response.razorpay_order_id, clientName, clientPhone, generatedUserId);
-          }
+          color: "#6366F1"
         },
         modal: {
           ondismiss: function() {
             showToast('Payment window closed.', 'var(--text-muted)');
           }
+        },
+        handler: function(response) {
+          if (response && response.razorpay_payment_id) {
+            const paymentId = response.razorpay_payment_id;
+            const generatedUserId = 'FC-PAY-' + Math.floor(10000 + Math.random() * 90000);
+
+            // Save user profile in header engine
+            if (typeof window.saveUserProfile === 'function') {
+              window.saveUserProfile({
+                userId: generatedUserId,
+                name: clientName || 'FlipCut Creator',
+                phone: clientPhone || '',
+                email: clientEmail || '',
+                packageName: cleanPkg,
+                paymentId: paymentId,
+                amount: `₹${rawAmount}`
+              });
+            }
+
+            // Sync lead to Dual Cloud (Firestore + Supabase) non-blockingly
+            if (typeof window.pushLeadToDualCloud === 'function') {
+              window.pushLeadToDualCloud({
+                id: generatedUserId,
+                userId: generatedUserId,
+                name: clientName || 'FlipCut Creator',
+                phone: clientPhone || '',
+                email: clientEmail || '',
+                service: cleanPkg,
+                budget: `₹${rawAmount}/mo`,
+                message: `Retainer Plan Booking: ${cleanPkg}`,
+                status: 'Paid & Verified (Razorpay)',
+                paymentId: paymentId
+              }).catch(() => {});
+            }
+
+            showPaymentSuccessModal(cleanPkg, rawAmount, paymentId, response.razorpay_order_id, clientName, clientPhone, generatedUserId);
+            showToast('✅ Payment Verified! Welcome to FlipCut Studio!', '#10B981');
+          } else {
+            showToast('Payment verification pending. Please contact support.', '#EF4444');
+          }
         }
       };
 
-      if (window.Razorpay) {
-        const rzp = new window.Razorpay(options);
-        rzp.open();
-      } else {
-        showToast('Razorpay SDK loading... Please retry in a second.', '#EF4444');
-      }
+      const rzp = new window.Razorpay(options);
+      rzp.on('payment.failed', function(response) {
+        const errDesc = response?.error?.description || 'Payment was not completed';
+        showToast(`❌ Payment Issue: ${errDesc}`, '#EF4444');
+      });
+      rzp.open();
 
     } catch (err) {
-      console.error('Razorpay error:', err);
-      showToast(`Payment error: ${err.message}`, '#EF4444');
+      console.error('Plan checkout error:', err);
+      const contactSec = document.getElementById('contact');
+      if (contactSec) {
+        contactSec.scrollIntoView({ behavior: 'smooth' });
+        const notesEl = document.getElementById('projectNotes');
+        if (notesEl) notesEl.value = `Hi FlipCut Studio! I want to book the ${packageName || 'Plan'} (₹${rawAmount || ''}).`;
+      }
+      showToast(`Selected ${packageName || 'Plan'}! Please submit your details below.`, 'var(--brand-indigo)');
     }
   };
 
