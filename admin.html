@@ -43,7 +43,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=13.2">
+  <link rel="stylesheet" href="styles.css?v=13.3">
   
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -3056,7 +3056,7 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
 
   <!-- Toast Notification Box -->
   <div class="toast-box" id="adminToastBox">
-    <i class="fa-solid fa-circle-check" style="color: #10B981; font-size: 1.3rem;"></i>
+            <i class="fa-solid fa-circle-check" style="color: #10B981; font-size: 1.3rem;"></i>
     <span id="adminToastMsg">Changes published to live website!</span>
   </div>
 
@@ -3065,10 +3065,10 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- Dual Cloud Sync Engine (Firebase + Supabase) -->
-  <script src="firebase-sync.js?v=13.2"></script>
+  <script src="firebase-sync.js?v=13.3"></script>
 
   <!-- CMS & SQL Engine Script -->
-  <script src="content-store.js?v=13.2"></script>
+  <script src="content-store.js?v=13.3"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
 
@@ -3513,6 +3513,13 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
           content.webinar.formSubtitle = getVal('cfgWebinarFormSubtitle', content.webinar.formSubtitle || '');
           content.webinar.whatsappGroupLink = getVal('cfgWebinarWaGroupLink', content.webinar.whatsappGroupLink || 'https://chat.whatsapp.com/B5hdxy7LbkNCrWRsHMtW8h');
           content.webinar.whatsappGroupMsg = getVal('cfgWebinarWaMsg', content.webinar.whatsappGroupMsg || '');
+          content.webinar.liveStatus = getVal('cfgWebinarLiveStatus', content.webinar.liveStatus || 'offline');
+          let ytVal = getVal('cfgWebinarLiveYtId', content.webinar.liveYoutubeId || '');
+          if (ytVal.includes('v=')) { const m = ytVal.match(/v=([a-zA-Z0-9_-]+)/); if (m) ytVal = m[1]; }
+          else if (ytVal.includes('youtu.be/')) { const m = ytVal.match(/youtu\.be\/([a-zA-Z0-9_-]+)/); if (m) ytVal = m[1]; }
+          content.webinar.liveYoutubeId = ytVal;
+          content.webinar.liveScheduledTime = getVal('cfgWebinarLiveTime', content.webinar.liveScheduledTime || 'Sunday, 9:00 AM IST');
+          content.webinar.liveDriveUrl = getVal('cfgWebinarLiveDriveUrl', content.webinar.liveDriveUrl || 'https://drive.google.com');
         }
       }
 
