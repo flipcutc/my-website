@@ -137,10 +137,13 @@ async function fetchLeadsFromDualCloud() {
         rows.forEach(r => {
           if (r.id && r.id !== 'CMS_SITE_CONTENT_LIVE') {
             const isWebinar = (r.service || '').toLowerCase().includes('webinar') || (r.id || '').startsWith('FC-WEB') || r.status === 'Booked / Paid';
+            const isWaJoined = r.whatsappJoined === true || r.waGroupStatus === 'Joined' || (r.message && r.message.includes('WhatsApp Group Joined'));
             mergedMap.set(r.id, {
               ...r,
               userId: r.id,
               notes: r.message,
+              whatsappJoined: isWaJoined,
+              waGroupStatus: isWaJoined ? 'Joined' : (r.waGroupStatus || 'Not Joined'),
               paymentStatus: r.paymentStatus || (isWebinar ? 'Paid & Verified (Razorpay)' : 'Inquiry / Quote Request'),
               paymentId: r.paymentId || (isWebinar ? (r.paymentId || 'rzp_verified_pass') : ''),
               date: r.date || (r.created_at ? r.created_at.slice(0, 10) : new Date().toISOString().slice(0, 10))
