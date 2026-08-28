@@ -56,7 +56,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=13.4">
+  <link rel="stylesheet" href="styles.css?v=13.5">
 
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -69,13 +69,13 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- Dual Cloud Sync Engine (Firebase + Supabase) -->
-  <script src="firebase-sync.js?v=13.4"></script>
+  <script src="firebase-sync.js?v=13.5"></script>
 
   <!-- VIP User Profile Header Engine -->
-  <script src="user-profile.js?v=13.4"></script>
+  <script src="user-profile.js?v=13.5"></script>
 
   <!-- Content Store & Instant Zero-Flicker Pre-Hydration -->
-  <script src="content-store.js?v=13.4"></script>
+  <script src="content-store.js?v=13.5"></script>
   <script>
     (function() {
       try {
@@ -748,16 +748,21 @@
       
       <!-- Verified User Status Header -->
       <div style="background: rgba(15, 23, 42, 0.95); border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
-        <div style="display: flex; align-items: center; gap: 10px;">
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
           <span style="background: rgba(16, 185, 129, 0.15); border: 1px solid #10B981; color: #34D399; font-size: 0.76rem; font-weight: 800; padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px;">
             <i class="fa-solid fa-gem"></i> VIP PASS VERIFIED
           </span>
           <strong id="vipUnlockedUserName" style="color: #FFF; font-size: 0.92rem;">Creator</strong>
           <span id="vipUnlockedUserId" style="font-family: monospace; color: #818CF8; font-size: 0.85rem; font-weight: 700;">(FC-WEB-00000)</span>
         </div>
-        <button type="button" onclick="lockVipLivePlayer()" class="btn btn-secondary" style="padding: 5px 12px; font-size: 0.76rem;" title="Switch User ID">
-          <i class="fa-solid fa-arrow-right-from-bracket"></i> <span>Switch ID</span>
-        </button>
+        <div style="display: flex; gap: 8px;">
+          <a href="#" id="vipDirectYtBtnTop" target="_blank" rel="noopener" class="btn btn-primary" style="padding: 6px 14px; font-size: 0.78rem; font-weight: 800; background: linear-gradient(135deg, #EF4444, #DC2626); border-color: #EF4444; box-shadow: 0 4px 12px rgba(239,68,68,0.35);">
+            <i class="fa-brands fa-youtube"></i> <span>Open YouTube Live</span>
+          </a>
+          <button type="button" onclick="lockVipLivePlayer()" class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.76rem;" title="Switch User ID">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          </button>
+        </div>
       </div>
 
       <!-- Video Viewport Container -->
@@ -1410,7 +1415,7 @@
               window.saveUserProfile(userObj);
             }
 
-            unlockVipLivePlayer(userObj);
+            unlockVipLivePlayer(userObj, true);
             if (typeof showToast === 'function') {
               showToast(`🔓 VIP Live Player unlocked for ${userObj.name}!`, '#10B981');
             }
@@ -1426,7 +1431,7 @@
       // Local check fallback
       const localProfile = (typeof window.getUserProfile === 'function') ? window.getUserProfile() : null;
       if (localProfile && (localProfile.userId?.toLowerCase() === val.toLowerCase() || localProfile.phone?.includes(val))) {
-        unlockVipLivePlayer(localProfile);
+        unlockVipLivePlayer(localProfile, true);
         if (typeof showToast === 'function') {
           showToast(`🔓 VIP Live Player unlocked for ${localProfile.name}!`, '#10B981');
         }
@@ -1446,52 +1451,63 @@
       }
     };
 
-    window.unlockVipLivePlayer = function(user) {
-      const gateLocked = document.getElementById('vipLiveGateLocked');
-      const playerUnlocked = document.getElementById('vipLivePlayerUnlocked');
-      const userNameElem = document.getElementById('vipUnlockedUserName');
-      const userIdElem = document.getElementById('vipUnlockedUserId');
-      const iframe = document.getElementById('vipLiveIframe');
-      const countdownBox = document.getElementById('vipLiveCountdownBox');
-      const schedTimeElem = document.getElementById('vipLiveScheduleTimeText');
-      const driveBtn = document.getElementById('vipLiveDriveBtn');
-      const waBtn = document.getElementById('vipLiveWhatsAppBtn');
+    window.unlockVipLivePlayer = function(user, shouldOpenTab = false) {
+        const gateLocked = document.getElementById('vipLiveGateLocked');
+        const playerUnlocked = document.getElementById('vipLivePlayerUnlocked');
+        const userNameElem = document.getElementById('vipUnlockedUserName');
+        const userIdElem = document.getElementById('vipUnlockedUserId');
+        const iframe = document.getElementById('vipLiveIframe');
+        const countdownBox = document.getElementById('vipLiveCountdownBox');
+        const schedTimeElem = document.getElementById('vipLiveScheduleTimeText');
+        const driveBtn = document.getElementById('vipLiveDriveBtn');
+        const waBtn = document.getElementById('vipLiveWhatsAppBtn');
+        const ytDirectTop = document.getElementById('vipDirectYtBtnTop');
 
-      if (gateLocked) gateLocked.style.display = 'none';
-      if (playerUnlocked) playerUnlocked.style.display = 'block';
+        if (gateLocked) gateLocked.style.display = 'none';
+        if (playerUnlocked) playerUnlocked.style.display = 'block';
 
-      if (userNameElem) userNameElem.textContent = user.name || 'VIP Attendee';
-      if (userIdElem) userIdElem.textContent = '(' + (user.userId || 'FC-WEB-00000') + ')';
+        if (userNameElem) userNameElem.textContent = user.name || 'VIP Attendee';
+        if (userIdElem) userIdElem.textContent = '(' + (user.userId || 'FC-WEB-00000') + ')';
 
-      // Load live stream configuration from content store
-      const liveCfg = (typeof getSiteContent === 'function') ? getSiteContent()?.webinar : (window.flipcutSiteContent?.webinar || {});
-      const liveStatus = liveCfg?.liveStatus || 'offline';
-      let ytId = liveCfg?.liveYoutubeId || '';
-      if (ytId.includes('v=')) { const m = ytId.match(/v=([a-zA-Z0-9_-]+)/); if (m) ytId = m[1]; }
-      else if (ytId.includes('youtu.be/')) { const m = ytId.match(/youtu\.be\/([a-zA-Z0-9_-]+)/); if (m) ytId = m[1]; }
+        // Load live stream configuration from content store
+        const liveCfg = (typeof getSiteContent === 'function') ? getSiteContent()?.webinar : (window.flipcutSiteContent?.webinar || {});
+        const liveStatus = liveCfg?.liveStatus || 'offline';
+        let ytId = liveCfg?.liveYoutubeId || '';
+        if (ytId.includes('v=')) { const m = ytId.match(/v=([a-zA-Z0-9_-]+)/); if (m) ytId = m[1]; }
+        else if (ytId.includes('youtu.be/')) { const m = ytId.match(/youtu\.be\/([a-zA-Z0-9_-]+)/); if (m) ytId = m[1]; }
 
-      const schedTime = liveCfg?.liveScheduledTime || 'Sunday, 9:00 AM IST';
-      const driveUrl = liveCfg?.liveDriveUrl || 'https://drive.google.com';
-      const waLink = liveCfg?.whatsappGroupLink || 'https://chat.whatsapp.com/B5hdxy7LbkNCrWRsHMtW8h';
+        const schedTime = liveCfg?.liveScheduledTime || 'Sunday, 9:00 AM IST';
+        const driveUrl = liveCfg?.liveDriveUrl || 'https://drive.google.com';
+        const waLink = liveCfg?.whatsappGroupLink || 'https://chat.whatsapp.com/B5hdxy7LbkNCrWRsHMtW8h';
 
-      if (schedTimeElem) schedTimeElem.textContent = schedTime;
-      if (driveBtn) driveBtn.href = driveUrl;
-      if (waBtn) waBtn.href = waLink;
+        if (schedTimeElem) schedTimeElem.textContent = schedTime;
+        if (driveBtn) driveBtn.href = driveUrl;
+        if (waBtn) waBtn.href = waLink;
 
-      if ((liveStatus === 'live' || liveStatus === 'replay') && ytId) {
-        if (iframe) {
-          iframe.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(ytId)}?autoplay=1&modestbranding=1&rel=0&playsinline=1`;
-          iframe.style.display = 'block';
+        let liveFullUrl = ytId ? (ytId.startsWith('http') ? ytId : `https://www.youtube.com/watch?v=${encodeURIComponent(ytId)}`) : 'https://www.youtube.com';
+        if (ytDirectTop) {
+          ytDirectTop.href = liveFullUrl;
         }
-        if (countdownBox) countdownBox.style.display = 'none';
-      } else {
-        if (iframe) {
-          iframe.src = '';
-          iframe.style.display = 'none';
+
+        if ((liveStatus === 'live' || liveStatus === 'replay') && ytId) {
+          if (iframe) {
+            iframe.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(ytId)}?autoplay=1&modestbranding=1&rel=0&playsinline=1`;
+            iframe.style.display = 'block';
+          }
+          if (countdownBox) countdownBox.style.display = 'none';
+
+          // Direct Open YouTube Live in New Tab / App
+          if (shouldOpenTab && liveFullUrl) {
+            window.open(liveFullUrl, '_blank');
+          }
+        } else {
+          if (iframe) {
+            iframe.src = '';
+            iframe.style.display = 'none';
+          }
+          if (countdownBox) countdownBox.style.display = 'block';
         }
-        if (countdownBox) countdownBox.style.display = 'block';
-      }
-    };
+      };
 
     window.lockVipLivePlayer = function() {
       const gateLocked = document.getElementById('vipLiveGateLocked');
