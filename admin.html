@@ -43,7 +43,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=11.0">
+  <link rel="stylesheet" href="styles.css?v=11.1">
   
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -1142,6 +1142,29 @@
                 <!-- Populated dynamically from SQL API -->
               </tbody>
             </table>
+          </div>
+
+          <!-- CRM Leads Pagination Bar (15 entries per page) -->
+          <div id="crmPaginationWrap" style="display: flex; justify-content: space-between; align-items: center; padding: 16px 4px 4px; margin-top: 12px; border-top: 1px solid var(--border-subtle); flex-wrap: wrap; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+              <span id="crmPaginationInfo" style="font-size: 0.88rem; color: var(--text-muted); font-weight: 600;">
+                Showing <strong>1–15</strong> of <strong>0</strong> leads
+              </span>
+              <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--text-muted);">
+                <span>Rows per page:</span>
+                <select id="crmPerPageSelect" class="form-control" style="width: auto; padding: 4px 8px; font-size: 0.82rem; cursor: pointer;">
+                  <option value="15" selected>15 (Default)</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Page Buttons (Previous, 1, 2, 3..., Next) -->
+            <div id="crmPaginationControls" style="display: flex; align-items: center; gap: 6px;">
+              <!-- Dynamic page buttons rendered in JS -->
+            </div>
           </div>
         </div>
 
@@ -2948,10 +2971,10 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- Dual Cloud Sync Engine (Firebase + Supabase) -->
-  <script src="firebase-sync.js?v=11.0"></script>
+  <script src="firebase-sync.js?v=11.1"></script>
 
   <!-- CMS & SQL Engine Script -->
-  <script src="content-store.js?v=11.0"></script>
+  <script src="content-store.js?v=11.1"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
 
@@ -3912,6 +3935,110 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
           .replace(/'/g, '&#039;');
       }
 
+      let crmCurrentPage = 1;
+      let crmItemsPerPage = 15;
+
+      function renderPaginationControls(totalPages) {
+        const container = document.getElementById('crmPaginationControls');
+        if (!container) return;
+        container.innerHTML = '';
+
+        if (totalPages <= 1) return;
+
+        // Previous Button
+        const prevBtn = document.createElement('button');
+        prevBtn.type = 'button';
+        prevBtn.className = 'btn btn-secondary';
+        prevBtn.style.padding = '5px 12px';
+        prevBtn.style.fontSize = '0.82rem';
+        prevBtn.innerHTML = '<i class="fa-solid fa-chevron-left"></i> <span>Prev</span>';
+        prevBtn.disabled = (crmCurrentPage <= 1);
+        prevBtn.style.opacity = (crmCurrentPage <= 1) ? '0.5' : '1';
+        prevBtn.style.cursor = (crmCurrentPage <= 1) ? 'not-allowed' : 'pointer';
+        prevBtn.addEventListener('click', () => {
+          if (crmCurrentPage > 1) {
+            crmCurrentPage--;
+            renderCrmTable();
+            const wrap = document.getElementById('crmPaginationWrap');
+            if (wrap) wrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+        });
+        container.appendChild(prevBtn);
+
+        // Page Number Generator with Smart Ellipsis Window
+        let startP = Math.max(1, crmCurrentPage - 2);
+        let endP = Math.min(totalPages, startP + 4);
+        if (endP - startP < 4) {
+          startP = Math.max(1, endP - 4);
+        }
+
+        const makePageBtn = (pNum) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          const isActive = (pNum === crmCurrentPage);
+          btn.className = isActive ? 'btn btn-primary' : 'btn btn-secondary';
+          btn.style.padding = '5px 11px';
+          btn.style.fontSize = '0.82rem';
+          btn.style.minWidth = '34px';
+          btn.style.fontWeight = isActive ? '800' : '600';
+          if (isActive) {
+            btn.style.boxShadow = '0 2px 8px rgba(99, 102, 241, 0.35)';
+          }
+          btn.textContent = String(pNum);
+          btn.addEventListener('click', () => {
+            crmCurrentPage = pNum;
+            renderCrmTable();
+          });
+          return btn;
+        };
+
+        if (startP > 1) {
+          container.appendChild(makePageBtn(1));
+          if (startP > 2) {
+            const dots = document.createElement('span');
+            dots.textContent = '...';
+            dots.style.padding = '0 4px';
+            dots.style.color = 'var(--text-muted)';
+            container.appendChild(dots);
+          }
+        }
+
+        for (let i = startP; i <= endP; i++) {
+          container.appendChild(makePageBtn(i));
+        }
+
+        if (endP < totalPages) {
+          if (endP < totalPages - 1) {
+            const dots = document.createElement('span');
+            dots.textContent = '...';
+            dots.style.padding = '0 4px';
+            dots.style.color = 'var(--text-muted)';
+            container.appendChild(dots);
+          }
+          container.appendChild(makePageBtn(totalPages));
+        }
+
+        // Next Button
+        const nextBtn = document.createElement('button');
+        nextBtn.type = 'button';
+        nextBtn.className = 'btn btn-secondary';
+        nextBtn.style.padding = '5px 12px';
+        nextBtn.style.fontSize = '0.82rem';
+        nextBtn.innerHTML = '<span>Next</span> <i class="fa-solid fa-chevron-right"></i>';
+        nextBtn.disabled = (crmCurrentPage >= totalPages);
+        nextBtn.style.opacity = (crmCurrentPage >= totalPages) ? '0.5' : '1';
+        nextBtn.style.cursor = (crmCurrentPage >= totalPages) ? 'not-allowed' : 'pointer';
+        nextBtn.addEventListener('click', () => {
+          if (crmCurrentPage < totalPages) {
+            crmCurrentPage++;
+            renderCrmTable();
+            const wrap = document.getElementById('crmPaginationWrap');
+            if (wrap) wrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+        });
+        container.appendChild(nextBtn);
+      }
+
       function renderCrmTable() {
         const query = (crmSearchInput ? crmSearchInput.value : '').toLowerCase();
         const statusVal = crmStatusFilter ? crmStatusFilter.value : 'all';
@@ -3959,6 +4086,32 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
           kpiPipelineVal.textContent = `₹${totalPipeline.toLocaleString('en-IN')}`;
         }
 
+        // Pagination Calculations (15 entries per page)
+        const totalItems = filtered.length;
+        const totalPages = Math.ceil(totalItems / crmItemsPerPage) || 1;
+        if (crmCurrentPage > totalPages) crmCurrentPage = totalPages;
+        if (crmCurrentPage < 1) crmCurrentPage = 1;
+
+        const startIndex = (crmCurrentPage - 1) * crmItemsPerPage;
+        const endIndex = Math.min(startIndex + crmItemsPerPage, totalItems);
+        const pagedLeads = filtered.slice(startIndex, endIndex);
+
+        // Update Pagination Info
+        const infoEl = document.getElementById('crmPaginationInfo');
+        const paginationWrap = document.getElementById('crmPaginationWrap');
+        if (infoEl) {
+          if (totalItems === 0) {
+            infoEl.innerHTML = `Showing <strong>0</strong> leads`;
+          } else {
+            infoEl.innerHTML = `Showing <strong>${startIndex + 1}–${endIndex}</strong> of <strong>${totalItems}</strong> leads (Page ${crmCurrentPage} of ${totalPages})`;
+          }
+        }
+        if (paginationWrap) {
+          paginationWrap.style.display = (totalItems > 0) ? 'flex' : 'none';
+        }
+
+        renderPaginationControls(totalPages);
+
         if (filtered.length === 0) {
           crmTableBody.innerHTML = `
             <tr>
@@ -3970,7 +4123,7 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
           return;
         }
 
-        filtered.forEach(lead => {
+        pagedLeads.forEach(lead => {
           const tr = document.createElement('tr');
 
           let statusClass = 'status-new';
@@ -4428,9 +4581,29 @@ We look forward to seeing you live in the masterclass!
         showAdminToast('Refreshed leads from SQL database.');
       });
 
-      crmSearchInput.addEventListener('input', renderCrmTable);
-      crmStatusFilter.addEventListener('change', renderCrmTable);
-      if (crmMonthFilter) crmMonthFilter.addEventListener('change', renderCrmTable);
+      crmSearchInput.addEventListener('input', () => {
+        crmCurrentPage = 1;
+        renderCrmTable();
+      });
+      crmStatusFilter.addEventListener('change', () => {
+        crmCurrentPage = 1;
+        renderCrmTable();
+      });
+      if (crmMonthFilter) {
+        crmMonthFilter.addEventListener('change', () => {
+          crmCurrentPage = 1;
+          renderCrmTable();
+        });
+      }
+
+      const crmPerPageSelect = document.getElementById('crmPerPageSelect');
+      if (crmPerPageSelect) {
+        crmPerPageSelect.addEventListener('change', (e) => {
+          crmItemsPerPage = parseInt(e.target.value, 10) || 15;
+          crmCurrentPage = 1;
+          renderCrmTable();
+        });
+      }
 
       document.getElementById('exportCsvBtn').addEventListener('click', () => {
         if (currentLeads.length === 0) {
