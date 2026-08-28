@@ -43,7 +43,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=11.3">
+  <link rel="stylesheet" href="styles.css?v=11.4">
   
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -2944,6 +2944,93 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
     </div>
   </div>
 
+  <!-- Permanent Admin Lead Edit Modal -->
+  <div class="lightbox-modal" id="adminEditLeadModal">
+    <div class="lightbox-content-box" style="max-width: 580px; background: var(--bg-surface); border-radius: var(--radius-lg); border: 2px solid var(--brand-indigo); box-shadow: 0 25px 60px rgba(0,0,0,0.6); padding: 28px 24px; text-align: left;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 12px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 42px; height: 42px; border-radius: 50%; background: rgba(99, 102, 241, 0.15); color: var(--brand-indigo); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+            <i class="fa-solid fa-pen-to-square"></i>
+          </div>
+          <div>
+            <h3 style="margin: 0; font-size: 1.2rem; color: var(--text-primary);">Edit Customer & Lead Details</h3>
+            <span style="font-size: 0.8rem; color: var(--text-muted);">Admin Permanent Edit (Syncs to Cloud Database)</span>
+          </div>
+        </div>
+        <button type="button" onclick="closeAdminEditLeadModal()" class="modal-close-btn" style="position: static; transform: none;">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="adminEditLeadForm" onsubmit="handleAdminEditLeadSubmit(event)">
+        <input type="hidden" id="adminEditLeadId">
+
+        <div class="cms-grid-2" style="margin-bottom: 12px;">
+          <div class="form-group">
+            <label style="font-size: 0.82rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px; display: block;">Customer Name</label>
+            <input type="text" id="adminEditLeadName" class="form-control" required style="font-size: 0.88rem; padding: 8px 12px;">
+          </div>
+          <div class="form-group">
+            <label style="font-size: 0.82rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px; display: block;">Mobile Number</label>
+            <input type="tel" id="adminEditLeadPhone" class="form-control" required style="font-size: 0.88rem; padding: 8px 12px;">
+          </div>
+        </div>
+
+        <div class="cms-grid-2" style="margin-bottom: 12px;">
+          <div class="form-group">
+            <label style="font-size: 0.82rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px; display: block;">Email Address</label>
+            <input type="email" id="adminEditLeadEmail" class="form-control" style="font-size: 0.88rem; padding: 8px 12px;">
+          </div>
+          <div class="form-group">
+            <label style="font-size: 0.82rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px; display: block;">Website Type / Plan</label>
+            <select id="adminEditLeadWebsiteType" class="form-control" style="font-size: 0.88rem; padding: 8px 12px;">
+              <option value="E-commerce">E-commerce</option>
+              <option value="Portfolio">Portfolio</option>
+              <option value="Corporate">Corporate / Business</option>
+              <option value="Agency">Agency / Studio</option>
+              <option value="Personal">Personal Brand / Creator</option>
+              <option value="Custom Project">Custom Project</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="cms-grid-2" style="margin-bottom: 12px;">
+          <div class="form-group">
+            <label style="font-size: 0.82rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px; display: block;">Amount / Budget (₹)</label>
+            <input type="text" id="adminEditLeadAmount" class="form-control" style="font-size: 0.88rem; padding: 8px 12px;">
+          </div>
+          <div class="form-group">
+            <label style="font-size: 0.82rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px; display: block;">Pipeline Status</label>
+            <select id="adminEditLeadStatus" class="form-control" style="font-size: 0.88rem; padding: 8px 12px;">
+              <option value="New">New</option>
+              <option value="Contacted">Contacted</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Booked / Paid">Booked / Paid</option>
+              <option value="Completed">Completed</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label style="font-size: 0.82rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px; display: block;">Payment ID / UPI Ref</label>
+          <input type="text" id="adminEditLeadPayId" class="form-control" placeholder="pay_xxx or UPI UTR" style="font-size: 0.88rem; padding: 8px 12px;">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 18px;">
+          <label style="font-size: 0.82rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px; display: block;">Internal Notes / Project Brief</label>
+          <textarea id="adminEditLeadNotes" class="form-control" rows="2" style="font-size: 0.88rem; padding: 8px 12px;"></textarea>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px;">
+          <button type="button" onclick="closeAdminEditLeadModal()" class="btn btn-secondary" style="padding: 8px 16px;">Cancel</button>
+          <button type="submit" class="btn btn-primary" style="padding: 8px 20px; font-weight: 700; background: #10B981; border-color: #10B981;">
+            <i class="fa-solid fa-cloud-arrow-up"></i> <span>Save & Update Permanently</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Publish Success Celebration Modal -->
   <div id="publishSuccessModal" style="display: none; position: fixed; inset: 0; background: rgba(5,7,15,0.85); backdrop-filter: blur(8px); z-index: 9999999; align-items: center; justify-content: center; padding: 20px;">
     <div style="background: var(--bg-secondary); border: 1.5px solid #10B981; border-radius: 20px; max-width: 490px; width: 100%; padding: 36px 28px; text-align: center; box-shadow: 0 25px 60px rgba(0,0,0,0.65); position: relative;">
@@ -2977,10 +3064,10 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- Dual Cloud Sync Engine (Firebase + Supabase) -->
-  <script src="firebase-sync.js?v=11.3"></script>
+  <script src="firebase-sync.js?v=11.4"></script>
 
   <!-- CMS & SQL Engine Script -->
-  <script src="content-store.js?v=11.3"></script>
+  <script src="content-store.js?v=11.4"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
 
@@ -4203,6 +4290,9 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
                     <i class="fa-solid fa-ticket"></i>
                   </button>
                 ` : ''}
+                <button class="action-btn-sm" onclick="openAdminEditLeadModal('${lead.id}')" title="Edit Customer Details (Permanent)" style="color: #F59E0B; background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.35);">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                </button>
                 <button class="action-btn-sm" onclick="viewLeadDetails('${lead.id}')" title="View Full Project Brief & Entries" style="color: var(--brand-indigo);">
                   <i class="fa-solid fa-eye"></i>
                 </button>
@@ -4344,6 +4434,89 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
           }
         });
       }
+
+      // Permanent Admin Lead Edit Handlers
+      const adminEditLeadModal = document.getElementById('adminEditLeadModal');
+
+      window.openAdminEditLeadModal = function(id) {
+        const lead = currentLeads.find(l => String(l.id) === String(id) || String(l.userId) === String(id));
+        if (!lead) return;
+
+        document.getElementById('adminEditLeadId').value = lead.id || lead.userId;
+        document.getElementById('adminEditLeadName').value = lead.name || '';
+        document.getElementById('adminEditLeadPhone').value = lead.phone || '';
+        document.getElementById('adminEditLeadEmail').value = lead.email || '';
+        document.getElementById('adminEditLeadWebsiteType').value = lead.websiteType || 'E-commerce';
+        document.getElementById('adminEditLeadAmount').value = lead.budget || lead.amount || '₹199';
+        document.getElementById('adminEditLeadStatus').value = lead.status || 'New';
+        document.getElementById('adminEditLeadPayId').value = lead.paymentId || '';
+        document.getElementById('adminEditLeadNotes').value = lead.notes || '';
+
+        if (adminEditLeadModal) {
+          adminEditLeadModal.style.display = 'flex';
+          adminEditLeadModal.style.opacity = '1';
+          adminEditLeadModal.style.visibility = 'visible';
+          adminEditLeadModal.classList.add('active');
+        }
+      };
+
+      window.closeAdminEditLeadModal = function() {
+        if (adminEditLeadModal) {
+          adminEditLeadModal.classList.remove('active');
+          adminEditLeadModal.style.display = 'none';
+          adminEditLeadModal.style.opacity = '0';
+          adminEditLeadModal.style.visibility = 'hidden';
+        }
+      };
+
+      window.handleAdminEditLeadSubmit = async function(e) {
+        if (e && e.preventDefault) e.preventDefault();
+        const id = document.getElementById('adminEditLeadId')?.value;
+        const lead = currentLeads.find(l => String(l.id) === String(id) || String(l.userId) === String(id));
+        if (!lead) return;
+
+        const updatedName = document.getElementById('adminEditLeadName')?.value?.trim();
+        const updatedPhone = document.getElementById('adminEditLeadPhone')?.value?.trim();
+        const updatedEmail = document.getElementById('adminEditLeadEmail')?.value?.trim();
+        const updatedType = document.getElementById('adminEditLeadWebsiteType')?.value;
+        const updatedAmount = document.getElementById('adminEditLeadAmount')?.value?.trim();
+        const updatedStatus = document.getElementById('adminEditLeadStatus')?.value;
+        const updatedPayId = document.getElementById('adminEditLeadPayId')?.value?.trim();
+        const updatedNotes = document.getElementById('adminEditLeadNotes')?.value?.trim();
+
+        if (!updatedName || !updatedPhone) {
+          showAdminToast('Customer Name and Mobile Number are required.', '#EF4444');
+          return;
+        }
+
+        // Apply changes to in-memory lead
+        lead.name = updatedName;
+        lead.phone = updatedPhone;
+        lead.email = updatedEmail;
+        lead.websiteType = updatedType;
+        lead.budget = updatedAmount;
+        lead.amount = updatedAmount;
+        lead.status = updatedStatus;
+        lead.paymentId = updatedPayId;
+        lead.notes = updatedNotes;
+        if (updatedPayId && (!lead.paymentStatus || lead.paymentStatus.includes('Pending'))) {
+          lead.paymentStatus = `Paid & Verified (${updatedPayId})`;
+        }
+
+        // Save to localStorage
+        localStorage.setItem('flipcut_leads', JSON.stringify(currentLeads));
+        renderCrmTable();
+        closeAdminEditLeadModal();
+
+        // Save to Dual Cloud (Supabase + Firestore)
+        try {
+          if (typeof window.pushLeadToDualCloud === 'function') {
+            await window.pushLeadToDualCloud(lead);
+          }
+        } catch (_) {}
+
+        showAdminToast(`✅ Lead details for "${updatedName}" updated permanently!`, '#10B981');
+      };
 
       window.toggleLeadComplete = async function(id) {
         const lead = currentLeads.find(l => String(l.id) === String(id));
