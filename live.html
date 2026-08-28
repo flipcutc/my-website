@@ -18,21 +18,20 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="styles.css?v=13.0">
+  <link rel="stylesheet" href="styles.css?v=13.1">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Jitsi WebRTC Embedded SDK for Real-Time 2-Way Audio & Screen Share -->
+  <script src="https://meet.jit.si/external_api.js"></script>
 
   <!-- Firebase App & Firestore Compat SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- Dual Cloud Sync Engine (Firebase + Supabase) -->
-  <script src="firebase-sync.js?v=13.0"></script>
-
-  <!-- VIP User Profile Engine -->
-  <script src="user-profile.js?v=13.0"></script>
-
-  <!-- Content Store & Fast Pre-Hydration -->
-  <script src="content-store.js?v=13.0"></script>
+  <script src="firebase-sync.js?v=13.1"></script>
+  <script src="user-profile.js?v=13.1"></script>
+  <script src="content-store.js?v=13.1"></script>
 
   <style>
     /* VIP Live Portal Dedicated Cinema Theme */
@@ -130,7 +129,7 @@
     .live-studio-container {
       max-width: 1600px;
       margin: 0 auto;
-      padding: 20px 24px 40px;
+      padding: 16px 24px 40px;
       width: 100%;
       display: grid;
       grid-template-columns: 1fr 380px;
@@ -141,8 +140,8 @@
     @media (max-width: 1024px) {
       .live-studio-container {
         grid-template-columns: 1fr;
-        padding: 14px 12px 30px;
-        gap: 16px;
+        padding: 12px;
+        gap: 14px;
       }
     }
 
@@ -175,47 +174,49 @@
       border: none;
     }
 
-    /* Pre-Live Countdown Screen */
-    .prelive-screen {
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at center, #1E1B4B 0%, #090D16 100%);
+    /* Student Interactive Stage Action Bar */
+    .student-action-bar {
+      background: rgba(15, 23, 42, 0.9);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 12px 18px;
       display: flex;
-      flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 24px;
-      text-align: center;
-      z-index: 10;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
     }
 
-    .countdown-timer-grid {
-      display: flex;
-      gap: 12px;
-      margin: 20px 0;
-    }
-
-    .countdown-box {
-      background: rgba(15, 23, 42, 0.8);
-      border: 1px solid rgba(99, 102, 241, 0.3);
-      padding: 10px 14px;
-      border-radius: 10px;
-      min-width: 65px;
-    }
-
-    .countdown-box strong {
-      font-size: 1.6rem;
+    .btn-speak-request {
+      background: linear-gradient(135deg, #F59E0B, #D97706);
+      color: #000;
       font-weight: 800;
-      color: #FFF;
-      display: block;
-      font-family: monospace;
+      font-size: 0.85rem;
+      padding: 9px 18px;
+      border-radius: 25px;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(245, 158, 11, 0.35);
+      transition: all 0.2s ease;
     }
 
-    .countdown-box span {
-      font-size: 0.65rem;
-      color: #94A3B8;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
+    .btn-speak-request:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(245, 158, 11, 0.45);
+    }
+
+    .btn-speak-request.speaking {
+      background: #10B981;
+      color: #FFF;
+      box-shadow: 0 0 15px #10B981;
+      animation: pulseGreen 1.5s infinite;
+    }
+
+    @keyframes pulseGreen {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.04); }
     }
 
     /* Floating Reactions Bar */
@@ -246,7 +247,6 @@
       transform: scale(1.4);
     }
 
-    /* Floating animation particles */
     .floating-particle {
       position: absolute;
       bottom: 60px;
@@ -270,7 +270,7 @@
       border-radius: 16px;
       display: flex;
       flex-direction: column;
-      height: 620px;
+      height: 640px;
       max-height: 85vh;
       overflow: hidden;
     }
@@ -303,7 +303,6 @@
       border-bottom: 2px solid #6366F1;
     }
 
-    /* Pinned Announcement Box */
     .pinned-announcement-card {
       background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(16, 185, 129, 0.12));
       border-bottom: 1px solid rgba(99, 102, 241, 0.25);
@@ -325,7 +324,6 @@
       white-space: nowrap;
     }
 
-    /* Chat Messages Stream */
     .chat-messages-scroll {
       flex: 1;
       overflow-y: auto;
@@ -382,7 +380,6 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Chat Input Form */
     .chat-input-bar {
       padding: 10px 12px;
       background: rgba(15, 23, 42, 0.85);
@@ -419,10 +416,6 @@
       justify-content: center;
       font-size: 0.95rem;
       transition: transform 0.15s ease;
-    }
-
-    .chat-send-btn:active {
-      transform: scale(0.9);
     }
 
     /* VIP Security Gate Modal */
@@ -511,9 +504,9 @@
       <a href="index.html" title="FlipCut Creation Home">
         <img src="assets/logo.png" alt="FlipCut Creation Logo">
       </a>
-      <div class="live-status-pill is-offline" id="headerLiveStatusPill">
+      <div class="live-status-pill is-live" id="headerLiveStatusPill">
         <span class="live-dot"></span>
-        <span id="headerLiveStatusText">Starting Soon</span>
+        <span id="headerLiveStatusText">LIVE MASTERCLASS</span>
       </div>
     </div>
 
@@ -532,40 +525,13 @@
   <!-- Live Studio Workspace -->
   <main class="live-studio-container">
     
-    <!-- Left Stage: Cinema Player & Controls -->
+    <!-- Left Stage: Cinema Player & Interactive Controls -->
     <div style="display: flex; flex-direction: column; gap: 16px;">
       
       <div class="live-player-card">
         
-        <div class="video-viewport" id="videoViewport">
-          
-          <!-- Pre-Live Screen Overlay -->
-          <div class="prelive-screen" id="preliveScreen">
-            <div style="width: 52px; height: 52px; background: rgba(99, 102, 241, 0.2); border: 2px solid #6366F1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #818CF8; margin-bottom: 12px;">
-              <i class="fa-solid fa-satellite-dish"></i>
-            </div>
-            
-            <h2 id="preliveTitle" style="font-size: 1.5rem; font-weight: 800; color: #FFF; margin-bottom: 6px;">
-              Webinar Session Starting Soon
-            </h2>
-            <p id="preliveSubtitle" style="color: #94A3B8; font-size: 0.86rem; max-width: 500px; line-height: 1.45;">
-              Welcome to the FlipCut VIP Masterclass. Your seat has been verified. The live stream will automatically start when the host goes live.
-            </p>
-
-            <div class="countdown-timer-grid">
-              <div class="countdown-box"><strong id="timerDays">00</strong><span>Days</span></div>
-              <div class="countdown-box"><strong id="timerHours">00</strong><span>Hours</span></div>
-              <div class="countdown-box"><strong id="timerMins">00</strong><span>Mins</span></div>
-              <div class="countdown-box"><strong id="timerSecs">00</strong><span>Secs</span></div>
-            </div>
-
-            <div style="display: flex; gap: 10px; align-items: center; font-size: 0.78rem; color: #10B981; background: rgba(16, 185, 129, 0.1); border: 1px solid #10B981; padding: 6px 14px; border-radius: 20px;">
-              <i class="fa-solid fa-circle-check"></i> <span>Audio & Video Test OK • Ready for Broadcast</span>
-            </div>
-          </div>
-
-          <!-- Active Embed Player (YouTube / Stream / Jitsi) -->
-          <iframe id="liveStreamIframe" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="display: none;"></iframe>
+        <div class="video-viewport" id="studentWebRtcViewport">
+          <!-- WebRTC Video Feed Injected Here -->
 
           <!-- Floating Interactive Reactions -->
           <div class="floating-reactions-dock" id="floatingReactionsDock">
@@ -575,24 +541,36 @@
             <button type="button" class="reaction-btn" onclick="triggerFloatingReaction('🚀')" title="Rocket">🚀</button>
             <button type="button" class="reaction-btn" onclick="triggerFloatingReaction('💎')" title="Diamond">💎</button>
           </div>
-
         </div>
 
-        <!-- Masterclass Info Ribbon -->
-        <div style="padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.06); background: rgba(15, 23, 42, 0.5);">
-          <div>
-            <h1 id="liveMasterclassTitle" style="font-size: 1.15rem; font-weight: 800; color: #FFF; margin-bottom: 2px;">
-              High-Retention Video Editing & AI Masterclass
-            </h1>
-            <span style="font-size: 0.78rem; color: #94A3B8;">
-              <i class="fa-solid fa-user-tie" style="color: #6366F1;"></i> Host: <strong>Murugan (FlipCut Creator)</strong> • Live Interactive Session
+        <!-- Student Interactive Mic Request Bar -->
+        <div class="student-action-bar">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <button type="button" class="btn-speak-request" id="btnRequestSpeak" onclick="toggleStudentSpeakRequest()">
+              <i class="fa-solid fa-hand"></i>
+              <span id="btnSpeakText">✋ Request to Speak (Ask Question)</span>
+            </button>
+            <span id="speakStatusHint" style="font-size: 0.76rem; color: #94A3B8;">
+              Click to raise hand. Host Murugan will accept your audio.
             </span>
           </div>
-          
+
           <div style="display: flex; gap: 8px;">
             <button type="button" class="btn btn-secondary" onclick="toggleTheaterMode()" style="padding: 8px 12px; font-size: 0.78rem;" title="Toggle Full Width">
               <i class="fa-solid fa-expand"></i> <span>Theater</span>
             </button>
+          </div>
+        </div>
+
+        <!-- Masterclass Info Ribbon -->
+        <div style="padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.06); background: rgba(15, 23, 42, 0.5);">
+          <div>
+            <h1 id="liveMasterclassTitle" style="font-size: 1.05rem; font-weight: 800; color: #FFF; margin-bottom: 2px;">
+              High-Retention Video Editing & AI Masterclass
+            </h1>
+            <span style="font-size: 0.76rem; color: #94A3B8;">
+              <i class="fa-solid fa-user-tie" style="color: #6366F1;"></i> Host: <strong style="color: #FCD34D;">Murugan</strong> • Live Screen Share & 2-Way Audio
+            </span>
           </div>
         </div>
 
@@ -605,11 +583,11 @@
             <i class="fa-solid fa-folder-open"></i>
           </div>
           <div>
-            <strong style="color: #FFF; font-size: 0.9rem; display: block;" id="resBannerHeadline">50+ Premiere Pro LUTs & Motion Presets Pack</strong>
-            <span style="color: #94A3B8; font-size: 0.76rem;" id="resBannerSubtext">Official project templates and assets provided for this session.</span>
+            <strong style="color: #FFF; font-size: 0.9rem; display: block;">50+ Premiere Pro LUTs & Motion Presets Pack</strong>
+            <span style="color: #94A3B8; font-size: 0.76rem;">Official project templates and assets provided for this session.</span>
           </div>
         </div>
-        <a href="https://drive.google.com" target="_blank" rel="noopener" id="btnDownloadDriveAssets" class="btn btn-primary" style="padding: 9px 16px; font-size: 0.82rem; font-weight: 700; white-space: nowrap; background: #10B981; border-color: #10B981;">
+        <a href="https://drive.google.com" target="_blank" rel="noopener" class="btn btn-primary" style="padding: 9px 16px; font-size: 0.82rem; font-weight: 700; white-space: nowrap; background: #10B981; border-color: #10B981;">
           <i class="fa-solid fa-download"></i> <span>Download Assets</span>
         </a>
       </div>
@@ -631,32 +609,28 @@
       <!-- Tab Content: Live Chat -->
       <div id="tabContentChat" style="display: flex; flex-direction: column; flex: 1; overflow: hidden;">
         
-        <!-- Pinned Announcement Card -->
         <div class="pinned-announcement-card" id="pinnedAnnouncementBox">
           <span class="pinned-badge">📌 PINNED</span>
           <div style="flex: 1;">
-            <strong id="pinnedMsgTitle" style="color: #FFF; display: block; font-size: 0.78rem;">Welcome to the Live Class!</strong>
-            <span id="pinnedMsgContent" style="color: #CBD5E1; font-size: 0.72rem; line-height: 1.35; display: block;">
-              Feel free to ask your editing and workflow questions below in real time.
+            <strong style="color: #FFF; display: block; font-size: 0.78rem;">Welcome to the Live Class!</strong>
+            <span style="color: #CBD5E1; font-size: 0.72rem; line-height: 1.35; display: block;">
+              Click "Request to Speak" above when you have a question to speak with Murugan.
             </span>
           </div>
         </div>
 
-        <!-- Chat Feed -->
         <div class="chat-messages-scroll" id="chatMessagesStream">
-          <!-- System Welcome Message -->
           <div class="chat-bubble is-host">
             <div class="chat-bubble-header">
               <span class="chat-sender-name host"><i class="fa-solid fa-crown"></i> FlipCut Host (Murugan)</span>
               <span class="chat-time">System</span>
             </div>
             <div class="chat-text">
-              Welcome everyone to the VIP Live Masterclass! Let us know where you are joining from in the chat! 👇
+              Welcome everyone to the 2-Way Interactive Masterclass! Drop your questions here or raise your hand to speak! 👇
             </div>
           </div>
         </div>
 
-        <!-- Chat Input Form -->
         <form class="chat-input-bar" id="chatInputForm" onsubmit="sendLiveChatMessage(event)">
           <input type="text" id="liveChatInputText" class="chat-input-field" placeholder="Ask a question or comment..." maxlength="200" autocomplete="off" required>
           <button type="submit" class="chat-send-btn" title="Send Message">
@@ -699,13 +673,14 @@
 
   </main>
 
-  <!-- Live Portal Core Client Engine -->
+  <!-- Live Portal Interactive Engine -->
   <script>
     (function() {
       'use strict';
 
       const SUPABASE_URL = 'https://cznixvdphwbjdnnmapvb.supabase.co';
       const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6bml4dmRwaHdiamRubm1hcHZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTgwMTgsImV4cCI6MjEwMzEzNDAxOH0.dTLN1DCbUiBawZq8YlS5Bol-i81JFKhKpPKCboyocuQ';
+      const ROOM_NAME = 'FlipCutVIPMasterclassRoom2026_Live';
 
       let currentSessionToken = localStorage.getItem('flipcut_live_session_token');
       if (!currentSessionToken) {
@@ -714,31 +689,11 @@
       }
 
       let activeUser = null;
-      let streamConfig = {
-        status: 'offline', // 'offline' | 'live' | 'replay'
-        streamUrl: '',
-        youtubeVideoId: '',
-        title: 'High-Retention Video Editing & AI Masterclass',
-        pinnedHeadline: 'Welcome to the Live Class!',
-        pinnedMessage: 'Ask your questions in the chat.',
-        driveUrl: 'https://drive.google.com'
-      };
+      let jitsiApi = null;
+      let isHandRaised = false;
 
       // 1. Initial Verification & Security Gate
       async function initLivePortal() {
-        try {
-          const raw = localStorage.getItem('flipcut_cms_draft') || localStorage.getItem('flipcut_site_content');
-          if (raw) {
-            const data = JSON.parse(raw);
-            if (data && data.liveClass) {
-              Object.assign(streamConfig, data.liveClass);
-            }
-          }
-        } catch (_) {}
-
-        renderStreamState();
-
-        // Check if user is already authenticated
         const profile = (typeof window.getUserProfile === 'function') ? window.getUserProfile() : null;
         if (profile && profile.userId) {
           const isValid = await verifySingleDeviceAccess(profile.userId, profile.phone);
@@ -748,7 +703,6 @@
           }
         }
 
-        // Show VIP Gate Modal
         const gate = document.getElementById('vipGateOverlay');
         if (gate) gate.style.display = 'flex';
       }
@@ -853,17 +807,99 @@
         if (idElem) idElem.textContent = '(' + (user.userId || 'FC-WEB-00000') + ')';
 
         startSessionHeartbeat(user.userId);
+        mountStudentWebRtcStream(user);
         initChatListener();
       }
 
-      window.logoutLiveSession = function() {
-        if (confirm('Are you sure you want to log out of this device?')) {
-          localStorage.removeItem('flipcut_user_profile');
-          window.location.reload();
+      // 4. Mount Student WebRTC Stream (Muted by default)
+      function mountStudentWebRtcStream(user) {
+        const domain = 'meet.jit.si';
+        const options = {
+          roomName: ROOM_NAME,
+          width: '100%',
+          height: '100%',
+          parentNode: document.querySelector('#studentWebRtcViewport'),
+          userInfo: {
+            displayName: (user.name || 'Student') + ' (' + (user.userId || 'Pass') + ')'
+          },
+          configOverwrite: {
+            startWithAudioMuted: true,
+            startWithVideoMuted: true,
+            disableDeepLinking: true,
+            prejoinPageEnabled: false,
+            enableWelcomePage: false,
+            toolbarButtons: [
+              'microphone',
+              'raisehand',
+              'chat',
+              'tileview',
+              'fullscreen'
+            ]
+          },
+          interfaceConfigOverwrite: {
+            SHOW_JITSI_WATERMARK: false,
+            SHOW_WATERMARK_FOR_GUESTS: false,
+            DEFAULT_BACKGROUND: '#070A12',
+            TOOLBAR_ALWAYS_VISIBLE: false
+          }
+        };
+
+        try {
+          if (typeof JitsiMeetExternalAPI !== 'undefined') {
+            jitsiApi = new JitsiMeetExternalAPI(domain, options);
+
+            jitsiApi.addEventListener('audioMuteStatusChanged', (muted) => {
+              updateMicButtonState(!muted.muted);
+            });
+
+            jitsiApi.addEventListener('raiseHandUpdated', (data) => {
+              isHandRaised = data.handRaised;
+              updateHandRaiseUI();
+            });
+          }
+        } catch (e) {
+          console.error('[WebRTC Stream Error]', e);
+        }
+      }
+
+      // 5. Student Hand Raise / Speak Request
+      window.toggleStudentSpeakRequest = function() {
+        if (jitsiApi) {
+          jitsiApi.executeCommand('toggleRaiseHand');
+          isHandRaised = !isHandRaised;
+          updateHandRaiseUI();
         }
       };
 
-      // 4. Single-Device Heartbeat Checker
+      function updateHandRaiseUI() {
+        const btn = document.getElementById('btnRequestSpeak');
+        const text = document.getElementById('btnSpeakText');
+        const hint = document.getElementById('speakStatusHint');
+
+        if (isHandRaised) {
+          if (btn) btn.className = 'btn-speak-request speaking';
+          if (text) text.textContent = '⏳ Mic Requested... (Waiting for Host)';
+          if (hint) hint.textContent = 'Host Murugan received your request. When accepted, speak freely.';
+        } else {
+          if (btn) btn.className = 'btn-speak-request';
+          if (text) text.textContent = '✋ Request to Speak (Ask Question)';
+          if (hint) hint.textContent = 'Click to raise hand. Host Murugan will accept your audio.';
+        }
+      }
+
+      function updateMicButtonState(isLiveMic) {
+        const btn = document.getElementById('btnRequestSpeak');
+        const text = document.getElementById('btnSpeakText');
+        const hint = document.getElementById('speakStatusHint');
+
+        if (isLiveMic) {
+          if (btn) btn.className = 'btn-speak-request speaking';
+          if (text) text.textContent = '🎙️ YOUR MIC IS LIVE! (Speaking)';
+          if (hint) hint.textContent = 'You are now speaking live in the masterclass!';
+        }
+      }
+
+      // 6. Single-Device Heartbeat Checker
       function startSessionHeartbeat(leadId) {
         setInterval(async () => {
           try {
@@ -885,56 +921,14 @@
         }, 15000);
       }
 
-      // 5. Render Stream & Countdown States
-      function renderStreamState() {
-        const prelive = document.getElementById('preliveScreen');
-        const iframe = document.getElementById('liveStreamIframe');
-        const statusPill = document.getElementById('headerLiveStatusPill');
-        const statusText = document.getElementById('headerLiveStatusText');
-
-        if (streamConfig.status === 'live' || streamConfig.status === 'replay') {
-          if (prelive) prelive.style.display = 'none';
-          if (iframe) {
-            iframe.style.display = 'block';
-            let srcUrl = streamConfig.streamUrl;
-            if (streamConfig.youtubeVideoId) {
-              srcUrl = 'https://www.youtube.com/embed/' + streamConfig.youtubeVideoId + '?autoplay=1&rel=0&modestbranding=1';
-            }
-            if (srcUrl && iframe.src !== srcUrl) {
-              iframe.src = srcUrl;
-            }
-          }
-          if (statusPill) {
-            statusPill.className = 'live-status-pill is-live';
-          }
-          if (statusText) {
-            statusText.textContent = streamConfig.status === 'live' ? 'LIVE NOW' : 'REPLAY';
-          }
-        } else {
-          if (prelive) prelive.style.display = 'flex';
-          if (iframe) {
-            iframe.style.display = 'none';
-            iframe.src = '';
-          }
-          if (statusPill) {
-            statusPill.className = 'live-status-pill is-offline';
-          }
-          if (statusText) {
-            statusText.textContent = 'Starting Soon';
-          }
+      window.logoutLiveSession = function() {
+        if (confirm('Are you sure you want to log out of this device?')) {
+          localStorage.removeItem('flipcut_user_profile');
+          window.location.reload();
         }
+      };
 
-        if (streamConfig.pinnedHeadline) {
-          const h = document.getElementById('pinnedMsgTitle');
-          if (h) h.textContent = streamConfig.pinnedHeadline;
-        }
-        if (streamConfig.pinnedMessage) {
-          const m = document.getElementById('pinnedMsgContent');
-          if (m) m.textContent = streamConfig.pinnedMessage;
-        }
-      }
-
-      // 6. Live Chat Engine
+      // 7. Live Chat Engine
       const chatStream = document.getElementById('chatMessagesStream');
 
       function initChatListener() {
@@ -995,9 +989,9 @@
         }[tag] || tag));
       }
 
-      // 7. Floating Emoji Reactions
+      // 8. Floating Emoji Reactions
       window.triggerFloatingReaction = function(emoji) {
-        const viewport = document.getElementById('videoViewport');
+        const viewport = document.getElementById('studentWebRtcViewport');
         if (!viewport) return;
 
         const particle = document.createElement('div');
@@ -1011,7 +1005,7 @@
         }, 2000);
       };
 
-      // 8. Tabs Switcher
+      // 9. Tabs Switcher
       window.switchLiveSidebarTab = function(tab) {
         const chatTab = document.getElementById('tabContentChat');
         const resTab = document.getElementById('tabContentResources');
@@ -1038,37 +1032,7 @@
         }
       };
 
-      // 9. Live Countdown Engine
-      function startCountdown() {
-        const now = new Date();
-        const target = new Date();
-        target.setDate(now.getDate() + ((7 - now.getDay()) % 7 || 7));
-        target.setHours(9, 0, 0, 0);
-
-        setInterval(() => {
-          const diff = Math.max(0, target.getTime() - new Date().getTime());
-          const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-          const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-          const mins = Math.floor((diff / (1000 * 60)) % 60);
-          const secs = Math.floor((diff / 1000) % 60);
-
-          const dElem = document.getElementById('timerDays');
-          const hElem = document.getElementById('timerHours');
-          const mElem = document.getElementById('timerMins');
-          const sElem = document.getElementById('timerSecs');
-
-          if (dElem) dElem.textContent = String(days).padStart(2, '0');
-          if (hElem) hElem.textContent = String(hours).padStart(2, '0');
-          if (mElem) mElem.textContent = String(mins).padStart(2, '0');
-          if (sElem) sElem.textContent = String(secs).padStart(2, '0');
-        }, 1000);
-      }
-
-      document.addEventListener('DOMContentLoaded', () => {
-        initLivePortal();
-        startCountdown();
-      });
-
+      document.addEventListener('DOMContentLoaded', initLivePortal);
     })();
   </script>
 </body>
