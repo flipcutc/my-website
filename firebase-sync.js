@@ -113,7 +113,38 @@ async function pushLeadToDualCloud(lead) {
     }
   } catch (_) {}
 
-  await Promise.allSettled([firestorePromise, supabasePromise]);
+  
+  // 1D. Push to Google Sheets Cloud (15 GB Lifetime Free Backup)
+  const googleSheetPromise = (async () => {
+    try {
+      const siteContent = (typeof getSiteContent === 'function') ? getSiteContent() : (window.flipcutSiteContent || {});
+      const sheetUrl = siteContent.contact?.googleSheetWebhookUrl || siteContent.googleSheetWebhookUrl || '';
+      if (sheetUrl && sheetUrl.startsWith('http')) {
+        await fetch(sheetUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: leadPayload.id,
+            name: leadPayload.name,
+            phone: leadPayload.phone,
+            email: leadPayload.email,
+            service: leadPayload.service,
+            amount: leadPayload.budget,
+            message: leadPayload.message,
+            status: leadPayload.status,
+            paymentId: leadPayload.paymentId,
+            date: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
+          })
+        });
+        console.log('✅ Lead synced to Google Sheets Cloud Backup:', userId);
+      }
+    } catch (sheetErr) {
+      console.warn('[Google Sheets Sync Note]', sheetErr.message);
+    }
+  })();
+
+  await Promise.allSettled([firestorePromise, supabasePromise, googleSheetPromise]);
   return leadPayload;
 }
 
