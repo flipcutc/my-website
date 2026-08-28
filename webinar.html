@@ -56,7 +56,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=12.0">
+  <link rel="stylesheet" href="styles.css?v=12.1">
 
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -69,13 +69,13 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- Dual Cloud Sync Engine (Firebase + Supabase) -->
-  <script src="firebase-sync.js?v=12.0"></script>
+  <script src="firebase-sync.js?v=12.1"></script>
 
   <!-- VIP User Profile Header Engine -->
-  <script src="user-profile.js?v=12.0"></script>
+  <script src="user-profile.js?v=12.1"></script>
 
   <!-- Content Store & Instant Zero-Flicker Pre-Hydration -->
-  <script src="content-store.js?v=12.0"></script>
+  <script src="content-store.js?v=12.1"></script>
   <script>
     (function() {
       try {
@@ -2015,334 +2015,379 @@
 
       // 1-Click Ticket Pass PDF Downloader
       window.downloadTicketPDF = function() {
-        const uid = document.getElementById('ticketUserId')?.textContent?.trim() || 'FC-WEB-00000';
-        const name = document.getElementById('ticketHolderName')?.textContent?.trim() || document.getElementById('ticketClientName')?.textContent?.trim() || 'Valued Creator';
-        const type = document.getElementById('ticketWebsiteType')?.textContent?.trim() || 'Webinar Masterclass';
-        const dateText = document.getElementById('ticketModalDateText')?.textContent?.trim() || 'Sunday, 9:00 AM IST';
-        const payId = document.getElementById('ticketPaymentId')?.textContent?.trim() || 'rzp_verified_paid';
-        const priceAmt = (content.webinar?.price || '199');
-
-        if (window.jspdf && window.jspdf.jsPDF) {
-          const { jsPDF } = window.jspdf;
-          const doc = new jsPDF({
-            orientation: 'portrait',
-            unit: 'mm',
-            format: [120, 175]
-          });
-
-          // Background Dark Theme
-          doc.setFillColor(15, 23, 42);
-          doc.rect(0, 0, 120, 175, 'F');
-
-          // Header Indigo Banner
-          doc.setFillColor(49, 46, 129);
-          doc.rect(0, 0, 120, 28, 'F');
-
-          // Border
-          doc.setDrawColor(99, 102, 241);
-          doc.setLineWidth(0.8);
-          doc.rect(4, 4, 112, 167);
-
-          // Header Text
-          doc.setTextColor(255, 255, 255);
-          doc.setFont('helvetica', 'bold');
-          doc.setFontSize(14);
-          doc.text('FLIPCUT CREATION', 60, 12, { align: 'center' });
-
-          doc.setTextColor(245, 158, 11);
-          doc.setFontSize(9);
-          doc.text('OFFICIAL WEBINAR VIP PASS', 60, 18, { align: 'center' });
-
-          doc.setTextColor(148, 163, 184);
-          doc.setFontSize(7.5);
-          doc.text('www.flipcutcreation.in', 60, 24, { align: 'center' });
-
-          // Pass Holder Section
-          doc.setTextColor(148, 163, 184);
-          doc.setFont('helvetica', 'normal');
-          doc.setFontSize(8);
-          doc.text('PASS HOLDER NAME', 12, 38);
-
-          doc.setTextColor(255, 255, 255);
-          doc.setFont('helvetica', 'bold');
-          doc.setFontSize(15);
-          doc.text(name, 12, 45);
-
-          // User ID Card Box
-          doc.setFillColor(30, 27, 75);
-          doc.roundedRect(12, 50, 96, 14, 2, 2, 'F');
-          doc.setDrawColor(99, 102, 241);
-          doc.setLineWidth(0.3);
-          doc.roundedRect(12, 50, 96, 14, 2, 2, 'D');
-
-          doc.setTextColor(129, 140, 248);
-          doc.setFontSize(8);
-          doc.text('REGISTERED USER ID:', 16, 59);
-
-          doc.setTextColor(255, 255, 255);
-          doc.setFont('courier', 'bold');
-          doc.setFontSize(11);
-          doc.text(uid, 62, 59);
-
-          // Details Card Box
-          doc.setFillColor(23, 32, 54);
-          doc.roundedRect(12, 68, 96, 56, 2, 2, 'F');
-          doc.setDrawColor(51, 65, 85);
-          doc.roundedRect(12, 68, 96, 56, 2, 2, 'D');
-
-          // Row 1: Website Type
-          doc.setTextColor(148, 163, 184);
-          doc.setFont('helvetica', 'normal');
-          doc.setFontSize(8);
-          doc.text('Website Type:', 16, 77);
-          doc.setTextColor(96, 165, 250);
-          doc.setFont('helvetica', 'bold');
-          doc.text(type, 104, 77, { align: 'right' });
-
-          // Row 2: Amount Paid
-          doc.setTextColor(148, 163, 184);
-          doc.setFont('helvetica', 'normal');
-          doc.text('Amount Paid:', 16, 88);
-          doc.setTextColor(52, 211, 153);
-          doc.setFont('helvetica', 'bold');
-          doc.text(`Rs. ${priceAmt} (Confirmed)`, 104, 88, { align: 'right' });
-
-          // Row 3: Session Time
-          doc.setTextColor(148, 163, 184);
-          doc.setFont('helvetica', 'normal');
-          doc.text('Session Time:', 16, 99);
-          doc.setTextColor(248, 250, 252);
-          doc.setFont('helvetica', 'bold');
-          doc.text(dateText, 104, 99, { align: 'right' });
-
-          // Row 4: Payment ID
-          doc.setTextColor(148, 163, 184);
-          doc.setFont('helvetica', 'normal');
-          doc.text('Payment Ref ID:', 16, 110);
-          doc.setTextColor(167, 139, 250);
-          doc.setFont('courier', 'bold');
-          doc.setFontSize(7.5);
-          doc.text(payId, 104, 110, { align: 'right' });
-
-          // Perforated Dashed Line
-          doc.setDrawColor(100, 116, 139);
-          doc.setLineDashPattern([2, 2], 0);
-          doc.line(12, 130, 108, 130);
-          doc.setLineDashPattern([], 0);
-
-          // Status & Verification Badge
-          doc.setFillColor(6, 78, 59);
-          doc.roundedRect(20, 135, 80, 10, 2, 2, 'F');
-          doc.setTextColor(52, 211, 153);
-          doc.setFont('helvetica', 'bold');
-          doc.setFontSize(8.5);
-          doc.text('✔ SEAT VERIFIED & LOCKED', 60, 141.5, { align: 'center' });
-
-          // Instructions Note
-          doc.setTextColor(148, 163, 184);
-          doc.setFont('helvetica', 'normal');
-          doc.setFontSize(7);
-          doc.text('Please join the VIP WhatsApp Group for the live meeting link.', 60, 152, { align: 'center' });
-          doc.text('Keep this User ID for future support and updates.', 60, 157, { align: 'center' });
-
-          // Barcode Simulation
-          doc.setFillColor(255, 255, 255);
-          let bx = 30;
-          const bars = [1, 2, 0.6, 2, 1.2, 0.6, 2.5, 1, 0.6, 2, 1.2, 2.5, 0.6, 1, 2, 0.6, 2, 1.2, 0.6, 2.5, 1, 0.6, 2];
-          for (let b of bars) {
-            doc.rect(bx, 162, b * 0.7, 5, 'F');
-            bx += b * 0.7 + 1.2;
+        try {
+          const uid = document.getElementById('ticketUserId')?.textContent?.trim() || 'FC-WEB-00000';
+          const name = document.getElementById('ticketHolderName')?.textContent?.trim() || document.getElementById('ticketClientName')?.textContent?.trim() || 'Valued Creator';
+          const type = document.getElementById('ticketWebsiteType')?.textContent?.trim() || 'Webinar Masterclass';
+          const dateText = document.getElementById('ticketModalDateText')?.textContent?.trim() || 'Sunday, 9:00 AM IST';
+          const payId = document.getElementById('ticketPaymentId')?.textContent?.trim() || 'rzp_verified_paid';
+          
+          let priceAmt = '2';
+          const amtElem = document.getElementById('ticketPassAmountText');
+          if (amtElem && amtElem.textContent) {
+            const m = amtElem.textContent.match(/\d+/);
+            if (m) priceAmt = m[0];
           }
 
-          doc.save(`FlipCut-Webinar-Pass-${uid}.pdf`);
-          if (typeof showToast === 'function') {
-            showToast(`📥 VIP Ticket PDF downloaded (${uid}.pdf)!`, '#10B981');
+          let JsPDFClass = null;
+          if (typeof window.jspdf !== 'undefined' && window.jspdf.jsPDF) {
+            JsPDFClass = window.jspdf.jsPDF;
+          } else if (typeof window.jsPDF !== 'undefined') {
+            JsPDFClass = window.jsPDF;
           }
-        } else {
+
+          if (JsPDFClass) {
+            const doc = new JsPDFClass({
+              orientation: 'portrait',
+              unit: 'mm',
+              format: [120, 175]
+            });
+
+            // Background Dark Theme
+            doc.setFillColor(15, 23, 42);
+            doc.rect(0, 0, 120, 175, 'F');
+
+            // Header Indigo Banner
+            doc.setFillColor(49, 46, 129);
+            doc.rect(0, 0, 120, 28, 'F');
+
+            // Border
+            doc.setDrawColor(99, 102, 241);
+            doc.setLineWidth(0.8);
+            doc.rect(4, 4, 112, 167);
+
+            // Header Text
+            doc.setTextColor(255, 255, 255);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(14);
+            doc.text('FLIPCUT CREATION', 60, 12, { align: 'center' });
+
+            doc.setTextColor(245, 158, 11);
+            doc.setFontSize(9);
+            doc.text('OFFICIAL WEBINAR VIP PASS', 60, 18, { align: 'center' });
+
+            doc.setTextColor(148, 163, 184);
+            doc.setFontSize(7.5);
+            doc.text('www.flipcutcreation.in', 60, 24, { align: 'center' });
+
+            // Pass Holder Section
+            doc.setTextColor(148, 163, 184);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(8);
+            doc.text('PASS HOLDER NAME', 12, 38);
+
+            doc.setTextColor(255, 255, 255);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(15);
+            doc.text(name, 12, 45);
+
+            // User ID Card Box
+            doc.setFillColor(30, 27, 75);
+            doc.roundedRect(12, 50, 96, 14, 2, 2, 'F');
+            doc.setDrawColor(99, 102, 241);
+            doc.setLineWidth(0.3);
+            doc.roundedRect(12, 50, 96, 14, 2, 2, 'D');
+
+            doc.setTextColor(129, 140, 248);
+            doc.setFontSize(8);
+            doc.text('REGISTERED USER ID:', 16, 59);
+
+            doc.setTextColor(255, 255, 255);
+            doc.setFont('courier', 'bold');
+            doc.setFontSize(11);
+            doc.text(uid, 62, 59);
+
+            // Details Card Box
+            doc.setFillColor(23, 32, 54);
+            doc.roundedRect(12, 68, 96, 56, 2, 2, 'F');
+            doc.setDrawColor(51, 65, 85);
+            doc.roundedRect(12, 68, 96, 56, 2, 2, 'D');
+
+            // Row 1: Website Type
+            doc.setTextColor(148, 163, 184);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(8);
+            doc.text('Website Type:', 16, 77);
+            doc.setTextColor(96, 165, 250);
+            doc.setFont('helvetica', 'bold');
+            doc.text(type, 104, 77, { align: 'right' });
+
+            // Row 2: Amount Paid
+            doc.setTextColor(148, 163, 184);
+            doc.setFont('helvetica', 'normal');
+            doc.text('Amount Paid:', 16, 88);
+            doc.setTextColor(52, 211, 153);
+            doc.setFont('helvetica', 'bold');
+            doc.text(`Rs. ${priceAmt} (Confirmed)`, 104, 88, { align: 'right' });
+
+            // Row 3: Session Time
+            doc.setTextColor(148, 163, 184);
+            doc.setFont('helvetica', 'normal');
+            doc.text('Session Time:', 16, 99);
+            doc.setTextColor(248, 250, 252);
+            doc.setFont('helvetica', 'bold');
+            doc.text(dateText, 104, 99, { align: 'right' });
+
+            // Row 4: Payment ID
+            doc.setTextColor(148, 163, 184);
+            doc.setFont('helvetica', 'normal');
+            doc.text('Payment Ref ID:', 16, 110);
+            doc.setTextColor(167, 139, 250);
+            doc.setFont('courier', 'bold');
+            doc.setFontSize(7.5);
+            doc.text(payId, 104, 110, { align: 'right' });
+
+            // Perforated Dashed Line
+            doc.setDrawColor(100, 116, 139);
+            doc.setLineDashPattern([2, 2], 0);
+            doc.line(12, 130, 108, 130);
+            doc.setLineDashPattern([], 0);
+
+            // Status & Verification Badge
+            doc.setFillColor(6, 78, 59);
+            doc.roundedRect(20, 135, 80, 10, 2, 2, 'F');
+            doc.setTextColor(52, 211, 153);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(8.5);
+            doc.text('✔ SEAT VERIFIED & LOCKED', 60, 141.5, { align: 'center' });
+
+            // Instructions Note
+            doc.setTextColor(148, 163, 184);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(7);
+            doc.text('Please join the VIP WhatsApp Group for the live meeting link.', 60, 152, { align: 'center' });
+            doc.text('Keep this User ID for future support and updates.', 60, 157, { align: 'center' });
+
+            // Barcode Simulation
+            doc.setFillColor(255, 255, 255);
+            let bx = 30;
+            const bars = [1, 2, 0.6, 2, 1.2, 0.6, 2.5, 1, 0.6, 2, 1.2, 2.5, 0.6, 1, 2, 0.6, 2, 1.2, 0.6, 2.5, 1, 0.6, 2];
+            for (let b of bars) {
+              doc.rect(bx, 162, b * 0.7, 5, 'F');
+              bx += b * 0.7 + 1.2;
+            }
+
+            // Universal Blob / DataURI Direct Save
+            try {
+              const blob = doc.output('blob');
+              const blobUrl = URL.createObjectURL(blob);
+              const link = document.createElement('a');
+              link.href = blobUrl;
+              link.download = `FlipCut-Webinar-Pass-${uid}.pdf`;
+              document.body.appendChild(link);
+              link.click();
+              setTimeout(() => {
+                try { document.body.removeChild(link); } catch (err) {}
+                URL.revokeObjectURL(blobUrl);
+              }, 1000);
+            } catch (err) {
+              doc.save(`FlipCut-Webinar-Pass-${uid}.pdf`);
+            }
+
+            if (typeof showToast === 'function') {
+              showToast(`📥 VIP Ticket PDF downloaded (${uid}.pdf)!`, '#10B981');
+            }
+          } else {
+            window.downloadVipTicketPassHD();
+          }
+        } catch (e) {
+          console.error('[Download PDF Error]', e);
           window.downloadVipTicketPassHD();
         }
       };
 
       // Ultra-HD VIP Boarding Pass Ticket Image Generator & Downloader
       window.downloadVipTicketPassHD = function() {
-        const uid = document.getElementById('ticketUserId')?.textContent?.trim() || 'FC-WEB-00000';
-        const name = document.getElementById('ticketHolderName')?.textContent?.trim() || document.getElementById('ticketClientName')?.textContent?.trim() || 'Valued Creator';
-        const type = document.getElementById('ticketWebsiteType')?.textContent?.trim() || 'Webinar Masterclass';
-        const dateText = document.getElementById('ticketModalDateText')?.textContent?.trim() || 'Sunday, 9:00 AM IST';
-        const payId = document.getElementById('ticketPaymentId')?.textContent?.trim() || 'rzp_paid_verified';
-        const priceAmt = (content.webinar?.price || '199');
+        try {
+          const uid = document.getElementById('ticketUserId')?.textContent?.trim() || 'FC-WEB-00000';
+          const name = document.getElementById('ticketHolderName')?.textContent?.trim() || document.getElementById('ticketClientName')?.textContent?.trim() || 'Valued Creator';
+          const type = document.getElementById('ticketWebsiteType')?.textContent?.trim() || 'Webinar Masterclass';
+          const dateText = document.getElementById('ticketModalDateText')?.textContent?.trim() || 'Sunday, 9:00 AM IST';
+          const payId = document.getElementById('ticketPaymentId')?.textContent?.trim() || 'rzp_paid_verified';
+          
+          let priceAmt = '2';
+          const amtElem = document.getElementById('ticketPassAmountText');
+          if (amtElem && amtElem.textContent) {
+            const m = amtElem.textContent.match(/\d+/);
+            if (m) priceAmt = m[0];
+          }
 
-        const canvas = document.createElement('canvas');
-        canvas.width = 1200;
-        canvas.height = 680;
-        const ctx = canvas.getContext('2d');
+          const canvas = document.createElement('canvas');
+          canvas.width = 1200;
+          canvas.height = 680;
+          const ctx = canvas.getContext('2d');
 
-        // 1. Dark Obsidian & Indigo Gradient Background
-        const bgGrad = ctx.createLinearGradient(0, 0, 1200, 680);
-        bgGrad.addColorStop(0, '#090D16');
-        bgGrad.addColorStop(0.5, '#13182C');
-        bgGrad.addColorStop(1, '#070A10');
-        ctx.fillStyle = bgGrad;
-        ctx.fillRect(0, 0, 1200, 680);
+          // 1. Dark Obsidian & Indigo Gradient Background
+          const bgGrad = ctx.createLinearGradient(0, 0, 1200, 680);
+          bgGrad.addColorStop(0, '#090D16');
+          bgGrad.addColorStop(0.5, '#13182C');
+          bgGrad.addColorStop(1, '#070A10');
+          ctx.fillStyle = bgGrad;
+          ctx.fillRect(0, 0, 1200, 680);
 
-        // 2. Ambient Aura Glows
-        const glow1 = ctx.createRadialGradient(1050, 120, 10, 1050, 120, 400);
-        glow1.addColorStop(0, 'rgba(99, 102, 241, 0.25)');
-        glow1.addColorStop(1, 'rgba(99, 102, 241, 0)');
-        ctx.fillStyle = glow1;
-        ctx.fillRect(0, 0, 1200, 680);
+          // 2. Ambient Aura Glows
+          const glow1 = ctx.createRadialGradient(1050, 120, 10, 1050, 120, 400);
+          glow1.addColorStop(0, 'rgba(99, 102, 241, 0.25)');
+          glow1.addColorStop(1, 'rgba(99, 102, 241, 0)');
+          ctx.fillStyle = glow1;
+          ctx.fillRect(0, 0, 1200, 680);
 
-        const glow2 = ctx.createRadialGradient(150, 550, 10, 150, 550, 350);
-        glow2.addColorStop(0, 'rgba(16, 185, 129, 0.18)');
-        glow2.addColorStop(1, 'rgba(16, 185, 129, 0)');
-        ctx.fillStyle = glow2;
-        ctx.fillRect(0, 0, 1200, 680);
+          const glow2 = ctx.createRadialGradient(150, 550, 10, 150, 550, 350);
+          glow2.addColorStop(0, 'rgba(16, 185, 129, 0.18)');
+          glow2.addColorStop(1, 'rgba(16, 185, 129, 0)');
+          ctx.fillStyle = glow2;
+          ctx.fillRect(0, 0, 1200, 680);
 
-        // 3. Gold & Indigo Metallic Outer Border
-        const borderGrad = ctx.createLinearGradient(0, 0, 1200, 680);
-        borderGrad.addColorStop(0, '#6366F1');
-        borderGrad.addColorStop(0.5, '#F59E0B');
-        borderGrad.addColorStop(1, '#10B981');
-        ctx.strokeStyle = borderGrad;
-        ctx.lineWidth = 6;
-        ctx.strokeRect(20, 20, 1160, 640);
+          // 3. Gold & Indigo Metallic Outer Border
+          const borderGrad = ctx.createLinearGradient(0, 0, 1200, 680);
+          borderGrad.addColorStop(0, '#6366F1');
+          borderGrad.addColorStop(0.5, '#F59E0B');
+          borderGrad.addColorStop(1, '#10B981');
+          ctx.strokeStyle = borderGrad;
+          ctx.lineWidth = 6;
+          ctx.strokeRect(20, 20, 1160, 640);
 
-        // 4. Inner Dashed Border
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-        ctx.lineWidth = 1.5;
-        ctx.setLineDash([8, 6]);
-        ctx.strokeRect(32, 32, 1136, 616);
-        ctx.setLineDash([]);
+          // 4. Inner Dashed Border
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+          ctx.lineWidth = 1.5;
+          ctx.setLineDash([8, 6]);
+          ctx.strokeRect(32, 32, 1136, 616);
+          ctx.setLineDash([]);
 
-        // 5. Header Bar
-        ctx.fillStyle = '#1E1B4B';
-        ctx.fillRect(34, 34, 1132, 90);
-        
-        ctx.fillStyle = '#FFFFFF';
-        ctx.font = 'bold 30px "Inter", sans-serif';
-        ctx.fillText('FLIPCUT CREATION', 70, 88);
+          // 5. Header Bar
+          ctx.fillStyle = '#1E1B4B';
+          ctx.fillRect(34, 34, 1132, 90);
+          
+          ctx.fillStyle = '#FFFFFF';
+          ctx.font = 'bold 30px "Inter", sans-serif';
+          ctx.fillText('FLIPCUT CREATION', 70, 88);
 
-        ctx.fillStyle = '#94A3B8';
-        ctx.font = '600 15px "Inter", sans-serif';
-        ctx.fillText('OFFICIAL WEBINAR MASTERCLASS • VIP ACCESS TICKET', 70, 112);
+          ctx.fillStyle = '#94A3B8';
+          ctx.font = '600 15px "Inter", sans-serif';
+          ctx.fillText('OFFICIAL WEBINAR MASTERCLASS • VIP ACCESS TICKET', 70, 112);
 
-        // VIP Access Gold Badge in Header
-        ctx.fillStyle = 'rgba(245, 158, 11, 0.2)';
-        ctx.fillRect(900, 58, 240, 42);
-        ctx.strokeStyle = '#F59E0B';
-        ctx.lineWidth = 1.5;
-        ctx.strokeRect(900, 58, 240, 42);
-        ctx.fillStyle = '#FCD34D';
-        ctx.font = 'bold 16px "Inter", sans-serif';
-        ctx.fillText('★ OFFICIAL VIP PASS ★', 920, 85);
+          // VIP Access Gold Badge in Header
+          ctx.fillStyle = 'rgba(245, 158, 11, 0.2)';
+          ctx.fillRect(900, 58, 240, 42);
+          ctx.strokeStyle = '#F59E0B';
+          ctx.lineWidth = 1.5;
+          ctx.strokeRect(900, 58, 240, 42);
+          ctx.fillStyle = '#FCD34D';
+          ctx.font = 'bold 16px "Inter", sans-serif';
+          ctx.fillText('★ OFFICIAL VIP PASS ★', 920, 85);
 
-        // 6. Pass Holder Section
-        ctx.fillStyle = '#94A3B8';
-        ctx.font = '600 16px "Inter", sans-serif';
-        ctx.fillText('PASS HOLDER NAME', 70, 175);
+          // 6. Pass Holder Section
+          ctx.fillStyle = '#94A3B8';
+          ctx.font = '600 16px "Inter", sans-serif';
+          ctx.fillText('PASS HOLDER NAME', 70, 175);
 
-        ctx.fillStyle = '#FFFFFF';
-        ctx.font = 'bold 42px "Inter", sans-serif';
-        ctx.fillText(name, 70, 225);
+          ctx.fillStyle = '#FFFFFF';
+          ctx.font = 'bold 42px "Inter", sans-serif';
+          ctx.fillText(name, 70, 225);
 
-        // 7. Registered User ID Badge
-        ctx.fillStyle = 'rgba(99, 102, 241, 0.18)';
-        ctx.fillRect(70, 255, 340, 54);
-        ctx.strokeStyle = '#6366F1';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(70, 255, 340, 54);
+          // 7. Registered User ID Badge
+          ctx.fillStyle = 'rgba(99, 102, 241, 0.18)';
+          ctx.fillRect(70, 255, 340, 54);
+          ctx.strokeStyle = '#6366F1';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(70, 255, 340, 54);
 
-        ctx.fillStyle = '#818CF8';
-        ctx.font = 'bold 14px "Inter", sans-serif';
-        ctx.fillText('USER ID:', 85, 289);
-        ctx.fillStyle = '#FFFFFF';
-        ctx.font = 'bold 24px monospace';
-        ctx.fillText(uid, 160, 291);
+          ctx.fillStyle = '#818CF8';
+          ctx.font = 'bold 14px "Inter", sans-serif';
+          ctx.fillText('USER ID:', 85, 289);
+          ctx.fillStyle = '#FFFFFF';
+          ctx.font = 'bold 24px monospace';
+          ctx.fillText(uid, 160, 291);
 
-        // 8. Grid Details Card
-        ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
-        ctx.fillRect(70, 335, 1060, 145);
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
-        ctx.lineWidth = 1;
-        ctx.strokeRect(70, 335, 1060, 145);
+          // 8. Grid Details Card
+          ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
+          ctx.fillRect(70, 335, 1060, 145);
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+          ctx.lineWidth = 1;
+          ctx.strokeRect(70, 335, 1060, 145);
 
-        // Column 1: Website Type & Fee
-        ctx.fillStyle = '#94A3B8';
-        ctx.font = '600 15px "Inter", sans-serif';
-        ctx.fillText('WEBSITE CATEGORY', 100, 375);
-        ctx.fillStyle = '#60A5FA';
-        ctx.font = 'bold 22px "Inter", sans-serif';
-        ctx.fillText(type, 100, 410);
+          // Column 1: Website Type & Fee
+          ctx.fillStyle = '#94A3B8';
+          ctx.font = '600 15px "Inter", sans-serif';
+          ctx.fillText('WEBSITE CATEGORY', 100, 375);
+          ctx.fillStyle = '#60A5FA';
+          ctx.font = 'bold 22px "Inter", sans-serif';
+          ctx.fillText(type, 100, 410);
 
-        ctx.fillStyle = '#94A3B8';
-        ctx.font = '600 15px "Inter", sans-serif';
-        ctx.fillText('FEE STATUS', 100, 452);
-        ctx.fillStyle = '#34D399';
-        ctx.font = 'bold 18px "Inter", sans-serif';
-        ctx.fillText('₹' + priceAmt + ' (Confirmed via Razorpay)', 210, 452);
+          ctx.fillStyle = '#94A3B8';
+          ctx.font = '600 15px "Inter", sans-serif';
+          ctx.fillText('FEE STATUS', 100, 452);
+          ctx.fillStyle = '#34D399';
+          ctx.font = 'bold 18px "Inter", sans-serif';
+          ctx.fillText('₹' + priceAmt + ' (Confirmed via Razorpay)', 210, 452);
 
-        // Column 2: Date & Session Schedule
-        ctx.fillStyle = '#94A3B8';
-        ctx.font = '600 15px "Inter", sans-serif';
-        ctx.fillText('SESSION SCHEDULE', 600, 375);
-        ctx.fillStyle = '#F8FAFC';
-        ctx.font = 'bold 22px "Inter", sans-serif';
-        ctx.fillText(dateText, 600, 410);
+          // Column 2: Date & Session Schedule
+          ctx.fillStyle = '#94A3B8';
+          ctx.font = '600 15px "Inter", sans-serif';
+          ctx.fillText('SESSION SCHEDULE', 600, 375);
+          ctx.fillStyle = '#F8FAFC';
+          ctx.font = 'bold 22px "Inter", sans-serif';
+          ctx.fillText(dateText, 600, 410);
 
-        ctx.fillStyle = '#94A3B8';
-        ctx.font = '600 15px "Inter", sans-serif';
-        ctx.fillText('PAYMENT ID:', 600, 452);
-        ctx.fillStyle = '#A78BFA';
-        ctx.font = 'bold 17px monospace';
-        ctx.fillText(payId, 715, 452);
+          ctx.fillStyle = '#94A3B8';
+          ctx.font = '600 15px "Inter", sans-serif';
+          ctx.fillText('PAYMENT ID:', 600, 452);
+          ctx.fillStyle = '#A78BFA';
+          ctx.font = 'bold 17px monospace';
+          ctx.fillText(payId, 715, 452);
 
-        // 9. Perforated Cutout Circles Simulation
-        ctx.fillStyle = '#05070F';
-        ctx.beginPath(); ctx.arc(20, 520, 18, 0, Math.PI * 2); ctx.fill();
-        ctx.beginPath(); ctx.arc(1180, 520, 18, 0, Math.PI * 2); ctx.fill();
+          // 9. Perforated Cutout Circles Simulation
+          ctx.fillStyle = '#05070F';
+          ctx.beginPath(); ctx.arc(20, 520, 18, 0, Math.PI * 2); ctx.fill();
+          ctx.beginPath(); ctx.arc(1180, 520, 18, 0, Math.PI * 2); ctx.fill();
 
-        // 10. Perforated Dashed Line across bottom
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-        ctx.lineWidth = 2;
-        ctx.setLineDash([12, 8]);
-        ctx.beginPath();
-        ctx.moveTo(50, 520);
-        ctx.lineTo(1150, 520);
-        ctx.stroke();
-        ctx.setLineDash([]);
+          // 10. Perforated Dashed Line across bottom
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+          ctx.lineWidth = 2;
+          ctx.setLineDash([12, 8]);
+          ctx.beginPath();
+          ctx.moveTo(50, 520);
+          ctx.lineTo(1150, 520);
+          ctx.stroke();
+          ctx.setLineDash([]);
 
-        // 11. Barcode Strip Footer
-        ctx.fillStyle = '#FFFFFF';
-        let barX = 70;
-        const widths = [2, 5, 2, 8, 3, 2, 6, 2, 4, 3, 7, 2, 5, 2, 8, 3, 4, 2, 6, 3, 5, 2, 8, 4, 2, 6, 3, 5, 2, 4, 8, 3];
-        for (let i = 0; i < widths.length; i++) {
-          ctx.fillRect(barX, 555, widths[i], 50);
-          barX += widths[i] + 4;
-        }
+          // 11. Barcode Strip Footer
+          ctx.fillStyle = '#FFFFFF';
+          let barX = 70;
+          const widths = [2, 5, 2, 8, 3, 2, 6, 2, 4, 3, 7, 2, 5, 2, 8, 3, 4, 2, 6, 3, 5, 2, 8, 4, 2, 6, 3, 5, 2, 4, 8, 3];
+          for (let i = 0; i < widths.length; i++) {
+            ctx.fillRect(barX, 555, widths[i], 50);
+            barX += widths[i] + 4;
+          }
 
-        ctx.fillStyle = '#94A3B8';
-        ctx.font = '13px monospace';
-        ctx.fillText('VERIFICATION CODE: ' + uid + '-' + payId.slice(-6), 70, 625);
+          ctx.fillStyle = '#94A3B8';
+          ctx.font = '13px monospace';
+          ctx.fillText('VERIFICATION CODE: ' + uid + '-' + payId.slice(-6), 70, 625);
 
-        // 12. Green Verified Seal
-        ctx.fillStyle = '#10B981';
-        ctx.font = 'bold 18px "Inter", sans-serif';
-        ctx.fillText('✔ SEAT LOCKED & CONFIRMED', 820, 585);
+          // 12. Green Verified Seal
+          ctx.fillStyle = '#10B981';
+          ctx.font = 'bold 18px "Inter", sans-serif';
+          ctx.fillText('✔ SEAT LOCKED & CONFIRMED', 820, 585);
 
-        ctx.fillStyle = '#94A3B8';
-        ctx.font = '600 13px "Inter", sans-serif';
-        ctx.fillText('FlipCut Creation • flipcutcreation.in', 820, 612);
+          ctx.fillStyle = '#94A3B8';
+          ctx.font = '600 13px "Inter", sans-serif';
+          ctx.fillText('FlipCut Creation • flipcutcreation.in', 820, 612);
 
-        // Trigger Instant Download
-        const link = document.createElement('a');
-        link.download = `FlipCut-VIP-Pass-${uid}.png`;
-        link.href = canvas.toDataURL('image/png');
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+          // Trigger Instant Download
+          const link = document.createElement('a');
+          link.download = `FlipCut-VIP-Pass-${uid}.png`;
+          link.href = canvas.toDataURL('image/png');
+          document.body.appendChild(link);
+          link.click();
+          setTimeout(() => {
+            try { document.body.removeChild(link); } catch (err) {}
+          }, 1000);
 
-        if (typeof showToast === 'function') {
-          showToast(`📥 VIP Ticket downloaded (${uid}.png)!`, '#10B981');
+          if (typeof showToast === 'function') {
+            showToast(`📥 VIP Ticket downloaded (${uid}.png)!`, '#10B981');
+          }
+        } catch (e) {
+          console.error('[Download Image Error]', e);
         }
       };
 
