@@ -56,7 +56,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=11.8">
+  <link rel="stylesheet" href="styles.css?v=11.9">
 
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -66,13 +66,13 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- Dual Cloud Sync Engine (Firebase + Supabase) -->
-  <script src="firebase-sync.js?v=11.8"></script>
+  <script src="firebase-sync.js?v=11.9"></script>
 
   <!-- VIP User Profile Header Engine -->
-  <script src="user-profile.js?v=11.8"></script>
+  <script src="user-profile.js?v=11.9"></script>
 
   <!-- Content Store & Instant Zero-Flicker Pre-Hydration -->
-  <script src="content-store.js?v=11.8"></script>
+  <script src="content-store.js?v=11.9"></script>
   <script>
     (function() {
       try {
@@ -1016,43 +1016,75 @@
         Welcome <strong id="ticketClientName" class="text-gradient">Creator</strong>! Your seat has been locked.
       </p>
 
-      <!-- Unique User ID Card -->
-      <div class="ticket-pass-uid-card">
-        <div style="text-align: left;">
-          <span style="font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; display: block;">Registered User ID</span>
-          <strong id="ticketUserId" style="font-family: monospace; font-size: 1rem; color: var(--brand-indigo); letter-spacing: 0.04em;">FC-WEB-00000</strong>
+      <!-- Luxury VIP Boarding Pass Ticket UI -->
+      <div id="vipTicketCardCapture" class="vip-boarding-ticket">
+        <!-- Holographic Top Ribbon -->
+        <div class="vip-ticket-header">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <img src="assets/logo.png" alt="FlipCut" style="height: 20px; width: auto;">
+            <span style="font-weight: 800; font-size: 0.76rem; letter-spacing: 0.08em; text-transform: uppercase; color: #FFF;">FLIPCUT VIP PASS</span>
+          </div>
+          <span class="vip-ticket-badge">★ OFFICIAL ACCESS ★</span>
         </div>
-        <button type="button" class="btn btn-secondary" onclick="copyTicketUserId()" style="padding: 5px 10px; font-size: 0.75rem;" title="Copy User ID">
-          <i class="fa-solid fa-copy"></i> <span>Copy ID</span>
-        </button>
+
+        <div class="vip-ticket-body">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+            <div>
+              <span style="font-size: 0.65rem; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.05em; display: block;">PASS HOLDER</span>
+              <strong id="ticketHolderName" style="font-size: 1.05rem; color: #F8FAFC; letter-spacing: 0.02em;">-</strong>
+            </div>
+            <div style="text-align: right;">
+              <span style="font-size: 0.65rem; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.05em; display: block;">USER ID</span>
+              <code id="ticketUserId" style="font-family: monospace; font-size: 0.95rem; color: #818CF8; font-weight: 800; letter-spacing: 0.05em;">FC-WEB-00000</code>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 6px; margin-bottom: 8px; font-size: 0.76rem; background: rgba(15, 23, 42, 0.65); padding: 7px 10px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.06);">
+            <div>
+              <span style="color: #94A3B8; font-size: 0.65rem; display: block;"><i class="fa-solid fa-laptop-code"></i> Website Type:</span>
+              <strong id="ticketWebsiteType" style="color: #60A5FA;">-</strong>
+            </div>
+            <div>
+              <span style="color: #94A3B8; font-size: 0.65rem; display: block;"><i class="fa-solid fa-indian-rupee-sign"></i> Fee Paid:</span>
+              <strong id="ticketPassAmountText" style="color: #34D399;">₹2 (Confirmed)</strong>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.74rem; border-top: 1px dashed rgba(255, 255, 255, 0.15); padding-top: 6px;">
+            <div>
+              <span style="color: #94A3B8; font-size: 0.65rem; display: block;"><i class="fa-solid fa-calendar-days"></i> Session Schedule:</span>
+              <strong id="ticketModalDateText" style="color: #F1F5F9;">Sunday, 9:00 AM IST</strong>
+            </div>
+            <div style="text-align: right;">
+              <span style="color: #94A3B8; font-size: 0.65rem; display: block;"><i class="fa-solid fa-receipt"></i> Payment ID:</span>
+              <code id="ticketPaymentId" style="color: #A78BFA; font-size: 0.72rem;">-</code>
+            </div>
+          </div>
+        </div>
+
+        <!-- Perforated Ticket Notches -->
+        <div class="ticket-notch-left"></div>
+        <div class="ticket-notch-right"></div>
+
+        <!-- Barcode / VIP Seal Footer -->
+        <div class="vip-ticket-footer">
+          <div class="vip-barcode-strip" title="Official Verification Barcode">
+            <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <span style="font-size: 0.68rem; color: #10B981; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+            <i class="fa-solid fa-circle-check"></i> SEAT LOCKED & VERIFIED
+          </span>
+        </div>
       </div>
 
-      <!-- Digital Pass Ticket Card -->
-      <div class="ticket-pass-details-card">
-        <div class="ticket-pass-details-row">
-          <span style="color: var(--text-muted);"><i class="fa-solid fa-user"></i> Pass Holder:</span>
-          <strong id="ticketHolderName" style="color: var(--text-primary);">-</strong>
-        </div>
-
-        <div class="ticket-pass-details-row">
-          <span style="color: var(--text-muted);"><i class="fa-solid fa-laptop-code"></i> Website Type:</span>
-          <strong id="ticketWebsiteType" style="color: var(--brand-indigo);">-</strong>
-        </div>
-
-        <div class="ticket-pass-details-row">
-          <span style="color: var(--text-muted);"><i class="fa-solid fa-calendar-days"></i> Session Time:</span>
-          <strong style="color: var(--text-primary);" id="ticketModalDateText">Sunday, 9:00 AM IST</strong>
-        </div>
-
-        <div class="ticket-pass-details-row">
-          <span style="color: var(--text-muted);"><i class="fa-solid fa-indian-rupee-sign"></i> Amount Paid:</span>
-          <strong style="color: #10B981;" id="ticketPassAmountText">₹2 (Confirmed)</strong>
-        </div>
-
-        <div class="ticket-pass-details-row">
-          <span style="color: var(--text-muted);"><i class="fa-solid fa-receipt"></i> Payment ID:</span>
-          <code id="ticketPaymentId" style="color: var(--brand-indigo); font-weight: 700; font-size: 0.78rem;">-</code>
-        </div>
+      <!-- Download HD Ticket Action Button -->
+      <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 8px; margin-bottom: 10px;">
+        <button type="button" class="btn btn-primary" onclick="downloadVipTicketPassHD()" style="padding: 9px 12px; font-size: 0.84rem; font-weight: 700; justify-content: center; background: linear-gradient(135deg, #6366F1, #8B5CF6); border-color: #6366F1; box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);">
+          <i class="fa-solid fa-download"></i> <span>Download Pass (HD)</span>
+        </button>
+        <button type="button" class="btn btn-secondary" onclick="copyTicketUserId()" style="padding: 9px 10px; font-size: 0.8rem; justify-content: center;" title="Copy User ID">
+          <i class="fa-solid fa-copy"></i> <span>Copy ID</span>
+        </button>
       </div>
 
       <!-- Easy 3-Step WhatsApp Group Guide for Beginners -->
@@ -1990,6 +2022,199 @@
           if (cardWrap) cardWrap.scrollIntoView({ behavior: 'smooth', block: 'center' });
         });
       }
+
+      // Copy User ID Helper
+      window.copyTicketUserId = function() {
+        const uid = document.getElementById('ticketUserId')?.textContent?.trim() || 'FC-WEB-00000';
+        navigator.clipboard.writeText(uid).then(() => {
+          showToast(`📋 User ID "${uid}" copied to clipboard!`, '#10B981');
+        }).catch(() => {
+          showToast(`User ID: ${uid}`, '#10B981');
+        });
+      };
+
+      // Ultra-HD VIP Boarding Pass Ticket Image Generator & Downloader
+      window.downloadVipTicketPassHD = function() {
+        const uid = document.getElementById('ticketUserId')?.textContent?.trim() || 'FC-WEB-00000';
+        const name = document.getElementById('ticketHolderName')?.textContent?.trim() || document.getElementById('ticketClientName')?.textContent?.trim() || 'Valued Creator';
+        const type = document.getElementById('ticketWebsiteType')?.textContent?.trim() || 'Webinar Masterclass';
+        const dateText = document.getElementById('ticketModalDateText')?.textContent?.trim() || 'Sunday, 9:00 AM IST';
+        const payId = document.getElementById('ticketPaymentId')?.textContent?.trim() || 'rzp_paid_verified';
+        const priceAmt = (content.webinar?.price || '199');
+
+        const canvas = document.createElement('canvas');
+        canvas.width = 1200;
+        canvas.height = 680;
+        const ctx = canvas.getContext('2d');
+
+        // 1. Dark Obsidian & Indigo Gradient Background
+        const bgGrad = ctx.createLinearGradient(0, 0, 1200, 680);
+        bgGrad.addColorStop(0, '#090D16');
+        bgGrad.addColorStop(0.5, '#13182C');
+        bgGrad.addColorStop(1, '#070A10');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, 1200, 680);
+
+        // 2. Ambient Aura Glows
+        const glow1 = ctx.createRadialGradient(1050, 120, 10, 1050, 120, 400);
+        glow1.addColorStop(0, 'rgba(99, 102, 241, 0.25)');
+        glow1.addColorStop(1, 'rgba(99, 102, 241, 0)');
+        ctx.fillStyle = glow1;
+        ctx.fillRect(0, 0, 1200, 680);
+
+        const glow2 = ctx.createRadialGradient(150, 550, 10, 150, 550, 350);
+        glow2.addColorStop(0, 'rgba(16, 185, 129, 0.18)');
+        glow2.addColorStop(1, 'rgba(16, 185, 129, 0)');
+        ctx.fillStyle = glow2;
+        ctx.fillRect(0, 0, 1200, 680);
+
+        // 3. Gold & Indigo Metallic Outer Border
+        const borderGrad = ctx.createLinearGradient(0, 0, 1200, 680);
+        borderGrad.addColorStop(0, '#6366F1');
+        borderGrad.addColorStop(0.5, '#F59E0B');
+        borderGrad.addColorStop(1, '#10B981');
+        ctx.strokeStyle = borderGrad;
+        ctx.lineWidth = 6;
+        ctx.strokeRect(20, 20, 1160, 640);
+
+        // 4. Inner Dashed Border
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([8, 6]);
+        ctx.strokeRect(32, 32, 1136, 616);
+        ctx.setLineDash([]);
+
+        // 5. Header Bar
+        ctx.fillStyle = '#1E1B4B';
+        ctx.fillRect(34, 34, 1132, 90);
+        
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = 'bold 30px "Inter", sans-serif';
+        ctx.fillText('FLIPCUT CREATION', 70, 88);
+
+        ctx.fillStyle = '#94A3B8';
+        ctx.font = '600 15px "Inter", sans-serif';
+        ctx.fillText('OFFICIAL WEBINAR MASTERCLASS • VIP ACCESS TICKET', 70, 112);
+
+        // VIP Access Gold Badge in Header
+        ctx.fillStyle = 'rgba(245, 158, 11, 0.2)';
+        ctx.fillRect(900, 58, 240, 42);
+        ctx.strokeStyle = '#F59E0B';
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(900, 58, 240, 42);
+        ctx.fillStyle = '#FCD34D';
+        ctx.font = 'bold 16px "Inter", sans-serif';
+        ctx.fillText('★ OFFICIAL VIP PASS ★', 920, 85);
+
+        // 6. Pass Holder Section
+        ctx.fillStyle = '#94A3B8';
+        ctx.font = '600 16px "Inter", sans-serif';
+        ctx.fillText('PASS HOLDER NAME', 70, 175);
+
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = 'bold 42px "Inter", sans-serif';
+        ctx.fillText(name, 70, 225);
+
+        // 7. Registered User ID Badge
+        ctx.fillStyle = 'rgba(99, 102, 241, 0.18)';
+        ctx.fillRect(70, 255, 340, 54);
+        ctx.strokeStyle = '#6366F1';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(70, 255, 340, 54);
+
+        ctx.fillStyle = '#818CF8';
+        ctx.font = 'bold 14px "Inter", sans-serif';
+        ctx.fillText('USER ID:', 85, 289);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = 'bold 24px monospace';
+        ctx.fillText(uid, 160, 291);
+
+        // 8. Grid Details Card
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
+        ctx.fillRect(70, 335, 1060, 145);
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(70, 335, 1060, 145);
+
+        // Column 1: Website Type & Fee
+        ctx.fillStyle = '#94A3B8';
+        ctx.font = '600 15px "Inter", sans-serif';
+        ctx.fillText('WEBSITE CATEGORY', 100, 375);
+        ctx.fillStyle = '#60A5FA';
+        ctx.font = 'bold 22px "Inter", sans-serif';
+        ctx.fillText(type, 100, 410);
+
+        ctx.fillStyle = '#94A3B8';
+        ctx.font = '600 15px "Inter", sans-serif';
+        ctx.fillText('FEE STATUS', 100, 452);
+        ctx.fillStyle = '#34D399';
+        ctx.font = 'bold 18px "Inter", sans-serif';
+        ctx.fillText('₹' + priceAmt + ' (Confirmed via Razorpay)', 210, 452);
+
+        // Column 2: Date & Session Schedule
+        ctx.fillStyle = '#94A3B8';
+        ctx.font = '600 15px "Inter", sans-serif';
+        ctx.fillText('SESSION SCHEDULE', 600, 375);
+        ctx.fillStyle = '#F8FAFC';
+        ctx.font = 'bold 22px "Inter", sans-serif';
+        ctx.fillText(dateText, 600, 410);
+
+        ctx.fillStyle = '#94A3B8';
+        ctx.font = '600 15px "Inter", sans-serif';
+        ctx.fillText('PAYMENT ID:', 600, 452);
+        ctx.fillStyle = '#A78BFA';
+        ctx.font = 'bold 17px monospace';
+        ctx.fillText(payId, 715, 452);
+
+        // 9. Perforated Cutout Circles Simulation
+        ctx.fillStyle = '#05070F';
+        ctx.beginPath(); ctx.arc(20, 520, 18, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(1180, 520, 18, 0, Math.PI * 2); ctx.fill();
+
+        // 10. Perforated Dashed Line across bottom
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([12, 8]);
+        ctx.beginPath();
+        ctx.moveTo(50, 520);
+        ctx.lineTo(1150, 520);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // 11. Barcode Strip Footer
+        ctx.fillStyle = '#FFFFFF';
+        let barX = 70;
+        const widths = [2, 5, 2, 8, 3, 2, 6, 2, 4, 3, 7, 2, 5, 2, 8, 3, 4, 2, 6, 3, 5, 2, 8, 4, 2, 6, 3, 5, 2, 4, 8, 3];
+        for (let i = 0; i < widths.length; i++) {
+          ctx.fillRect(barX, 555, widths[i], 50);
+          barX += widths[i] + 4;
+        }
+
+        ctx.fillStyle = '#94A3B8';
+        ctx.font = '13px monospace';
+        ctx.fillText('VERIFICATION CODE: ' + uid + '-' + payId.slice(-6), 70, 625);
+
+        // 12. Green Verified Seal
+        ctx.fillStyle = '#10B981';
+        ctx.font = 'bold 18px "Inter", sans-serif';
+        ctx.fillText('✔ SEAT LOCKED & CONFIRMED', 820, 585);
+
+        ctx.fillStyle = '#94A3B8';
+        ctx.font = '600 13px "Inter", sans-serif';
+        ctx.fillText('FlipCut Creation • flipcutcreation.in', 820, 612);
+
+        // Trigger Instant Download
+        const link = document.createElement('a');
+        link.download = `FlipCut-VIP-Pass-${uid}.png`;
+        link.href = canvas.toDataURL('image/png');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        if (typeof showToast === 'function') {
+          showToast(`📥 VIP Ticket downloaded (${uid}.png)!`, '#10B981');
+        }
+      };
 
       // User Self-Edit Ticket Pass Handlers (Strict Max 2 Times Limit)
       const editPassModal = document.getElementById('editPassModal');

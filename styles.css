@@ -2577,14 +2577,97 @@ textarea.form-control {
   justify-content: space-between;
 }
 
-.ticket-pass-details-card {
-  background: var(--bg-tertiary);
-  border: 1px dashed var(--border-glow);
-  border-radius: 8px;
-  padding: 10px 12px;
+/* Ultra-Luxury VIP Boarding Pass Ticket UI */
+.vip-boarding-ticket {
+  background: linear-gradient(145deg, #0f172a 0%, #1e1b4b 60%, #090d16 100%);
+  border: 1.5px solid rgba(129, 140, 248, 0.4);
+  border-radius: 14px;
+  padding: 0;
+  margin-bottom: 12px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(99, 102, 241, 0.15);
   text-align: left;
-  font-size: 0.82rem;
-  margin-bottom: 10px;
+}
+
+.vip-ticket-header {
+  background: linear-gradient(90deg, #312E81, #4338CA, #1E1B4B);
+  padding: 8px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.vip-ticket-badge {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #FCD34D;
+  background: rgba(245, 158, 11, 0.2);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  padding: 2px 8px;
+  border-radius: 20px;
+  letter-spacing: 0.06em;
+}
+
+.vip-ticket-body {
+  padding: 12px 14px;
+}
+
+.ticket-notch-left, .ticket-notch-right {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background: var(--bg-card);
+  border-radius: 50%;
+  bottom: 28px;
+  z-index: 5;
+}
+
+.ticket-notch-left {
+  left: -7px;
+  border-right: 1.5px solid rgba(129, 140, 248, 0.4);
+}
+
+.ticket-notch-right {
+  right: -7px;
+  border-left: 1.5px solid rgba(129, 140, 248, 0.4);
+}
+
+.vip-ticket-footer {
+  background: rgba(15, 23, 42, 0.85);
+  border-top: 1px dashed rgba(255, 255, 255, 0.12);
+  padding: 8px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.vip-barcode-strip {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 14px;
+  opacity: 0.7;
+}
+
+.vip-barcode-strip span {
+  display: inline-block;
+  height: 100%;
+  background: #FFF;
+  width: 2px;
+}
+
+.vip-barcode-strip span:nth-child(2n) {
+  width: 3px;
+}
+
+.vip-barcode-strip span:nth-child(3n) {
+  width: 1px;
+}
+
+.vip-barcode-strip span:nth-child(5n) {
+  width: 4px;
 }
 
 .ticket-pass-details-row {
