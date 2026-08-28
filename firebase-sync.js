@@ -152,7 +152,43 @@ async function pushLeadToDualCloud(lead) {
     }
   })();
 
-  await Promise.allSettled([firestorePromise, supabasePromise, googleSheetPromise]);
+  
+  // 1E. Push to Convex Cloud Reactive Database (mellow-retriever-445)
+  const convexPromise = (async () => {
+    try {
+      const siteContent = (typeof getSiteContent === 'function') ? getSiteContent() : (window.flipcutSiteContent || {});
+      const convexUrl = siteContent.contact?.convexDeploymentUrl || siteContent.convexDeploymentUrl || 'https://mellow-retriever-445.convex.cloud';
+      const convexPath = siteContent.contact?.convexMutationPath || siteContent.convexMutationPath || 'leads:saveLead';
+
+      if (convexUrl && convexUrl.startsWith('http')) {
+        await fetch(`${convexUrl}/api/mutation`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            path: convexPath,
+            args: {
+              userId: leadPayload.id,
+              name: leadPayload.name || 'Valued Client',
+              phone: leadPayload.phone || '',
+              email: leadPayload.email || '',
+              service: leadPayload.service || 'Webinar Masterclass',
+              amount: leadPayload.budget || '₹2',
+              message: leadPayload.message || '',
+              status: leadPayload.status || 'Booked / Paid',
+              paymentId: leadPayload.paymentId || '',
+              date: new Date().toISOString()
+            },
+            format: 'json'
+          })
+        });
+        console.log('✅ Lead synced to Convex Cloud Database (mellow-retriever-445):', userId);
+      }
+    } catch (convexErr) {
+      console.warn('[Convex Cloud Sync Note]', convexErr.message);
+    }
+  })();
+
+  await Promise.allSettled([firestorePromise, supabasePromise, googleSheetPromise, convexPromise]);
   return leadPayload;
 }
 

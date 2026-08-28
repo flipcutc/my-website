@@ -43,7 +43,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=14.3">
+  <link rel="stylesheet" href="styles.css?v=14.4">
   
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -3112,10 +3112,10 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- Dual Cloud Sync Engine (Firebase + Supabase) -->
-  <script src="firebase-sync.js?v=14.3"></script>
+  <script src="firebase-sync.js?v=14.4"></script>
 
   <!-- CMS & SQL Engine Script -->
-  <script src="content-store.js?v=14.3"></script>
+  <script src="content-store.js?v=14.4"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
 
@@ -5471,6 +5471,8 @@ ${waGroup}
             setVal('cfgWhatsappNum', content.contact.whatsappNum);
             setVal('cfgWhatsappMsg', content.contact.whatsappMessage);
             setVal('cfgGoogleSheetWebhookUrl', content.contact.googleSheetWebhookUrl || '');
+            setVal('cfgConvexDeploymentUrl', content.contact.convexDeploymentUrl || 'https://mellow-retriever-445.convex.cloud');
+            setVal('cfgConvexMutationPath', content.contact.convexMutationPath || 'leads:saveLead');
             setVal('cfgInstaHandle', content.contact.instagramHandle);
             setVal('cfgYoutubeChannel', content.contact.youtubeChannel);
             setVal('cfgCopyrightText', content.contact.copyrightText);
