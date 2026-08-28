@@ -2524,6 +2524,130 @@ textarea.form-control {
   margin-bottom: 0;
 }
 
+/* Responsive Medium-Compact Ticket Pass Modal */
+.ticket-pass-modal-box {
+  max-width: 450px !important;
+  width: 92% !important;
+  max-height: 90vh !important;
+  overflow-y: auto !important;
+  text-align: center !important;
+  padding: 22px 20px !important;
+  background: var(--bg-card) !important;
+  border-radius: var(--radius-lg) !important;
+  border: 1.5px solid #10B981 !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55) !important;
+}
+
+.ticket-pass-icon-badge {
+  width: 52px;
+  height: 52px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1.5px solid #10B981;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 10px;
+  font-size: 1.5rem;
+  color: #10B981;
+}
+
+.ticket-pass-title {
+  font-size: 1.25rem;
+  margin-bottom: 4px;
+  color: var(--text-primary);
+  font-weight: 800;
+}
+
+.ticket-pass-subtitle {
+  color: var(--text-secondary);
+  font-size: 0.84rem;
+  margin-bottom: 12px;
+  line-height: 1.35;
+}
+
+.ticket-pass-uid-card {
+  background: rgba(99, 102, 241, 0.1);
+  border: 1px dashed var(--brand-indigo);
+  border-radius: 8px;
+  padding: 7px 12px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ticket-pass-details-card {
+  background: var(--bg-tertiary);
+  border: 1px dashed var(--border-glow);
+  border-radius: 8px;
+  padding: 10px 12px;
+  text-align: left;
+  font-size: 0.82rem;
+  margin-bottom: 10px;
+}
+
+.ticket-pass-details-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.ticket-pass-details-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.ticket-pass-wa-guide {
+  background: rgba(37, 211, 102, 0.08);
+  border: 1px solid #25D366;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  text-align: left;
+}
+
+@media (max-width: 480px) {
+  .ticket-pass-modal-box {
+    padding: 16px 12px !important;
+    max-width: 95% !important;
+    max-height: 88vh !important;
+    border-radius: var(--radius-md) !important;
+  }
+  .ticket-pass-icon-badge {
+    width: 42px;
+    height: 42px;
+    font-size: 1.25rem;
+    margin-bottom: 6px;
+  }
+  .ticket-pass-title {
+    font-size: 1.12rem;
+  }
+  .ticket-pass-subtitle {
+    font-size: 0.78rem;
+    margin-bottom: 8px;
+  }
+  .ticket-pass-uid-card {
+    padding: 5px 10px;
+    margin-bottom: 8px;
+  }
+  .ticket-pass-details-card {
+    padding: 8px 10px;
+    margin-bottom: 8px;
+    font-size: 0.76rem;
+  }
+  .ticket-pass-details-row {
+    padding: 3px 0;
+  }
+  .ticket-pass-wa-guide {
+    padding: 6px 10px;
+    margin-bottom: 10px;
+    font-size: 0.74rem;
+  }
+}
+
 .toast-box {
   position: fixed;
   bottom: 24px;

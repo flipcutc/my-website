@@ -56,7 +56,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=11.7">
+  <link rel="stylesheet" href="styles.css?v=11.8">
 
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -66,13 +66,13 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- Dual Cloud Sync Engine (Firebase + Supabase) -->
-  <script src="firebase-sync.js?v=11.7"></script>
+  <script src="firebase-sync.js?v=11.8"></script>
 
   <!-- VIP User Profile Header Engine -->
-  <script src="user-profile.js?v=11.7"></script>
+  <script src="user-profile.js?v=11.8"></script>
 
   <!-- Content Store & Instant Zero-Flicker Pre-Hydration -->
-  <script src="content-store.js?v=11.7"></script>
+  <script src="content-store.js?v=11.8"></script>
   <script>
     (function() {
       try {
@@ -1001,83 +1001,82 @@
 
   <!-- Digital Ticket Pass Modal -->
   <div class="lightbox-modal" id="ticketSuccessModal">
-    <div class="lightbox-content-box" style="max-width: 540px; text-align: center; padding: 36px 28px; background: var(--bg-card); border-radius: var(--radius-lg); border: 2px solid #10B981; box-shadow: 0 25px 60px rgba(0,0,0,0.5);">
+    <div class="lightbox-content-box ticket-pass-modal-box">
       
-      <button class="modal-close-btn" id="ticketModalCloseBtn" aria-label="Close Modal" style="top: 16px; right: 16px;">
+      <button class="modal-close-btn" id="ticketModalCloseBtn" aria-label="Close Modal" style="top: 12px; right: 12px; width: 34px; height: 34px; font-size: 1rem;">
         <i class="fa-solid fa-xmark"></i>
       </button>
 
-      <div style="width: 76px; height: 76px; background: rgba(16, 185, 129, 0.12); border: 2px solid #10B981; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; font-size: 2.2rem; color: #10B981;">
+      <div class="ticket-pass-icon-badge">
         <i class="fa-solid fa-ticket"></i>
       </div>
 
-      <h3 style="font-size: 1.6rem; margin-bottom: 6px; color: var(--text-primary);">🎉 Webinar Pass Confirmed!</h3>
-      <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 18px;">
-        Welcome <strong id="ticketClientName" class="text-gradient">Creator</strong>! Your seat has been locked and recorded in our system.
+      <h3 class="ticket-pass-title">🎉 Webinar Pass Confirmed!</h3>
+      <p class="ticket-pass-subtitle">
+        Welcome <strong id="ticketClientName" class="text-gradient">Creator</strong>! Your seat has been locked.
       </p>
 
       <!-- Unique User ID Card -->
-      <div style="background: rgba(99, 102, 241, 0.12); border: 1px dashed var(--brand-indigo); border-radius: var(--radius-md); padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between;">
+      <div class="ticket-pass-uid-card">
         <div style="text-align: left;">
-          <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; display: block;">Registered Pass User ID</span>
-          <strong id="ticketUserId" style="font-family: monospace; font-size: 1.15rem; color: var(--brand-indigo); letter-spacing: 0.05em;">FC-WEB-00000</strong>
+          <span style="font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; display: block;">Registered User ID</span>
+          <strong id="ticketUserId" style="font-family: monospace; font-size: 1rem; color: var(--brand-indigo); letter-spacing: 0.04em;">FC-WEB-00000</strong>
         </div>
-        <button type="button" class="btn btn-secondary" onclick="copyTicketUserId()" style="padding: 6px 12px; font-size: 0.78rem;" title="Copy User ID">
+        <button type="button" class="btn btn-secondary" onclick="copyTicketUserId()" style="padding: 5px 10px; font-size: 0.75rem;" title="Copy User ID">
           <i class="fa-solid fa-copy"></i> <span>Copy ID</span>
         </button>
       </div>
 
       <!-- Digital Pass Ticket Card -->
-      <div style="background: var(--bg-tertiary); border: 1.5px dashed var(--border-glow); border-radius: var(--radius-md); padding: 18px; text-align: left; font-size: 0.88rem; margin-bottom: 22px;">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px;">
+      <div class="ticket-pass-details-card">
+        <div class="ticket-pass-details-row">
           <span style="color: var(--text-muted);"><i class="fa-solid fa-user"></i> Pass Holder:</span>
           <strong id="ticketHolderName" style="color: var(--text-primary);">-</strong>
         </div>
 
-        <div style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px;">
+        <div class="ticket-pass-details-row">
           <span style="color: var(--text-muted);"><i class="fa-solid fa-laptop-code"></i> Website Type:</span>
           <strong id="ticketWebsiteType" style="color: var(--brand-indigo);">-</strong>
         </div>
 
-        <div style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px;">
+        <div class="ticket-pass-details-row">
           <span style="color: var(--text-muted);"><i class="fa-solid fa-calendar-days"></i> Session Time:</span>
           <strong style="color: var(--text-primary);" id="ticketModalDateText">Sunday, 9:00 AM IST</strong>
         </div>
 
-        <div style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px;">
+        <div class="ticket-pass-details-row">
           <span style="color: var(--text-muted);"><i class="fa-solid fa-indian-rupee-sign"></i> Amount Paid:</span>
-          <strong style="color: #10B981;" id="ticketPassAmountText">₹2 (Confirmed via Razorpay)</strong>
+          <strong style="color: #10B981;" id="ticketPassAmountText">₹2 (Confirmed)</strong>
         </div>
 
-        <div style="display: flex; justify-content: space-between;">
+        <div class="ticket-pass-details-row">
           <span style="color: var(--text-muted);"><i class="fa-solid fa-receipt"></i> Payment ID:</span>
-          <code id="ticketPaymentId" style="color: var(--brand-indigo); font-weight: 700;">-</code>
+          <code id="ticketPaymentId" style="color: var(--brand-indigo); font-weight: 700; font-size: 0.78rem;">-</code>
         </div>
       </div>
 
       <!-- Easy 3-Step WhatsApp Group Guide for Beginners -->
-      <div style="background: rgba(37, 211, 102, 0.08); border: 1.5px solid #25D366; border-radius: var(--radius-md); padding: 12px 14px; margin-bottom: 16px; text-align: left;">
-        <div style="font-weight: 800; font-size: 0.88rem; color: #15803D; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
-          <i class="fa-brands fa-whatsapp" style="font-size: 1.15rem; color: #25D366;"></i>
-          <span>முக்கியம்: WhatsApp Group-ல் இணைய 3 எளிய வழிகள்:</span>
+      <div class="ticket-pass-wa-guide">
+        <div style="font-weight: 800; font-size: 0.82rem; color: #15803D; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+          <i class="fa-brands fa-whatsapp" style="font-size: 1rem; color: #25D366;"></i>
+          <span>WhatsApp Group-ல் இணைய வழிமுறை:</span>
         </div>
-        <div style="font-size: 0.8rem; color: var(--text-primary); line-height: 1.55;">
-          1. கீழே உள்ள <strong>"Join VIP WhatsApp Group"</strong> பட்டனை கிளிக் செய்யவும்.<br>
-          2. உங்கள் மொபைலில் தானாகவே WhatsApp திறக்கும்.<br>
-          3. அதில் <strong>"Join Group"</strong> பட்டனை அழுத்தி குழுவில் இணையவும்.
+        <div style="font-size: 0.76rem; color: var(--text-primary); line-height: 1.45;">
+          1. கீழே உள்ள <strong>"Join VIP WhatsApp Group"</strong> கிளிக் செய்யவும்.<br>
+          2. WhatsApp-ல் <strong>"Join Group"</strong> அழுத்தி இணையவும்.
         </div>
       </div>
 
-      <div style="display: flex; gap: 10px; flex-direction: column;">
-        <a href="#" target="_blank" rel="noopener" id="ticketWhatsAppBtn" class="btn btn-whatsapp" style="width: 100%; padding: 13px; font-size: 0.98rem; font-weight: 700; box-shadow: 0 4px 15px rgba(37,211,102,0.35);">
-          <i class="fa-brands fa-whatsapp" style="font-size: 1.25rem;"></i>
+      <div style="display: flex; gap: 8px; flex-direction: column;">
+        <a href="#" target="_blank" rel="noopener" id="ticketWhatsAppBtn" class="btn btn-whatsapp" style="width: 100%; padding: 11px 12px; font-size: 0.92rem; font-weight: 700; box-shadow: 0 4px 15px rgba(37,211,102,0.35);">
+          <i class="fa-brands fa-whatsapp" style="font-size: 1.15rem;"></i>
           <span id="ticketWhatsAppBtnText">👉 Click Here to Join VIP WhatsApp Group</span>
         </a>
         <div style="display: flex; gap: 8px;">
-          <button type="button" class="btn btn-secondary" onclick="openEditPassModal()" style="flex: 1; padding: 10px; font-size: 0.85rem; justify-content: center; color: var(--brand-indigo); border-color: var(--brand-indigo);">
+          <button type="button" class="btn btn-secondary" onclick="openEditPassModal()" style="flex: 1; padding: 8px 10px; font-size: 0.82rem; justify-content: center; color: var(--brand-indigo); border-color: var(--brand-indigo);">
             <i class="fa-solid fa-user-pen"></i> <span>Edit Details</span>
           </button>
-          <button type="button" class="btn btn-primary" id="ticketDoneBtn" style="flex: 1.2; padding: 10px; font-size: 0.85rem;">
+          <button type="button" class="btn btn-primary" id="ticketDoneBtn" style="flex: 1.2; padding: 8px 10px; font-size: 0.82rem;">
             <span>Done & Return</span>
           </button>
         </div>
