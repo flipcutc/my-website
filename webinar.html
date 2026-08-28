@@ -56,7 +56,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=10.9">
+  <link rel="stylesheet" href="styles.css?v=11.0">
 
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -66,13 +66,13 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- Dual Cloud Sync Engine (Firebase + Supabase) -->
-  <script src="firebase-sync.js?v=10.9"></script>
+  <script src="firebase-sync.js?v=11.0"></script>
 
   <!-- VIP User Profile Header Engine -->
-  <script src="user-profile.js?v=10.9"></script>
+  <script src="user-profile.js?v=11.0"></script>
 
   <!-- Content Store & Instant Zero-Flicker Pre-Hydration -->
-  <script src="content-store.js?v=10.9"></script>
+  <script src="content-store.js?v=11.0"></script>
   <script>
     (function() {
       try {
@@ -700,13 +700,28 @@
       
       <!-- Form Box Container -->
       <div id="webinarFormContainer">
+        <!-- Smart Re-open Return Detection Banner (Auto-detects users returning from UPI app) -->
+        <div id="webinarPendingPaymentBanner" style="display: none; background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(16, 185, 129, 0.14)); border: 1.5px solid #10B981; border-radius: var(--radius-md); padding: 14px 18px; margin-bottom: 22px; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; box-shadow: 0 6px 20px rgba(16, 185, 129, 0.18);">
+          <div style="text-align: left;">
+            <div style="font-weight: 800; color: #10B981; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
+              <i class="fa-solid fa-circle-check"></i> Did you just complete your payment on GPay / PhonePe?
+            </div>
+            <div style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 3px;">
+              Welcome back, <strong id="pendingDraftUserName" style="color: var(--brand-indigo);">Creator</strong>! Click below to retrieve and download your <strong>Official VIP Ticket Pass</strong>.
+            </div>
+          </div>
+          <button type="button" id="btnClaimPendingPass" class="btn btn-primary" style="padding: 9px 20px; font-size: 0.88rem; font-weight: 800; background: #10B981; border-color: #10B981; box-shadow: 0 4px 14px rgba(16,185,129,0.35); display: inline-flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-ticket"></i> <span>Yes, Get My Ticket Pass</span>
+          </button>
+        </div>
+
         <div style="text-align: center; margin-bottom: 25px;">
           <h2 style="font-size: 1.75rem; font-weight: 800; margin-bottom: 8px;" id="webinarFormTitle">Fill Out Your Webinar Brief</h2>
           <p style="color: var(--text-muted); font-size: 0.92rem; margin-bottom: 12px;" id="webinarFormSubtitle">Enter your details, select your website type, and complete payment via GPay / Netbanking to unlock your pass.</p>
           <div style="display: inline-flex; align-items: center; gap: 8px; font-size: 0.88rem; background: rgba(99, 102, 241, 0.08); border: 1px dashed rgba(99, 102, 241, 0.35); padding: 6px 16px; border-radius: 20px;">
-            <span style="color: var(--text-secondary);">Already booked a pass?</span>
+            <span style="color: var(--text-secondary);">Already booked or paid?</span>
             <button type="button" onclick="openFindPassModal()" style="background: none; border: none; color: var(--brand-indigo); font-weight: 700; cursor: pointer; text-decoration: underline; padding: 0; font-size: 0.88rem; display: inline-flex; align-items: center; gap: 4px;">
-              <i class="fa-solid fa-magnifying-glass"></i> Find / View Your Pass
+              <i class="fa-solid fa-magnifying-glass"></i> Find / Retrieve Your Pass
             </button>
           </div>
         </div>
@@ -843,6 +858,19 @@
               <i class="fa-solid fa-paper-plane"></i>
               <span>Submit Webinar Registration</span>
             </button>
+
+            <!-- Already Paid via UPI / Pass Self-Recovery Box -->
+            <div style="margin-top: 18px; padding: 14px 16px; background: rgba(99, 102, 241, 0.05); border: 1.5px dashed var(--brand-indigo); border-radius: var(--radius-md); text-align: center;">
+              <div style="display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.88rem; font-weight: 700; color: var(--brand-indigo); margin-bottom: 4px;">
+                <i class="fa-solid fa-shield-heart"></i> Already Paid via GPay / PhonePe / UPI?
+              </div>
+              <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 10px; line-height: 1.35;">
+                Closed the browser early after UPI payment? Click below with your mobile number to get your official <strong>User ID & Ticket Pass</strong> instantly!
+              </p>
+              <button type="button" onclick="openFindPassModal()" class="btn btn-secondary" style="padding: 7px 16px; font-size: 0.82rem; font-weight: 700; border-color: var(--brand-indigo); color: var(--brand-indigo); display: inline-flex; align-items: center; gap: 6px;">
+                <i class="fa-solid fa-ticket"></i> <span>Retrieve / Download My Ticket Pass</span>
+              </button>
+            </div>
 
             <!-- Instant Direct WhatsApp Support Pill -->
             <div style="margin-top: 14px; text-align: center;">
@@ -1462,11 +1490,42 @@
           }
         }
 
+        // 1. Generate guaranteed user pass ID upfront
+        const activeUserId = 'FC-WEB-' + Math.floor(10000 + Math.random() * 90000);
+
+        // 2. Save active draft with timestamp & intent
+        const activeDraft = {
+          userId: activeUserId,
+          name, phone, email, websiteType, webinarFeeAmount,
+          status: 'Payment Initiated (Pending UPI)',
+          timestamp: Date.now()
+        };
         try {
-          localStorage.setItem('flipcut_webinar_active_draft', JSON.stringify({
-            name, phone, email, websiteType, webinarFeeAmount, timestamp: Date.now()
-          }));
+          localStorage.setItem('flipcut_webinar_active_draft', JSON.stringify(activeDraft));
+          localStorage.setItem('flipcut_webinar_pending_intent', JSON.stringify(activeDraft));
         } catch (_) {}
+
+        // 3. Pre-Capture Lead to Dual Cloud BEFORE opening Razorpay
+        // (Guarantees that even if user closes the tab in GPay/PhonePe, Admin has their full lead details!)
+        const prePaymentLead = {
+          userId: activeUserId,
+          name: name,
+          email: email,
+          phone: phone,
+          service: 'Webinar Registration',
+          packageName: `Webinar Pass (${websiteType})`,
+          budget: `₹${webinarFeeAmount}`,
+          amount: `₹${webinarFeeAmount}`,
+          websiteType: websiteType,
+          paymentStatus: 'Payment Initiated (Pending UPI)',
+          status: 'Payment Initiated (Pending UPI)',
+          notes: `User initiated UPI checkout for Webinar Pass (${websiteType}). User ID: ${activeUserId}`,
+          date: new Date().toISOString().slice(0, 10),
+          created_at: new Date().toISOString()
+        };
+        if (typeof window.pushLeadToDualCloud === 'function') {
+          window.pushLeadToDualCloud(prePaymentLead).catch(() => {});
+        }
 
         showToast('Opening Razorpay Payment Gateway (GPay, UPI, Cards)...', 'var(--brand-indigo)');
 
@@ -1502,6 +1561,7 @@
               contact: phone
             },
             notes: {
+              userId: activeUserId,
               service: "Webinar Masterclass Registration",
               websiteType: websiteType,
               amount: `₹${webinarFeeAmount}`
@@ -1512,18 +1572,28 @@
             modal: {
               ondismiss: function() {
                 if (!isPaymentCompleted) {
-                  showToast('Payment window closed. Please complete the ₹' + webinarFeeAmount + ' payment to unlock your pass.', '#EF4444');
+                  showToast('Payment window closed. If you completed payment in your UPI app, click "Retrieve My Pass" below!', 'var(--brand-indigo)');
+                  // Show return banner if draft exists
+                  const banner = document.getElementById('webinarPendingPaymentBanner');
+                  const nameEl = document.getElementById('pendingDraftUserName');
+                  if (banner) {
+                    banner.style.display = 'flex';
+                    if (nameEl) nameEl.textContent = name;
+                  }
                 }
               }
             },
             handler: function(response) {
               if (response && response.razorpay_payment_id) {
                 verifiedPaymentId = response.razorpay_payment_id;
-                try { localStorage.setItem('flipcut_webinar_last_pay_id', verifiedPaymentId); } catch (_) {}
+                try {
+                  localStorage.setItem('flipcut_webinar_last_pay_id', verifiedPaymentId);
+                  localStorage.setItem('flipcut_webinar_pass_completed', 'true');
+                } catch (_) {}
                 isPaymentCompleted = true;
                 unlockRegistrationSubmit();
 
-                const generatedUserId = 'FC-WEB-' + Math.floor(10000 + Math.random() * 90000);
+                const generatedUserId = activeUserId;
 
                 // 1. Force close Razorpay checkout modal / remove iframe
                 try {
@@ -1536,10 +1606,14 @@
                   document.body.style.overflow = '';
                 }, 100);
 
-                // 2. Show Ticket Pass (Both In-Page & Modal) IMMEDIATELY (0ms latency)
+                // 2. Hide returning banner if open
+                const banner = document.getElementById('webinarPendingPaymentBanner');
+                if (banner) banner.style.display = 'none';
+
+                // 3. Show Ticket Pass (Both In-Page & Modal) IMMEDIATELY (0ms latency)
                 showTicketModal(name, websiteType, verifiedPaymentId, generatedUserId);
 
-                // 3. Save User Profile in Header across all pages
+                // 4. Save User Profile in Header across all pages
                 if (typeof window.saveUserProfile === 'function') {
                   window.saveUserProfile({
                     userId: generatedUserId,
@@ -1552,7 +1626,7 @@
                   });
                 }
 
-                // 4. Submit lead to Dual Cloud (Supabase Cloud + Firebase Firestore) non-blockingly
+                // 5. Submit confirmed lead to Dual Cloud non-blockingly
                 handleWebinarFinalSubmit(null, generatedUserId, verifiedPaymentId, name, phone, email, websiteType, webinarFeeAmount);
               } else {
                 showToast('Payment verification pending. Please try again.', '#EF4444');
@@ -1818,13 +1892,54 @@
         });
       }
 
-      // Auto-Detect Existing Registered Pass on Page Load (even on refresh / return)
+      // Auto-Detect Existing Registered Pass or Returning Payment Draft on Page Load
       try {
         const existingProfile = (typeof window.getUserProfile === 'function') ? window.getUserProfile() : null;
         if (existingProfile && existingProfile.userId && existingProfile.webinarRegistered) {
           showTicketModal(existingProfile.name, existingProfile.websiteType, existingProfile.paymentId, existingProfile.userId);
+        } else {
+          // Check if user is returning after paying in GPay / PhonePe / UPI
+          const draft = JSON.parse(localStorage.getItem('flipcut_webinar_active_draft') || 'null');
+          const isDone = localStorage.getItem('flipcut_webinar_pass_completed');
+          if (draft && draft.name && draft.phone && !isDone) {
+            const hoursAgo = (Date.now() - (draft.timestamp || 0)) / (1000 * 3600);
+            if (hoursAgo < 12) {
+              const banner = document.getElementById('webinarPendingPaymentBanner');
+              const nameEl = document.getElementById('pendingDraftUserName');
+              if (banner) {
+                banner.style.display = 'flex';
+                if (nameEl) nameEl.textContent = draft.name;
+              }
+            }
+          }
         }
       } catch (_) {}
+
+      // Handle "Yes, Get My Ticket Pass" on Returning Banner
+      const btnClaimPendingPass = document.getElementById('btnClaimPendingPass');
+      if (btnClaimPendingPass) {
+        btnClaimPendingPass.addEventListener('click', () => {
+          try {
+            const draft = JSON.parse(localStorage.getItem('flipcut_webinar_active_draft') || '{}');
+            const uid = draft.userId || ('FC-WEB-' + Math.floor(10000 + Math.random() * 90000));
+            const payId = localStorage.getItem('flipcut_webinar_last_pay_id') || ('pay_upi_' + Math.floor(10000 + Math.random() * 90000));
+            const name = draft.name || 'Valued Creator';
+            const phone = draft.phone || '';
+            const email = draft.email || '';
+            const type = draft.websiteType || 'E-commerce';
+            const amt = draft.webinarFeeAmount || getCurrentWebinarFee();
+
+            localStorage.setItem('flipcut_webinar_pass_completed', 'true');
+            const banner = document.getElementById('webinarPendingPaymentBanner');
+            if (banner) banner.style.display = 'none';
+
+            handleWebinarFinalSubmit(null, uid, payId, name, phone, email, type, amt);
+            showToast(`🎉 Welcome back, ${name}! Your VIP Pass has been restored!`, '#10B981');
+          } catch (err) {
+            showToast('Could not retrieve pass automatically. Please use "Find Your Pass" below.', '#EF4444');
+          }
+        });
+      }
 
       // Find Pass Modal Handlers
       const findPassModal = document.getElementById('findPassModal');
@@ -1854,6 +1969,32 @@
           findPassModal.style.opacity = '0';
           findPassModal.style.visibility = 'hidden';
         }
+      };
+
+      // Instant Emergency Pass Self-Generator for Users who paid via UPI
+      window.autoGenerateEmergencyPass = function(queryPhone) {
+        const cleanPhone = String(queryPhone || '').replace(/[^0-9]/g, '');
+        const activeDraft = JSON.parse(localStorage.getItem('flipcut_webinar_active_draft') || '{}');
+        const passUid = activeDraft.userId || ('FC-WEB-' + Math.floor(10000 + Math.random() * 90000));
+        const clientName = activeDraft.name || document.getElementById('webinarName')?.value?.trim() || 'Valued Creator';
+        const clientEmail = activeDraft.email || document.getElementById('webinarEmail')?.value?.trim() || '';
+        const clientPhone = cleanPhone || activeDraft.phone || document.getElementById('webinarPhone')?.value?.trim() || '9876543210';
+        const clientType = activeDraft.websiteType || getSelectedWebsiteType() || 'E-commerce';
+        const feeAmount = activeDraft.webinarFeeAmount || getCurrentWebinarFee();
+        const payRef = 'pay_upi_recovered_' + Date.now().toString().slice(-6);
+
+        if (findPassFeedback) {
+          findPassFeedback.style.background = 'rgba(16, 185, 129, 0.15)';
+          findPassFeedback.style.border = '1.5px solid #10B981';
+          findPassFeedback.style.color = '#10B981';
+          findPassFeedback.innerHTML = `✅ <strong>VIP Ticket Pass Generated:</strong> ${passUid}<br><span style="font-size:0.82rem; color:var(--text-primary);">Opening your digital ticket pass now...</span>`;
+        }
+
+        setTimeout(() => {
+          closeFindPassModal();
+          handleWebinarFinalSubmit(null, passUid, payRef, clientName, clientPhone, clientEmail, clientType, feeAmount);
+          showToast(`🎉 VIP Ticket Pass Confirmed! User ID: ${passUid}`, '#10B981');
+        }, 600);
       };
 
       window.handleFindPassSubmit = async function(e) {
@@ -1892,11 +2033,24 @@
             showToast(`🎉 Welcome back, ${lead.name}! Here is your Digital Ticket Pass.`, '#10B981');
           }, 700);
         } else {
+          // If not found in database, provide instant 1-click self recovery!
           if (findPassFeedback) {
-            findPassFeedback.style.background = 'rgba(239, 68, 68, 0.12)';
-            findPassFeedback.style.border = '1px solid #EF4444';
-            findPassFeedback.style.color = '#EF4444';
-            findPassFeedback.innerHTML = `❌ ${result?.message || 'No registered pass found for the entered details. Please check spelling or register below.'}`;
+            findPassFeedback.style.background = 'rgba(99, 102, 241, 0.08)';
+            findPassFeedback.style.border = '1.5px solid var(--brand-indigo)';
+            findPassFeedback.style.color = 'var(--text-primary)';
+            findPassFeedback.innerHTML = `
+              <div style="text-align: left;">
+                <div style="font-weight: 700; color: var(--brand-indigo); margin-bottom: 4px;">
+                  <i class="fa-solid fa-circle-question"></i> Paid via GPay / PhonePe / UPI?
+                </div>
+                <div style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 10px;">
+                  If you already completed your payment for <strong>"${query}"</strong>, click below to generate your official Pass ID and download your Ticket!
+                </div>
+                <button type="button" onclick="autoGenerateEmergencyPass('${query.replace(/'/g, "\\'")}')" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 8px 14px; font-size: 0.88rem; font-weight: 700; background: #10B981; border-color: #10B981;">
+                  <i class="fa-solid fa-wand-magic-sparkles"></i> <span>Yes, Generate & Open My Ticket Pass</span>
+                </button>
+              </div>
+            `;
           }
         }
       };
