@@ -114,12 +114,20 @@ async function pushLeadToDualCloud(lead) {
   } catch (_) {}
 
   
-  // 1D. Push to Google Sheets Cloud (15 GB Lifetime Free Backup)
+  // 1D. Push to Google Sheets Cloud (15 GB Lifetime Free Backup with Strict Deduplication)
+  if (!window._syncedGoogleSheetsLeads) {
+    window._syncedGoogleSheetsLeads = new Set();
+  }
+
   const googleSheetPromise = (async () => {
     try {
+      if (window._syncedGoogleSheetsLeads.has(userId)) {
+        return; // Prevent duplicate row in Google Sheet
+      }
       const siteContent = (typeof getSiteContent === 'function') ? getSiteContent() : (window.flipcutSiteContent || {});
       const sheetUrl = siteContent.contact?.googleSheetWebhookUrl || siteContent.googleSheetWebhookUrl || '';
       if (sheetUrl && sheetUrl.startsWith('http')) {
+        window._syncedGoogleSheetsLeads.add(userId);
         await fetch(sheetUrl, {
           method: 'POST',
           mode: 'no-cors',
@@ -137,7 +145,7 @@ async function pushLeadToDualCloud(lead) {
             date: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
           })
         });
-        console.log('✅ Lead synced to Google Sheets Cloud Backup:', userId);
+        console.log('✅ Lead synced to Google Sheets Cloud Backup (Zero Duplicate):', userId);
       }
     } catch (sheetErr) {
       console.warn('[Google Sheets Sync Note]', sheetErr.message);
