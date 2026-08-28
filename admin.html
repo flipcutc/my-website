@@ -5498,6 +5498,11 @@ ${waGroup}
             setVal('cfgWebinarFormSubtitle', content.webinar.formSubtitle);
             setVal('cfgWebinarWaGroupLink', content.webinar.whatsappGroupLink || 'https://chat.whatsapp.com/B5hdxy7LbkNCrWRsHMtW8h');
             setVal('cfgWebinarWaMsg', content.webinar.whatsappGroupMsg);
+            const liveStatSel = document.getElementById('cfgWebinarLiveStatus');
+            if (liveStatSel) liveStatSel.value = content.webinar.liveStatus || 'offline';
+            setVal('cfgWebinarLiveYtId', content.webinar.liveYoutubeId || '');
+            setVal('cfgWebinarLiveTime', content.webinar.liveScheduledTime || 'Sunday, 9:00 AM IST');
+            setVal('cfgWebinarLiveDriveUrl', content.webinar.liveDriveUrl || 'https://drive.google.com');
             const statusSelect = document.getElementById('cfgWebinarEnabled');
             if (statusSelect) statusSelect.value = content.webinar.enabled !== false ? 'true' : 'false';
           }

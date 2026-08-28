@@ -1354,7 +1354,157 @@
       renderWebinarData();
     } catch (_) {}
 
+    
+    // ====================================================================
+    // VIP LIVE MASTERCLASS PLAYER ENGINE (USER ID VERIFICATION)
+    // ====================================================================
+    window.initVipLiveCinema = function() {
+      try {
+        const profile = (typeof window.getUserProfile === 'function') ? window.getUserProfile() : null;
+        if (profile && profile.userId) {
+          unlockVipLivePlayer(profile);
+        } else {
+          lockVipLivePlayer();
+        }
+      } catch (_) {}
+    };
+
+    window.handleVipLiveGateSubmit = async function(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const input = document.getElementById('vipGateUidInput');
+      const alertBox = document.getElementById('vipGateErrorAlert');
+      const alertText = document.getElementById('vipGateErrorText');
+      const btn = document.getElementById('btnUnlockVipPlayer');
+
+      if (!input || !input.value.trim()) return;
+      const val = input.value.trim();
+
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying User ID...';
+      }
+
+      try {
+        const SUPABASE_URL = 'https://cznixvdphwbjdnnmapvb.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6bml4dmRwaHdiamRubm1hcHZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTgwMTgsImV4cCI6MjEwMzEzNDAxOH0.dTLN1DCbUiBawZq8YlS5Bol-i81JFKhKpPKCboyocuQ';
+        const query = encodeURIComponent(val);
+        const url = `${SUPABASE_URL}/rest/v1/leads?or=(id.eq.${query},phone.ilike.*${query}*)&limit=1`;
+        
+        const res = await fetch(url, {
+          headers: { apikey: SUPABASE_KEY, Authorization: 'Bearer ' + SUPABASE_KEY }
+        });
+
+        if (res.ok) {
+          const rows = await res.json();
+          if (Array.isArray(rows) && rows.length > 0) {
+            const lead = rows[0];
+            const userObj = {
+              userId: lead.id,
+              name: lead.name || 'VIP Attendee',
+              phone: lead.phone || '',
+              service: lead.service || 'Webinar Masterclass',
+              paymentStatus: 'Paid & Verified'
+            };
+
+            if (typeof window.saveUserProfile === 'function') {
+              window.saveUserProfile(userObj);
+            }
+
+            unlockVipLivePlayer(userObj);
+            if (typeof showToast === 'function') {
+              showToast(`🔓 VIP Live Player unlocked for ${userObj.name}!`, '#10B981');
+            }
+            const sec = document.getElementById('vipLiveMasterclassSection');
+            if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            return;
+          }
+        }
+      } catch (err) {
+        console.warn('[VIP Live Verify Error]', err);
+      }
+
+      // Local check fallback
+      const localProfile = (typeof window.getUserProfile === 'function') ? window.getUserProfile() : null;
+      if (localProfile && (localProfile.userId?.toLowerCase() === val.toLowerCase() || localProfile.phone?.includes(val))) {
+        unlockVipLivePlayer(localProfile);
+        if (typeof showToast === 'function') {
+          showToast(`🔓 VIP Live Player unlocked for ${localProfile.name}!`, '#10B981');
+        }
+        const sec = document.getElementById('vipLiveMasterclassSection');
+        if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+      }
+
+      // Error display
+      if (alertBox) {
+        alertBox.style.display = 'block';
+        if (alertText) alertText.textContent = 'User ID or Phone number not found in registered attendees. Please check your pass.';
+      }
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-unlock-keyhole"></i> <span>Unlock Live Player</span>';
+      }
+    };
+
+    window.unlockVipLivePlayer = function(user) {
+      const gateLocked = document.getElementById('vipLiveGateLocked');
+      const playerUnlocked = document.getElementById('vipLivePlayerUnlocked');
+      const userNameElem = document.getElementById('vipUnlockedUserName');
+      const userIdElem = document.getElementById('vipUnlockedUserId');
+      const iframe = document.getElementById('vipLiveIframe');
+      const countdownBox = document.getElementById('vipLiveCountdownBox');
+      const schedTimeElem = document.getElementById('vipLiveScheduleTimeText');
+      const driveBtn = document.getElementById('vipLiveDriveBtn');
+      const waBtn = document.getElementById('vipLiveWhatsAppBtn');
+
+      if (gateLocked) gateLocked.style.display = 'none';
+      if (playerUnlocked) playerUnlocked.style.display = 'block';
+
+      if (userNameElem) userNameElem.textContent = user.name || 'VIP Attendee';
+      if (userIdElem) userIdElem.textContent = '(' + (user.userId || 'FC-WEB-00000') + ')';
+
+      // Load live stream configuration from content store
+      const liveCfg = (typeof getSiteContent === 'function') ? getSiteContent()?.webinar : (window.flipcutSiteContent?.webinar || {});
+      const liveStatus = liveCfg?.liveStatus || 'offline';
+      let ytId = liveCfg?.liveYoutubeId || '';
+      if (ytId.includes('v=')) { const m = ytId.match(/v=([a-zA-Z0-9_-]+)/); if (m) ytId = m[1]; }
+      else if (ytId.includes('youtu.be/')) { const m = ytId.match(/youtu\.be\/([a-zA-Z0-9_-]+)/); if (m) ytId = m[1]; }
+
+      const schedTime = liveCfg?.liveScheduledTime || 'Sunday, 9:00 AM IST';
+      const driveUrl = liveCfg?.liveDriveUrl || 'https://drive.google.com';
+      const waLink = liveCfg?.whatsappGroupLink || 'https://chat.whatsapp.com/B5hdxy7LbkNCrWRsHMtW8h';
+
+      if (schedTimeElem) schedTimeElem.textContent = schedTime;
+      if (driveBtn) driveBtn.href = driveUrl;
+      if (waBtn) waBtn.href = waLink;
+
+      if ((liveStatus === 'live' || liveStatus === 'replay') && ytId) {
+        if (iframe) {
+          iframe.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(ytId)}?autoplay=1&modestbranding=1&rel=0&playsinline=1`;
+          iframe.style.display = 'block';
+        }
+        if (countdownBox) countdownBox.style.display = 'none';
+      } else {
+        if (iframe) {
+          iframe.src = '';
+          iframe.style.display = 'none';
+        }
+        if (countdownBox) countdownBox.style.display = 'block';
+      }
+    };
+
+    window.lockVipLivePlayer = function() {
+      const gateLocked = document.getElementById('vipLiveGateLocked');
+      const playerUnlocked = document.getElementById('vipLivePlayerUnlocked');
+      const iframe = document.getElementById('vipLiveIframe');
+
+      if (gateLocked) gateLocked.style.display = 'block';
+      if (playerUnlocked) playerUnlocked.style.display = 'none';
+      if (iframe) iframe.src = '';
+    };
+
     document.addEventListener('DOMContentLoaded', async () => {
+      setTimeout(window.initVipLiveCinema, 250);
       
       // Theme Switcher Logic (Multi-Button & Mobile Drawer Support)
       const themeToggleBtns = document.querySelectorAll('.theme-toggle-btn');
