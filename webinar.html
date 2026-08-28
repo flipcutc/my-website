@@ -2013,7 +2013,7 @@
         });
       };
 
-      // 1-Click Ticket Pass PDF Downloader
+      // 1-Click Ticket Pass PDF Downloader (Pixel-Perfect Typography & Vector Design)
       window.downloadTicketPDF = function() {
         try {
           const uid = document.getElementById('ticketUserId')?.textContent?.trim() || 'FC-WEB-00000';
@@ -2040,132 +2040,172 @@
             const doc = new JsPDFClass({
               orientation: 'portrait',
               unit: 'mm',
-              format: [120, 175]
+              format: [120, 185]
             });
 
-            // Background Dark Theme
-            doc.setFillColor(15, 23, 42);
-            doc.rect(0, 0, 120, 175, 'F');
+            // 1. Deep Midnight Background
+            doc.setFillColor(11, 15, 25);
+            doc.rect(0, 0, 120, 185, 'F');
 
-            // Header Indigo Banner
-            doc.setFillColor(49, 46, 129);
-            doc.rect(0, 0, 120, 28, 'F');
+            // 2. Header Top Banner Box
+            doc.setFillColor(26, 26, 64);
+            doc.roundedRect(4, 4, 112, 30, 3, 3, 'F');
 
-            // Border
-            doc.setDrawColor(99, 102, 241);
+            // 3. Elegant Outer Border
+            doc.setDrawColor(79, 70, 229);
             doc.setLineWidth(0.8);
-            doc.rect(4, 4, 112, 167);
+            doc.roundedRect(4, 4, 112, 177, 3, 3, 'D');
 
-            // Header Text
+            // 4. Header Typography
             doc.setTextColor(255, 255, 255);
             doc.setFont('helvetica', 'bold');
-            doc.setFontSize(14);
-            doc.text('FLIPCUT CREATION', 60, 12, { align: 'center' });
+            doc.setFontSize(14.5);
+            doc.text('FLIPCUT CREATION', 60, 14, { align: 'center' });
 
             doc.setTextColor(245, 158, 11);
+            doc.setFont('helvetica', 'bold');
             doc.setFontSize(9);
-            doc.text('OFFICIAL WEBINAR VIP PASS', 60, 18, { align: 'center' });
+            doc.text('OFFICIAL WEBINAR VIP PASS', 60, 21.5, { align: 'center' });
 
-            doc.setTextColor(148, 163, 184);
-            doc.setFontSize(7.5);
-            doc.text('www.flipcutcreation.in', 60, 24, { align: 'center' });
-
-            // Pass Holder Section
             doc.setTextColor(148, 163, 184);
             doc.setFont('helvetica', 'normal');
-            doc.setFontSize(8);
-            doc.text('PASS HOLDER NAME', 12, 38);
+            doc.setFontSize(7.5);
+            doc.text('www.flipcutcreation.in', 60, 28, { align: 'center' });
+
+            // 5. Pass Holder Section
+            doc.setTextColor(148, 163, 184);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(7.5);
+            doc.text('PASS HOLDER NAME', 12, 43);
 
             doc.setTextColor(255, 255, 255);
             doc.setFont('helvetica', 'bold');
-            doc.setFontSize(15);
-            doc.text(name, 12, 45);
+            doc.setFontSize(15.5);
+            doc.text(name, 12, 51);
 
-            // User ID Card Box
+            // 6. Registered User ID Card Box
             doc.setFillColor(30, 27, 75);
-            doc.roundedRect(12, 50, 96, 14, 2, 2, 'F');
+            doc.roundedRect(12, 56, 96, 15, 2.5, 2.5, 'F');
             doc.setDrawColor(99, 102, 241);
-            doc.setLineWidth(0.3);
-            doc.roundedRect(12, 50, 96, 14, 2, 2, 'D');
+            doc.setLineWidth(0.4);
+            doc.roundedRect(12, 56, 96, 15, 2.5, 2.5, 'D');
 
             doc.setTextColor(129, 140, 248);
-            doc.setFontSize(8);
-            doc.text('REGISTERED USER ID:', 16, 59);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(8.5);
+            doc.text('REGISTERED USER ID:', 17, 65.5);
 
             doc.setTextColor(255, 255, 255);
-            doc.setFont('courier', 'bold');
-            doc.setFontSize(11);
-            doc.text(uid, 62, 59);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(11.5);
+            doc.text(uid, 103, 65.5, { align: 'right' });
 
-            // Details Card Box
-            doc.setFillColor(23, 32, 54);
-            doc.roundedRect(12, 68, 96, 56, 2, 2, 'F');
-            doc.setDrawColor(51, 65, 85);
-            doc.roundedRect(12, 68, 96, 56, 2, 2, 'D');
+            // 7. Details Card Box
+            doc.setFillColor(17, 24, 39);
+            doc.roundedRect(12, 75, 96, 52, 2.5, 2.5, 'F');
+            doc.setDrawColor(55, 65, 81);
+            doc.setLineWidth(0.3);
+            doc.roundedRect(12, 75, 96, 52, 2.5, 2.5, 'D');
 
             // Row 1: Website Type
-            doc.setTextColor(148, 163, 184);
+            doc.setTextColor(156, 163, 175);
             doc.setFont('helvetica', 'normal');
             doc.setFontSize(8);
-            doc.text('Website Type:', 16, 77);
+            doc.text('Website Type:', 17, 85);
             doc.setTextColor(96, 165, 250);
             doc.setFont('helvetica', 'bold');
-            doc.text(type, 104, 77, { align: 'right' });
+            doc.setFontSize(8.5);
+            doc.text(type, 103, 85, { align: 'right' });
 
             // Row 2: Amount Paid
-            doc.setTextColor(148, 163, 184);
+            doc.setTextColor(156, 163, 175);
             doc.setFont('helvetica', 'normal');
-            doc.text('Amount Paid:', 16, 88);
-            doc.setTextColor(52, 211, 153);
-            doc.setFont('helvetica', 'bold');
-            doc.text(`Rs. ${priceAmt} (Confirmed)`, 104, 88, { align: 'right' });
-
-            // Row 3: Session Time
-            doc.setTextColor(148, 163, 184);
-            doc.setFont('helvetica', 'normal');
-            doc.text('Session Time:', 16, 99);
-            doc.setTextColor(248, 250, 252);
-            doc.setFont('helvetica', 'bold');
-            doc.text(dateText, 104, 99, { align: 'right' });
-
-            // Row 4: Payment ID
-            doc.setTextColor(148, 163, 184);
-            doc.setFont('helvetica', 'normal');
-            doc.text('Payment Ref ID:', 16, 110);
-            doc.setTextColor(167, 139, 250);
-            doc.setFont('courier', 'bold');
-            doc.setFontSize(7.5);
-            doc.text(payId, 104, 110, { align: 'right' });
-
-            // Perforated Dashed Line
-            doc.setDrawColor(100, 116, 139);
-            doc.setLineDashPattern([2, 2], 0);
-            doc.line(12, 130, 108, 130);
-            doc.setLineDashPattern([], 0);
-
-            // Status & Verification Badge
-            doc.setFillColor(6, 78, 59);
-            doc.roundedRect(20, 135, 80, 10, 2, 2, 'F');
+            doc.setFontSize(8);
+            doc.text('Amount Paid:', 17, 96);
             doc.setTextColor(52, 211, 153);
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(8.5);
-            doc.text('✔ SEAT VERIFIED & LOCKED', 60, 141.5, { align: 'center' });
+            doc.text(`Rs. ${priceAmt} (Confirmed)`, 103, 96, { align: 'right' });
 
-            // Instructions Note
+            // Row 3: Session Time
+            doc.setTextColor(156, 163, 175);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(8);
+            doc.text('Session Time:', 17, 107);
+            doc.setTextColor(248, 250, 252);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(8.5);
+            doc.text(dateText, 103, 107, { align: 'right' });
+
+            // Row 4: Payment ID
+            doc.setTextColor(156, 163, 175);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(8);
+            doc.text('Payment Ref ID:', 17, 118);
+            doc.setTextColor(192, 132, 252);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(8);
+            doc.text(payId, 103, 118, { align: 'right' });
+
+            // 8. Perforated Dashed Line & Ticket Notches
+            doc.setDrawColor(100, 116, 139);
+            doc.setLineWidth(0.4);
+            doc.setLineDashPattern([2, 2], 0);
+            doc.line(12, 134, 108, 134);
+            doc.setLineDashPattern([], 0);
+
+            // Left & Right Cutout Notches
+            doc.setFillColor(11, 15, 25);
+            doc.circle(4, 134, 3.5, 'F');
+            doc.setDrawColor(79, 70, 229);
+            doc.circle(4, 134, 3.5, 'D');
+
+            doc.setFillColor(11, 15, 25);
+            doc.circle(116, 134, 3.5, 'F');
+            doc.setDrawColor(79, 70, 229);
+            doc.circle(116, 134, 3.5, 'D');
+
+            // 9. Status & Verification Badge with Vector Checkmark
+            doc.setFillColor(6, 78, 59);
+            doc.roundedRect(18, 140, 84, 11, 2.5, 2.5, 'F');
+            doc.setDrawColor(16, 185, 129);
+            doc.setLineWidth(0.3);
+            doc.roundedRect(18, 140, 84, 11, 2.5, 2.5, 'D');
+
+            // Crisp Vector Checkmark
+            doc.setDrawColor(52, 211, 153);
+            doc.setLineWidth(0.8);
+            doc.line(26, 145.5, 28.5, 147.8);
+            doc.line(28.5, 147.8, 33, 143);
+
+            doc.setTextColor(52, 211, 153);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(8.5);
+            doc.text('SEAT VERIFIED & LOCKED', 63, 147.2, { align: 'center' });
+
+            // 10. Instructions Note
             doc.setTextColor(148, 163, 184);
             doc.setFont('helvetica', 'normal');
-            doc.setFontSize(7);
-            doc.text('Please join the VIP WhatsApp Group for the live meeting link.', 60, 152, { align: 'center' });
-            doc.text('Keep this User ID for future support and updates.', 60, 157, { align: 'center' });
+            doc.setFontSize(7.2);
+            doc.text('Please join the VIP WhatsApp Group for the live meeting link.', 60, 157.5, { align: 'center' });
+            doc.text('Keep this User ID for future support and updates.', 60, 162.5, { align: 'center' });
 
-            // Barcode Simulation
+            // 11. Centered Barcode Simulation
             doc.setFillColor(255, 255, 255);
-            let bx = 30;
-            const bars = [1, 2, 0.6, 2, 1.2, 0.6, 2.5, 1, 0.6, 2, 1.2, 2.5, 0.6, 1, 2, 0.6, 2, 1.2, 0.6, 2.5, 1, 0.6, 2];
+            const bars = [1.2, 2, 0.7, 2.5, 1.2, 0.7, 2.8, 1.2, 0.7, 2, 1.2, 2.8, 0.7, 1.2, 2.5, 0.7, 2, 1.2, 0.7, 2.8, 1.2, 0.7, 2];
+            let totalBarW = 0;
+            for (let b of bars) totalBarW += b + 0.8;
+            totalBarW -= 0.8;
+            let curBx = 60 - (totalBarW / 2);
             for (let b of bars) {
-              doc.rect(bx, 162, b * 0.7, 5, 'F');
-              bx += b * 0.7 + 1.2;
+              doc.rect(curBx, 167.5, b, 5, 'F');
+              curBx += b + 0.8;
             }
+
+            doc.setTextColor(148, 163, 184);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(6.5);
+            doc.text(`VERIFICATION: ${uid} • FLIPCUT CREATION`, 60, 176.5, { align: 'center' });
 
             // Universal Blob / DataURI Direct Save
             try {
