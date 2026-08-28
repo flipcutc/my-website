@@ -43,7 +43,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=11.4">
+  <link rel="stylesheet" href="styles.css?v=11.5">
   
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -1141,6 +1141,7 @@
                   <th>Service / Plan</th>
                   <th>Amount / Paid</th>
                   <th>Status</th>
+                  <th>WhatsApp Group</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -3064,10 +3065,10 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- Dual Cloud Sync Engine (Firebase + Supabase) -->
-  <script src="firebase-sync.js?v=11.4"></script>
+  <script src="firebase-sync.js?v=11.5"></script>
 
   <!-- CMS & SQL Engine Script -->
-  <script src="content-store.js?v=11.4"></script>
+  <script src="content-store.js?v=11.5"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
 
@@ -4208,7 +4209,7 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
         if (filtered.length === 0) {
           crmTableBody.innerHTML = `
             <tr>
-              <td colspan="9" style="text-align: center; color: var(--text-muted); padding: 40px;">
+              <td colspan="10" style="text-align: center; color: var(--text-muted); padding: 40px;">
                 <i class="fa-solid fa-inbox" style="font-size: 2rem; margin-bottom: 8px; display: block; opacity: 0.4;"></i>
                 No inquiries matching criteria in pipeline. Real client registrations from website appear here in real-time.
               </td>
@@ -4222,6 +4223,7 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
           let statusClass = 'status-new';
           const isPendingUpi = lead.status === 'Payment Initiated (Pending UPI)' || (lead.paymentStatus && lead.paymentStatus.includes('Payment Initiated'));
           const isWebinar = (lead.service || '').toLowerCase().includes('webinar') || (lead.packageName || '').toLowerCase().includes('webinar') || (lead.userId || '').startsWith('FC-WEB');
+          const isJoinedGroup = lead.whatsappJoined === true || lead.waGroupStatus === 'Joined';
           
           if (lead.status === 'Contacted') statusClass = 'status-contacted';
           if (lead.status === 'In Progress') statusClass = 'status-progress';
@@ -4273,6 +4275,17 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
               <span class="status-badge ${statusClass}" onclick="cycleCrmStatus('${lead.id}')" title="Click to cycle status" style="${isPendingUpi ? 'background: rgba(245, 158, 11, 0.15); color: #F59E0B; border: 1px solid #F59E0B;' : ''}">
                 ● ${escapeHtml(lead.status || 'New')}
               </span>
+            </td>
+            <td>
+              ${isJoinedGroup ? `
+                <span onclick="toggleWaGroupStatus('${lead.id}')" title="Client joined VIP WhatsApp Group (Click to toggle)" style="cursor: pointer; background: rgba(37,211,102,0.15); color: #10B981; border: 1px solid #10B981; padding: 4px 8px; border-radius: 12px; font-size: 0.78rem; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;">
+                  <i class="fa-brands fa-whatsapp" style="font-size: 0.92rem;"></i> ✅ Joined
+                </span>
+              ` : `
+                <button type="button" class="btn btn-secondary" onclick="sendWhatsAppGroupInviteDirect('${lead.id}')" title="Customer has not joined yet! Click to 1-Click Send Direct Group Invite on WhatsApp" style="cursor: pointer; background: rgba(245, 158, 11, 0.15); color: #D97706; border: 1px solid #F59E0B; padding: 4px 8px; border-radius: 12px; font-size: 0.78rem; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;">
+                  <i class="fa-brands fa-whatsapp" style="font-size: 0.92rem;"></i> 📢 Invite
+                </button>
+              `}
             </td>
             <td>
               <div class="action-btn-group">
@@ -4662,6 +4675,65 @@ We look forward to seeing you live in the masterclass!
         const waUrl = `https://wa.me/${num.length === 10 ? '91' + num : num}?text=${encodeURIComponent(msg)}`;
         window.open(waUrl, '_blank');
         showAdminToast(`💬 Opening WhatsApp to dispatch Ticket Pass to ${name}!`, '#10B981');
+      };
+
+      // 1.1 Send Direct WhatsApp Group Invite to Customers who haven't joined yet
+      window.sendWhatsAppGroupInviteDirect = async function(id) {
+        const lead = currentLeads.find(l => String(l.id) === String(id) || String(l.userId) === String(id));
+        if (!lead) return;
+        const num = lead.phone ? lead.phone.replace(/[^0-9]/g, '') : '';
+        if (!num) {
+          showAdminToast('No mobile number found for this lead.', '#EF4444');
+          return;
+        }
+        const name = lead.name || 'Creator';
+        const uid = lead.userId || lead.id || 'FC-WEB-00000';
+        const waGroup = content.webinar?.whatsappGroupLink || 'https://chat.whatsapp.com/B5hdxy7LbkNCrWRsHMtW8h';
+
+        const inviteMsg = 
+`👋 *வணக்கம் ${name}*,
+FlipCut Creation Live Webinar-ல் பதிவு செய்தமைக்கு நன்றி! (User ID: ${uid})
+
+நீங்கள் இன்னும் நமது *Official VIP WhatsApp Group*-ல் இணையவில்லை. 
+
+👉 *Group-ல் உடனே இணைய இந்த லிங்கை கிளிக் செய்யவும்:*
+${waGroup}
+
+*(நேரலை வெபினார் Zoom/Google Meet லிங்க் மற்றும் பிரத்யேக வீடியோ எடிட்டிங் பைல்கள் இந்த வாட்ஸ்அப் குழுவில் மட்டுமே பகிரப்படும்!)*
+
+ஏதேனும் சந்தேகம் இருந்தால் இந்த மெசேஜுக்கு பதிலளிக்கவும்.
+- *FlipCut Creation Team*`;
+
+        const waUrl = `https://wa.me/${num.length === 10 ? '91' + num : num}?text=${encodeURIComponent(inviteMsg)}`;
+        window.open(waUrl, '_blank');
+
+        lead.waGroupStatus = 'Invite Sent';
+        localStorage.setItem('flipcut_leads', JSON.stringify(currentLeads));
+        renderCrmTable();
+
+        showAdminToast(`📢 Opening WhatsApp to send Group Invite link to ${name}!`, '#F59E0B');
+      };
+
+      // 1.2 Toggle WhatsApp Group Joined Status manually by Admin
+      window.toggleWaGroupStatus = async function(id) {
+        const lead = currentLeads.find(l => String(l.id) === String(id) || String(l.userId) === String(id));
+        if (!lead) return;
+
+        const isCurrentlyJoined = lead.whatsappJoined === true || lead.waGroupStatus === 'Joined';
+        lead.whatsappJoined = !isCurrentlyJoined;
+        lead.waGroupStatus = lead.whatsappJoined ? 'Joined' : 'Not Joined';
+
+        localStorage.setItem('flipcut_leads', JSON.stringify(currentLeads));
+        renderCrmTable();
+
+        // Sync to Dual Cloud
+        try {
+          if (typeof window.pushLeadToDualCloud === 'function') {
+            await window.pushLeadToDualCloud(lead);
+          }
+        } catch (_) {}
+
+        showAdminToast(`Updated WhatsApp Group status to "${lead.waGroupStatus}" for ${lead.name || 'client'}!`, lead.whatsappJoined ? '#10B981' : 'var(--brand-indigo)');
       };
 
       // 2. Verify & Issue Pass for "Payment Initiated" leads
