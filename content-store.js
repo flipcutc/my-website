@@ -406,6 +406,19 @@ const DEFAULT_SITE_CONTENT = {
     "btnText": "Book Ticket Pass",
     "btnUrl": "webinar.html"
   },
+  "liveClass": {
+    "status": "offline",
+    "title": "High-Retention Video Editing & AI Masterclass",
+    "subtitle": "Exclusive Live Session for VIP Registered Ticket Holders",
+    "streamType": "youtube",
+    "streamUrl": "",
+    "youtubeVideoId": "",
+    "scheduledTime": "Sunday, 9:00 AM IST",
+    "pinnedHeadline": "Welcome to the VIP Live Class!",
+    "pinnedMessage": "Ask your questions in the real-time chat below.",
+    "driveUrl": "https://drive.google.com",
+    "chatEnabled": true
+  },
   "sectionsVisibility": {
     "topAnnouncement": true,
     "headerBadge": true,
