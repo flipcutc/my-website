@@ -56,7 +56,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=14.5">
+  <link rel="stylesheet" href="styles.css?v=14.6">
 
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -69,13 +69,13 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- Dual Cloud Sync Engine (Firebase + Supabase) -->
-  <script src="firebase-sync.js?v=14.5"></script>
+  <script src="firebase-sync.js?v=14.6"></script>
 
   <!-- VIP User Profile Header Engine -->
-  <script src="user-profile.js?v=14.5"></script>
+  <script src="user-profile.js?v=14.6"></script>
 
   <!-- Content Store & Instant Zero-Flicker Pre-Hydration -->
-  <script src="content-store.js?v=14.5"></script>
+  <script src="content-store.js?v=14.6"></script>
   <script>
     (function() {
       try {
@@ -511,56 +511,7 @@
 
 <body>
 
-  <!-- ====================================================================
-       VIP WEBINAR ACCESS GATE (USER ID & PHONE VERIFICATION OVERLAY)
-       ==================================================================== -->
-  <div id="vipWebinarAccessGateOverlay" style="position: fixed; inset: 0; background: rgba(6, 9, 17, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); z-index: 99999; display: flex; align-items: center; justify-content: center; padding: 20px;">
-    <div style="background: linear-gradient(135deg, #0F172A, #1E1B4B); border: 2px solid var(--brand-indigo); border-radius: var(--radius-xl); max-width: 460px; width: 100%; padding: 34px 26px; text-align: center; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 35px rgba(99, 102, 241, 0.25); position: relative;">
-      
-      <div style="width: 66px; height: 66px; background: rgba(99, 102, 241, 0.15); border: 2px solid var(--brand-indigo); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 2rem; color: #818CF8; box-shadow: 0 0 25px rgba(99, 102, 241, 0.4);">
-        <i class="fa-solid fa-id-card-clip"></i>
-      </div>
-
-      <div class="webinar-badge-pill" style="background: rgba(245, 158, 11, 0.15); color: #F59E0B; border-color: rgba(245, 158, 11, 0.35); margin-bottom: 12px;">
-        <i class="fa-solid fa-lock"></i> Registered VIP Member Access
-      </div>
-
-      <h2 style="font-size: 1.65rem; font-weight: 800; color: #FFF; margin-bottom: 8px;">
-        FlipCut VIP Masterclass
-      </h2>
-      <p style="color: #94A3B8; font-size: 0.88rem; margin-bottom: 22px; line-height: 1.45;">
-        Enter your <strong>Registered User ID</strong> (e.g. <code style="color: #818CF8;">FC-WEB-50498</code>) or <strong>Mobile Number</strong> to unlock the masterclass.
-      </p>
-
-      <form id="vipWebinarAccessGateForm" onsubmit="handleVipWebinarAccessGateSubmit(event)" style="text-align: left;">
-        <div style="margin-bottom: 14px;">
-          <label style="font-size: 0.75rem; color: #CBD5E1; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 6px;">
-            Pass User ID / Phone Number:
-          </label>
-          <div style="position: relative;">
-            <i class="fa-solid fa-user-shield" style="position: absolute; left: 15px; top: 13px; color: #64748B; font-size: 1.05rem;"></i>
-            <input type="text" id="vipWebinarGateInput" class="form-control" placeholder="e.g. FC-WEB-50498 or 9360242148" required style="padding-left: 44px; background: #070A13; border-color: rgba(255,255,255,0.18); color: #FFF; font-weight: 700; font-size: 0.95rem; height: 48px; border-radius: 12px; font-family: monospace;">
-          </div>
-        </div>
-
-        <div id="vipWebinarGateAlert" style="display: none; background: rgba(239, 68, 68, 0.15); border: 1px solid #EF4444; border-radius: 8px; padding: 10px 14px; color: #FCA5A5; font-size: 0.82rem; margin-bottom: 14px; text-align: center;">
-          <i class="fa-solid fa-triangle-exclamation"></i> <span id="vipWebinarGateAlertText">User ID not found in registered attendees.</span>
-        </div>
-
-        <button type="submit" id="btnUnlockWebinarPortal" class="btn btn-primary" style="width: 100%; height: 48px; font-weight: 800; font-size: 1rem; justify-content: center; background: linear-gradient(135deg, #6366F1, #8B5CF6); border-color: #6366F1; box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4); border-radius: 12px;">
-          <i class="fa-solid fa-unlock-keyhole"></i> <span>Unlock Masterclass Portal</span>
-        </button>
-      </form>
-
-      <div style="margin-top: 20px; padding-top: 16px; border-top: 1px dashed rgba(255,255,255,0.12); font-size: 0.84rem; color: #94A3B8;">
-        <span>New creator without a ticket pass?</span><br>
-        <button type="button" onclick="bypassGateForRegistration()" style="margin-top: 8px; background: none; border: none; color: #10B981; font-weight: 800; cursor: pointer; text-decoration: underline; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 6px;">
-          <i class="fa-solid fa-ticket"></i> <span>Book Your VIP Ticket Pass (₹2)</span>
-        </button>
-      </div>
-
-    </div>
-  </div>
+  
 
 
   <!-- Ambient Luxury Glow Orbs (Fixed Container - Zero Overscroll) -->
@@ -1603,106 +1554,10 @@
 
 
     
-    // ====================================================================
-    // FULL PAGE WEBINAR ACCESS GATE HANDLER
-    // ====================================================================
-    window.checkWebinarAccessGate = function() {
-      const overlay = document.getElementById('vipWebinarAccessGateOverlay');
-      if (!overlay) return;
-
-      const profile = (typeof window.getUserProfile === 'function') ? window.getUserProfile() : null;
-      if (profile && profile.userId) {
-        overlay.style.display = 'none';
-      } else {
-        overlay.style.display = 'flex';
-      }
-    };
-
-    window.handleVipWebinarAccessGateSubmit = async function(e) {
-      if (e && e.preventDefault) e.preventDefault();
-      const input = document.getElementById('vipWebinarGateInput');
-      const alertBox = document.getElementById('vipWebinarGateAlert');
-      const alertText = document.getElementById('vipWebinarGateAlertText');
-      const btn = document.getElementById('btnUnlockWebinarPortal');
-
-      if (!input || !input.value.trim()) return;
-      const val = input.value.trim();
-
-      if (btn) {
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying Pass...';
-      }
-
-      try {
-        const SUPABASE_URL = 'https://cznixvdphwbjdnnmapvb.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6bml4dmRwaHdiamRubm1hcHZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTgwMTgsImV4cCI6MjEwMzEzNDAxOH0.dTLN1DCbUiBawZq8YlS5Bol-i81JFKhKpPKCboyocuQ';
-        const query = encodeURIComponent(val);
-        const url = `${SUPABASE_URL}/rest/v1/leads?or=(id.eq.${query},phone.ilike.*${query}*)&limit=1`;
-        
-        const res = await fetch(url, {
-          headers: { apikey: SUPABASE_KEY, Authorization: 'Bearer ' + SUPABASE_KEY }
-        });
-
-        if (res.ok) {
-          const rows = await res.json();
-          if (Array.isArray(rows) && rows.length > 0) {
-            const lead = rows[0];
-            const userObj = {
-              userId: lead.id,
-              name: lead.name || 'VIP Attendee',
-              phone: lead.phone || '',
-              service: lead.service || 'Webinar Masterclass',
-              paymentStatus: 'Paid & Verified'
-            };
-
-            if (typeof window.saveUserProfile === 'function') {
-              window.saveUserProfile(userObj);
-            }
-
-            const overlay = document.getElementById('vipWebinarAccessGateOverlay');
-            if (overlay) overlay.style.display = 'none';
-
-            if (typeof showToast === 'function') {
-              showToast(`🎉 Welcome back, ${userObj.name}! VIP Masterclass Unlocked.`, '#10B981');
-            }
-            return;
-          }
-        }
-      } catch (err) {
-        console.warn('[Gate Verify Note]', err);
-      }
-
-      // Check localStorage fallback
-      const localProfile = (typeof window.getUserProfile === 'function') ? window.getUserProfile() : null;
-      if (localProfile && (localProfile.userId?.toLowerCase() === val.toLowerCase() || localProfile.phone?.includes(val))) {
-        const overlay = document.getElementById('vipWebinarAccessGateOverlay');
-        if (overlay) overlay.style.display = 'none';
-        if (typeof showToast === 'function') {
-          showToast(`🎉 Welcome back, ${localProfile.name}! VIP Masterclass Unlocked.`, '#10B981');
-        }
-        return;
-      }
-
-      // Error feedback
-      if (alertBox) {
-        alertBox.style.display = 'block';
-        if (alertText) alertText.textContent = 'User ID or Phone number not found in registered attendees. Please check your pass.';
-      }
-      if (btn) {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fa-solid fa-unlock-keyhole"></i> <span>Unlock Masterclass Portal</span>';
-      }
-    };
-
-    window.bypassGateForRegistration = function() {
-      const overlay = document.getElementById('vipWebinarAccessGateOverlay');
-      if (overlay) overlay.style.display = 'none';
-      const formWrap = document.getElementById('webinarBriefCard') || document.getElementById('webinarRegistrationForm');
-      if (formWrap) formWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    };
+    
 
     document.addEventListener('DOMContentLoaded', async () => {
-      setTimeout(window.checkWebinarAccessGate, 100);
+      
       setTimeout(window.initVipLiveCinema, 250);
       
       // Theme Switcher Logic (Multi-Button & Mobile Drawer Support)
