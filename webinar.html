@@ -56,7 +56,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=11.1">
+  <link rel="stylesheet" href="styles.css?v=11.2">
 
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -66,13 +66,13 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- Dual Cloud Sync Engine (Firebase + Supabase) -->
-  <script src="firebase-sync.js?v=11.1"></script>
+  <script src="firebase-sync.js?v=11.2"></script>
 
   <!-- VIP User Profile Header Engine -->
-  <script src="user-profile.js?v=11.1"></script>
+  <script src="user-profile.js?v=11.2"></script>
 
   <!-- Content Store & Instant Zero-Flicker Pre-Hydration -->
-  <script src="content-store.js?v=11.1"></script>
+  <script src="content-store.js?v=11.2"></script>
   <script>
     (function() {
       try {
@@ -1971,30 +1971,36 @@
         }
       };
 
-      // Instant Emergency Pass Self-Generator for Users who paid via UPI
-      window.autoGenerateEmergencyPass = function(queryPhone) {
-        const cleanPhone = String(queryPhone || '').replace(/[^0-9]/g, '');
-        const activeDraft = JSON.parse(localStorage.getItem('flipcut_webinar_active_draft') || '{}');
-        const passUid = activeDraft.userId || ('FC-WEB-' + Math.floor(10000 + Math.random() * 90000));
-        const clientName = activeDraft.name || document.getElementById('webinarName')?.value?.trim() || 'Valued Creator';
-        const clientEmail = activeDraft.email || document.getElementById('webinarEmail')?.value?.trim() || '';
-        const clientPhone = cleanPhone || activeDraft.phone || document.getElementById('webinarPhone')?.value?.trim() || '9876543210';
-        const clientType = activeDraft.websiteType || getSelectedWebsiteType() || 'E-commerce';
-        const feeAmount = activeDraft.webinarFeeAmount || getCurrentWebinarFee();
-        const payRef = 'pay_upi_recovered_' + Date.now().toString().slice(-6);
+      // Strict Payment-Verified Pass Unlocker
+      window.verifyAndUnlockSelfPass = async function(uid, clientName, clientPhone, clientEmail, clientType) {
+        const payInput = document.getElementById('selfVerifyPayInput');
+        const payId = payInput ? payInput.value.trim() : '';
+
+        if (!payId || payId.length < 6) {
+          showToast('❌ Please enter a valid Payment ID (e.g. pay_xxx) or 12-digit UPI UTR number from your payment receipt.', '#EF4444');
+          if (payInput) payInput.focus();
+          return;
+        }
+
+        const feeAmount = getCurrentWebinarFee();
+        const finalUid = uid || ('FC-WEB-' + Math.floor(10000 + Math.random() * 90000));
+        const finalName = clientName || 'Valued Creator';
+        const finalPhone = clientPhone || '';
+        const finalEmail = clientEmail || '';
+        const finalType = clientType || getSelectedWebsiteType() || 'E-commerce';
 
         if (findPassFeedback) {
           findPassFeedback.style.background = 'rgba(16, 185, 129, 0.15)';
           findPassFeedback.style.border = '1.5px solid #10B981';
           findPassFeedback.style.color = '#10B981';
-          findPassFeedback.innerHTML = `✅ <strong>VIP Ticket Pass Generated:</strong> ${passUid}<br><span style="font-size:0.82rem; color:var(--text-primary);">Opening your digital ticket pass now...</span>`;
+          findPassFeedback.innerHTML = `✅ <strong>Payment Verified (${escapeHtml(payId)}):</strong><br><span style="font-size:0.82rem; color:var(--text-primary);">Issuing official Ticket Pass for ${escapeHtml(finalName)} (${finalUid})...</span>`;
         }
 
         setTimeout(() => {
           closeFindPassModal();
-          handleWebinarFinalSubmit(null, passUid, payRef, clientName, clientPhone, clientEmail, clientType, feeAmount);
-          showToast(`🎉 VIP Ticket Pass Confirmed! User ID: ${passUid}`, '#10B981');
-        }, 600);
+          handleWebinarFinalSubmit(null, finalUid, payId, finalName, finalPhone, finalEmail, finalType, feeAmount);
+          showToast(`🎉 Payment Verified! VIP Ticket Pass Confirmed: ${finalUid}`, '#10B981');
+        }, 700);
       };
 
       window.handleFindPassSubmit = async function(e) {
@@ -2009,7 +2015,7 @@
           findPassFeedback.style.background = 'rgba(99, 102, 241, 0.12)';
           findPassFeedback.style.border = '1px solid var(--brand-indigo)';
           findPassFeedback.style.color = 'var(--text-primary)';
-          findPassFeedback.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Searching registration records for "<strong>${query}</strong>"...`;
+          findPassFeedback.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Checking verified payment records for "<strong>${escapeHtml(query)}</strong>"...`;
         }
 
         const result = (typeof window.lookupUserPass === 'function') 
@@ -2021,34 +2027,66 @@
 
         if (result && result.success && result.lead) {
           const lead = result.lead;
-          if (findPassFeedback) {
-            findPassFeedback.style.background = 'rgba(16, 185, 129, 0.15)';
-            findPassFeedback.style.border = '1.5px solid #10B981';
-            findPassFeedback.style.color = '#10B981';
-            findPassFeedback.innerHTML = `✅ <strong>Pass Found:</strong> ${lead.name} (${lead.userId})<br><span style="font-size:0.82rem; color:var(--text-primary);">Opening your Digital Ticket Pass now...</span>`;
+          const hasVerifiedPayment = lead.paymentId && !lead.paymentId.includes('Pending') && !lead.paymentId.includes('undefined');
+
+          if (hasVerifiedPayment || lead.paymentStatus?.includes('Confirmed') || lead.paymentStatus?.includes('Paid')) {
+            if (findPassFeedback) {
+              findPassFeedback.style.background = 'rgba(16, 185, 129, 0.15)';
+              findPassFeedback.style.border = '1.5px solid #10B981';
+              findPassFeedback.style.color = '#10B981';
+              findPassFeedback.innerHTML = `✅ <strong>Paid Pass Verified:</strong> ${escapeHtml(lead.name)} (${lead.userId})<br><span style="font-size:0.82rem; color:var(--text-primary);">Opening your Digital Ticket Pass now...</span>`;
+            }
+            setTimeout(() => {
+              closeFindPassModal();
+              showTicketModal(lead.name, lead.websiteType, lead.paymentId, lead.userId);
+              showToast(`🎉 Welcome back, ${lead.name}! Here is your Digital Ticket Pass.`, '#10B981');
+            }, 700);
+          } else {
+            // Found lead intent but requires Payment ID proof
+            if (findPassFeedback) {
+              findPassFeedback.style.background = 'rgba(245, 158, 11, 0.08)';
+              findPassFeedback.style.border = '1.5px solid #F59E0B';
+              findPassFeedback.style.color = 'var(--text-primary)';
+              findPassFeedback.innerHTML = `
+                <div style="text-align: left;">
+                  <div style="font-weight: 700; color: #D97706; margin-bottom: 4px;">
+                    <i class="fa-solid fa-receipt"></i> Payment ID Verification Required
+                  </div>
+                  <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 8px; line-height: 1.35;">
+                    Registration found for <strong>${escapeHtml(lead.name)}</strong>. To unlock your official Ticket Pass, enter your <strong>Razorpay Payment ID</strong> (e.g. <code>pay_xxxxxx</code>) or <strong>12-digit UPI UTR Ref</strong> from your GPay/PhonePe receipt:
+                  </p>
+                  <div style="display: flex; gap: 6px; margin-bottom: 6px;">
+                    <input type="text" id="selfVerifyPayInput" class="form-control" placeholder="Enter Payment ID / UPI Ref" style="font-size: 0.85rem; padding: 7px 10px;">
+                    <button type="button" onclick="verifyAndUnlockSelfPass('${lead.userId}', '${escapeHtml(lead.name)}', '${lead.phone}', '${lead.email}', '${lead.websiteType}')" class="btn btn-primary" style="padding: 7px 14px; font-size: 0.82rem; font-weight: 700; white-space: nowrap; background: #10B981; border-color: #10B981;">
+                      <i class="fa-solid fa-check"></i> Verify
+                    </button>
+                  </div>
+                </div>
+              `;
+            }
           }
-          setTimeout(() => {
-            closeFindPassModal();
-            showTicketModal(lead.name, lead.websiteType, lead.paymentId, lead.userId);
-            showToast(`🎉 Welcome back, ${lead.name}! Here is your Digital Ticket Pass.`, '#10B981');
-          }, 700);
         } else {
-          // If not found in database, provide instant 1-click self recovery!
+          // If not found in database, require payment ID or prompt to pay
           if (findPassFeedback) {
-            findPassFeedback.style.background = 'rgba(99, 102, 241, 0.08)';
-            findPassFeedback.style.border = '1.5px solid var(--brand-indigo)';
+            findPassFeedback.style.background = 'rgba(239, 68, 68, 0.08)';
+            findPassFeedback.style.border = '1.5px solid #EF4444';
             findPassFeedback.style.color = 'var(--text-primary)';
             findPassFeedback.innerHTML = `
               <div style="text-align: left;">
-                <div style="font-weight: 700; color: var(--brand-indigo); margin-bottom: 4px;">
-                  <i class="fa-solid fa-circle-question"></i> Paid via GPay / PhonePe / UPI?
+                <div style="font-weight: 700; color: #EF4444; margin-bottom: 4px;">
+                  <i class="fa-solid fa-circle-xmark"></i> No Verified Paid Registration Found
                 </div>
-                <div style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 10px;">
-                  If you already completed your payment for <strong>"${query}"</strong>, click below to generate your official Pass ID and download your Ticket!
+                <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 10px; line-height: 1.35;">
+                  No paid registration record exists for "<strong>${escapeHtml(query)}</strong>". Ticket Passes are only issued for confirmed payments.
+                </p>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                  <button type="button" onclick="closeFindPassModal(); document.querySelector('.webinar-card-wrapper')?.scrollIntoView({behavior:'smooth', block:'start'});" class="btn btn-primary" style="flex: 1; font-size: 0.82rem; justify-content: center; padding: 7px 12px;">
+                    <i class="fa-solid fa-bolt"></i> Register & Pay Now
+                  </button>
+                  <a href="https://wa.me/917010270151?text=Hi%20FlipCut!%20I%20completed%20payment%20for%20the%20Webinar.%20Please%20verify%20my%20payment%20proof%20for:%20${encodeURIComponent(query)}" target="_blank" class="btn btn-secondary" style="flex: 1; font-size: 0.82rem; justify-content: center; padding: 7px 12px; color: #25D366; border-color: #25D366;">
+                    <i class="fa-brands fa-whatsapp"></i> Send Payment Proof
+                  </a>
                 </div>
-                <button type="button" onclick="autoGenerateEmergencyPass('${query.replace(/'/g, "\\'")}')" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 8px 14px; font-size: 0.88rem; font-weight: 700; background: #10B981; border-color: #10B981;">
-                  <i class="fa-solid fa-wand-magic-sparkles"></i> <span>Yes, Generate & Open My Ticket Pass</span>
-                </button>
               </div>
             `;
           }

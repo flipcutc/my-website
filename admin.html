@@ -43,7 +43,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=11.1">
+  <link rel="stylesheet" href="styles.css?v=11.2">
   
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -1116,9 +1116,9 @@
                 <option value="Agency">Agency / Studio</option>
                 <option value="Personal">Personal Brand / Creator</option>
               </select>
-              <input type="text" id="quickPassPayId" class="form-control" placeholder="UPI Ref / Pay ID (Optional)" style="padding: 9px 12px; font-size: 0.88rem;">
+              <input type="text" id="quickPassPayId" class="form-control" placeholder="Payment ID / UPI Ref (Required*)" required style="padding: 9px 12px; font-size: 0.88rem; border-color: var(--brand-indigo); font-weight: 600;">
               <button type="button" id="btnQuickGeneratePass" class="btn btn-primary" style="padding: 9px 18px; font-size: 0.88rem; font-weight: 700; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px;">
-                <i class="fa-solid fa-wand-magic-sparkles"></i> <span>Generate & Save Pass</span>
+                <i class="fa-solid fa-wand-magic-sparkles"></i> <span>Verify & Save Pass</span>
               </button>
             </div>
           </div>
@@ -2971,10 +2971,10 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- Dual Cloud Sync Engine (Firebase + Supabase) -->
-  <script src="firebase-sync.js?v=11.1"></script>
+  <script src="firebase-sync.js?v=11.2"></script>
 
   <!-- CMS & SQL Engine Script -->
-  <script src="content-store.js?v=11.1"></script>
+  <script src="content-store.js?v=11.2"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
 
@@ -4490,14 +4490,19 @@ We look forward to seeing you live in the masterclass!
         const lead = currentLeads.find(l => String(l.id) === String(id) || String(l.userId) === String(id));
         if (!lead) return;
         
+        const enteredPayId = prompt(`Enter Razorpay Payment ID or UPI Transaction Ref for ${lead.name} (Mandatory):`, lead.paymentId && !lead.paymentId.includes('Pending') ? lead.paymentId : '');
+        if (!enteredPayId || !enteredPayId.trim() || enteredPayId.trim().length < 6) {
+          showAdminToast('❌ Verification cancelled: Valid Payment ID / UPI Transaction Ref is REQUIRED.', '#EF4444');
+          return;
+        }
+
+        const cleanPayId = enteredPayId.trim();
         const finalUid = (lead.userId && lead.userId.startsWith('FC-WEB')) ? lead.userId : ('FC-WEB-' + Math.floor(10000 + Math.random() * 90000));
         lead.userId = finalUid;
         lead.id = finalUid;
+        lead.paymentId = cleanPayId;
         lead.status = 'Booked / Paid';
-        lead.paymentStatus = 'Paid & Verified (Admin Verified)';
-        if (!lead.paymentId || lead.paymentId.includes('Pending')) {
-          lead.paymentId = 'pay_admin_verified_' + Date.now().toString().slice(-6);
-        }
+        lead.paymentStatus = `Paid & Verified (${cleanPayId})`;
 
         // Save to local storage
         localStorage.setItem('flipcut_leads', JSON.stringify(currentLeads));
@@ -4513,22 +4518,29 @@ We look forward to seeing you live in the masterclass!
         showAdminToast(`✅ Pass Confirmed for ${lead.name}! User ID: ${finalUid}`, '#10B981');
         
         // Prompt to send pass via WhatsApp
-        if (confirm(`Pass confirmed for ${lead.name} (${finalUid})! Open WhatsApp to send Ticket Pass to client now?`)) {
+        if (confirm(`Pass confirmed with Payment ID "${cleanPayId}" for ${lead.name} (${finalUid})! Open WhatsApp to send Ticket Pass now?`)) {
           window.sendWebinarPassOnWhatsApp(finalUid);
         }
       };
 
-      // 3. Quick Manual Webinar Pass Generator
+      // 3. Quick Manual Webinar Pass Generator (Strict Payment Verification)
       const btnQuickGen = document.getElementById('btnQuickGeneratePass');
       if (btnQuickGen) {
         btnQuickGen.addEventListener('click', async () => {
           const name = document.getElementById('quickPassName')?.value?.trim();
           const phone = document.getElementById('quickPassPhone')?.value?.trim();
           const type = document.getElementById('quickPassWebsiteType')?.value || 'E-commerce';
-          const payRef = document.getElementById('quickPassPayId')?.value?.trim() || ('pay_manual_' + Math.floor(10000 + Math.random() * 90000));
+          const payRef = document.getElementById('quickPassPayId')?.value?.trim();
 
           if (!name || !phone) {
             showAdminToast('Please enter both Customer Name and Mobile Number.', '#EF4444');
+            return;
+          }
+
+          if (!payRef || payRef.length < 6) {
+            showAdminToast('❌ Payment ID / UPI Transaction Ref is REQUIRED! Only paid registrations can receive a Pass.', '#EF4444');
+            const inp = document.getElementById('quickPassPayId');
+            if (inp) inp.focus();
             return;
           }
 
@@ -4547,11 +4559,11 @@ We look forward to seeing you live in the masterclass!
             amount: `₹${feeAmt}`,
             websiteType: type,
             paymentId: payRef,
-            paymentStatus: 'Paid & Verified (Manual Admin Pass)',
+            paymentStatus: `Paid & Verified (${payRef})`,
             status: 'Booked / Paid',
             date: new Date().toISOString().slice(0, 10),
             time: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
-            notes: `Manual Pass Generated in Admin. Ref: ${payRef}`
+            notes: `Verified Pass Generated in Admin. Payment ID: ${payRef}`
           };
 
           currentLeads.unshift(newPassLead);
@@ -4568,9 +4580,9 @@ We look forward to seeing you live in the masterclass!
           if (document.getElementById('quickPassPhone')) document.getElementById('quickPassPhone').value = '';
           if (document.getElementById('quickPassPayId')) document.getElementById('quickPassPayId').value = '';
 
-          showAdminToast(`🎉 Pass ${newUid} created successfully for ${name}!`, '#10B981');
+          showAdminToast(`🎉 Pass ${newUid} created with Payment ID ${payRef}!`, '#10B981');
 
-          if (confirm(`Pass ${newUid} generated for ${name}! Open WhatsApp to send Ticket Pass now?`)) {
+          if (confirm(`Pass ${newUid} verified & generated for ${name}! Open WhatsApp to send Ticket Pass now?`)) {
             window.sendWebinarPassOnWhatsApp(newUid);
           }
         });
