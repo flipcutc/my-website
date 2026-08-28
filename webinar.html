@@ -56,7 +56,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=13.5">
+  <link rel="stylesheet" href="styles.css?v=13.6">
 
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -69,13 +69,13 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- Dual Cloud Sync Engine (Firebase + Supabase) -->
-  <script src="firebase-sync.js?v=13.5"></script>
+  <script src="firebase-sync.js?v=13.6"></script>
 
   <!-- VIP User Profile Header Engine -->
-  <script src="user-profile.js?v=13.5"></script>
+  <script src="user-profile.js?v=13.6"></script>
 
   <!-- Content Store & Instant Zero-Flicker Pre-Hydration -->
-  <script src="content-store.js?v=13.5"></script>
+  <script src="content-store.js?v=13.6"></script>
   <script>
     (function() {
       try {
@@ -702,7 +702,7 @@
   <!-- ====================================================================
        VIP LIVE MASTERCLASS CINEMA PLAYER (LOCKED GATE / USER ID UNLOCK)
        ==================================================================== -->
-  <section class="container" id="vipLiveMasterclassSection" style="max-width: 860px; margin: 0 auto 50px;">
+  <section class="container" id="vipLiveMasterclassSection" style="max-width: 860px; margin: 0 auto 50px; display: none;">
     
     <!-- State 1: Locked Gate (Enter User ID) -->
     <div id="vipLiveGateLocked" style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 27, 75, 0.95)); border: 2px solid var(--brand-indigo); border-radius: var(--radius-xl); padding: 36px 28px; text-align: center; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(99, 102, 241, 0.2); position: relative; overflow: hidden;">
@@ -1346,6 +1346,12 @@
       setTxt('webinarOrigPriceDisplay', `₹${origPrice}`);
       setTxt('btnPayRazorpayText', `Pay ₹${price} & Unlock Registration`);
       setTxt('ticketPassAmountText', `₹${price} (Confirmed via Razorpay)`);
+
+      const liveSectionElem = document.getElementById('vipLiveMasterclassSection');
+      if (liveSectionElem) {
+        const isLiveVisible = (webinarCfg.liveSectionVisible === true) || (content.sectionsVisibility?.webinarLiveSection === true);
+        liveSectionElem.style.display = isLiveVisible ? 'block' : 'none';
+      }
 
       const annTextEl = document.getElementById('topAnnouncementText');
       if (annTextEl) {
