@@ -106,7 +106,7 @@ function hydratePageFromCMS(customContent) {
     const isTopAnnActive = (!content.sectionsVisibility || content.sectionsVisibility.topAnnouncement !== false) &&
                            (annData.enabled !== false);
 
-    const webinarPrice = (content.webinar && content.webinar.price) ? String(content.webinar.price).replace(/[^0-9]/g, '') : '199';
+    const webinarPrice = (content.webinar && content.webinar.price) ? String(content.webinar.price).replace(/[^0-9]/g, '') : '99';
 
     if (topBar) {
       if (!isTopAnnActive) {
@@ -2330,4 +2330,54 @@ function hydratePageFromCMS(customContent) {
     window.switchPricingPlan(1);
   }
 
+});
+
+
+// =========================================================================
+// AUTOMATIC WEBINAR MASTERCLASS ENTRANCE POPUP MODAL (₹99 REGISTER NOW)
+// =========================================================================
+window.showWebinarEntrancePopup = function() {
+  const modal = document.getElementById('webinarEntrancePopupModal');
+  if (!modal) return;
+
+  const content = (typeof getSiteContent === 'function') ? getSiteContent() : (window.flipcutSiteContent || {});
+  if (content.webinar && content.webinar.autoPopupEnabled === false) {
+    return; // Admin turned off auto-popup
+  }
+
+  modal.classList.add('active');
+  modal.style.setProperty('display', 'flex', 'important');
+  modal.style.setProperty('opacity', '1', 'important');
+  modal.style.setProperty('visibility', 'visible', 'important');
+  modal.style.setProperty('z-index', '9999999', 'important');
+};
+
+window.closeWebinarEntrancePopup = function() {
+  const modal = document.getElementById('webinarEntrancePopupModal');
+  if (modal) {
+    modal.classList.remove('active');
+    modal.style.setProperty('display', 'none', 'important');
+    modal.style.setProperty('opacity', '0', 'important');
+    modal.style.setProperty('visibility', 'hidden', 'important');
+  }
+  try {
+    sessionStorage.setItem('flipcut_webinar_popup_dismissed', 'true');
+  } catch (_) {}
+};
+
+// Automatically pop up on page arrival after 1.2s delay
+document.addEventListener('DOMContentLoaded', () => {
+  // If not on webinar page itself, auto-trigger popup on arrival
+  if (!location.pathname.includes('webinar')) {
+    setTimeout(() => {
+      try {
+        const isDismissed = sessionStorage.getItem('flipcut_webinar_popup_dismissed');
+        if (!isDismissed) {
+          window.showWebinarEntrancePopup();
+        }
+      } catch (_) {
+        window.showWebinarEntrancePopup();
+      }
+    }, 1200);
+  }
 });

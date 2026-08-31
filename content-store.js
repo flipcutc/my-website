@@ -536,6 +536,7 @@ const DEFAULT_SITE_CONTENT = {
     "whatsappGroupLink": "https://chat.whatsapp.com/B5hdxy7LbkNCrWRsHMtW8h",
     "whatsappGroupMsg": "Hi FlipCut Team! I just registered for the Live Masterclass Webinar. Please add me to the VIP Group!",
     "shareBannerImage": "https://flipcutcreation.in/assets/logo.png",
+    "autoPopupEnabled": true,
     "liveSectionVisible": false,
     "liveStatus": "offline",
     "liveYoutubeId": "",
