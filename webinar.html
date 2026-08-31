@@ -97,7 +97,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=15.4">
+  <link rel="stylesheet" href="styles.css?v=15.5">
 
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -110,13 +110,13 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- Dual Cloud Sync Engine (Firebase + Supabase) -->
-  <script src="firebase-sync.js?v=15.4"></script>
+  <script src="firebase-sync.js?v=15.5"></script>
 
   <!-- VIP User Profile Header Engine -->
-  <script src="user-profile.js?v=15.4"></script>
+  <script src="user-profile.js?v=15.5"></script>
 
   <!-- Content Store & Instant Zero-Flicker Pre-Hydration -->
-  <script src="content-store.js?v=15.4"></script>
+  <script src="content-store.js?v=15.5"></script>
   <script>
     (function() {
       try {
@@ -2267,6 +2267,22 @@ _Keep this User ID safe to unlock the live session!_
 - *FlipCut Creation Team*`;
 
         const sendPassWaUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(passMsg)}`;
+
+        // Auto-Trigger WhatsApp Ticket Pass Delivery after 0.8s on confirmation
+        setTimeout(() => {
+          try {
+            if (sendPassWaUrl && !window._waPassAutoOpened) {
+              window._waPassAutoOpened = true;
+              const waWin = window.open(sendPassWaUrl, '_blank');
+              if (waWin) {
+                if (typeof showToast === 'function') {
+                  showToast('🚀 WhatsApp opened! Sending your Official Ticket Pass...', '#10B981');
+                }
+              }
+            }
+          } catch (_) {}
+        }, 800);
+
 
         // Force remove any remaining Razorpay container / iframe
         document.querySelectorAll('.razorpay-container, iframe[name^="razorpay"], .razorpay-backdrop').forEach(el => {

@@ -188,7 +188,97 @@ async function pushLeadToDualCloud(lead) {
     }
   })();
 
-  await Promise.allSettled([firestorePromise, supabasePromise, googleSheetPromise, convexPromise]);
+    // 1F. Push to Automated WhatsApp Cloud Gateway (Green-API / UltraMsg / Custom Webhook)
+  const whatsappAutoDispatchPromise = (async () => {
+    try {
+      const siteContent = (typeof getSiteContent === 'function') ? getSiteContent() : (window.flipcutSiteContent || {});
+      const waWebhook = siteContent.contact?.whatsappWebhookUrl || siteContent.whatsappWebhookUrl || '';
+      const instanceId = siteContent.contact?.whatsappInstanceId || siteContent.whatsappInstanceId || '';
+      const apiToken = siteContent.contact?.whatsappApiToken || siteContent.whatsappApiToken || '';
+      const gatewayType = siteContent.contact?.whatsappGatewayType || 'auto_client';
+
+      const rawPhone = (leadPayload.phone || '').replace(/[^0-9]/g, '');
+      const cleanPhone = rawPhone.length === 10 ? '91' + rawPhone : rawPhone;
+      const uid = leadPayload.id || 'FC-WEB-00000';
+      const name = leadPayload.name || 'Creator';
+      const price = leadPayload.budget || '₹99';
+      const waGroup = siteContent.webinar?.whatsappGroupLink || 'https://chat.whatsapp.com/B5hdxy7LbkNCrWRsHMtW8h';
+
+      const passMessage = 
+`🎟️ *FLIPCUT CREATION - OFFICIAL WEBINAR VIP PASS* 🎟️
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+👋 *வணக்கம் ${name}*,
+FlipCut Creation-ன் *Live Masterclass Webinar*-ல் உங்கள் இருக்கை உறுதி செய்யப்பட்டது!
+
+🆔 *Pass User ID:* ${uid}
+💻 *Session:* Web Creation & High-Retention Masterclass
+📅 *Date & Time:* Sunday, 9:00 AM IST
+💰 *Status:* ${price} Paid & Confirmed (Seat Locked)
+
+👉 *Step 1: Join Official VIP WhatsApp Group:*
+${waGroup}
+
+👉 *Step 2: Access & Retrieve Your Pass Online:*
+https://flipcutcreation.in/webinar.html
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+_Keep this User ID safe to unlock the live session!_
+- *FlipCut Creation Team*`;
+
+      // 1. If Custom Webhook (Make / Pabbly / Google Apps Script)
+      if (waWebhook && waWebhook.startsWith('http')) {
+        await fetch(waWebhook, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            event: 'NEW_WEBINAR_VIP_PASS',
+            phone: cleanPhone,
+            name: name,
+            userId: uid,
+            amount: price,
+            message: passMessage,
+            waGroupLink: waGroup,
+            ticketUrl: 'https://flipcutcreation.in/webinar.html',
+            timestamp: new Date().toISOString()
+          })
+        });
+        console.log('✅ Dispatched to WhatsApp Cloud Webhook Gateway:', cleanPhone);
+      }
+
+      // 2. If Green-API Instance Configured
+      if (instanceId && apiToken && gatewayType === 'green_api') {
+        const greenUrl = `https://api.green-api.com/waInstance${instanceId}/sendMessage/${apiToken}`;
+        await fetch(greenUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chatId: `${cleanPhone}@c.us`,
+            message: passMessage
+          })
+        });
+        console.log('✅ Sent via Green-API Free WhatsApp Gateway:', cleanPhone);
+      }
+
+      // 3. If UltraMsg Instance Configured
+      if (instanceId && apiToken && gatewayType === 'ultramsg') {
+        const ultraUrl = `https://api.ultramsg.com/${instanceId}/messages/chat`;
+        await fetch(ultraUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            token: apiToken,
+            to: cleanPhone,
+            body: passMessage
+          })
+        });
+        console.log('✅ Sent via UltraMsg WhatsApp Gateway:', cleanPhone);
+      }
+
+    } catch (waErr) {
+      console.warn('[WhatsApp Auto-Dispatch Note]', waErr.message);
+    }
+  })();
+
+  await Promise.allSettled([firestorePromise, supabasePromise, googleSheetPromise, convexPromise, whatsappAutoDispatchPromise]);
   return leadPayload;
 }
 
