@@ -97,7 +97,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=15.3">
+  <link rel="stylesheet" href="styles.css?v=15.4">
 
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -110,13 +110,13 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- Dual Cloud Sync Engine (Firebase + Supabase) -->
-  <script src="firebase-sync.js?v=15.3"></script>
+  <script src="firebase-sync.js?v=15.4"></script>
 
   <!-- VIP User Profile Header Engine -->
-  <script src="user-profile.js?v=15.3"></script>
+  <script src="user-profile.js?v=15.4"></script>
 
   <!-- Content Store & Instant Zero-Flicker Pre-Hydration -->
-  <script src="content-store.js?v=15.3"></script>
+  <script src="content-store.js?v=15.4"></script>
   <script>
     (function() {
       try {
@@ -2389,6 +2389,249 @@ _Keep this User ID safe to unlock the live session!_
       };
 
       // 1-Click Ticket Pass PDF Downloader (Pixel-Perfect Typography & Vector Design)
+      
+      // =========================================================================
+      // HIGH-DEFINITION VIP TICKET PASS IMAGE GENERATOR (PNG & CANVAS)
+      // =========================================================================
+      window.generateTicketImageBlob = function(opts = {}) {
+        return new Promise((resolve) => {
+          const name = opts.name || 'Valued Creator';
+          const uid = opts.userId || opts.uid || 'FC-WEB-00000';
+          const type = opts.websiteType || opts.type || 'Webinar Masterclass';
+          const dateText = opts.dateText || opts.date || 'Sunday, 9:00 AM IST';
+          const payId = opts.paymentId || opts.payId || 'rzp_verified_paid';
+          const price = opts.price || '99';
+
+          const canvas = document.createElement('canvas');
+          canvas.width = 1080;
+          canvas.height = 1440;
+          const ctx = canvas.getContext('2d');
+
+          // 1. Background Gradient (Midnight Luxury)
+          const bgGrad = ctx.createLinearGradient(0, 0, 1080, 1440);
+          bgGrad.addColorStop(0, '#0B0F19');
+          bgGrad.addColorStop(0.5, '#111827');
+          bgGrad.addColorStop(1, '#0F172A');
+          ctx.fillStyle = bgGrad;
+          ctx.fillRect(0, 0, 1080, 1440);
+
+          // 2. Ambient Glow Orbs
+          const orbGrad = ctx.createRadialGradient(200, 200, 10, 200, 200, 350);
+          orbGrad.addColorStop(0, 'rgba(99, 102, 241, 0.25)');
+          orbGrad.addColorStop(1, 'rgba(99, 102, 241, 0)');
+          ctx.fillStyle = orbGrad;
+          ctx.fillRect(0, 0, 600, 600);
+
+          const orb2Grad = ctx.createRadialGradient(900, 1200, 10, 900, 1200, 400);
+          orb2Grad.addColorStop(0, 'rgba(16, 185, 129, 0.2)');
+          orb2Grad.addColorStop(1, 'rgba(16, 185, 129, 0)');
+          ctx.fillStyle = orb2Grad;
+          ctx.fillRect(500, 800, 600, 640);
+
+          // 3. Elegant Outer Border
+          ctx.strokeStyle = '#4F46E5';
+          ctx.lineWidth = 6;
+          ctx.strokeRect(40, 40, 1000, 1360);
+
+          // 4. Header Top Box
+          ctx.fillStyle = '#1E1B4B';
+          ctx.fillRect(40, 40, 1000, 220);
+
+          // Header Text
+          ctx.fillStyle = '#FFFFFF';
+          ctx.font = 'bold 54px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('FLIPCUT CREATION', 540, 125);
+
+          ctx.fillStyle = '#F59E0B';
+          ctx.font = 'bold 30px sans-serif';
+          ctx.fillText('⭐ OFFICIAL WEBINAR VIP PASS ⭐', 540, 180);
+
+          ctx.fillStyle = '#94A3B8';
+          ctx.font = '24px sans-serif';
+          ctx.fillText('www.flipcutcreation.in', 540, 225);
+
+          // 5. Pass Holder Name Section
+          ctx.textAlign = 'left';
+          ctx.fillStyle = '#94A3B8';
+          ctx.font = 'bold 26px sans-serif';
+          ctx.fillText('PASS HOLDER NAME', 90, 340);
+
+          ctx.fillStyle = '#FFFFFF';
+          ctx.font = 'bold 58px sans-serif';
+          ctx.fillText(name, 90, 415);
+
+          // 6. Registered User ID Card Box
+          ctx.fillStyle = '#1E1B4B';
+          ctx.fillRect(90, 465, 900, 115);
+          ctx.strokeStyle = '#6366F1';
+          ctx.lineWidth = 3;
+          ctx.strokeRect(90, 465, 900, 115);
+
+          ctx.fillStyle = '#818CF8';
+          ctx.font = 'bold 30px sans-serif';
+          ctx.fillText('REGISTERED USER ID:', 130, 535);
+
+          ctx.textAlign = 'right';
+          ctx.fillStyle = '#FFFFFF';
+          ctx.font = 'bold 44px monospace';
+          ctx.fillText(uid, 950, 540);
+
+          // 7. Details Card Box
+          ctx.textAlign = 'left';
+          ctx.fillStyle = '#1F2937';
+          ctx.fillRect(90, 620, 900, 390);
+          ctx.strokeStyle = '#374151';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(90, 620, 900, 390);
+
+          const drawRow = (label, val, y, valColor = '#FFFFFF') => {
+            ctx.fillStyle = '#9CA3AF';
+            ctx.font = '30px sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText(label, 130, y);
+
+            ctx.fillStyle = valColor;
+            ctx.font = 'bold 32px sans-serif';
+            ctx.textAlign = 'right';
+            ctx.fillText(val, 950, y);
+          };
+
+          drawRow('Session Type:', type, 695, '#60A5FA');
+          drawRow('Amount Paid:', '₹' + price + ' (Confirmed)', 775, '#34D399');
+          drawRow('Session Date & Time:', dateText, 855, '#F8FAFC');
+          drawRow('Payment Ref ID:', payId.slice(0, 20), 935, '#C084FC');
+
+          // 8. Perforated Dashed Line
+          ctx.strokeStyle = '#64748B';
+          ctx.lineWidth = 3;
+          ctx.setLineDash([12, 12]);
+          ctx.beginPath();
+          ctx.moveTo(90, 1070);
+          ctx.lineTo(990, 1070);
+          ctx.stroke();
+          ctx.setLineDash([]); // reset
+
+          // Cutout Circles
+          ctx.fillStyle = '#0B0F19';
+          ctx.beginPath(); ctx.arc(40, 1070, 30, 0, Math.PI * 2); ctx.fill();
+          ctx.beginPath(); ctx.arc(1040, 1070, 30, 0, Math.PI * 2); ctx.fill();
+
+          // 9. Status & Verification Badge
+          ctx.fillStyle = '#064E3B';
+          ctx.fillRect(90, 1120, 900, 100);
+          ctx.strokeStyle = '#10B981';
+          ctx.lineWidth = 3;
+          ctx.strokeRect(90, 1120, 900, 100);
+
+          ctx.textAlign = 'center';
+          ctx.fillStyle = '#34D399';
+          ctx.font = 'bold 36px sans-serif';
+          ctx.fillText('✅ VERIFIED VIP PASS • SEAT CONFIRMED', 540, 1182);
+
+          // 10. Footer Security & Live Instructions
+          ctx.fillStyle = '#94A3B8';
+          ctx.font = '24px sans-serif';
+          ctx.fillText('Live Masterclass Portal: https://flipcutcreation.in/webinar.html', 540, 1280);
+          ctx.fillStyle = '#64748B';
+          ctx.font = '20px sans-serif';
+          ctx.fillText('Official Digital Verification by FlipCut Post-Production Systems', 540, 1330);
+
+          canvas.toBlob((blob) => {
+            resolve(blob);
+          }, 'image/png');
+        });
+      };
+
+      // 1-Click WhatsApp Ticket Image Dispatcher (Native File Share on Mobile & Auto-Copy on Desktop)
+      window.shareTicketPassImageOnWhatsApp = async function(opts = {}) {
+        try {
+          if (typeof showToast === 'function') {
+            showToast('🎨 Generating HD Ticket Image...', 'var(--brand-indigo)');
+          }
+
+          const blob = await window.generateTicketImageBlob(opts);
+          if (!blob) return;
+
+          const uid = opts.userId || opts.uid || 'FC-WEB-00000';
+          const name = opts.name || 'Creator';
+          const file = new File([blob], `FlipCut-VIP-Ticket-${uid}.png`, { type: 'image/png' });
+
+          // 1. If Web Share API supports file sharing (Android & iOS Mobile Devices)
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              title: 'FlipCut VIP Masterclass Ticket Pass',
+              text: `🎟️ Official Webinar VIP Ticket Pass for ${name} (User ID: ${uid})`,
+              files: [file]
+            });
+            if (typeof showToast === 'function') {
+              showToast('🎉 Ticket Image shared to WhatsApp successfully!', '#10B981');
+            }
+            return;
+          }
+
+          // 2. Desktop Fallback: Copy Image to Clipboard & Auto-Download & Open WhatsApp
+          try {
+            if (navigator.clipboard && window.ClipboardItem) {
+              await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+              if (typeof showToast === 'function') {
+                showToast('📋 HD Ticket Image copied to Clipboard! Press Ctrl+V in WhatsApp chat.', '#10B981');
+              }
+            }
+          } catch (_) {}
+
+          // Download the Image File directly
+          const imgUrl = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = imgUrl;
+          a.download = `FlipCut-VIP-Ticket-${uid}.png`;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          setTimeout(() => URL.revokeObjectURL(imgUrl), 5000);
+
+          // Open WhatsApp
+          const rawPhone = (opts.phone || '').replace(/[^0-9]/g, '');
+          const cleanPhone = rawPhone.length === 10 ? '91' + rawPhone : rawPhone;
+          const msg = `🎟️ *FLIPCUT CREATION - WEBINAR VIP PASS*
+
+Hi *${name}*,
+Here is your official Ticket Pass (User ID: ${uid})!
+
+Access Live Masterclass:
+https://flipcutcreation.in/webinar.html`;
+          const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
+          window.open(waUrl, '_blank');
+
+        } catch (err) {
+          console.warn('[Ticket Image Share Note]', err);
+        }
+      };
+
+      // 1-Click Ticket Image PNG Downloader
+      window.downloadTicketImagePNG = async function() {
+        const uid = document.getElementById('ticketUserId')?.textContent?.trim() || 'FC-WEB-00000';
+        const name = document.getElementById('ticketHolderName')?.textContent?.trim() || document.getElementById('ticketClientName')?.textContent?.trim() || 'Valued Creator';
+        const type = document.getElementById('ticketWebsiteType')?.textContent?.trim() || 'Webinar Masterclass';
+        const dateText = document.getElementById('ticketModalDateText')?.textContent?.trim() || 'Sunday, 9:00 AM IST';
+        const payId = document.getElementById('ticketPaymentId')?.textContent?.trim() || 'rzp_verified_paid';
+
+        const blob = await window.generateTicketImageBlob({ name, uid, type, dateText, payId, price: '99' });
+        if (!blob) return;
+
+        const imgUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = imgUrl;
+        a.download = `FlipCut-VIP-Ticket-${uid}.png`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(imgUrl), 5000);
+        if (typeof showToast === 'function') {
+          showToast('📸 HD Ticket Image (PNG) downloaded successfully!', '#10B981');
+        }
+      };
+
       window.downloadTicketPDF = function() {
         try {
           const uid = document.getElementById('ticketUserId')?.textContent?.trim() || 'FC-WEB-00000';
