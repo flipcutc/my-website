@@ -97,7 +97,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=15.0">
+  <link rel="stylesheet" href="styles.css?v=15.1">
 
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -110,13 +110,13 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- Dual Cloud Sync Engine (Firebase + Supabase) -->
-  <script src="firebase-sync.js?v=15.0"></script>
+  <script src="firebase-sync.js?v=15.1"></script>
 
   <!-- VIP User Profile Header Engine -->
-  <script src="user-profile.js?v=15.0"></script>
+  <script src="user-profile.js?v=15.1"></script>
 
   <!-- Content Store & Instant Zero-Flicker Pre-Hydration -->
-  <script src="content-store.js?v=15.0"></script>
+  <script src="content-store.js?v=15.1"></script>
   <script>
     (function() {
       try {
@@ -2038,7 +2038,7 @@
                 if (banner) banner.style.display = 'none';
 
                 // 3. Show Ticket Pass (Both In-Page & Modal) IMMEDIATELY (0ms latency)
-                showTicketModal(name, websiteType, verifiedPaymentId, generatedUserId);
+                showTicketModal(name, websiteType, verifiedPaymentId, generatedUserId, phone);
 
                 // 4. Save User Profile in Header across all pages
                 if (typeof window.saveUserProfile === 'function') {
@@ -2127,7 +2127,7 @@
         const generatedUserId = explicitUid || ('FC-WEB-' + Math.floor(10000 + Math.random() * 90000));
 
         // Display Ticket Modal synchronously
-        showTicketModal(name, websiteType, payId, generatedUserId);
+        showTicketModal(name, websiteType, payId, generatedUserId, phone);
 
         // Create / Update VIP User Profile in Header across all pages
         if (typeof window.saveUserProfile === 'function') {
@@ -2237,12 +2237,36 @@
       const ticketModalCloseBtn = document.getElementById('ticketModalCloseBtn');
       const ticketDoneBtn = document.getElementById('ticketDoneBtn');
 
-      function showTicketModal(name, websiteType, payId, userId) {
+      function showTicketModal(name, websiteType, payId, userId, explicitPhone) {
         const uid = userId || ('FC-WEB-' + Math.floor(10000 + Math.random() * 90000));
         const currentFee = getCurrentWebinarFee();
         const paymentId = payId || `pay_${Date.now()}`;
         const groupInviteLink = siteContent?.webinar?.whatsappGroupLink || 'https://chat.whatsapp.com/B5hdxy7LbkNCrWRsHMtW8h';
         const waUrl = groupInviteLink;
+
+        // Construct Official Formatted WhatsApp VIP Ticket Pass
+        const rawPhone = (explicitPhone || document.getElementById('webinarPhone')?.value || savedDraft?.phone || '').replace(/[^0-9]/g, '');
+        const cleanPhone = rawPhone.length === 10 ? '91' + rawPhone : rawPhone;
+        const passMsg = 
+`🎟️ *FLIPCUT CREATION - WEBINAR VIP PASS CONFIRMED* 🎟️
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+👤 *Pass Holder:* ${name}
+🆔 *Registered User ID:* ${uid}
+💻 *Session:* Web Creation & High-Retention Masterclass
+📅 *Date & Time:* Sunday, 9:00 AM IST
+💰 *Amount Paid:* ₹${currentFee} (Confirmed via Razorpay)
+🔑 *Payment Ref ID:* ${paymentId}
+
+👉 *Step 1: Join Official VIP WhatsApp Group:*
+${groupInviteLink}
+
+👉 *Step 2: Access & Retrieve Your Pass Online:*
+https://flipcutcreation.in/webinar.html
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+_Keep this User ID safe to unlock the live session!_
+- *FlipCut Creation Team*`;
+
+        const sendPassWaUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(passMsg)}`;
 
         // Force remove any remaining Razorpay container / iframe
         document.querySelectorAll('.razorpay-container, iframe[name^="razorpay"], .razorpay-backdrop').forEach(el => {
@@ -3053,7 +3077,7 @@
             }
             setTimeout(() => {
               closeFindPassModal();
-              showTicketModal(lead.name, lead.websiteType, lead.paymentId, lead.userId);
+              showTicketModal(lead.name, lead.websiteType, lead.paymentId, lead.userId, lead.phone);
               showToast(`🎉 Welcome back, ${lead.name}! Here is your Digital Ticket Pass.`, '#10B981');
             }, 700);
           } else {
