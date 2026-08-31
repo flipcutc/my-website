@@ -217,7 +217,7 @@ FlipCut Creation-ன் *Live Masterclass Webinar*-ல் உங்கள் இ
 💰 *Status:* ${price} Paid & Confirmed (Seat Locked)
 
 🖼️ *Step 1: View & Access Your Official VIP Pass:*
-https://flipcutcreation.in/webinar.html
+https://flipcutcreation.in/webinar
 
 👉 *Step 2: Join Official VIP WhatsApp Community Group:*
 ${waGroup}
@@ -238,7 +238,7 @@ _Keep this User ID safe to unlock the live session!_
             amount: price,
             message: passMessage,
             waGroupLink: waGroup,
-            ticketUrl: 'https://flipcutcreation.in/webinar.html',
+            ticketUrl: 'https://flipcutcreation.in/webinar',
             timestamp: new Date().toISOString()
           })
         });
