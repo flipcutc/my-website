@@ -2334,7 +2334,7 @@ function hydratePageFromCMS(customContent) {
 
 
 // =========================================================================
-// AUTOMATIC WEBINAR MASTERCLASS ENTRANCE POPUP MODAL (₹99 REGISTER NOW)
+// AUTOMATIC WEBINAR MASTERCLASS ENTRANCE POPUP MODAL (ON EVERY VISIT / RELOAD)
 // =========================================================================
 window.showWebinarEntrancePopup = function() {
   const modal = document.getElementById('webinarEntrancePopupModal');
@@ -2360,24 +2360,20 @@ window.closeWebinarEntrancePopup = function() {
     modal.style.setProperty('opacity', '0', 'important');
     modal.style.setProperty('visibility', 'hidden', 'important');
   }
-  try {
-    sessionStorage.setItem('flipcut_webinar_popup_dismissed', 'true');
-  } catch (_) {}
 };
 
-// Automatically pop up on page arrival after 1.2s delay
+// Close on Escape key press
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' || e.key === 'Esc') {
+    window.closeWebinarEntrancePopup();
+  }
+});
+
+// Automatically pop up on page arrival / reload after 1.0s delay
 document.addEventListener('DOMContentLoaded', () => {
-  // If not on webinar page itself, auto-trigger popup on arrival
   if (!location.pathname.includes('webinar')) {
     setTimeout(() => {
-      try {
-        const isDismissed = sessionStorage.getItem('flipcut_webinar_popup_dismissed');
-        if (!isDismissed) {
-          window.showWebinarEntrancePopup();
-        }
-      } catch (_) {
-        window.showWebinarEntrancePopup();
-      }
-    }, 1200);
+      window.showWebinarEntrancePopup();
+    }, 1000);
   }
 });
