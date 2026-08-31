@@ -2334,16 +2334,39 @@ function hydratePageFromCMS(customContent) {
 
 
 // =========================================================================
-// AUTOMATIC WEBINAR MASTERCLASS ENTRANCE POPUP MODAL (ON EVERY VISIT / RELOAD)
+// AUTOMATIC WEBINAR MASTERCLASS ENTRANCE POPUP MODAL (100% SYNCHRONIZED CMS DATA)
 // =========================================================================
 window.showWebinarEntrancePopup = function() {
   const modal = document.getElementById('webinarEntrancePopupModal');
   if (!modal) return;
 
   const content = (typeof getSiteContent === 'function') ? getSiteContent() : (window.flipcutSiteContent || {});
-  if (content.webinar && content.webinar.autoPopupEnabled === false) {
+  const webinarCfg = content.webinar || {};
+
+  if (webinarCfg.autoPopupEnabled === false) {
     return; // Admin turned off auto-popup
   }
+
+  // Dynamically synchronize Price, Original Price, Date, Time, Title, and Description
+  const price = String(webinarCfg.price !== undefined && webinarCfg.price !== '' ? webinarCfg.price : '99').replace(/[^0-9]/g, '') || '99';
+  const origPrice = String(webinarCfg.originalPrice !== undefined && webinarCfg.originalPrice !== '' ? webinarCfg.originalPrice : '999').replace(/[^0-9]/g, '') || '999';
+  const sessionDate = webinarCfg.date || 'Sunday, 9:00 AM IST';
+  const title = webinarCfg.title || 'Web Creation & High-Retention Video Masterclass 🚀';
+  const desc = webinarCfg.description || 'Transform your brand, build websites & master viral video editing with FlipCut Creation!';
+  const badge = webinarCfg.badge || 'Limited Seats Available';
+
+  const setElText = (id, val) => {
+    const el = document.getElementById(id);
+    if (el && val) el.textContent = val;
+  };
+
+  setElText('webinarPopupPrice', '₹' + price);
+  setElText('webinarPopupOrigPrice', '₹' + origPrice);
+  setElText('webinarPopupDate', sessionDate);
+  setElText('webinarPopupTitle', title);
+  setElText('webinarPopupDesc', desc);
+  setElText('webinarPopupBadge', badge);
+  setElText('webinarPopupBtnText', 'Register Now for ₹' + price + ' & Claim Seat');
 
   modal.classList.add('active');
   modal.style.setProperty('display', 'flex', 'important');
