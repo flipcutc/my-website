@@ -72,11 +72,11 @@
   </script>
 
   <!-- High-Definition Crisp Vector & Multi-Platform Favicon Suite -->
-  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg?v=17.1">
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png?v=17.1">
-  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png?v=17.1">
-  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico?v=17.1">
-  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=17.1">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg?v=17.2">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png?v=17.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png?v=17.2">
+  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico?v=17.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=17.2">
   <meta name="apple-mobile-web-app-title" content="FlipCut">
   <meta name="application-name" content="FlipCut Creation">
   <meta name="theme-color" content="#0B0F19">
@@ -97,7 +97,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=17.1">
+  <link rel="stylesheet" href="styles.css?v=17.2">
 
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -110,13 +110,13 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- Dual Cloud Sync Engine (Firebase + Supabase) -->
-  <script src="firebase-sync.js?v=17.1"></script>
+  <script src="firebase-sync.js?v=17.2"></script>
 
   <!-- VIP User Profile Header Engine -->
-  <script src="user-profile.js?v=17.1"></script>
+  <script src="user-profile.js?v=17.2"></script>
 
   <!-- Content Store & Instant Zero-Flicker Pre-Hydration -->
-  <script src="content-store.js?v=17.1"></script>
+  <script src="content-store.js?v=17.2"></script>
   <script>
     (function() {
       try {
@@ -3469,6 +3469,55 @@ https://flipcutcreation.in/webinar`;
 
     });
   </script>
+
+  <!-- ==========================================================================
+       STICKY MOBILE QUICK CHECKOUT DOCK BAR (ONE-TAP FAST REGISTRATION)
+       ========================================================================== -->
+  <div id="mobileStickyWebinarCta" style="display: none; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10, 15, 29, 0.96); backdrop-filter: blur(16px); border-top: 1.5px solid #6366F1; padding: 10px 16px; z-index: 9999; box-shadow: 0 -10px 30px rgba(0,0,0,0.7);">
+    <div style="max-width: 600px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+      <div style="text-align: left;">
+        <div style="display: flex; align-items: baseline; gap: 6px;">
+          <strong style="color: #10B981; font-size: 1.3rem; font-weight: 900;">₹99</strong>
+          <span style="color: #64748B; font-size: 0.8rem; text-decoration: line-through;">₹999</span>
+          <span style="color: #F59E0B; font-size: 0.65rem; font-weight: 800; background: rgba(245,158,11,0.15); padding: 1px 5px; border-radius: 4px;">90% OFF</span>
+        </div>
+        <div style="font-size: 0.7rem; color: #94A3B8; font-weight: 600;">Sep 5 • 10:00 AM IST</div>
+      </div>
+      <button type="button" onclick="scrollToWebinarCheckout()" class="btn btn-primary" style="padding: 10px 18px; font-size: 0.92rem; font-weight: 800; border-radius: 10px; background: linear-gradient(135deg, #6366F1, #4F46E5); box-shadow: 0 4px 14px rgba(99,102,241,0.45); display: flex; align-items: center; gap: 6px; border: none; color: #FFF; cursor: pointer;">
+        <i class="fa-solid fa-ticket"></i> <span>Register (₹99)</span>
+      </button>
+    </div>
+  </div>
+
+
+  <script>
+    window.scrollToWebinarCheckout = function() {
+      const formCard = document.getElementById('webinarFormContainer') || document.querySelector('.webinar-card-wrapper');
+      if (formCard) {
+        formCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setTimeout(() => {
+          const nameInput = document.getElementById('webinarName');
+          if (nameInput) nameInput.focus();
+        }, 500);
+      }
+    };
+
+    // Show sticky bar on mobile when scrolled past hero
+    window.addEventListener('scroll', () => {
+      const stickyBar = document.getElementById('mobileStickyWebinarCta');
+      if (!stickyBar) return;
+      if (window.innerWidth <= 768) {
+        if (window.scrollY > 280) {
+          stickyBar.style.display = 'block';
+        } else {
+          stickyBar.style.display = 'none';
+        }
+      } else {
+        stickyBar.style.display = 'none';
+      }
+    }, { passive: true });
+  </script>
+
 </body>
 
 </html>
