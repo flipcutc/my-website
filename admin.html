@@ -18,11 +18,11 @@
   </script>
 
   <!-- High-Definition Crisp Vector & Multi-Platform Favicon Suite -->
-  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg?v=16.1">
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png?v=16.1">
-  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png?v=16.1">
-  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico?v=16.1">
-  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=16.1">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg?v=16.2">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png?v=16.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png?v=16.2">
+  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico?v=16.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=16.2">
   <meta name="apple-mobile-web-app-title" content="FlipCut">
   <meta name="application-name" content="FlipCut Creation">
   <meta name="theme-color" content="#0B0F19">
@@ -43,7 +43,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=16.1">
+  <link rel="stylesheet" href="styles.css?v=16.2">
   
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -3112,10 +3112,10 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- Dual Cloud Sync Engine (Firebase + Supabase) -->
-  <script src="firebase-sync.js?v=16.1"></script>
+  <script src="firebase-sync.js?v=16.2"></script>
 
   <!-- CMS & SQL Engine Script -->
-  <script src="content-store.js?v=16.1"></script>
+  <script src="content-store.js?v=16.2"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
 
@@ -4908,6 +4908,108 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
       let activeTicketImageBlob = null;
       let activeTicketLead = null;
 
+      
+      // Bulk WhatsApp Dispatcher Logic
+      let bulkWaQueue = [];
+      let bulkWaCurrentIndex = 0;
+
+      window.openBulkWhatsAppDispatcherModal = function() {
+        const modal = document.getElementById('bulkWhatsAppDispatcherModal');
+        if (!modal) return;
+
+        bulkWaQueue = currentLeads.filter(l => {
+          const isWebinar = (l.service || '').toLowerCase().includes('webinar') || (l.packageName || '').toLowerCase().includes('webinar') || (l.userId || '').startsWith('FC-WEB');
+          return isWebinar && l.phone;
+        });
+
+        bulkWaCurrentIndex = 0;
+        renderBulkWaList();
+        modal.classList.add('active');
+        modal.style.setProperty('display', 'flex', 'important');
+        modal.style.setProperty('opacity', '1', 'important');
+        modal.style.setProperty('visibility', 'visible', 'important');
+        modal.style.setProperty('z-index', '999999999', 'important');
+      };
+
+      window.closeBulkWhatsAppDispatcherModal = function() {
+        const modal = document.getElementById('bulkWhatsAppDispatcherModal');
+        if (modal) {
+          modal.classList.remove('active');
+          modal.style.setProperty('display', 'none', 'important');
+          modal.style.setProperty('opacity', '0', 'important');
+          modal.style.setProperty('visibility', 'hidden', 'important');
+        }
+      };
+
+      function renderBulkWaList() {
+        const listEl = document.getElementById('bulkWaAttendeesList');
+        const statsEl = document.getElementById('bulkWaQueueStats');
+        const nextBtn = document.getElementById('btnSendNextBulkWa');
+        if (!listEl) return;
+
+        const sentCount = bulkWaQueue.filter(l => l.waPassSent === 'Sent ✅' || l.passDispatched).length;
+        const total = bulkWaQueue.length;
+        if (statsEl) {
+          statsEl.innerHTML = `<strong>${sentCount}</strong> of <strong>${total}</strong> Passes Dispatched (${total > 0 ? Math.round((sentCount/total)*100) : 0}%)`;
+        }
+
+        if (total === 0) {
+          listEl.innerHTML = '<div style="color:#94A3B8; text-align:center; padding:30px;">No registered webinar attendees found.</div>';
+          if (nextBtn) nextBtn.disabled = true;
+          return;
+        }
+
+        const pendingLeads = bulkWaQueue.filter(l => l.waPassSent !== 'Sent ✅' && !l.passDispatched);
+        if (nextBtn) {
+          if (pendingLeads.length === 0) {
+            nextBtn.innerHTML = '<i class="fa-solid fa-circle-check"></i> <span>All Passes Sent!</span>';
+            nextBtn.disabled = true;
+            nextBtn.style.background = '#10B981';
+          } else {
+            nextBtn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> <span>Send Next (${pendingLeads[0].name || 'Attendee'})`;
+            nextBtn.disabled = false;
+            nextBtn.style.background = 'linear-gradient(135deg, #25D366, #128C7E)';
+          }
+        }
+
+        listEl.innerHTML = bulkWaQueue.map((lead) => {
+          const isSent = lead.waPassSent === 'Sent ✅' || lead.passDispatched;
+          const uid = lead.userId || lead.id || 'FC-WEB-00000';
+          return `
+            <div style="background: ${isSent ? 'rgba(16,185,129,0.06)' : 'rgba(255,255,255,0.03)'}; border: 1px solid ${isSent ? '#10B981' : 'rgba(255,255,255,0.1)'}; border-radius: 10px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <strong style="color: #FFF; font-size: 0.92rem; display: block;">${lead.name || 'Attendee'}</strong>
+                <span style="font-size: 0.78rem; color: #94A3B8; font-family: monospace;">${lead.phone} • ${uid}</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                ${isSent ? `
+                  <span style="background: rgba(16,185,129,0.15); color: #10B981; border: 1px solid #10B981; font-size: 0.75rem; font-weight: 700; padding: 3px 8px; border-radius: 6px;">
+                    ✅ Dispatched
+                  </span>
+                ` : `
+                  <span style="background: rgba(245,158,11,0.15); color: #F59E0B; border: 1px solid #F59E0B; font-size: 0.75rem; font-weight: 700; padding: 3px 8px; border-radius: 6px;">
+                    ⏳ Pending
+                  </span>
+                `}
+                <button type="button" class="btn btn-whatsapp" onclick="sendWebinarPassOnWhatsApp('${lead.id}'); setTimeout(renderBulkWaList, 1000);" style="padding: 5px 10px; font-size: 0.78rem; font-weight: 700; background: #25D366; border: none; border-radius: 6px; color: #FFF; cursor: pointer;">
+                  <i class="fa-brands fa-whatsapp"></i> ${isSent ? 'Resend' : 'Send'}
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      window.sendNextBulkWaPass = function() {
+        const pending = bulkWaQueue.find(l => l.waPassSent !== 'Sent ✅' && !l.passDispatched);
+        if (pending) {
+          sendWebinarPassOnWhatsApp(pending.id);
+          setTimeout(renderBulkWaList, 1000);
+        } else {
+          showAdminToast('🎉 All webinar passes in queue have already been dispatched!', '#10B981');
+        }
+      };
+
       window.sendTicketImageOnWhatsApp = async function(id) {
         const lead = currentLeads.find(l => String(l.id) === String(id) || String(l.userId) === String(id));
         if (!lead) {
@@ -4943,7 +5045,14 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
 
           if (previewEl) previewEl.src = imgUrl;
           if (subtitleEl) subtitleEl.textContent = `Pass for ${opts.name} (${opts.userId})`;
-          if (modal) modal.style.display = 'flex';
+          if (modal) {
+            modal.classList.add('active');
+            modal.style.setProperty('display', 'flex', 'important');
+            modal.style.setProperty('opacity', '1', 'important');
+            modal.style.setProperty('visibility', 'visible', 'important');
+            modal.style.setProperty('z-index', '999999999', 'important');
+            modal.style.setProperty('pointer-events', 'auto', 'important');
+          }
 
           showAdminToast(`✅ HD VIP Ticket Image Ready for ${opts.name}!`, '#10B981');
 
@@ -4955,7 +5064,12 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
 
       window.closeAdminTicketImageModal = function() {
         const modal = document.getElementById('adminTicketImageModal');
-        if (modal) modal.style.display = 'none';
+        if (modal) {
+          modal.classList.remove('active');
+          modal.style.setProperty('display', 'none', 'important');
+          modal.style.setProperty('opacity', '0', 'important');
+          modal.style.setProperty('visibility', 'hidden', 'important');
+        }
       };
 
       window.adminShareCurrentTicketImageOnWhatsApp = async function() {
