@@ -92,7 +92,7 @@
             phone: lead.phone,
             websiteType: lead.websiteType || 'Webinar Masterclass',
             paymentId: lead.paymentId || 'Confirmed Pass',
-            amount: lead.budget || lead.amount || '₹2',
+            amount: lead.budget || lead.amount || '₹99',
             webinarRegistered: true
           };
           saveUserProfile(restored);
@@ -157,7 +157,7 @@
 
     const cardPayStatus = document.getElementById('cardProfilePaymentStatus');
     if (cardPayStatus) {
-      cardPayStatus.textContent = `✅ ${profile.amount || '₹2'} Confirmed (Razorpay)`;
+      cardPayStatus.textContent = `✅ ${profile.amount || '₹99'} Confirmed (Razorpay)`;
     }
 
     const cardWaBtn = document.getElementById('cardProfileWhatsAppBtn');

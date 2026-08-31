@@ -172,7 +172,7 @@ async function pushLeadToDualCloud(lead) {
               phone: leadPayload.phone || '',
               email: leadPayload.email || '',
               service: leadPayload.service || 'Webinar Masterclass',
-              amount: leadPayload.budget || '₹2',
+              amount: leadPayload.budget || '₹99',
               message: leadPayload.message || '',
               status: leadPayload.status || 'Booked / Paid',
               paymentId: leadPayload.paymentId || '',

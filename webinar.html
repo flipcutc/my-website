@@ -51,7 +51,7 @@
     },
     "offers": {
       "@type": "Offer",
-      "price": "2",
+      "price": "99",
       "priceCurrency": "INR",
       "url": "https://flipcutcreation.in/webinar",
       "availability": "https://schema.org/InStock"
@@ -97,7 +97,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=15.1">
+  <link rel="stylesheet" href="styles.css?v=15.2">
 
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -110,13 +110,13 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- Dual Cloud Sync Engine (Firebase + Supabase) -->
-  <script src="firebase-sync.js?v=15.1"></script>
+  <script src="firebase-sync.js?v=15.2"></script>
 
   <!-- VIP User Profile Header Engine -->
-  <script src="user-profile.js?v=15.1"></script>
+  <script src="user-profile.js?v=15.2"></script>
 
   <!-- Content Store & Instant Zero-Flicker Pre-Hydration -->
-  <script src="content-store.js?v=15.1"></script>
+  <script src="content-store.js?v=15.2"></script>
   <script>
     (function() {
       try {
@@ -650,7 +650,7 @@
 
               <div class="profile-detail-row">
                 <span class="detail-label"><i class="fa-solid fa-receipt"></i> Payment:</span>
-                <strong id="cardProfilePaymentStatus" class="detail-value" style="color: #10B981;">✅ ₹2 Confirmed (Razorpay)</strong>
+                <strong id="cardProfilePaymentStatus" class="detail-value" style="color: #10B981;">✅ ₹99 Confirmed (Razorpay)</strong>
               </div>
             </div>
 
@@ -737,7 +737,7 @@
       <span><i class="fa-solid fa-calendar-days text-gradient"></i> <span id="webinarDateText">Saturday, 7:00 PM IST</span></span>
       <span><i class="fa-solid fa-clock text-gradient"></i> <span id="webinarDurationText">90 Minutes Live + Q&A</span></span>
       <span><i class="fa-solid fa-users text-gradient"></i> <span id="webinarSeatsText">Limited 100 Seats</span></span>
-      <span><i class="fa-solid fa-ticket text-gradient"></i> Ticket Fee: <span id="webinarTicketFeeText">₹2</span></span>
+      <span><i class="fa-solid fa-ticket text-gradient"></i> Ticket Fee: <span id="webinarTicketFeeText">₹99</span></span>
     </div>
   </section>
 
@@ -783,7 +783,7 @@
       </form>
 
       <div style="margin-top: 18px; font-size: 0.82rem; color: #94A3B8;">
-        <span>Haven't registered for a ticket pass yet?</span> <a href="#webinarBriefCard" style="color: #818CF8; font-weight: 700; text-decoration: underline;">Book VIP Pass (₹2)</a>
+        <span>Haven't registered for a ticket pass yet?</span> <a href="#webinarBriefCard" style="color: #818CF8; font-weight: 700; text-decoration: underline;">Book VIP Pass (₹99)</a>
       </div>
     </div>
 
@@ -1008,7 +1008,7 @@
             <!-- Step 1 Button: Pay via Razorpay -->
             <button type="button" class="btn btn-primary" id="btnPayRazorpay" style="width: 100%; justify-content: center; padding: 14px; font-size: 1.05rem;">
               <i class="fa-solid fa-lock"></i>
-              <span id="btnPayRazorpayText">Pay ₹2 & Unlock Registration</span>
+              <span id="btnPayRazorpayText">Pay ₹99 & Unlock Registration</span>
             </button>
 
             <!-- Step 2 Button: Final Submit (Visible after Payment Done) -->
@@ -1087,7 +1087,7 @@
           </div>
           <div style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px;">
             <span style="color: var(--text-muted);"><i class="fa-solid fa-indian-rupee-sign"></i> Amount Paid:</span>
-            <strong id="inlineTicketPassAmountText" style="color: #10B981; font-weight: 800;">₹2 (Confirmed via Razorpay)</strong>
+            <strong id="inlineTicketPassAmountText" style="color: #10B981; font-weight: 800;">₹99 (Confirmed via Razorpay)</strong>
           </div>
           <div style="display: flex; justify-content: space-between;">
             <span style="color: var(--text-muted);"><i class="fa-solid fa-receipt"></i> Razorpay Payment ID:</span>
@@ -1206,7 +1206,7 @@
 
         <div class="ticket-pass-details-row">
           <span style="color: var(--text-muted);"><i class="fa-solid fa-indian-rupee-sign"></i> Amount Paid:</span>
-          <strong style="color: #10B981;" id="ticketPassAmountText">₹2 (Confirmed)</strong>
+          <strong style="color: #10B981;" id="ticketPassAmountText">₹99 (Confirmed)</strong>
         </div>
 
         <div class="ticket-pass-details-row">
@@ -2397,7 +2397,7 @@ _Keep this User ID safe to unlock the live session!_
           const dateText = document.getElementById('ticketModalDateText')?.textContent?.trim() || 'Sunday, 9:00 AM IST';
           const payId = document.getElementById('ticketPaymentId')?.textContent?.trim() || 'rzp_verified_paid';
           
-          let priceAmt = '2';
+          let priceAmt = '99';
           const amtElem = document.getElementById('ticketPassAmountText');
           if (amtElem && amtElem.textContent) {
             const m = amtElem.textContent.match(/\d+/);
@@ -2620,7 +2620,7 @@ _Keep this User ID safe to unlock the live session!_
           const dateText = document.getElementById('ticketModalDateText')?.textContent?.trim() || 'Sunday, 9:00 AM IST';
           const payId = document.getElementById('ticketPaymentId')?.textContent?.trim() || 'rzp_paid_verified';
           
-          let priceAmt = '2';
+          let priceAmt = '99';
           const amtElem = document.getElementById('ticketPassAmountText');
           if (amtElem && amtElem.textContent) {
             const m = amtElem.textContent.match(/\d+/);
