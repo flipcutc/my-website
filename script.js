@@ -2334,8 +2334,46 @@ function hydratePageFromCMS(customContent) {
 
 
 // =========================================================================
-// AUTOMATIC WEBINAR MASTERCLASS ENTRANCE POPUP MODAL (100% SYNCHRONIZED CMS DATA)
+// AUTOMATIC WEBINAR MASTERCLASS ENTRANCE POPUP (SEP 5 10:00 AM LIVE COUNTDOWN)
 // =========================================================================
+let __webinarCountdownTimer = null;
+
+function startPopupCountdownTimer(targetDateStr) {
+  if (__webinarCountdownTimer) clearInterval(__webinarCountdownTimer);
+
+  // Target: September 5, 2026 10:00:00 AM IST
+  const targetDate = new Date(targetDateStr || '2026-09-05T10:00:00+05:30').getTime();
+
+  function tick() {
+    const now = new Date().getTime();
+    const distance = targetDate - now;
+
+    if (distance <= 0) {
+      const d = document.getElementById('popupTimerDays'); if (d) d.textContent = '00';
+      const h = document.getElementById('popupTimerHours'); if (h) h.textContent = '00';
+      const m = document.getElementById('popupTimerMins'); if (m) m.textContent = '00';
+      const s = document.getElementById('popupTimerSecs'); if (s) s.textContent = '00';
+      if (__webinarCountdownTimer) clearInterval(__webinarCountdownTimer);
+      return;
+    }
+
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    const pad = (n) => String(n).padStart(2, '0');
+
+    const dEl = document.getElementById('popupTimerDays'); if (dEl) dEl.textContent = pad(days);
+    const hEl = document.getElementById('popupTimerHours'); if (hEl) hEl.textContent = pad(hours);
+    const mEl = document.getElementById('popupTimerMins'); if (mEl) mEl.textContent = pad(minutes);
+    const sEl = document.getElementById('popupTimerSecs'); if (sEl) sEl.textContent = pad(seconds);
+  }
+
+  tick();
+  __webinarCountdownTimer = setInterval(tick, 1000);
+}
+
 window.showWebinarEntrancePopup = function() {
   const modal = document.getElementById('webinarEntrancePopupModal');
   if (!modal) return;
@@ -2347,13 +2385,12 @@ window.showWebinarEntrancePopup = function() {
     return; // Admin turned off auto-popup
   }
 
-  // Dynamically synchronize Price, Original Price, Date, Time, Title, and Description
   const price = String(webinarCfg.price !== undefined && webinarCfg.price !== '' ? webinarCfg.price : '99').replace(/[^0-9]/g, '') || '99';
   const origPrice = String(webinarCfg.originalPrice !== undefined && webinarCfg.originalPrice !== '' ? webinarCfg.originalPrice : '999').replace(/[^0-9]/g, '') || '999';
-  const sessionDate = webinarCfg.date || 'Sunday, 9:00 AM IST';
-  const title = webinarCfg.title || 'Web Creation & High-Retention Video Masterclass 🚀';
-  const desc = webinarCfg.description || 'Transform your brand, build websites & master viral video editing with FlipCut Creation!';
-  const badge = webinarCfg.badge || 'Limited Seats Available';
+  const sessionDate = webinarCfg.date || 'Saturday, Sep 5, 2026 • 10:00 AM IST';
+  const title = webinarCfg.title || 'How to Build & Scale High-Converting Websites That Drive Real Sales';
+  const desc = webinarCfg.description || "Join FlipCut Creation's lead architects for an interactive live session on building high-retention E-commerce, Portfolio, and Service sites with cinematic visual assets.";
+  const badge = webinarCfg.badge || '🔴 Live Webinar • Sep 5th, 10:00 AM IST';
 
   const setElText = (id, val) => {
     const el = document.getElementById(id);
@@ -2367,6 +2404,25 @@ window.showWebinarEntrancePopup = function() {
   setElText('webinarPopupDesc', desc);
   setElText('webinarPopupBadge', badge);
   setElText('webinarPopupBtnText', 'Register Now for ₹' + price + ' & Claim Seat');
+
+  // Live Bookings Counter Calculation
+  let baseBookings = webinarCfg.registeredCount || 84;
+  try {
+    const cachedLeads = JSON.parse(localStorage.getItem('flipcut_leads_cache') || '[]');
+    const liveWebinarLeads = cachedLeads.filter(l => (l.service || '').toLowerCase().includes('webinar') || (l.userId || '').startsWith('FC-WEB')).length;
+    if (liveWebinarLeads > 0) {
+      baseBookings = Math.min(96, Math.max(baseBookings, baseBookings + liveWebinarLeads));
+    }
+  } catch (_) {}
+
+  const seatsLeft = Math.max(4, 100 - baseBookings);
+  setElText('popupBookingText', baseBookings + '+ People Already Registered / Booked');
+  setElText('popupSeatsLeft', 'Only ' + seatsLeft + ' Seats Left!');
+  const progBar = document.getElementById('popupProgressBar');
+  if (progBar) progBar.style.width = baseBookings + '%';
+
+  // Start Countdown Timer
+  startPopupCountdownTimer(webinarCfg.targetDateTime || '2026-09-05T10:00:00+05:30');
 
   modal.classList.add('active');
   modal.style.setProperty('display', 'flex', 'important');
@@ -2383,6 +2439,7 @@ window.closeWebinarEntrancePopup = function() {
     modal.style.setProperty('opacity', '0', 'important');
     modal.style.setProperty('visibility', 'hidden', 'important');
   }
+  if (__webinarCountdownTimer) clearInterval(__webinarCountdownTimer);
 };
 
 // Close on Escape key press
