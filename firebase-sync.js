@@ -206,6 +206,7 @@ async function pushLeadToDualCloud(lead) {
 
       const passMessage = 
 `🎟️ *FLIPCUT CREATION - OFFICIAL WEBINAR VIP PASS* 🎟️
+🎉 *THANK YOU FOR REGISTERING!*
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
 👋 *வணக்கம் ${name}*,
 FlipCut Creation-ன் *Live Masterclass Webinar*-ல் உங்கள் இருக்கை உறுதி செய்யப்பட்டது!
