@@ -192,7 +192,7 @@ async function pushLeadToDualCloud(lead) {
   const whatsappAutoDispatchPromise = (async () => {
     try {
       const siteContent = (typeof getSiteContent === 'function') ? getSiteContent() : (window.flipcutSiteContent || {});
-      const waWebhook = siteContent.contact?.whatsappWebhookUrl || siteContent.whatsappWebhookUrl || '';
+      const waWebhook = siteContent.contact?.whatsappWebhookUrl || siteContent.whatsappWebhookUrl || 'https://bin.webhookrelay.com/v1/webhooks/811da262-a0c0-4ae5-bb9c-1adaa541bfbf';
       const instanceId = siteContent.contact?.whatsappInstanceId || siteContent.whatsappInstanceId || '';
       const apiToken = siteContent.contact?.whatsappApiToken || siteContent.whatsappApiToken || '';
       const gatewayType = siteContent.contact?.whatsappGatewayType || 'auto_client';
