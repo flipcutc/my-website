@@ -216,11 +216,11 @@ FlipCut Creation-ன் *Live Masterclass Webinar*-ல் உங்கள் இ
 📅 *Date & Time:* Sunday, 9:00 AM IST
 💰 *Status:* ${price} Paid & Confirmed (Seat Locked)
 
-👉 *Step 1: Join Official VIP WhatsApp Group:*
-${waGroup}
-
-👉 *Step 2: Access & Retrieve Your Pass Online:*
+🖼️ *Step 1: View & Access Your Official VIP Pass:*
 https://flipcutcreation.in/webinar.html
+
+👉 *Step 2: Join Official VIP WhatsApp Community Group:*
+${waGroup}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
 _Keep this User ID safe to unlock the live session!_
 - *FlipCut Creation Team*`;
