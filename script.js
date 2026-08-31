@@ -2405,18 +2405,50 @@ window.showWebinarEntrancePopup = function() {
   setElText('webinarPopupBadge', badge);
   setElText('webinarPopupBtnText', 'Register Now for ₹' + price + ' & Claim Seat');
 
-  // Live Bookings Counter Calculation (Total 150 Seats, 20 Registered, 130 Left)
-  const totalSeats = webinarCfg.totalSeats || 150;
-  let baseBookings = webinarCfg.registeredCount || 20;
+  // Live Real-Time Bookings Counter Calculation (Base 20, increments live with every new registration)
+  const totalSeats = Number(webinarCfg.totalSeats) || 150;
+  const baseMilestone = Number(webinarCfg.registeredCount) || 20;
 
-  const seatsLeft = Math.max(1, totalSeats - baseBookings);
-  setElText('popupBookingText', baseBookings + ' People Already Registered / Booked');
-  setElText('popupSeatsLeft', 'Only ' + seatsLeft + ' Seats Left! (Total ' + totalSeats + ')');
-  const progBar = document.getElementById('popupProgressBar');
-  if (progBar) {
-    const pct = Math.min(100, Math.round((baseBookings / totalSeats) * 100));
-    progBar.style.width = pct + '%';
+  function updateBookingUI(count) {
+    const currentBookings = Math.min(totalSeats, Math.max(baseMilestone, count));
+    const seatsLeft = Math.max(0, totalSeats - currentBookings);
+    setElText('popupBookingText', currentBookings + ' People Already Registered / Booked');
+    setElText('popupSeatsLeft', 'Only ' + seatsLeft + ' Seats Left! (Total ' + totalSeats + ')');
+    const progBar = document.getElementById('popupProgressBar');
+    if (progBar) {
+      const pct = Math.min(100, Math.round((currentBookings / totalSeats) * 100));
+      progBar.style.width = pct + '%';
+    }
   }
+
+  // Display initial base count
+  updateBookingUI(baseMilestone);
+
+  // Real-time Cloud Sync from Supabase DB to dynamically add newly registered attendees
+  (async function syncLiveRegistrations() {
+    try {
+      const SUPABASE_SYNC_URL = 'https://cznixvdphwbjdnnmapvb.supabase.co';
+      const SUPABASE_SYNC_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6bml4dmRwaHdiamRubm1hcHZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTgwMTgsImV4cCI6MjEwMzEzNDAxOH0.dTLN1DCbUiBawZq8YlS5Bol-i81JFKhKpPKCboyocuQ';
+      
+      const res = await fetch(`${SUPABASE_SYNC_URL}/rest/v1/leads?select=id,created_at,service,status&or=(service.ilike.*webinar*,id.like.FC-WEB*)&status=eq.Booked%20%2F%20Paid`, {
+        headers: { apikey: SUPABASE_SYNC_KEY, Authorization: 'Bearer ' + SUPABASE_SYNC_KEY }
+      });
+      if (res.ok) {
+        const rows = await res.json();
+        if (Array.isArray(rows)) {
+          // Count verified webinar registrations created from launch baseline
+          const milestoneTime = new Date('2026-08-31T10:05:00Z').getTime();
+          const liveNewRegistrations = rows.filter(r => {
+            if (!r.created_at) return false;
+            return new Date(r.created_at).getTime() >= milestoneTime;
+          }).length;
+
+          const totalLiveCount = baseMilestone + liveNewRegistrations;
+          updateBookingUI(totalLiveCount);
+        }
+      }
+    } catch (_) {}
+  })();
 
   // Start Countdown Timer
   startPopupCountdownTimer(webinarCfg.targetDateTime || '2026-09-05T10:00:00+05:30');
