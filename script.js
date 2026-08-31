@@ -2405,21 +2405,18 @@ window.showWebinarEntrancePopup = function() {
   setElText('webinarPopupBadge', badge);
   setElText('webinarPopupBtnText', 'Register Now for ₹' + price + ' & Claim Seat');
 
-  // Live Bookings Counter Calculation
-  let baseBookings = webinarCfg.registeredCount || 84;
-  try {
-    const cachedLeads = JSON.parse(localStorage.getItem('flipcut_leads_cache') || '[]');
-    const liveWebinarLeads = cachedLeads.filter(l => (l.service || '').toLowerCase().includes('webinar') || (l.userId || '').startsWith('FC-WEB')).length;
-    if (liveWebinarLeads > 0) {
-      baseBookings = Math.min(96, Math.max(baseBookings, baseBookings + liveWebinarLeads));
-    }
-  } catch (_) {}
+  // Live Bookings Counter Calculation (Total 150 Seats, 20 Registered, 130 Left)
+  const totalSeats = webinarCfg.totalSeats || 150;
+  let baseBookings = webinarCfg.registeredCount || 20;
 
-  const seatsLeft = Math.max(4, 100 - baseBookings);
-  setElText('popupBookingText', baseBookings + '+ People Already Registered / Booked');
-  setElText('popupSeatsLeft', 'Only ' + seatsLeft + ' Seats Left!');
+  const seatsLeft = Math.max(1, totalSeats - baseBookings);
+  setElText('popupBookingText', baseBookings + ' People Already Registered / Booked');
+  setElText('popupSeatsLeft', 'Only ' + seatsLeft + ' Seats Left! (Total ' + totalSeats + ')');
   const progBar = document.getElementById('popupProgressBar');
-  if (progBar) progBar.style.width = baseBookings + '%';
+  if (progBar) {
+    const pct = Math.min(100, Math.round((baseBookings / totalSeats) * 100));
+    progBar.style.width = pct + '%';
+  }
 
   // Start Countdown Timer
   startPopupCountdownTimer(webinarCfg.targetDateTime || '2026-09-05T10:00:00+05:30');
