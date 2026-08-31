@@ -43,7 +43,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=15.9">
+  <link rel="stylesheet" href="styles.css?v=16.0">
   
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -3112,10 +3112,10 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- Dual Cloud Sync Engine (Firebase + Supabase) -->
-  <script src="firebase-sync.js?v=15.9"></script>
+  <script src="firebase-sync.js?v=16.0"></script>
 
   <!-- CMS & SQL Engine Script -->
-  <script src="content-store.js?v=15.9"></script>
+  <script src="content-store.js?v=16.0"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
 
@@ -7771,6 +7771,50 @@ ${waGroup}
         <span style="font-size: 0.78rem; color: #94A3B8;"><i class="fa-solid fa-shield-halved" style="color: #10B981;"></i> 100% Anti-Ban Official Direct API</span>
         <button type="button" class="btn btn-secondary" onclick="closeBulkWhatsAppDispatcherModal()" style="padding: 8px 16px; font-size: 0.85rem; font-weight: 700;">
           Close
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ====================================================================
+       ADMIN VIP TICKET PASS IMAGE PREVIEW & DISPATCH MODAL
+       ==================================================================== -->
+  <div class="lightbox-modal" id="adminTicketImageModal" style="display: none; align-items: center; justify-content: center; z-index: 999999999; backdrop-filter: blur(12px); background: rgba(0,0,0,0.85);">
+    <div class="lightbox-content-box" style="max-width: 540px; width: 94%; text-align: center; padding: 24px; background: #0B0F19; border-radius: 20px; border: 1.5px solid #4F46E5; box-shadow: 0 25px 60px rgba(0,0,0,0.85), 0 0 35px rgba(79,70,229,0.3); position: relative; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden;">
+      
+      <!-- Modal Header -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 12px;">
+        <div style="display: flex; align-items: center; gap: 10px; text-align: left;">
+          <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(56,189,248,0.15); border: 1.5px solid #38BDF8; color: #38BDF8; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+            <i class="fa-solid fa-image"></i>
+          </div>
+          <div>
+            <h3 style="font-size: 1.15rem; font-weight: 800; color: #FFF; margin: 0;">Official VIP Ticket Pass Image</h3>
+            <p id="adminTicketImgSubtitle" style="font-size: 0.78rem; color: #94A3B8; margin: 2px 0 0 0;">Generated HD Pass for attendee</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeAdminTicketImageModal()" style="background: none; border: none; font-size: 1.3rem; color: #94A3B8; cursor: pointer; padding: 4px;">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Ticket Image Canvas / Preview Box -->
+      <div id="adminTicketImgContainer" style="flex: 1; overflow-y: auto; display: flex; justify-content: center; align-items: center; padding: 6px; background: #050811; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06); margin-bottom: 16px;">
+        <img id="adminTicketImgPreview" src="" alt="VIP Ticket Pass" style="max-width: 100%; height: auto; max-height: 440px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+      </div>
+
+      <!-- Modal Action Buttons -->
+      <div style="display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 8px;">
+        <button type="button" id="btnAdminShareImgWa" onclick="adminShareCurrentTicketImageOnWhatsApp()" class="btn btn-whatsapp" style="padding: 11px 12px; font-size: 0.84rem; font-weight: 800; justify-content: center; background: linear-gradient(135deg, #25D366, #128C7E); border: none; box-shadow: 0 4px 14px rgba(37,211,102,0.3); border-radius: 10px; color: #FFF; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+          <i class="fa-brands fa-whatsapp" style="font-size: 1rem;"></i> <span>Send on WhatsApp</span>
+        </button>
+        <button type="button" onclick="adminDownloadCurrentTicketImage()" class="btn btn-secondary" style="padding: 11px 12px; font-size: 0.84rem; font-weight: 700; justify-content: center; color: #38BDF8; border-color: #38BDF8; background: rgba(56,189,248,0.1); border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+          <i class="fa-solid fa-download"></i> <span>Download</span>
+        </button>
+        <button type="button" onclick="adminCopyCurrentTicketImage()" class="btn btn-secondary" style="padding: 11px 12px; font-size: 0.84rem; font-weight: 700; justify-content: center; color: #A855F7; border-color: #A855F7; background: rgba(168,85,247,0.1); border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+          <i class="fa-solid fa-copy"></i> <span>Copy</span>
         </button>
       </div>
 
