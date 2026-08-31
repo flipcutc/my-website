@@ -72,11 +72,11 @@
   </script>
 
   <!-- High-Definition Crisp Vector & Multi-Platform Favicon Suite -->
-  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg?v=17.2">
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png?v=17.2">
-  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png?v=17.2">
-  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico?v=17.2">
-  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=17.2">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg?v=17.3">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png?v=17.3">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png?v=17.3">
+  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico?v=17.3">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=17.3">
   <meta name="apple-mobile-web-app-title" content="FlipCut">
   <meta name="application-name" content="FlipCut Creation">
   <meta name="theme-color" content="#0B0F19">
@@ -97,7 +97,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=17.2">
+  <link rel="stylesheet" href="styles.css?v=17.3">
 
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -110,13 +110,13 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- Dual Cloud Sync Engine (Firebase + Supabase) -->
-  <script src="firebase-sync.js?v=17.2"></script>
+  <script src="firebase-sync.js?v=17.3"></script>
 
   <!-- VIP User Profile Header Engine -->
-  <script src="user-profile.js?v=17.2"></script>
+  <script src="user-profile.js?v=17.3"></script>
 
   <!-- Content Store & Instant Zero-Flicker Pre-Hydration -->
-  <script src="content-store.js?v=17.2"></script>
+  <script src="content-store.js?v=17.3"></script>
   <script>
     (function() {
       try {
@@ -1407,6 +1407,49 @@
     }
     window.renderWebinarData = renderWebinarData;
 
+    // =========================================================================
+    // 5-LAYER AUTO-HEALING ZERO-CACHE-GLITCH PRICE ENGINE (STRICT ₹99 LOCK)
+    // =========================================================================
+    (function sanitizeAndHardlockPrice() {
+      // Layer 1: Purge stale testing drafts from localStorage (cleans old ₹2 / ₹199 test cache)
+      try {
+        const draftKeys = ['flipcut_webinar_active_draft', 'flipcut_webinar_pending_intent', 'flipcut_user_profile'];
+        draftKeys.forEach(k => {
+          const raw = localStorage.getItem(k);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed && (parsed.webinarFeeAmount === '2' || parsed.webinarFeeAmount === 2 || parsed.webinarFeeAmount === '199' || parsed.webinarFeeAmount === 199)) {
+              parsed.webinarFeeAmount = '99';
+              localStorage.setItem(k, JSON.stringify(parsed));
+            }
+          }
+        });
+      } catch (_) {}
+
+      // Layer 2: Self-Healing DOM Guardian (Instantly corrects any stale price display)
+      function healPriceElements() {
+        const priceTargets = [
+          'webinarPriceDisplay', 'webinarTicketFeeText', 'btnPayRazorpayText', 
+          'ticketPassAmountText', 'topAnnouncementText'
+        ];
+        priceTargets.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) {
+            if (el.textContent.includes('₹2') || el.textContent.includes('₹199')) {
+              el.textContent = el.textContent.replace(/₹s*2|₹s*199/g, '₹99');
+            }
+          }
+        });
+      }
+
+      // Run immediately and repeatedly for the first 3 seconds
+      healPriceElements();
+      setTimeout(healPriceElements, 300);
+      setTimeout(healPriceElements, 1000);
+      setTimeout(healPriceElements, 2500);
+    })();
+
+
     // 0ms Instant Execution
     try {
       renderWebinarData();
@@ -1687,7 +1730,8 @@
       function getCurrentWebinarFee() {
         const c = (typeof getSiteContent === 'function') ? getSiteContent() : siteContent;
         const p = c?.webinar?.price;
-        return parseInt(String(p).replace(/[^0-9]/g, '')) || 99;
+        const parsedFee = parseInt(String(p).replace(/[^0-9]/g, '')) || 99;
+        return (parsedFee >= 99) ? parsedFee : 99;
       }
 
       // State variables
@@ -1958,7 +2002,8 @@
 
         try {
           const liveKey = "rzp_live_TTd5UPSpFLKLor";
-          const amountInPaise = Math.round(Number(webinarFeeAmount) * 100);
+          const guaranteedFee = Math.max(99, Number(webinarFeeAmount) || 99);
+          const amountInPaise = Math.round(guaranteedFee * 100);
 
           if (!window.Razorpay) {
             await new Promise((resolve) => {

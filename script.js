@@ -1,3 +1,18 @@
+
+// Real-time Self-Healing Price Guardian
+(function autoHealClientPrice() {
+  try {
+    const rawContent = localStorage.getItem('flipcut_site_content');
+    if (rawContent) {
+      const parsed = JSON.parse(rawContent);
+      if (parsed?.webinar && (parsed.webinar.price === '2' || parsed.webinar.price === 2 || parsed.webinar.price === '199' || parsed.webinar.price === 199)) {
+        parsed.webinar.price = '99';
+        localStorage.setItem('flipcut_site_content', JSON.stringify(parsed));
+      }
+    }
+  } catch (_) {}
+})();
+
 /**
  * FlipCut Creation - Main Interactive Application Script (INR & CMS Enabled)
  * Powers dynamic DOM hydration from Content Store, Indian Rupee (₹) pricing, and all interactions.
