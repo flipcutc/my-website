@@ -2390,6 +2390,8 @@ function startPopupCountdownTimer(targetDateStr) {
 }
 
 window.showWebinarEntrancePopup = function() {
+  // Session concluded: Popup permanently disabled
+  return;
   const modal = document.getElementById('webinarEntrancePopupModal');
   if (!modal) return;
 
@@ -2493,11 +2495,7 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// Automatically pop up on page arrival / reload after 1.0s delay
+// Webinar session concluded: Auto-popup disabled
 document.addEventListener('DOMContentLoaded', () => {
-  if (!location.pathname.includes('webinar')) {
-    setTimeout(() => {
-      window.showWebinarEntrancePopup();
-    }, 1000);
-  }
+  // Popups disabled as session is concluded
 });

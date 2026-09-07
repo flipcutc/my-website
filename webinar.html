@@ -72,11 +72,11 @@
   </script>
 
   <!-- High-Definition Crisp Vector & Multi-Platform Favicon Suite -->
-  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg?v=17.3">
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png?v=17.3">
-  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png?v=17.3">
-  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico?v=17.3">
-  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=17.3">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg?v=18.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png?v=18.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png?v=18.0">
+  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico?v=18.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=18.0">
   <meta name="apple-mobile-web-app-title" content="FlipCut">
   <meta name="application-name" content="FlipCut Creation">
   <meta name="theme-color" content="#0B0F19">
@@ -97,7 +97,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=17.3">
+  <link rel="stylesheet" href="styles.css?v=18.0">
 
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -110,13 +110,13 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- Dual Cloud Sync Engine (Firebase + Supabase) -->
-  <script src="firebase-sync.js?v=17.3"></script>
+  <script src="firebase-sync.js?v=18.0"></script>
 
   <!-- VIP User Profile Header Engine -->
-  <script src="user-profile.js?v=17.3"></script>
+  <script src="user-profile.js?v=18.0"></script>
 
   <!-- Content Store & Instant Zero-Flicker Pre-Hydration -->
-  <script src="content-store.js?v=17.3"></script>
+  <script src="content-store.js?v=18.0"></script>
   <script>
     (function() {
       try {
@@ -568,15 +568,15 @@
       <div class="announcement-content-wrap">
         <span class="announcement-live-badge" id="topAnnouncementBadge">
           <span class="live-pulse-dot"></span>
-          <span id="topAnnouncementBadgeText">🔥 LIMITED 100 SEATS</span>
+          <span id="topAnnouncementBadgeText">🎉 SESSION CONCLUDED</span>
         </span>
         <span class="announcement-text" id="topAnnouncementText">
-          Live Masterclass Webinar Pass Registration at <strong>₹99 Only!</strong>
+          The Sep 5th Live Masterclass has ended. <strong>Stay tuned for the next batch!</strong>
         </span>
       </div>
       <div class="announcement-action-wrap">
         <a href="#webinarBriefCard" class="announcement-cta-btn" id="topAnnouncementCtaBtn">
-          <span id="topAnnouncementBtnText">Register Now</span>
+          <span id="topAnnouncementBtnText">Session Details</span>
           <i class="fa-solid fa-arrow-down"></i>
         </a>
       </div>
@@ -1006,7 +1006,7 @@
             </div>
 
             <!-- Step 1 Button: Pay via Razorpay -->
-            <button type="button" class="btn btn-primary" id="btnPayRazorpay" style="width: 100%; justify-content: center; padding: 14px; font-size: 1.05rem;">
+            <button type="button" class="btn btn-primary" id="btnPayRazorpay" disabled style="opacity: 0.6; cursor: not-allowed; filter: grayscale(1);" style="width: 100%; justify-content: center; padding: 14px; font-size: 1.05rem;">
               <i class="fa-solid fa-lock"></i>
               <span id="btnPayRazorpayText">Pay ₹99 & Unlock Registration</span>
             </button>
@@ -3518,7 +3518,7 @@ https://flipcutcreation.in/webinar`;
   <!-- ==========================================================================
        STICKY MOBILE QUICK CHECKOUT DOCK BAR (ONE-TAP FAST REGISTRATION)
        ========================================================================== -->
-  <div id="mobileStickyWebinarCta" style="display: none; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10, 15, 29, 0.96); backdrop-filter: blur(16px); border-top: 1.5px solid #6366F1; padding: 10px 16px; z-index: 9999; box-shadow: 0 -10px 30px rgba(0,0,0,0.7);">
+  <div id="mobileStickyWebinarCta" style="display: none !important;" style="display: none; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10, 15, 29, 0.96); backdrop-filter: blur(16px); border-top: 1.5px solid #6366F1; padding: 10px 16px; z-index: 9999; box-shadow: 0 -10px 30px rgba(0,0,0,0.7);">
     <div style="max-width: 600px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
       <div style="text-align: left;">
         <div style="display: flex; align-items: baseline; gap: 6px;">
