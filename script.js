@@ -1,4 +1,41 @@
 
+// 1-Click WhatsApp Inquiry for the 3 Pricing Plans (Direct to Owner WhatsApp: 917010270151)
+window.inquirePlanViaWhatsApp = function(packageName, price) {
+  const cleanPkg = packageName || 'Retainer Plan';
+  const cleanPrice = price || 'Custom';
+
+  // 1. Pre-fill the contact form inputs in the background
+  const servEl = document.getElementById('projectTypeSelect');
+  if (servEl) servEl.value = 'retainer';
+  const budgetEl = document.getElementById('projectBudget');
+  if (budgetEl) {
+    if (cleanPrice.includes('14')) budgetEl.value = '10k-25k';
+    else if (cleanPrice.includes('34')) budgetEl.value = '25k-50k';
+    else budgetEl.value = '50k-100k';
+  }
+  const notesEl = document.getElementById('projectNotes');
+  if (notesEl) {
+    notesEl.value = 'Hi FlipCut Team! I am interested in the ' + cleanPkg + ' (₹' + cleanPrice + '/month). Please share full details and onboarding steps.';
+  }
+
+  // 2. Open WhatsApp directly to owner (917010270151) with pre-filled professional inquiry
+  const waMsg = encodeURIComponent(
+    'Hi FlipCut Creation! 🎬\n\n' +
+    'I am interested in booking the *' + cleanPkg + '* (₹' + cleanPrice + '/month).\n\n' +
+    'Please share your client onboarding process, turnaround SLA, and next available start date!'
+  );
+  window.open('https://wa.me/917010270151?text=' + waMsg, '_blank');
+
+  if (typeof showToast === 'function') {
+    showToast('Opening WhatsApp with ' + cleanPkg + ' details...', '#25D366');
+  }
+};
+
+window.startPlanCheckout = function(packageName, rawAmount) {
+  window.inquirePlanViaWhatsApp(packageName, rawAmount);
+};
+
+
 // Real-time Self-Healing Price Guardian
 (function autoHealClientPrice() {
   try {
@@ -2069,7 +2106,24 @@ function hydratePageFromCMS(customContent) {
         localStorage.setItem('flipcut_leads', JSON.stringify(existingLeads));
       } catch (_) {}
 
-      // 4. Trigger Luxury Success Popup Modal
+      // 4. Automatically forward complete client inquiry details directly to owner WhatsApp (917010270151)
+      const waBriefText = encodeURIComponent(
+        '🎬 *NEW CLIENT INQUIRY - FLIPCUT CREATION* 🎬\n' +
+        '━━━━━━━━━━━━━━━━━━━━━━━━━━\n' +
+        '👤 *Client Name:* ' + name + '\n' +
+        '📱 *Mobile / WhatsApp:* ' + phone + '\n' +
+        '📧 *Email:* ' + email + '\n' +
+        '💼 *Selected Service / Plan:* ' + (serviceLabels[serviceType] || serviceType) + '\n' +
+        '💰 *Budget Range:* ' + (budgetLabels[budget] || budget) + '\n' +
+        '🔗 *Raw Footage / Reference:* ' + (footage || 'None provided') + '\n' +
+        '📝 *Project Vision:* ' + (notes || 'Standard Retainer / Project') + '\n' +
+        '🆔 *Inquiry ID:* ' + assignedUserId + '\n' +
+        '━━━━━━━━━━━━━━━━━━━━━━━━━━\n' +
+        'Ready to discuss project scope!'
+      );
+      window.open('https://wa.me/917010270151?text=' + waBriefText, '_blank');
+
+      // 5. Trigger Luxury Success Popup Modal
       showBriefSuccessModal(leadPayload);
       showToast(`🎉 Registration Successful! User ID: ${assignedUserId}`, '#10B981');
       inquiryForm.reset();
