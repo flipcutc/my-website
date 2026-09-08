@@ -335,14 +335,15 @@
     const dropdown = document.getElementById('headerUserProfileDropdown');
     if (dropdown) {
       if (authUser && (!profile || !profile.webinarRegistered)) {
-        // --- 1. DEDICATED GOOGLE USER ACCOUNT CARD ---
+        // --- 1. DEDICATED GOOGLE USER ACCOUNT CARD (CLEAN & MODERN) ---
         dropdown.innerHTML = `
           <div class="google-user-profile-card">
-            <div class="google-card-header-v2">
-              <div class="google-card-avatar-v2">
+            <!-- Centered Avatar & Identity -->
+            <div class="google-card-header-clean">
+              <div class="google-card-avatar-clean">
                 <img src="${photoURL || 'assets/logo.png'}" alt="${displayName}" referrerpolicy="no-referrer" onerror="this.src='assets/logo.png'">
-                <span class="google-icon-badge">
-                  <svg viewBox="0 0 24 24" width="14" height="14">
+                <span class="google-icon-badge-clean">
+                  <svg viewBox="0 0 24 24" width="13" height="13">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                     <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
                     <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
@@ -350,36 +351,41 @@
                   </svg>
                 </span>
               </div>
-              <div class="google-card-info-v2">
-                <h4 class="google-card-name">${displayName}</h4>
-                <p class="google-card-email">${displayEmail}</p>
-                <span class="google-status-pill"><i class="fa-solid fa-circle-check"></i> Google Verified Account</span>
-              </div>
+              <h4 class="google-card-name-clean">${displayName}</h4>
+              <p class="google-card-email-clean">${displayEmail}</p>
+              <span class="google-verified-tag-clean"><i class="fa-solid fa-circle-check"></i> Google Verified</span>
             </div>
 
-            <div class="google-card-divider"></div>
+            <div class="google-card-divider-clean"></div>
 
-            <div class="google-card-details-v2">
-              <div class="google-detail-item">
-                <span class="detail-key"><i class="fa-solid fa-shield-halved" style="color: #4285F4;"></i> Account Status</span>
-                <span class="detail-val" style="color: #10B981;">Active &amp; Verified</span>
-              </div>
-              <div class="google-detail-item">
-                <span class="detail-key"><i class="fa-solid fa-database" style="color: #F59E0B;"></i> Cloud Database</span>
-                <span class="detail-val">Firebase RTDB</span>
-              </div>
-            </div>
-
-            <div class="google-card-actions-v2">
-              <a href="#contact" class="btn btn-primary" onclick="document.getElementById('headerUserProfileWrap')?.classList.remove('active')" style="width: 100%; justify-content: center; padding: 11px 16px; font-size: 0.88rem;">
-                <i class="fa-solid fa-paper-plane"></i>
-                <span>Start Project Brief</span>
+            <!-- Helpful Navigation Items -->
+            <div class="google-card-menu-clean">
+              <a href="#contact" class="google-menu-item-clean" onclick="document.getElementById('headerUserProfileWrap')?.classList.remove('active')">
+                <div class="menu-icon-clean"><i class="fa-solid fa-file-pen"></i></div>
+                <div class="menu-text-clean">
+                  <strong>Request Project Quote</strong>
+                  <span>Get custom pricing for your video</span>
+                </div>
+                <i class="fa-solid fa-chevron-right menu-arrow-clean"></i>
               </a>
-              <button type="button" class="btn btn-secondary" onclick="signOutUser()" style="width: 100%; justify-content: center; padding: 9px 16px; font-size: 0.85rem; color: #EF4444; border-color: rgba(239, 68, 68, 0.35);">
-                <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                <span>Sign Out</span>
-              </button>
+
+              <a href="https://wa.me/917010270151?text=Hi%20Flipcut%20Creation%2C%20I%20am%20logged%20in%20as%20${encodeURIComponent(displayName)}" target="_blank" rel="noopener noreferrer" class="google-menu-item-clean">
+                <div class="menu-icon-clean whatsapp-icon-clean"><i class="fa-brands fa-whatsapp"></i></div>
+                <div class="menu-text-clean">
+                  <strong>WhatsApp Direct Chat</strong>
+                  <span>Fast reply from creative director</span>
+                </div>
+                <i class="fa-solid fa-arrow-up-right-from-square menu-arrow-clean"></i>
+              </a>
             </div>
+
+            <div class="google-card-divider-clean"></div>
+
+            <!-- Clean Sign Out Action -->
+            <button type="button" class="google-signout-btn-clean" onclick="signOutUser()">
+              <i class="fa-solid fa-arrow-right-from-bracket"></i>
+              <span>Sign Out of Google</span>
+            </button>
           </div>
         `;
       } else {
