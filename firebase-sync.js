@@ -6,6 +6,7 @@
 const FIREBASE_SYNC_CONFIG = {
   apiKey: "AIzaSyDPJoYyUt4opENdFjlIQrX2S4j8xxb_rIg",
   authDomain: "flipcut-website.firebaseapp.com",
+  databaseURL: "https://flipcut-website-default-rtdb.firebaseio.com",
   projectId: "flipcut-website",
   storageBucket: "flipcut-website.firebasestorage.app",
   messagingSenderId: "284282950565",
@@ -16,8 +17,10 @@ const FIREBASE_SYNC_CONFIG = {
 const SUPABASE_SYNC_URL = 'https://cznixvdphwbjdnnmapvb.supabase.co';
 const SUPABASE_SYNC_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6bml4dmRwaHdiamRubm1hcHZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTgwMTgsImV4cCI6MjEwMzEzNDAxOH0.dTLN1DCbUiBawZq8YlS5Bol-i81JFKhKpPKCboyocuQ';
 
-// Initialize Firebase Client
+// Initialize Firebase Client (Firestore, Realtime Database, Auth)
 let firestoreInstance = null;
+let rtdbInstance = null;
+let authInstance = null;
 if (typeof firebase !== 'undefined') {
   try {
     if (!firebase.apps.length) {
@@ -25,6 +28,12 @@ if (typeof firebase !== 'undefined') {
     }
     if (typeof firebase.firestore === 'function') {
       firestoreInstance = firebase.firestore();
+    }
+    if (typeof firebase.database === 'function') {
+      rtdbInstance = firebase.database();
+    }
+    if (typeof firebase.auth === 'function') {
+      authInstance = firebase.auth();
     }
   } catch (e) {
     console.warn('[Firebase Sync Init Note]', e.message);
@@ -60,6 +69,18 @@ async function pushLeadToDualCloud(lead) {
       }
     } catch (fsErr) {
       console.warn('[Firestore Lead Push Note]', fsErr.message);
+    }
+  })();
+
+  // 1A2. Push to Google Firebase Realtime Database
+  const rtdbPromise = (async () => {
+    try {
+      if (rtdbInstance) {
+        await rtdbInstance.ref('leads/' + userId).set(leadPayload);
+        console.log('✅ Lead synced to Firebase Realtime Database:', userId);
+      }
+    } catch (rtdbErr) {
+      console.warn('[RTDB Lead Push Note]', rtdbErr.message);
     }
   })();
 
@@ -279,7 +300,7 @@ _Keep this User ID safe to unlock the live session!_
     }
   })();
 
-  await Promise.allSettled([firestorePromise, supabasePromise, googleSheetPromise, convexPromise, whatsappAutoDispatchPromise]);
+  await Promise.allSettled([firestorePromise, rtdbPromise, supabasePromise, googleSheetPromise, convexPromise, whatsappAutoDispatchPromise]);
   return leadPayload;
 }
 
@@ -538,6 +559,69 @@ async function checkDuplicateLead(email, phone, currentService = '') {
   return { isDuplicate: false };
 }
 
+/**
+ * 7. Save / Sync Authenticated Google User to Firebase Realtime Database & Firestore
+ */
+async function syncAuthUserToDatabase(user) {
+  if (!user || !user.uid) return null;
+  const userPayload = {
+    uid: user.uid,
+    name: user.displayName || 'Google User',
+    email: user.email || '',
+    photoURL: user.photoURL || '',
+    phoneNumber: user.phoneNumber || '',
+    provider: 'google.com',
+    lastLogin: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+
+  // 1. Firebase Realtime Database
+  try {
+    if (rtdbInstance) {
+      await rtdbInstance.ref('users/' + user.uid).update(userPayload);
+      console.log('✅ Google User synced to Realtime Database:', user.uid);
+    }
+  } catch (err) {
+    console.warn('[RTDB User Sync Note]', err.message);
+  }
+
+  // 2. Firebase Firestore
+  try {
+    if (firestoreInstance) {
+      await firestoreInstance.collection('users').doc(user.uid).set(userPayload, { merge: true });
+      console.log('✅ Google User synced to Firestore:', user.uid);
+    }
+  } catch (err) {
+    console.warn('[Firestore User Sync Note]', err.message);
+  }
+
+  // 3. Dual-Cloud Redundancy: Sync to Supabase Leads / Users
+  try {
+    const sbRow = {
+      id: 'AUTH-' + user.uid.substring(0, 15),
+      name: userPayload.name,
+      email: userPayload.email,
+      phone: userPayload.phoneNumber || '',
+      service: 'Google Authenticated User',
+      budget: 'Account Verified',
+      message: 'Google Sign-In Account (UID: ' + user.uid + ')',
+      status: 'Active User'
+    };
+    await fetch(SUPABASE_SYNC_URL + '/rest/v1/leads', {
+      method: 'POST',
+      headers: {
+        apikey: SUPABASE_SYNC_KEY,
+        Authorization: 'Bearer ' + SUPABASE_SYNC_KEY,
+        'Content-Type': 'application/json',
+        Prefer: 'resolution=merge-duplicates,return=representation'
+      },
+      body: JSON.stringify(sbRow)
+    });
+  } catch (_) {}
+
+  return userPayload;
+}
+
 // Attach to window object for global access
 if (typeof window !== 'undefined') {
   window.pushLeadToDualCloud = pushLeadToDualCloud;
@@ -546,5 +630,6 @@ if (typeof window !== 'undefined') {
   window.deleteLeadDualCloud = deleteLeadDualCloud;
   window.publishCmsToDualCloud = publishCmsToDualCloud;
   window.checkDuplicateLead = checkDuplicateLead;
+  window.syncAuthUserToDatabase = syncAuthUserToDatabase;
   window.FIREBASE_SYNC_CONFIG = FIREBASE_SYNC_CONFIG;
 }

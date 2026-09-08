@@ -73,23 +73,25 @@
     rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=18.5">
+  <link rel="stylesheet" href="styles.css?v=18.6">
 
   <!-- FontAwesome Icons for clean UI symbols -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-  <!-- Firebase App & Firestore Compat SDK -->
+    <!-- Firebase App, Auth, Firestore & Realtime Database Compat SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
   <!-- Dual Cloud Sync Engine (Firebase + Supabase) -->
-  <script src="firebase-sync.js?v=18.5"></script>
+  <script src="firebase-sync.js?v=18.6"></script>
 
   <!-- VIP User Profile Header Engine -->
-  <script src="user-profile.js?v=18.5"></script>
+  <script src="user-profile.js?v=18.6"></script>
 
   <!-- Content Store & Instant Fast Pre-Hydration -->
-  <script src="content-store.js?v=18.5"></script>
+  <script src="content-store.js?v=18.6"></script>
   <script>
     // Instant 0ms Pre-Hydration & Zero-Flicker Renderer
     (function() {
@@ -286,13 +288,24 @@
                 <a href="webinar.html" class="btn btn-secondary" style="flex: 1; justify-content: center; padding: 8px 12px; font-size: 0.82rem;">
                   <i class="fa-solid fa-ticket"></i> View Pass
                 </a>
-                <button type="button" class="btn btn-secondary" onclick="logoutUserProfile()" style="padding: 8px 12px; font-size: 0.82rem; color: #EF4444;" title="Sign out / Clear profile">
+                <button type="button" class="btn btn-secondary" onclick="signOutUser()" style="padding: 8px 12px; font-size: 0.82rem; color: #EF4444;" title="Sign out / Clear profile">
                   <i class="fa-solid fa-arrow-right-from-bracket"></i>
                 </button>
               </div>
             </div>
           </div>
         </div>
+
+        <!-- Google Login Button (Firebase Auth) -->
+        <button type="button" class="google-auth-btn" id="headerGoogleLoginBtn" onclick="signInWithGoogle()" aria-label="Continue with Google">
+          <svg class="google-svg" viewBox="0 0 24 24" width="18" height="18">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+          </svg>
+          <span class="google-btn-text">Continue with Google</span>
+        </button>
 
         <!-- Luxury Mode / Dark Switcher -->
         <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Theme" aria-label="Toggle Theme">
@@ -346,6 +359,17 @@
     </ul>
 
     <div class="mobile-nav-footer">
+
+      <button type="button" class="btn btn-secondary google-auth-mobile-btn" id="mobileGoogleLoginBtn" onclick="signInWithGoogle()"
+        style="width: 100%; justify-content: center; padding: 12px 20px; gap: 10px; margin-bottom: 8px;">
+        <svg class="google-svg" viewBox="0 0 24 24" width="18" height="18">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+        </svg>
+        <span>Continue with Google</span>
+      </button>
       <a href="#contact" class="btn btn-primary" id="mobileNavCta"
         style="width: 100%; justify-content: center; padding: 14px 20px;">
         <span>Get Free Project Quote</span>
@@ -1288,7 +1312,7 @@
   <!-- Razorpay SDK Disabled on Homepage -->
 
   <!-- JavaScript Modules -->
-  <script src="script.js?v=18.5"></script>
+  <script src="script.js?v=18.6"></script>
 
 </body>
 
