@@ -311,8 +311,12 @@
     // Header UID / Short Name
     const uidText = document.getElementById('headerUserUidText');
     if (uidText) {
-      const firstName = displayName.split(' ')[0];
-      uidText.textContent = firstName.length > 12 ? firstName.substring(0, 10) + '..' : firstName;
+      if (profile && profile.webinarRegistered) {
+        uidText.textContent = profile.userId || 'FC-WEB-00000';
+      } else {
+        const firstName = displayName.split(' ')[0];
+        uidText.textContent = firstName.length > 12 ? firstName.substring(0, 10) + '..' : firstName;
+      }
     }
 
     // Badge label
@@ -322,58 +326,114 @@
         passBadge.innerHTML = `<i class="fa-solid fa-circle-check"></i> VIP Pass`;
         passBadge.style.color = '#10B981';
       } else {
-        passBadge.innerHTML = `<i class="fa-solid fa-circle-check"></i> Google Verified`;
+        passBadge.innerHTML = `<i class="fa-solid fa-circle-check"></i> Google Account`;
         passBadge.style.color = '#3B82F6';
       }
     }
 
-    // Card Details
-    const cardAvatar = document.querySelector('.profile-card-avatar');
-    if (cardAvatar) {
-      if (photoURL) {
-        cardAvatar.innerHTML = `<img src="${photoURL}" alt="${displayName}" class="card-avatar-img" referrerpolicy="no-referrer" onerror="this.outerHTML='<i class=\\'fa-solid fa-user-check\\'></i>'">`;
+    // Render Dropdown Content Dynamically
+    const dropdown = document.getElementById('headerUserProfileDropdown');
+    if (dropdown) {
+      if (authUser && (!profile || !profile.webinarRegistered)) {
+        // --- 1. DEDICATED GOOGLE USER ACCOUNT CARD ---
+        dropdown.innerHTML = `
+          <div class="google-user-profile-card">
+            <div class="google-card-header-v2">
+              <div class="google-card-avatar-v2">
+                <img src="${photoURL || 'assets/logo.png'}" alt="${displayName}" referrerpolicy="no-referrer" onerror="this.src='assets/logo.png'">
+                <span class="google-icon-badge">
+                  <svg viewBox="0 0 24 24" width="14" height="14">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                  </svg>
+                </span>
+              </div>
+              <div class="google-card-info-v2">
+                <h4 class="google-card-name">${displayName}</h4>
+                <p class="google-card-email">${displayEmail}</p>
+                <span class="google-status-pill"><i class="fa-solid fa-circle-check"></i> Google Verified Account</span>
+              </div>
+            </div>
+
+            <div class="google-card-divider"></div>
+
+            <div class="google-card-details-v2">
+              <div class="google-detail-item">
+                <span class="detail-key"><i class="fa-solid fa-shield-halved" style="color: #4285F4;"></i> Account Status</span>
+                <span class="detail-val" style="color: #10B981;">Active &amp; Verified</span>
+              </div>
+              <div class="google-detail-item">
+                <span class="detail-key"><i class="fa-solid fa-database" style="color: #F59E0B;"></i> Cloud Database</span>
+                <span class="detail-val">Firebase RTDB</span>
+              </div>
+            </div>
+
+            <div class="google-card-actions-v2">
+              <a href="#contact" class="btn btn-primary" onclick="document.getElementById('headerUserProfileWrap')?.classList.remove('active')" style="width: 100%; justify-content: center; padding: 11px 16px; font-size: 0.88rem;">
+                <i class="fa-solid fa-paper-plane"></i>
+                <span>Start Project Brief</span>
+              </a>
+              <button type="button" class="btn btn-secondary" onclick="signOutUser()" style="width: 100%; justify-content: center; padding: 9px 16px; font-size: 0.85rem; color: #EF4444; border-color: rgba(239, 68, 68, 0.35);">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                <span>Sign Out</span>
+              </button>
+            </div>
+          </div>
+        `;
       } else {
-        cardAvatar.innerHTML = `<i class="fa-solid fa-user-check"></i>`;
+        // --- 2. WEBINAR PASS HOLDER CARD ---
+        dropdown.innerHTML = `
+          <div class="profile-card-header">
+            <div class="profile-card-avatar">
+              ${photoURL ? `<img src="${photoURL}" alt="${displayName}" class="card-avatar-img" referrerpolicy="no-referrer">` : `<i class="fa-solid fa-user-check"></i>`}
+            </div>
+            <div class="profile-card-title-group">
+              <h4 id="cardProfileName">${displayName}</h4>
+              <span class="profile-vip-tag"><i class="fa-solid fa-star"></i> Verified Webinar Pass Holder</span>
+            </div>
+          </div>
+
+          <div class="profile-card-body">
+            <div class="profile-detail-row">
+              <span class="detail-label"><i class="fa-solid fa-id-card"></i> User Pass ID:</span>
+              <strong id="cardProfileUid" class="detail-value text-gradient font-mono">${displayUid}</strong>
+            </div>
+            <div class="profile-detail-row">
+              <span class="detail-label"><i class="fa-solid fa-phone"></i> Mobile / WhatsApp:</span>
+              <span id="cardProfilePhone" class="detail-value">${displayPhone}</span>
+            </div>
+            <div class="profile-detail-row">
+              <span class="detail-label"><i class="fa-solid fa-envelope"></i> Email:</span>
+              <span id="cardProfileEmail" class="detail-value">${displayEmail}</span>
+            </div>
+            <div class="profile-detail-row">
+              <span class="detail-label"><i class="fa-solid fa-ticket"></i> Pass Type:</span>
+              <span id="cardProfilePassType" class="detail-value" style="color: var(--brand-indigo); font-weight: 700;">${profile?.websiteType || 'Webinar Live Pass'}</span>
+            </div>
+            <div class="profile-detail-row">
+              <span class="detail-label"><i class="fa-solid fa-receipt"></i> Payment:</span>
+              <strong id="cardProfilePaymentStatus" class="detail-value" style="color: #10B981;">✅ ${profile?.amount || '₹99'} Confirmed</strong>
+            </div>
+          </div>
+
+          <div class="profile-card-actions">
+            <a href="${(typeof getSiteContent === 'function' && getSiteContent()?.webinar?.whatsappGroupLink) || 'https://chat.whatsapp.com/B5hdxy7LbkNCrWRsHMtW8h'}" id="cardProfileWhatsAppBtn" target="_blank" rel="noopener" class="btn btn-whatsapp" style="width: 100%; justify-content: center; padding: 10px 14px; font-size: 0.92rem; margin-bottom: 8px;">
+              <i class="fa-brands fa-whatsapp" style="font-size: 1.1rem;"></i>
+              <span>Join VIP WhatsApp Group</span>
+            </a>
+            <div style="display: flex; gap: 8px;">
+              <a href="webinar.html" class="btn btn-secondary" style="flex: 1; justify-content: center; padding: 8px 12px; font-size: 0.82rem;">
+                <i class="fa-solid fa-ticket"></i> View Pass
+              </a>
+              <button type="button" class="btn btn-secondary" onclick="signOutUser()" style="padding: 8px 12px; font-size: 0.82rem; color: #EF4444;" title="Sign out / Clear profile">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+              </button>
+            </div>
+          </div>
+        `;
       }
-    }
-
-    const cardName = document.getElementById('cardProfileName');
-    if (cardName) cardName.textContent = displayName;
-
-    const cardUid = document.getElementById('cardProfileUid');
-    if (cardUid) cardUid.textContent = displayUid;
-
-    const cardPhone = document.getElementById('cardProfilePhone');
-    if (cardPhone) cardPhone.textContent = displayPhone;
-
-    const cardEmail = document.getElementById('cardProfileEmail');
-    if (cardEmail) cardEmail.textContent = displayEmail;
-
-    const cardPassType = document.getElementById('cardProfilePassType');
-    if (cardPassType) {
-      if (profile && profile.websiteType) {
-        cardPassType.textContent = `Webinar Pass (${profile.websiteType})`;
-      } else if (profile && profile.webinarRegistered) {
-        cardPassType.textContent = 'Webinar Live Masterclass';
-      } else {
-        cardPassType.textContent = 'Google Verified Account';
-      }
-    }
-
-    const cardPayStatus = document.getElementById('cardProfilePaymentStatus');
-    if (cardPayStatus) {
-      if (profile && profile.amount) {
-        cardPayStatus.textContent = `✅ ${profile.amount} Confirmed (Razorpay)`;
-      } else {
-        cardPayStatus.textContent = `✅ Google Account Connected`;
-      }
-    }
-
-    const cardWaBtn = document.getElementById('cardProfileWhatsAppBtn');
-    if (cardWaBtn) {
-      const siteContent = (typeof getSiteContent === 'function') ? getSiteContent() : null;
-      const groupLink = siteContent?.webinar?.whatsappGroupLink || 'https://chat.whatsapp.com/B5hdxy7LbkNCrWRsHMtW8h';
-      cardWaBtn.href = groupLink;
     }
   }
 

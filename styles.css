@@ -4420,3 +4420,133 @@ body.has-announcement .webinar-hero-section {
     content: 'Login';
   }
 }
+
+/* ==========================================================================
+   GOOGLE USER ACCOUNT CARD (CLEAN & PROFESSIONAL - NO WEBINAR PASS ELEMENTS)
+   ========================================================================== */
+.google-user-profile-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.google-card-header-v2 {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.google-card-avatar-v2 {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 2.5px solid #4285F4;
+  box-shadow: 0 4px 15px rgba(66, 133, 244, 0.35);
+  background: var(--bg-surface);
+}
+
+.google-card-avatar-v2 img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+.google-icon-badge {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  background: #FFFFFF;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  padding: 2px;
+}
+
+.google-card-info-v2 {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  text-align: left;
+}
+
+.google-card-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.google-card-email {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.google-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(66, 133, 244, 0.12);
+  color: #3B82F6;
+  border: 1px solid rgba(66, 133, 244, 0.3);
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  width: fit-content;
+}
+
+.google-card-divider {
+  height: 1px;
+  background: var(--border-subtle);
+  margin: 0 -4px;
+}
+
+.google-card-details-v2 {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+}
+
+.google-detail-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.82rem;
+}
+
+.google-detail-item .detail-key {
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.google-detail-item .detail-val {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.google-card-actions-v2 {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
