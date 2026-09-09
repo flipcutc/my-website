@@ -97,7 +97,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=20.0">
+  <link rel="stylesheet" href="styles.css?v=21.0">
 
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -120,17 +120,28 @@
   <!-- Content Store & Instant Zero-Flicker Pre-Hydration -->
   <script src="content-store.js?v=19.0"></script>
   <script>
+    // Instant 0ms Pre-Hydration & Zero-Flicker Brand Renderer (100% Identical to Home Page)
     (function() {
       try {
         document.documentElement.classList.add('has-announcement');
-        const raw = localStorage.getItem('flipcut_cms_draft') || localStorage.getItem('flipcut_site_content');
-        if (raw) {
-          const data = JSON.parse(raw);
-          window.__PRE_HYDRATED_CMS__ = data;
-          if (data && data.brand && data.brand.faviconUrl && typeof applyDynamicFavicon === 'function') {
-            applyDynamicFavicon(data.brand.faviconUrl);
-          }
+        var raw = localStorage.getItem('flipcut_cms_draft') || localStorage.getItem('flipcut_site_content');
+        var data = raw ? JSON.parse(raw) : null;
+        if (data) window.__PRE_HYDRATED_CMS__ = data;
+
+        var logoHeight = (data && data.brand && data.brand.logoHeight) ? data.brand.logoHeight : 65;
+        var logoUrl = (data && data.brand && data.brand.logoUrl) ? data.brand.logoUrl : '';
+
+        var css = '.brand-logo-img { height: ' + logoHeight + 'px !important; max-height: 140px !important; width: auto !important; max-width: 280px !important; }\n';
+        if (logoUrl) {
+          css += '.brand-logo-img { content: url("' + logoUrl + '") !important; }\n';
         }
+        if (data && data.brand && data.brand.faviconUrl && typeof applyDynamicFavicon === 'function') {
+          applyDynamicFavicon(data.brand.faviconUrl);
+        }
+        var s = document.createElement('style');
+        s.id = 'cms-instant-visibility-styles';
+        s.textContent = css;
+        document.head.appendChild(s);
       } catch (e) {}
     })();
   </script>
@@ -376,7 +387,7 @@
 
       /* 2. Compact Sleek Mobile App Header & Logo Stability */
       .site-header {
-        height: 58px !important;
+        height: 68px !important;
         background: rgba(255, 255, 255, 0.94) !important;
         backdrop-filter: blur(20px) !important;
         -webkit-backdrop-filter: blur(20px) !important;
@@ -389,7 +400,7 @@
       }
 
       .nav-container {
-        height: 58px !important;
+        height: 68px !important;
         padding-left: 14px !important;
         padding-right: 14px !important;
         gap: 6px !important;
@@ -408,9 +419,9 @@
       }
 
       .brand-logo-img {
-        height: 38px !important;
-        max-height: 38px !important;
-        max-width: 145px !important;
+        height: var(--brand-logo-height, 60px) !important;
+        max-height: 65px !important;
+        max-width: 220px !important;
         width: auto !important;
         object-fit: contain !important;
         display: block !important;
@@ -418,7 +429,7 @@
 
       /* 3. Safe Dynamic Top Spacing clearing Fixed Announcement + Header */
       .webinar-hero-section {
-        padding-top: calc(58px + 22px) !important;
+        padding-top: calc(68px + 22px) !important;
         padding-bottom: 24px !important;
         text-align: center !important;
         width: 100% !important;
@@ -429,7 +440,7 @@
 
       html.has-announcement .webinar-hero-section,
       body.has-announcement .webinar-hero-section {
-        padding-top: calc(58px + var(--top-ann-height, 34px) + 22px) !important;
+        padding-top: calc(68px + var(--top-ann-height, 34px) + 22px) !important;
       }
 
       .webinar-badge-pill {
@@ -840,7 +851,7 @@
   </div>
 
   <!-- Header & Nav Bar -->
-  <header class="site-header scrolled" id="siteHeader">
+  <header class="site-header" id="siteHeader">
     <div class="container nav-container">
       <a href="index.html" class="brand-logo-wrap" aria-label="FlipCut Creation Home">
         <img src="assets/logo.png" alt="FlipCut Creation Logo" class="brand-logo-img">
@@ -1661,11 +1672,14 @@
     function renderWebinarData(content) {
       if (!content) content = (typeof getSiteContent === 'function') ? getSiteContent() : null;
       if (!content) return;
-      const brandLogo = document.querySelector('.brand-logo-img');
+            const brandLogos = document.querySelectorAll('.brand-logo-img');
       const logoH = (content.brand && content.brand.logoHeight) ? content.brand.logoHeight : 65;
       document.documentElement.style.setProperty('--brand-logo-height', `${logoH}px`);
-      // Logo height is managed cleanly by CSS to prevent layout shifts on mobile
-      // if (brandLogo && content.brand && content.brand.logoHeight) brandLogo.style.height = `${content.brand.logoHeight}px`;
+      brandLogos.forEach(img => {
+        if (content.brand && content.brand.logoUrl) img.src = content.brand.logoUrl;
+        img.style.setProperty('height', `${logoH}px`, 'important');
+        img.style.maxHeight = '140px';
+      });
 
       if (content.brand && content.brand.faviconUrl && typeof window.applyDynamicFavicon === 'function') {
         window.applyDynamicFavicon(content.brand.faviconUrl);

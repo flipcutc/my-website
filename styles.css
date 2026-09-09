@@ -4670,7 +4670,7 @@ body.has-announcement .webinar-hero-section {
 
   /* 2. Compact Sleek Mobile App Header */
   .site-header {
-    height: 58px !important;
+    height: 68px !important;
     background: rgba(255, 255, 255, 0.92) !important;
     backdrop-filter: blur(20px) !important;
     -webkit-backdrop-filter: blur(20px) !important;
@@ -4683,20 +4683,23 @@ body.has-announcement .webinar-hero-section {
   }
 
   .nav-container {
-    height: 58px !important;
+    height: 68px !important;
     padding-left: 14px !important;
     padding-right: 14px !important;
   }
 
   .brand-logo-img {
-    height: 36px !important;
-    max-height: 38px !important;
-    max-width: 140px !important;
+    height: var(--brand-logo-height, 60px) !important;
+    max-height: 65px !important;
+    max-width: 220px !important;
+    width: auto !important;
+    object-fit: contain !important;
+    display: block !important;
   }
 
   /* 2.1 Dynamic Safe Top Spacing clearing Fixed Announcement + Header */
   .hero-section {
-    padding-top: calc(58px + 20px) !important;
+    padding-top: calc(68px + 20px) !important;
     padding-bottom: 30px !important;
     overflow: hidden !important;
     width: 100% !important;
@@ -4706,7 +4709,7 @@ body.has-announcement .webinar-hero-section {
 
   html.has-announcement .hero-section,
   body.has-announcement .hero-section {
-    padding-top: calc(58px + var(--top-ann-height, 34px) + 20px) !important;
+    padding-top: calc(68px + var(--top-ann-height, 34px) + 20px) !important;
   }
 
   /* 2.2 Hero Container & Content - Centered Mobile App Architecture */
