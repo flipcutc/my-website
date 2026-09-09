@@ -2553,3 +2553,66 @@ document.addEventListener('keydown', (e) => {
 document.addEventListener('DOMContentLoaded', () => {
   // Popups disabled as session is concluded
 });
+
+/* ==========================================================================
+   MOBILE APP DOCK SCROLL-SPY & CHIP FILTER INTERACTION
+   ========================================================================== */
+(function initMobileAppDock() {
+  const dockTabs = document.querySelectorAll('.mobile-app-dock .dock-tab[data-tab]');
+  if (!dockTabs || dockTabs.length === 0) return;
+
+  const sections = ['hero', 'services', 'portfolio', 'pricing'];
+
+  function updateActiveDockTab() {
+    const scrollPos = window.scrollY + 180;
+    let currentSection = 'hero';
+
+    for (const id of sections) {
+      const el = document.getElementById(id);
+      if (el) {
+        const top = el.offsetTop;
+        const height = el.offsetHeight;
+        if (scrollPos >= top && scrollPos < top + height) {
+          currentSection = id;
+          break;
+        } else if (scrollPos >= top) {
+          currentSection = id;
+        }
+      }
+    }
+
+    dockTabs.forEach(tab => {
+      if (tab.getAttribute('data-tab') === currentSection) {
+        tab.classList.add('active');
+      } else {
+        tab.classList.remove('active');
+      }
+    });
+  }
+
+  window.addEventListener('scroll', updateActiveDockTab, { passive: true });
+  updateActiveDockTab();
+
+  // Mobile App Category Chips Filter
+  const appChips = document.querySelectorAll('.mobile-app-chips .app-chip');
+  appChips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      appChips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+
+      const filter = chip.getAttribute('data-filter');
+      const filterBtn = document.querySelector(`.portfolio-filter-bar .filter-btn[data-filter="${filter}"]`);
+      if (filterBtn) {
+        filterBtn.click();
+      }
+
+      if (filter !== 'all') {
+        const portfolioSec = document.getElementById('portfolio');
+        if (portfolioSec) {
+          portfolioSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+    });
+  });
+})();
+

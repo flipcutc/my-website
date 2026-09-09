@@ -4646,3 +4646,290 @@ body.has-announcement .webinar-hero-section {
 [data-theme="dark"] .menu-text-clean span {
   color: #94A3B8;
 }
+
+/* ==========================================================================
+   NATIVE MOBILE APP VIEW DESIGN SYSTEM (≤768px)
+   Transforms the mobile website into an authentic, fluid native app interface
+   while strictly preserving the luxury desktop layout (>768px).
+   ========================================================================== */
+
+/* Desktop: Hide Bottom Dock & Chips */
+.mobile-app-dock {
+  display: none;
+}
+
+.mobile-app-chips {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  /* 1. Body Safe Spacing for Bottom Dock */
+  body {
+    padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  /* 2. Compact Sleek Mobile App Header */
+  .site-header {
+    height: 58px !important;
+    background: rgba(255, 255, 255, 0.92) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.08) !important;
+  }
+
+  [data-theme="dark"] .site-header {
+    background: rgba(13, 17, 34, 0.94) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  }
+
+  .nav-container {
+    height: 58px !important;
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+  }
+
+  .brand-logo-img {
+    height: 36px !important;
+    max-height: 38px !important;
+    max-width: 140px !important;
+  }
+
+  .hero-section {
+    padding-top: calc(58px + 14px) !important;
+    padding-bottom: 30px !important;
+  }
+
+  /* 3. Native App Bottom Navigation Dock */
+  .mobile-app-dock {
+    display: flex !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: calc(64px + env(safe-area-inset-bottom, 0px)) !important;
+    padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+    background: rgba(255, 255, 255, 0.94) !important;
+    backdrop-filter: blur(24px) !important;
+    -webkit-backdrop-filter: blur(24px) !important;
+    border-top: 1px solid rgba(15, 23, 42, 0.08) !important;
+    box-shadow: 0 -4px 25px rgba(15, 23, 42, 0.06) !important;
+    z-index: 9999 !important;
+    align-items: center !important;
+    justify-content: space-around !important;
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  [data-theme="dark"] .mobile-app-dock {
+    background: rgba(13, 17, 34, 0.96) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.5) !important;
+  }
+
+  .dock-tab {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 1 !important;
+    height: 100% !important;
+    text-decoration: none !important;
+    color: var(--text-muted) !important;
+    gap: 3px !important;
+    position: relative !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    -webkit-tap-highlight-color: transparent !important;
+    touch-action: manipulation !important;
+  }
+
+  .dock-icon-wrap {
+    width: 32px !important;
+    height: 30px !important;
+    border-radius: 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.15rem !important;
+    transition: all 0.2s ease !important;
+  }
+
+  .dock-label {
+    font-size: 0.68rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.02em !important;
+    line-height: 1 !important;
+    transition: all 0.2s ease !important;
+  }
+
+  /* Active Tab Glowing App Pill */
+  .dock-tab.active {
+    color: var(--brand-indigo) !important;
+  }
+
+  .dock-tab.active .dock-icon-wrap {
+    background: rgba(79, 70, 229, 0.12) !important;
+    transform: translateY(-2px) scale(1.08) !important;
+    color: var(--brand-indigo) !important;
+  }
+
+  .dock-tab.active .dock-label {
+    font-weight: 800 !important;
+    color: var(--brand-indigo) !important;
+  }
+
+  .dock-tab.active::after {
+    content: '';
+    position: absolute;
+    top: 4px;
+    width: 14px;
+    height: 3px;
+    border-radius: 10px;
+    background: var(--brand-indigo);
+    box-shadow: 0 0 8px var(--brand-indigo);
+  }
+
+  /* WhatsApp Tab Special App Styling */
+  .dock-tab-whatsapp {
+    color: #25D366 !important;
+  }
+
+  .dock-tab-whatsapp .dock-icon-wrap {
+    color: #25D366 !important;
+    font-size: 1.35rem !important;
+  }
+
+  .dock-tab-whatsapp:active {
+    transform: scale(0.92);
+  }
+
+  /* 4. App Category Quick Chips (Story/Pills) */
+  .mobile-app-chips {
+    display: flex !important;
+    gap: 8px !important;
+    overflow-x: auto !important;
+    padding: 14px 4px 4px !important;
+    scrollbar-width: none !important;
+    -webkit-overflow-scrolling: touch !important;
+    scroll-snap-type: x mandatory !important;
+    width: 100% !important;
+    margin-top: 14px !important;
+  }
+
+  .mobile-app-chips::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .app-chip {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 7px !important;
+    white-space: nowrap !important;
+    padding: 8px 16px !important;
+    border-radius: 9999px !important;
+    font-family: var(--font-body) !important;
+    font-size: 0.82rem !important;
+    font-weight: 600 !important;
+    background: var(--bg-surface) !important;
+    color: var(--text-secondary) !important;
+    border: 1px solid var(--border-medium) !important;
+    box-shadow: var(--shadow-subtle) !important;
+    cursor: pointer !important;
+    scroll-snap-align: start !important;
+    flex-shrink: 0 !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    -webkit-tap-highlight-color: transparent !important;
+    touch-action: manipulation !important;
+  }
+
+  .app-chip:active {
+    transform: scale(0.94) !important;
+  }
+
+  .app-chip.active {
+    background: var(--grad-brand-horizontal) !important;
+    color: #FFFFFF !important;
+    border-color: transparent !important;
+    box-shadow: 0 4px 15px rgba(79, 70, 229, 0.35) !important;
+  }
+
+  .app-chip.active i {
+    color: #FFFFFF !important;
+  }
+
+  /* 5. Swipeable Horizontal Snap Cards for Testimonials */
+  .testimonials-grid {
+    display: flex !important;
+    overflow-x: auto !important;
+    scroll-snap-type: x mandatory !important;
+    gap: 14px !important;
+    padding: 6px 14px 18px !important;
+    scrollbar-width: none !important;
+    -webkit-overflow-scrolling: touch !important;
+    margin: 0 -14px !important;
+  }
+
+  .testimonials-grid::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .testimonial-card {
+    min-width: 86% !important;
+    max-width: 86% !important;
+    scroll-snap-align: center !important;
+    flex-shrink: 0 !important;
+    border-radius: 20px !important;
+    background: var(--bg-card) !important;
+    box-shadow: var(--shadow-card) !important;
+    border: 1px solid var(--border-subtle) !important;
+    padding: 22px 18px !important;
+  }
+
+  /* 6. Portfolio Filter Bar (Horizontal App Swipe) */
+  .portfolio-filter-bar {
+    display: flex !important;
+    overflow-x: auto !important;
+    scroll-snap-type: x mandatory !important;
+    gap: 8px !important;
+    padding-bottom: 8px !important;
+    scrollbar-width: none !important;
+    -webkit-overflow-scrolling: touch !important;
+    flex-wrap: nowrap !important;
+  }
+
+  .portfolio-filter-bar::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .filter-btn {
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    border-radius: 9999px !important;
+    font-size: 0.8rem !important;
+    padding: 8px 14px !important;
+    scroll-snap-align: start !important;
+  }
+
+  /* 7. Floating WhatsApp position above Bottom Dock */
+  .mobile-floating-wa {
+    bottom: calc(76px + env(safe-area-inset-bottom, 0px)) !important;
+    right: 14px !important;
+    width: 48px !important;
+    height: 48px !important;
+    font-size: 1.4rem !important;
+  }
+
+  /* 8. App-like tactile tap feedback */
+  button, .btn, .pricing-card, .service-card, .workflow-step-card {
+    -webkit-tap-highlight-color: transparent !important;
+    touch-action: manipulation !important;
+  }
+
+  .btn:active,
+  button:active,
+  .user-profile-pill-btn:active {
+    transform: scale(0.96) !important;
+  }
+}
+
