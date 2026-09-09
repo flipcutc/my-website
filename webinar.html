@@ -97,7 +97,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=19.0">
+  <link rel="stylesheet" href="styles.css?v=20.0">
 
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -354,25 +354,89 @@
     }
 
     @media (max-width: 768px) {
+      /* 1. Body Safe Spacing for Bottom Dock */
+      body {
+        padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
+      }
+
+      /* 2. Compact Sleek Mobile App Header */
+      .site-header {
+        height: 58px !important;
+        background: rgba(255, 255, 255, 0.94) !important;
+        backdrop-filter: blur(20px) !important;
+        -webkit-backdrop-filter: blur(20px) !important;
+        border-bottom: 1px solid rgba(15, 23, 42, 0.08) !important;
+      }
+
+      [data-theme="dark"] .site-header {
+        background: rgba(13, 17, 34, 0.95) !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+      }
+
+      .nav-container {
+        height: 58px !important;
+        padding-left: 14px !important;
+        padding-right: 14px !important;
+        gap: 6px !important;
+        max-width: 100% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+      }
+
+      .brand-logo-img {
+        height: 36px !important;
+        max-height: 38px !important;
+        max-width: 140px !important;
+        width: auto;
+        object-fit: contain;
+        display: block;
+      }
+
+      /* 3. Safe Dynamic Top Spacing clearing Fixed Announcement + Header */
       .webinar-hero-section {
-        padding-top: calc(var(--nav-height) + 10px) !important;
-        padding-bottom: 12px !important;
+        padding-top: calc(58px + 20px) !important;
+        padding-bottom: 20px !important;
         text-align: center;
+        width: 100% !important;
+        max-width: 100vw !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
       }
+
+      html.has-announcement .webinar-hero-section,
+      body.has-announcement .webinar-hero-section {
+        padding-top: calc(58px + var(--top-ann-height, 34px) + 20px) !important;
+      }
+
       .webinar-badge-pill {
-        font-size: 0.68rem !important;
-        padding: 3px 10px !important;
-        margin-bottom: 8px !important;
-      }
-      .webinar-hero-section h1 {
-        font-size: 1.32rem !important;
+        font-size: 0.72rem !important;
+        padding: 4px 12px !important;
         margin-bottom: 10px !important;
+      }
+
+      .webinar-hero-section h1 {
+        font-size: clamp(1.35rem, 5.5vw, 1.75rem) !important;
+        margin-bottom: 12px !important;
         line-height: 1.25 !important;
-        max-width: 95% !important;
+        max-width: 100% !important;
+        word-break: normal !important;
+        overflow-wrap: break-word !important;
       }
-      #webinarHeroDesc, #webinarFormSubtitle {
-        display: none !important; /* Hide long non-essential paragraphs on mobile */
+
+      #webinarHeroDesc {
+        display: block !important;
+        font-size: 0.88rem !important;
+        line-height: 1.52 !important;
+        color: var(--text-secondary) !important;
+        max-width: 100% !important;
+        margin: 0 auto 16px !important;
       }
+
+      #webinarFormSubtitle {
+        display: none !important;
+      }
+
       .webinar-details-bar {
         display: flex !important;
         justify-content: center !important;
@@ -381,44 +445,11 @@
         font-size: 0.76rem !important;
         margin-bottom: 14px !important;
       }
+
       .nav-links, .nav-actions .btn-primary, .back-home-btn {
         display: none !important;
       }
-      .nav-container {
-        padding-left: 10px !important;
-        padding-right: 10px !important;
-        gap: 6px !important;
-        height: 100%;
-        max-width: 100% !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: space-between !important;
-      }
-      .brand-logo-wrap {
-        display: flex;
-        align-items: center;
-        flex-shrink: 1;
-        min-width: 0;
-      }
-      .brand-logo-img {
-        height: 50px !important;
-        max-height: 58px !important;
-        max-width: 170px !important;
-        width: auto;
-        object-fit: contain;
-        display: block;
-        filter: drop-shadow(0 2px 8px rgba(99, 102, 241, 0.25));
-        transition: transform var(--transition-fast);
-      }
-      .brand-logo-wrap:hover .brand-logo-img {
-        transform: scale(1.03);
-      }
-      .nav-actions {
-        display: flex;
-        align-items: center;
-        gap: 6px !important;
-        flex-shrink: 0;
-      }
+
       .theme-toggle-btn {
         width: 36px !important;
         height: 36px !important;
@@ -427,6 +458,7 @@
         border-radius: 50% !important;
         font-size: 0.9rem !important;
       }
+
       .mobile-menu-btn {
         width: 36px !important;
         height: 36px !important;
@@ -435,26 +467,31 @@
         border-radius: 10px !important;
         font-size: 1.05rem !important;
       }
+
       .user-profile-badge-wrap {
         flex-shrink: 0;
         max-width: 135px;
       }
+
       .user-profile-pill-btn {
         padding: 3px 8px 3px 4px !important;
         gap: 5px !important;
         max-width: 135px !important;
         box-sizing: border-box !important;
       }
+
       .user-avatar-circle {
         width: 24px !important;
         height: 24px !important;
         font-size: 0.7rem !important;
         flex-shrink: 0 !important;
       }
+
       .user-profile-pill-info {
         max-width: 80px;
         overflow: hidden;
       }
+
       .user-uid-label {
         font-size: 0.7rem !important;
         white-space: nowrap;
@@ -463,32 +500,67 @@
         display: block;
         line-height: 1.1;
       }
+
       .user-pass-badge {
         font-size: 0.58rem !important;
         line-height: 1;
         white-space: nowrap;
       }
+
       .pill-chevron {
         font-size: 0.65rem !important;
         margin-left: 0 !important;
       }
-      .webinar-card-wrapper {
-        padding: 16px 12px !important;
-        border-radius: 16px !important;
-        margin-bottom: 16px !important;
+
+      /* 4. Native App Cards & Waitlist Form */
+      .webinar-announcement-card {
+        padding: 18px 14px !important;
+        border-radius: 18px !important;
+        margin: 0 auto 20px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
       }
+
+      .webinar-announcement-card .announcement-badge {
+        font-size: 0.74rem !important;
+        padding: 4px 12px !important;
+        margin-bottom: 10px !important;
+      }
+
+      .webinar-announcement-card h2 {
+        font-size: 1.28rem !important;
+        margin-bottom: 8px !important;
+        line-height: 1.25 !important;
+      }
+
+      .webinar-announcement-card p {
+        font-size: 0.86rem !important;
+        line-height: 1.5 !important;
+      }
+
+      .webinar-card-wrapper {
+        padding: 18px 14px !important;
+        border-radius: 18px !important;
+        margin-bottom: 20px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+      }
+
       .webinar-card-wrapper > div:first-child {
         margin-bottom: 12px !important;
       }
+
       .webinar-card-wrapper h2 {
-        font-size: 1.15rem !important;
+        font-size: 1.2rem !important;
         margin-bottom: 0 !important;
       }
+
       .website-type-grid {
         display: grid !important;
         grid-template-columns: 1fr 1fr !important;
         gap: 8px !important;
       }
+
       .website-type-box {
         padding: 10px 8px !important;
         display: flex !important;
@@ -497,59 +569,75 @@
         gap: 4px !important;
         border-radius: 10px !important;
       }
+
       .website-type-box i {
         font-size: 1.25rem !important;
         margin: 0 auto !important;
       }
+
       .website-type-box h4 {
         font-size: 0.82rem !important;
         margin-bottom: 2px !important;
         line-height: 1.2 !important;
       }
+
       .website-type-box span {
         font-size: 0.68rem !important;
         line-height: 1.2 !important;
       }
+
       .form-row-2 {
-        grid-template-columns: 1fr;
-        gap: 10px;
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
       }
+
+      input, select, textarea {
+        font-size: 16px !important; /* Prevents auto-zoom on mobile */
+      }
+
       .payment-options-badge-row {
         padding: 10px !important;
         margin: 12px 0 16px !important;
         gap: 6px !important;
       }
+
       .payment-option-pill {
         padding: 4px 10px !important;
         font-size: 0.74rem !important;
       }
+
       .pay-step-box {
         padding: 16px 12px !important;
         margin-top: 14px !important;
       }
+
       .active-webinar-price {
         font-size: 2rem !important;
       }
+
       .orig-webinar-price {
         font-size: 1.1rem !important;
       }
+
       .site-footer {
         margin-top: 10px !important;
         padding: 16px 0 !important;
       }
+
+      /* 5. Native App Tactile Tap Interactions */
+      button, .btn, .website-type-card, .dock-tab {
+        -webkit-tap-highlight-color: transparent !important;
+        touch-action: manipulation !important;
+      }
+
+      .btn:active,
+      button:active,
+      .dock-tab:active,
+      .user-profile-pill-btn:active {
+        transform: scale(0.96) !important;
+      }
     }
 
-    @media (max-width: 480px) {
-      .webinar-card-wrapper {
-        padding: 14px 10px !important;
-      }
-      .brand-logo-img {
-        height: 38px !important;
-        max-height: 42px !important;
-        max-width: 140px !important;
-      }
-    }
-  
     /* Next Webinar Announcement Card - High Contrast Light & Dark Mode */
     .webinar-announcement-card {
       background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(16, 185, 129, 0.08));
@@ -3628,18 +3716,18 @@ https://flipcutcreation.in/webinar`;
   <!-- ==========================================================================
        STICKY MOBILE QUICK CHECKOUT DOCK BAR (ONE-TAP FAST REGISTRATION)
        ========================================================================== -->
-  <div id="mobileStickyWebinarCta" style="display: none !important;" style="display: none; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10, 15, 29, 0.96); backdrop-filter: blur(16px); border-top: 1.5px solid #6366F1; padding: 10px 16px; z-index: 9999; box-shadow: 0 -10px 30px rgba(0,0,0,0.7);">
+  <div id="mobileStickyWebinarCta" style="display: none !important; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10, 15, 29, 0.96); backdrop-filter: blur(16px); border-top: 1.5px solid #6366F1; padding: 10px 16px; z-index: 9998; box-shadow: 0 -10px 30px rgba(0,0,0,0.7); pointer-events: none;" aria-hidden="true">
     <div style="max-width: 600px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
       <div style="text-align: left;">
         <div style="display: flex; align-items: baseline; gap: 6px;">
-          <strong style="color: #10B981; font-size: 1.3rem; font-weight: 900;">₹99</strong>
+          <strong id="stickyWebinarPrice" style="color: #10B981; font-size: 1.25rem; font-weight: 900;">₹199</strong>
           <span style="color: #64748B; font-size: 0.8rem; text-decoration: line-through;">₹999</span>
-          <span style="color: #F59E0B; font-size: 0.65rem; font-weight: 800; background: rgba(245,158,11,0.15); padding: 1px 5px; border-radius: 4px;">90% OFF</span>
+          <span style="color: #F59E0B; font-size: 0.65rem; font-weight: 800; background: rgba(245,158,11,0.15); padding: 1px 5px; border-radius: 4px;">VIP ACCESS</span>
         </div>
-        <div style="font-size: 0.7rem; color: #94A3B8; font-weight: 600;">Sep 5 • 10:00 AM IST</div>
+        <div style="font-size: 0.7rem; color: #94A3B8; font-weight: 600;">Next Cohort • Live Online Masterclass</div>
       </div>
-      <button type="button" onclick="scrollToWebinarCheckout()" class="btn btn-primary" style="padding: 10px 18px; font-size: 0.92rem; font-weight: 800; border-radius: 10px; background: linear-gradient(135deg, #6366F1, #4F46E5); box-shadow: 0 4px 14px rgba(99,102,241,0.45); display: flex; align-items: center; gap: 6px; border: none; color: #FFF; cursor: pointer;">
-        <i class="fa-solid fa-ticket"></i> <span>Register (₹99)</span>
+      <button type="button" onclick="scrollToWebinarCheckout()" class="btn btn-primary" style="padding: 10px 18px; font-size: 0.9rem; font-weight: 800; border-radius: 9999px; background: linear-gradient(135deg, #6366F1, #4F46E5); box-shadow: 0 4px 14px rgba(99,102,241,0.45); display: flex; align-items: center; gap: 6px; border: none; color: #FFF; cursor: pointer;">
+        <i class="fa-solid fa-ticket"></i> <span>Join Waitlist</span>
       </button>
     </div>
   </div>
@@ -3657,17 +3745,10 @@ https://flipcutcreation.in/webinar`;
       }
     };
 
-    // Show sticky bar on mobile when scrolled past hero
+    // Sticky bar disabled as requested so it does not block the native bottom app dock
     window.addEventListener('scroll', () => {
       const stickyBar = document.getElementById('mobileStickyWebinarCta');
-      if (!stickyBar) return;
-      if (window.innerWidth <= 768) {
-        if (window.scrollY > 280) {
-          stickyBar.style.display = 'block';
-        } else {
-          stickyBar.style.display = 'none';
-        }
-      } else {
+      if (stickyBar) {
         stickyBar.style.display = 'none';
       }
     }, { passive: true });
@@ -3743,25 +3824,25 @@ https://flipcutcreation.in/webinar`;
       <span class="dock-label">Home</span>
     </a>
 
-    <a href="#overview" class="dock-tab active" aria-label="Overview">
+    <a href="#" onclick="window.scrollTo({ top: 0, behavior: 'smooth' }); return false;" class="dock-tab active" aria-label="Webinar">
       <div class="dock-icon-wrap">
         <i class="fa-solid fa-ticket"></i>
       </div>
       <span class="dock-label">Webinar</span>
     </a>
 
-    <a href="#curriculum" class="dock-tab" aria-label="Topics">
+    <a href="#webinarBriefCard" class="dock-tab" aria-label="Waitlist">
       <div class="dock-icon-wrap">
-        <i class="fa-solid fa-book-open"></i>
+        <i class="fa-solid fa-clipboard-list"></i>
       </div>
-      <span class="dock-label">Topics</span>
+      <span class="dock-label">Waitlist</span>
     </a>
 
-    <a href="#speaker" class="dock-tab" aria-label="Speaker">
+    <a href="javascript:void(0)" onclick="openFindPassModal()" class="dock-tab" aria-label="My Pass">
       <div class="dock-icon-wrap">
-        <i class="fa-solid fa-user-tie"></i>
+        <i class="fa-solid fa-id-card"></i>
       </div>
-      <span class="dock-label">Mentor</span>
+      <span class="dock-label">My Pass</span>
     </a>
 
     <a href="https://wa.me/917010270151?text=Hi%20Flipcut%20Creation%2C%20I%20have%20a%20question%20about%20the%20Webinar%20Masterclass" target="_blank" rel="noopener noreferrer" class="dock-tab dock-tab-whatsapp" aria-label="WhatsApp Chat">
