@@ -310,69 +310,83 @@ _Keep this User ID safe to unlock the live session!_
 async function fetchLeadsFromDualCloud() {
   const mergedMap = new Map();
 
-  // A. Fetch from Supabase Cloud
+  // 1. Seed immediately from local storage (Instant 0ms baseline)
   try {
-    const res = await fetch(SUPABASE_SYNC_URL + '/rest/v1/leads?id=neq.CMS_SITE_CONTENT_LIVE&order=created_at.desc', {
-      headers: {
-        apikey: SUPABASE_SYNC_KEY,
-        Authorization: 'Bearer ' + SUPABASE_SYNC_KEY
-      }
-    });
-    if (res.ok) {
-      const rows = await res.json();
-      if (Array.isArray(rows)) {
-        rows.forEach(r => {
-          if (r.id && r.id !== 'CMS_SITE_CONTENT_LIVE') {
-            const isWebinar = (r.service || '').toLowerCase().includes('webinar') || (r.id || '').startsWith('FC-WEB') || r.status === 'Booked / Paid';
-            const isWaJoined = r.whatsappJoined === true || r.waGroupStatus === 'Joined' || (r.message && r.message.includes('WhatsApp Group Joined'));
-            mergedMap.set(r.id, {
-              ...r,
-              userId: r.id,
-              notes: r.message,
-              whatsappJoined: isWaJoined,
-              waGroupStatus: isWaJoined ? 'Joined' : (r.waGroupStatus || 'Not Joined'),
-              paymentStatus: r.paymentStatus || (isWebinar ? 'Paid & Verified (Razorpay)' : 'Inquiry / Quote Request'),
-              paymentId: r.paymentId || (isWebinar ? (r.paymentId || 'rzp_verified_pass') : ''),
-              date: r.date || (r.created_at ? r.created_at.slice(0, 10) : new Date().toISOString().slice(0, 10))
-            });
-          }
-        });
-      }
-    }
-  } catch (err) {
-    console.warn('[Supabase Fetch Note]', err.message);
-  }
-
-  // B. Fetch from Google Firebase Firestore
-  try {
-    if (firestoreInstance) {
-      const snapshot = await firestoreInstance.collection('leads').get();
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        const docId = doc.id;
-        if (docId && docId !== 'CMS_SITE_CONTENT_LIVE') {
-          if (!mergedMap.has(docId)) {
-            mergedMap.set(docId, { ...data, id: docId, userId: docId });
-          } else {
-            mergedMap.set(docId, { ...mergedMap.get(docId), ...data });
-          }
-        }
-      });
-    }
-  } catch (fsErr) {
-    console.warn('[Firestore Fetch Note]', fsErr.message);
-  }
-
-  // C. Fallback to LocalStorage if both fail
-  if (mergedMap.size === 0) {
-    try {
-      const local = JSON.parse(localStorage.getItem('flipcut_leads') || '[]');
+    const local = JSON.parse(localStorage.getItem('flipcut_leads') || '[]');
+    if (Array.isArray(local)) {
       local.forEach(r => {
         const uid = r.id || r.userId;
         if (uid && uid !== 'CMS_SITE_CONTENT_LIVE') mergedMap.set(uid, r);
       });
-    } catch (_) {}
-  }
+    }
+  } catch (_) {}
+
+  // 2. Fetch from Supabase Cloud (Fast 3000ms AbortController)
+  const supabasePromise = (async () => {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000);
+      const res = await fetch(SUPABASE_SYNC_URL + '/rest/v1/leads?id=neq.CMS_SITE_CONTENT_LIVE&order=created_at.desc', {
+        headers: {
+          apikey: SUPABASE_SYNC_KEY,
+          Authorization: 'Bearer ' + SUPABASE_SYNC_KEY
+        },
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      if (res.ok) {
+        const rows = await res.json();
+        if (Array.isArray(rows)) {
+          rows.forEach(r => {
+            if (r.id && r.id !== 'CMS_SITE_CONTENT_LIVE') {
+              const isWebinar = (r.service || '').toLowerCase().includes('webinar') || (r.id || '').startsWith('FC-WEB') || r.status === 'Booked / Paid';
+              const isWaJoined = r.whatsappJoined === true || r.waGroupStatus === 'Joined' || (r.message && r.message.includes('WhatsApp Group Joined'));
+              mergedMap.set(r.id, {
+                ...r,
+                userId: r.id,
+                notes: r.message,
+                whatsappJoined: isWaJoined,
+                waGroupStatus: isWaJoined ? 'Joined' : (r.waGroupStatus || 'Not Joined'),
+                paymentStatus: r.paymentStatus || (isWebinar ? 'Paid & Verified (Razorpay)' : 'Inquiry / Quote Request'),
+                paymentId: r.paymentId || (isWebinar ? (r.paymentId || 'rzp_verified_pass') : ''),
+                date: r.date || (r.created_at ? r.created_at.slice(0, 10) : new Date().toISOString().slice(0, 10))
+              });
+            }
+          });
+        }
+      }
+    } catch (err) {
+      console.warn('[Supabase Fetch Note]', err.message);
+    }
+  })();
+
+  // 3. Fetch from Google Firebase Firestore with 2500ms timeout in parallel
+  const firestorePromise = (async () => {
+    try {
+      if (firestoreInstance) {
+        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Firestore timeout')), 2500));
+        const fetchPromise = firestoreInstance.collection('leads').get();
+        const snapshot = await Promise.race([fetchPromise, timeoutPromise]);
+        if (snapshot && typeof snapshot.forEach === 'function') {
+          snapshot.forEach(doc => {
+            const data = doc.data();
+            const docId = doc.id;
+            if (docId && docId !== 'CMS_SITE_CONTENT_LIVE') {
+              if (!mergedMap.has(docId)) {
+                mergedMap.set(docId, { ...data, id: docId, userId: docId });
+              } else {
+                mergedMap.set(docId, { ...mergedMap.get(docId), ...data });
+              }
+            }
+          });
+        }
+      }
+    } catch (fsErr) {
+      console.warn('[Firestore Fetch Note]', fsErr.message);
+    }
+  })();
+
+  await Promise.allSettled([supabasePromise, firestorePromise]);
 
   const result = Array.from(mergedMap.values());
   result.sort((a, b) => new Date(b.created_at || b.date || 0) - new Date(a.created_at || a.date || 0));
