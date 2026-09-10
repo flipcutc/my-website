@@ -1,20 +1,7 @@
 
-// Immediate Client-Side Self-Healing: Purge stale ₹2 / ₹99 / ₹199 from localStorage
-(function selfHealLocalCache() {
+// Dynamic Price Guardian: Preserves Admin-set webinar fee across all storage keys
+(function syncStorageWebinarPrice() {
   try {
-    ['flipcut_site_content', 'flipcut_cms_draft', 'flipcut_site_content_backup'].forEach(k => {
-      const raw = localStorage.getItem(k);
-      if (raw && (raw.includes('"price":"2"') || raw.includes('"price":2') || raw.includes('"price":"99"') || raw.includes('"price":"199"'))) {
-        try {
-          const parsed = JSON.parse(raw);
-          if (parsed.webinar) parsed.webinar.price = '49';
-          if (parsed.topAnnouncement && parsed.topAnnouncement.text) {
-            parsed.topAnnouncement.text = parsed.topAnnouncement.text.replace(/₹\s*(2|99|199)\b/g, '₹49');
-          }
-          localStorage.setItem(k, JSON.stringify(parsed));
-        } catch (_) {}
-      }
-    });
     sessionStorage.removeItem('flipcut_webinar_popup_dismissed');
   } catch (_) {}
 })();
@@ -57,22 +44,7 @@ window.startPlanCheckout = function(packageName, rawAmount) {
 };
 
 
-// Real-time Self-Healing Price Guardian
-(function autoHealClientPrice() {
-  try {
-    const rawContent = localStorage.getItem('flipcut_site_content');
-    if (rawContent) {
-      const parsed = JSON.parse(rawContent);
-      if (parsed?.webinar) {
-        parsed.webinar.price = '49';
-        parsed.webinar.date = '27th September, Sunday • 10:00 AM IST';
-        parsed.webinar.targetDateTime = '2026-09-27T10:00:00+05:30';
-        parsed.webinar.autoPopupEnabled = true;
-        localStorage.setItem('flipcut_site_content', JSON.stringify(parsed));
-      }
-    }
-  } catch (_) {}
-})();
+
 
 /**
  * FlipCut Creation - Main Interactive Application Script (INR & CMS Enabled)
@@ -80,13 +52,14 @@ window.startPlanCheckout = function(packageName, rawAmount) {
  */
 
 // Version-Aware Intelligent Cache Purge
-const FLIPCUT_CURRENT_BUILD = '20260827_V9';
+const FLIPCUT_CURRENT_BUILD = '20260910_V22';
 try {
   const lastBuild = localStorage.getItem('flipcut_build_ver');
   if (lastBuild !== FLIPCUT_CURRENT_BUILD) {
     localStorage.setItem('flipcut_build_ver', FLIPCUT_CURRENT_BUILD);
     localStorage.removeItem('flipcut_site_content');
     localStorage.removeItem('flipcut_cms_draft');
+    localStorage.removeItem('flipcut_site_content_backup');
   }
 } catch (_) {}
 

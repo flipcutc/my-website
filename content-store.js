@@ -554,22 +554,21 @@ const DEFAULT_SITE_CONTENT = {
 function sanitizeWebinarContent(data) {
   if (!data || typeof data !== 'object') return data;
   if (!data.webinar) data.webinar = {};
-  const rawPrice = String(data.webinar.price || '').replace(/[^0-9]/g, '');
-  if (!rawPrice || rawPrice === '2' || rawPrice === '99' || rawPrice === '199' || rawPrice === '0') {
+  const rawPrice = String(data.webinar.price !== undefined && data.webinar.price !== '' ? data.webinar.price : '').replace(/[^0-9]/g, '');
+  if (!rawPrice || Number(rawPrice) < 1) {
     data.webinar.price = '49';
+  } else {
+    data.webinar.price = rawPrice;
   }
-  if (!data.webinar.originalPrice || data.webinar.originalPrice === '899' || data.webinar.originalPrice === '199') {
+  if (!data.webinar.originalPrice) {
     data.webinar.originalPrice = '999';
   }
   if (!data.webinar.date || data.webinar.date.includes('Saturday') || data.webinar.date.includes('7:00 PM')) {
     data.webinar.date = '27th September, Sunday • 10:00 AM IST';
     data.webinar.targetDateTime = '2026-09-27T10:00:00+05:30';
   }
-  if (data.topAnnouncement && typeof data.topAnnouncement.text === 'string') {
-    data.topAnnouncement.text = data.topAnnouncement.text
-      .replace(/₹\s*2\b/g, '₹49')
-      .replace(/₹\s*99\b/g, '₹49')
-      .replace(/₹\s*199\b/g, '₹49');
+  if (data.topAnnouncement && typeof data.topAnnouncement.text === 'string' && data.webinar.price) {
+    data.topAnnouncement.text = data.topAnnouncement.text.replace(/₹\s*\d+/g, '₹' + data.webinar.price);
   }
   return data;
 }

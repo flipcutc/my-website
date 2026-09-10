@@ -99,6 +99,13 @@
     // Instant 0ms Pre-Hydration & Zero-Flicker Renderer
     (function() {
       try {
+        var FLIPCUT_BUILD = '20260910_V22';
+        if (localStorage.getItem('flipcut_build_ver') !== FLIPCUT_BUILD) {
+          localStorage.setItem('flipcut_build_ver', FLIPCUT_BUILD);
+          localStorage.removeItem('flipcut_site_content');
+          localStorage.removeItem('flipcut_cms_draft');
+          localStorage.removeItem('flipcut_site_content_backup');
+        }
         var raw = localStorage.getItem('flipcut_cms_draft') || localStorage.getItem('flipcut_site_content');
         if (raw) {
           var data = JSON.parse(raw);

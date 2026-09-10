@@ -135,14 +135,14 @@
           const data = JSON.parse(raw);
           let modified = false;
 
-          // Heal Webinar price if corrupted or set to stale 2 / 99 / 199 / 0
+          // Heal Webinar price only if completely missing or empty
           if (data.webinar) {
-            const rawP = String(data.webinar.price || '').replace(/[^0-9]/g, '');
-            if (!rawP || rawP === '2' || rawP === '99' || rawP === '199' || rawP === '0') {
+            const rawP = String(data.webinar.price !== undefined && data.webinar.price !== '' ? data.webinar.price : '').replace(/[^0-9]/g, '');
+            if (!rawP || Number(rawP) < 1) {
               data.webinar.price = '49';
               modified = true;
             }
-            if (!data.webinar.originalPrice || data.webinar.originalPrice === '899' || data.webinar.originalPrice === '199') {
+            if (!data.webinar.originalPrice) {
               data.webinar.originalPrice = '999';
               modified = true;
             }
@@ -153,12 +153,9 @@
             }
           }
 
-          // Heal Announcement text price
-          if (data.topAnnouncement && typeof data.topAnnouncement.text === 'string') {
-            if (data.topAnnouncement.text.includes('₹2') || data.topAnnouncement.text.includes('₹99') || data.topAnnouncement.text.includes('₹199')) {
-              data.topAnnouncement.text = data.topAnnouncement.text.replace(/₹\s*(2|99|199)\b/g, '₹49');
-              modified = true;
-            }
+          // Auto-sync Announcement text price to match dynamic webinar price
+          if (data.topAnnouncement && typeof data.topAnnouncement.text === 'string' && data.webinar && data.webinar.price) {
+            data.topAnnouncement.text = data.topAnnouncement.text.replace(/₹\s*\d+/g, '₹' + data.webinar.price);
           }
 
           if (modified) {
