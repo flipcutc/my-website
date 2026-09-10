@@ -834,7 +834,50 @@
       margin: 20px 0;
       outline: none;
     }
-  </style>
+  
+    /* Segmented CRM Category Pill Switcher */
+    .crm-category-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1.5px solid var(--border-subtle);
+      flex-wrap: wrap;
+    }
+    .crm-category-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 9999px;
+      background: var(--bg-tertiary);
+      border: 1.5px solid var(--border-subtle);
+      color: var(--text-secondary);
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    .crm-category-pill:hover {
+      background: var(--bg-accent-subtle);
+      border-color: var(--brand-indigo);
+      color: var(--text-primary);
+    }
+    .crm-category-pill.active {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.22), rgba(16, 185, 129, 0.18));
+      border-color: var(--brand-indigo);
+      color: #FFF;
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.25);
+    }
+    .category-badge {
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-size: 0.74rem;
+      font-weight: 800;
+      color: #FFF;
+    }
+
+</style>
 </head>
 <body class="admin-layout-body">
 
@@ -3964,6 +4007,60 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
       }
 
 
+      
+      // Category Switching Controller (Webinar, Project Inquiries, Google Accounts, All)
+      window.__crmActiveCategory = 'webinar'; // Default to Webinar view
+
+      window.switchCrmCategory = function(category) {
+        window.__crmActiveCategory = category || 'webinar';
+        crmCurrentPage = 1;
+
+        // Update active class on pills
+        document.querySelectorAll('.crm-category-pill').forEach(pill => {
+          pill.classList.toggle('active', pill.id === (
+            category === 'webinar' ? 'pillWebinar' :
+            category === 'project' ? 'pillProject' :
+            category === 'google_auth' ? 'pillGoogle' : 'pillAll'
+          ));
+        });
+
+        // Update active state in sidebar
+        document.querySelectorAll('.tab-btn-vertical[data-tab="tab-crm"]').forEach(btn => {
+          const cat = btn.getAttribute('data-crm-cat');
+          btn.classList.toggle('active', cat === category);
+        });
+
+        // Contextual Header & Generator Visibility
+        const titleEl = document.getElementById('crmSectionTitle');
+        const subEl = document.getElementById('crmSectionSubtitle');
+        const topViewTitle = document.getElementById('activeViewTitle');
+        const quickPassBox = document.getElementById('quickPassBox');
+
+        if (category === 'webinar') {
+          if (titleEl) titleEl.textContent = '🎟 Webinar Live Masterclass Attendees & Passes';
+          if (subEl) subEl.textContent = 'Verified webinar pass holders and pending UPI registrations. Official ₹49 passes generated only for paid attendees.';
+          if (topViewTitle) topViewTitle.textContent = '🎟 Webinar Passes & Attendees';
+          if (quickPassBox) quickPassBox.style.display = 'block';
+        } else if (category === 'project') {
+          if (titleEl) titleEl.textContent = '💼 Creative Project Briefs & Client Inquiries';
+          if (subEl) subEl.textContent = 'Client bookings submitted via website project calculator & creative brief form (Video Editing, Color Grading, Retainers, etc.).';
+          if (topViewTitle) topViewTitle.textContent = '💼 Project Inquiries & Briefs';
+          if (quickPassBox) quickPassBox.style.display = 'none';
+        } else if (category === 'google_auth') {
+          if (titleEl) titleEl.textContent = '🔑 Google Authenticated User Accounts';
+          if (subEl) subEl.textContent = 'Users verified via Google Sign-In authentication. (Webinar passes are NOT assigned unless booked).';
+          if (topViewTitle) topViewTitle.textContent = '🔑 Google Authenticated Accounts';
+          if (quickPassBox) quickPassBox.style.display = 'none';
+        } else {
+          if (titleEl) titleEl.textContent = 'Incoming Leads & Project Briefs (All Records)';
+          if (subEl) subEl.textContent = 'Complete master pipeline of all inquiries, bookings, and verified user accounts.';
+          if (topViewTitle) topViewTitle.textContent = '📋 Master Pipeline (All Records)';
+          if (quickPassBox) quickPassBox.style.display = 'block';
+        }
+
+        renderCrmTable();
+      };
+
       // 4. Leads & CRM (Local lead fetching & earnings summary)
       function parseLeadAmount(budgetStr) {
         if (!budgetStr || typeof budgetStr !== 'string') return 25000;
@@ -4401,9 +4498,95 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
           const clientPhoneDisplay = safePhone ? `<a href="tel:${safePhone}" style="color:var(--text-primary); font-weight:600; text-decoration:none;"><i class="fa-solid fa-phone" style="font-size:0.75rem; color:#10B981; margin-right:4px;"></i> ${safePhone}</a>` : '<span style="color:var(--text-dim);">-</span>';
           const waNum = lead.phone ? lead.phone.replace(/[^0-9]/g, '') : (content.contact ? content.contact.whatsappNum.replace(/[^0-9]/g, '') : '919999999999');
 
+                    const isGoogleUser = (lead.service === 'Google Authenticated User') || (lead.userId || '').startsWith('AUTH-') || String(lead.id || '').startsWith('AUTH-');
+          const isProjectUser = !isWebinar && !isGoogleUser;
+          const isWebinarPaid = isWebinar && (lead.status === 'Booked / Paid' || lead.paymentStatus?.includes('Paid'));
+
+          let badgeColorStyle = 'background: rgba(99, 102, 241, 0.15); border-color: #6366F1; color: #A5B4FC;';
+          if (isGoogleUser) badgeColorStyle = 'background: rgba(234, 67, 53, 0.12); border-color: #EA4335; color: #F87171;';
+          if (isProjectUser) badgeColorStyle = 'background: rgba(16, 185, 129, 0.12); border-color: #10B981; color: #34D399;';
+
+          let waGroupCellHtml = '';
+          if (isGoogleUser) {
+            waGroupCellHtml = '<span style="color: var(--text-dim); font-size: 0.8rem; font-weight: 600;">Google Account</span>';
+          } else if (isProjectUser) {
+            waGroupCellHtml = '<span style="color: var(--text-dim); font-size: 0.8rem; font-weight: 600;">Project Inquiry</span>';
+          } else if (isJoinedGroup) {
+            waGroupCellHtml = `
+              <span onclick="toggleWaGroupStatus('${lead.id}')" title="Client joined VIP WhatsApp Group (Click to toggle)" style="cursor: pointer; background: rgba(37,211,102,0.15); color: #10B981; border: 1px solid #10B981; padding: 4px 8px; border-radius: 12px; font-size: 0.78rem; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;">
+                <i class="fa-brands fa-whatsapp" style="font-size: 0.92rem;"></i> ✅ Joined
+              </span>`;
+          } else {
+            waGroupCellHtml = `
+              <button type="button" class="btn btn-secondary" onclick="sendWhatsAppGroupInviteDirect('${lead.id}')" title="Click to 1-Click Send Direct Group Invite on WhatsApp" style="cursor: pointer; background: rgba(245, 158, 11, 0.15); color: #D97706; border: 1px solid #F59E0B; padding: 4px 8px; border-radius: 12px; font-size: 0.78rem; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;">
+                <i class="fa-brands fa-whatsapp" style="font-size: 0.92rem;"></i> 📢 Invite
+              </button>`;
+          }
+
+          let actionsCellHtml = '';
+          if (isGoogleUser) {
+            // Google Accounts: View, Email, WhatsApp, Delete (NO WEBINAR PASS BUTTONS)
+            actionsCellHtml = `
+              <button class="action-btn-sm" onclick="viewLeadDetails('${lead.id}')" title="View Google User Account Details" style="color: var(--brand-indigo);">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+              ${safeEmail ? `<a href="mailto:${safeEmail}" class="action-btn-sm" title="Email User" style="color: #38BDF8;"><i class="fa-solid fa-envelope"></i></a>` : ''}
+              ${safePhone ? `<a href="https://wa.me/${waNum}?text=Hi%20${encodeURIComponent(lead.name || 'there')}%2C%20reaching%20out%20from%20FlipCut%20Creation!" target="_blank" class="action-btn-sm" title="WhatsApp User"><i class="fa-brands fa-whatsapp" style="color: #10B981;"></i></a>` : ''}
+              <button class="action-btn-sm delete-btn" onclick="deleteCrmLead('${lead.id}')" title="Delete User">
+                <i class="fa-solid fa-trash"></i>
+              </button>`;
+          } else if (isProjectUser) {
+            // Project Inquiries: Accept & Close, Edit Brief, View Brief, WhatsApp, Delete (NO WEBINAR PASS BUTTONS)
+            actionsCellHtml = `
+              <button class="action-btn-sm" onclick="toggleLeadComplete('${lead.id}')" title="${lead.status === 'Completed' ? 'Project Completed & Closed (Click to Revert)' : 'Accept & Close Project (Adds to Total Earnings)'}" style="${lead.status === 'Completed' ? 'background:rgba(16,185,129,0.18); color:#10B981; border:1.5px solid #10B981;' : 'color:#10B981;'}">
+                <i class="fa-solid fa-circle-check"></i>
+              </button>
+              <button class="action-btn-sm" onclick="openAdminEditLeadModal('${lead.id}')" title="Edit Customer Details (Permanent)" style="color: #F59E0B; background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.35);">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>
+              <button class="action-btn-sm" onclick="viewLeadDetails('${lead.id}')" title="View Full Project Brief & Entries" style="color: var(--brand-indigo);">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+              <a href="https://wa.me/${waNum}?text=Hi%20${encodeURIComponent(lead.name || 'there')}%20(Lead%20ID:%20${encodeURIComponent(leadUid)})%2C%20reaching%20out%20from%20FlipCut%20Creation%20regarding%20your%20project%20inquiry!" target="_blank" class="action-btn-sm" title="WhatsApp Client">
+                <i class="fa-brands fa-whatsapp" style="color: #10B981;"></i>
+              </a>
+              <button class="action-btn-sm delete-btn" onclick="deleteCrmLead('${lead.id}')" title="Delete Lead">
+                <i class="fa-solid fa-trash"></i>
+              </button>`;
+          } else {
+            // Webinar Attendees: ONLY PAID USERS GET WEBINAR TOKEN & PASS GENERATION
+            actionsCellHtml = `
+              ${isPendingUpi ? `
+                <button class="action-btn-sm" onclick="verifyPendingWebinarLead('${lead.id}')" title="Confirm Payment & Issue Official Pass" style="color: #10B981; background: rgba(16, 185, 129, 0.15); border: 1.5px solid #10B981;">
+                  <i class="fa-solid fa-user-check"></i>
+                </button>
+              ` : `
+                ${isWebinarPaid ? `
+                  <button class="action-btn-sm" onclick="sendWebinarPassOnWhatsApp('${lead.id}')" title="Send Official Ticket Pass on WhatsApp" style="color: #25D366; background: rgba(37, 211, 102, 0.12); border: 1px solid rgba(37,211,102,0.4);">
+                    <i class="fa-solid fa-ticket"></i>
+                  </button>
+                  <button class="action-btn-sm" onclick="sendTicketImageOnWhatsApp('${lead.id}')" title="Send HD Graphic Ticket IMAGE on WhatsApp" style="color: #38BDF8; background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56,189,248,0.4);">
+                    <i class="fa-solid fa-image"></i>
+                  </button>
+                ` : ''}
+              `}
+              <button class="action-btn-sm" onclick="openAdminEditLeadModal('${lead.id}')" title="Edit Customer Details (Permanent)" style="color: #F59E0B; background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.35);">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>
+              <button class="action-btn-sm" onclick="viewLeadDetails('${lead.id}')" title="View Full Details" style="color: var(--brand-indigo);">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+              <a href="https://wa.me/${waNum}?text=Hi%20${encodeURIComponent(lead.name || 'there')}%20(Webinar%20Pass:%20${encodeURIComponent(leadUid)})%2C%20reaching%20out%20from%20FlipCut%20Creation!" target="_blank" class="action-btn-sm" title="WhatsApp Client">
+                <i class="fa-brands fa-whatsapp" style="color: #10B981;"></i>
+              </a>
+              <button class="action-btn-sm delete-btn" onclick="deleteCrmLead('${lead.id}')" title="Delete Lead">
+                <i class="fa-solid fa-trash"></i>
+              </button>`;
+          }
+
           tr.innerHTML = `
             <td>
-              <span class="user-id-badge" onclick="copyLeadUserId('${leadUid}')" title="Click to copy User ID">
+              <span class="user-id-badge" onclick="copyLeadUserId('${leadUid}')" title="Click to copy User ID" style="${badgeColorStyle}">
                 ${leadUid} <i class="fa-solid fa-copy" style="font-size: 0.78rem; opacity: 0.7;"></i>
               </span>
             </td>
@@ -4434,47 +4617,11 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
               </span>
             </td>
             <td>
-              ${isJoinedGroup ? `
-                <span onclick="toggleWaGroupStatus('${lead.id}')" title="Client joined VIP WhatsApp Group (Click to toggle)" style="cursor: pointer; background: rgba(37,211,102,0.15); color: #10B981; border: 1px solid #10B981; padding: 4px 8px; border-radius: 12px; font-size: 0.78rem; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;">
-                  <i class="fa-brands fa-whatsapp" style="font-size: 0.92rem;"></i> ✅ Joined
-                </span>
-              ` : `
-                <button type="button" class="btn btn-secondary" onclick="sendWhatsAppGroupInviteDirect('${lead.id}')" title="Customer has not joined yet! Click to 1-Click Send Direct Group Invite on WhatsApp" style="cursor: pointer; background: rgba(245, 158, 11, 0.15); color: #D97706; border: 1px solid #F59E0B; padding: 4px 8px; border-radius: 12px; font-size: 0.78rem; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;">
-                  <i class="fa-brands fa-whatsapp" style="font-size: 0.92rem;"></i> 📢 Invite
-                </button>
-              `}
+              ${waGroupCellHtml}
             </td>
             <td>
               <div class="action-btn-group">
-                ${isPendingUpi ? `
-                  <button class="action-btn-sm" onclick="verifyPendingWebinarLead('${lead.id}')" title="Confirm Payment & Issue Official Pass" style="color: #10B981; background: rgba(16, 185, 129, 0.15); border: 1.5px solid #10B981;">
-                    <i class="fa-solid fa-user-check"></i>
-                  </button>
-                ` : `
-                  <button class="action-btn-sm" onclick="toggleLeadComplete('${lead.id}')" title="${lead.status === 'Completed' ? 'Project Completed & Closed (Click to Revert)' : 'Accept & Close Project (Adds to Total Earnings)'}" style="${lead.status === 'Completed' ? 'background:rgba(16,185,129,0.18); color:#10B981; border:1.5px solid #10B981;' : 'color:#10B981;'}">
-                    <i class="fa-solid fa-circle-check"></i>
-                  </button>
-                `}
-                ${isWebinar ? `
-                  <button class="action-btn-sm" onclick="sendWebinarPassOnWhatsApp('${lead.id}')" title="Send Official Ticket Pass on WhatsApp" style="color: #25D366; background: rgba(37, 211, 102, 0.12); border: 1px solid rgba(37,211,102,0.4);">
-                    <i class="fa-solid fa-ticket"></i>
-                  </button>
-                  <button class="action-btn-sm" onclick="sendTicketImageOnWhatsApp('${lead.id}')" title="Send HD Graphic Ticket IMAGE on WhatsApp" style="color: #38BDF8; background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56,189,248,0.4);">
-                    <i class="fa-solid fa-image"></i>
-                  </button>
-                ` : ''}
-                <button class="action-btn-sm" onclick="openAdminEditLeadModal('${lead.id}')" title="Edit Customer Details (Permanent)" style="color: #F59E0B; background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.35);">
-                  <i class="fa-solid fa-pen-to-square"></i>
-                </button>
-                <button class="action-btn-sm" onclick="viewLeadDetails('${lead.id}')" title="View Full Project Brief & Entries" style="color: var(--brand-indigo);">
-                  <i class="fa-solid fa-eye"></i>
-                </button>
-                <a href="https://wa.me/${waNum}?text=Hi%20${encodeURIComponent(lead.name || 'there')}%20(User%20ID:%20${encodeURIComponent(leadUid)}),%20reaching%20out%20from%20FlipCut%20Creation%20regarding%20your%20booking!" target="_blank" class="action-btn-sm" title="WhatsApp Client">
-                  <i class="fa-brands fa-whatsapp" style="color: #10B981;"></i>
-                </a>
-                <button class="action-btn-sm delete-btn" onclick="deleteCrmLead('${lead.id}')" title="Delete Lead">
-                  <i class="fa-solid fa-trash"></i>
-                </button>
+                ${actionsCellHtml}
               </div>
             </td>
           `;
