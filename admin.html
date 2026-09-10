@@ -6983,8 +6983,9 @@ ${waGroup}
           }
         } catch (_) {}
 
+        const curPrice = content.webinar?.price || '2';
         if (isOn) {
-          showAdminToast('🟢 Webinar Master Live Mode is ON! Popup, ₹49 Banner & Razorpay Checkout are LIVE across website!', '#10B981');
+          showAdminToast(`🟢 Webinar Master Live Mode is ON! Popup, ₹${curPrice} Banner & Razorpay Checkout are LIVE across website!`, '#10B981');
         } else {
           showAdminToast('🔴 Webinar Master Live Mode is OFF! Popup & Banner hidden, Webinar page switched to "Coming Soon" & payments disabled!', '#EF4444');
         }
