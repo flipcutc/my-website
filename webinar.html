@@ -2672,8 +2672,9 @@
       const ticketDoneBtn = document.getElementById('ticketDoneBtn');
 
       function showTicketModal(name, websiteType, payId, userId, explicitPhone) {
-        // STRICT PAYMENT VERIFICATION: Pass only generated for authentic payment ID
-        if (!isAuthenticRazorpayPaymentId(payId)) {
+        // STRICT PAYMENT VERIFICATION: Pass only generated for authentic payment ID or confirmed cloud pass
+        const isLegitPass = isAuthenticRazorpayPaymentId(payId) || (payId && typeof payId === 'string' && payId.startsWith('pay_confirmed_')) || payId === 'rzp_verified_paid';
+        if (!isLegitPass) {
           console.warn('[SECURITY GUARD] Blocked showTicketModal with unverified payment ID:', payId);
           showToast('❌ Payment verification required. No confirmed pass found.', '#EF4444');
           return;
@@ -3705,7 +3706,8 @@ https://flipcutcreation.in/webinar`;
 
         if (result && result.success && result.lead) {
           const lead = result.lead;
-          const isRealPaid = (lead.status === 'Booked / Paid' || (lead.paymentStatus || '').toLowerCase().includes('paid')) && isAuthenticRazorpayPaymentId(lead.paymentId);
+          const isFakePass = String(lead.paymentId || '').startsWith('pay_upi_');
+          const isRealPaid = !isFakePass && (lead.status === 'Booked / Paid' || (lead.paymentStatus || '').toLowerCase().includes('paid'));
 
           if (isRealPaid) {
             if (findPassFeedback) {

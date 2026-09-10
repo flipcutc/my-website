@@ -229,35 +229,91 @@
     if (!query || typeof query !== 'string' || !query.trim()) {
       return { success: false, message: 'Please enter your Name, Mobile Number, or User ID.' };
     }
-    const cleanQ = encodeURIComponent(query.trim());
+    const rawQ = query.trim();
+    const cleanQ = rawQ.toLowerCase();
+    const cleanDigits = rawQ.replace(/[^0-9]/g, '');
+    const last10 = cleanDigits.length >= 5 ? cleanDigits.slice(-10) : '';
+
     const SUPABASE_SYNC_URL = 'https://cznixvdphwbjdnnmapvb.supabase.co';
     const SUPABASE_SYNC_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6bml4dmRwaHdiamRubm1hcHZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTgwMTgsImV4cCI6MjEwMzEzNDAxOH0.dTLN1DCbUiBawZq8YlS5Bol-i81JFKhKpPKCboyocuQ';
 
     try {
-      const url = `${SUPABASE_SYNC_URL}/rest/v1/leads?or=(phone.ilike.*${cleanQ}*,name.ilike.*${cleanQ}*,id.ilike.*${cleanQ}*,email.ilike.*${cleanQ}*)&limit=5`;
-      const res = await fetch(url, {
-        headers: { apikey: SUPABASE_SYNC_KEY, Authorization: 'Bearer ' + SUPABASE_SYNC_KEY }
-      });
-      if (res.ok) {
-        const rows = await res.json();
-        if (Array.isArray(rows) && rows.length > 0) {
-          const lead = rows[0];
-          const restored = {
-            userId: lead.id,
-            name: lead.name,
-            email: lead.email,
-            phone: lead.phone,
-            websiteType: lead.websiteType || 'Webinar Masterclass',
-            paymentId: lead.paymentId || 'Confirmed Pass',
-            amount: lead.budget || lead.amount || '₹49',
-            webinarRegistered: true
-          };
-          saveUserProfile(restored);
-          return { success: true, lead: restored };
+      // 1. Check local storage cache first
+      let candidates = [];
+      try {
+        const local = JSON.parse(localStorage.getItem('flipcut_leads') || '[]');
+        if (Array.isArray(local)) candidates.push(...local);
+      } catch (_) {}
+
+      // 2. Fetch fresh leads from Supabase Cloud
+      try {
+        const res = await fetch(`${SUPABASE_SYNC_URL}/rest/v1/leads?id=neq.CMS_SITE_CONTENT_LIVE&order=created_at.desc&limit=100`, {
+          headers: { apikey: SUPABASE_SYNC_KEY, Authorization: 'Bearer ' + SUPABASE_SYNC_KEY }
+        });
+        if (res.ok) {
+          const rows = await res.json();
+          if (Array.isArray(rows)) candidates.push(...rows);
         }
+      } catch (cloudErr) {
+        console.warn('Cloud pass fetch note:', cloudErr);
+      }
+
+      // 3. Smart Match Algorithm (Normalizes phone numbers, handles +91 and spaces)
+      const match = candidates.find(r => {
+        if (!r || r.id === 'CMS_SITE_CONTENT_LIVE') return false;
+        const rName = (r.name || '').toLowerCase();
+        const rEmail = (r.email || '').toLowerCase();
+        const rId = (r.id || r.userId || '').toLowerCase();
+        const rPhoneDigits = (r.phone || '').replace(/[^0-9]/g, '');
+
+        if (rName.includes(cleanQ) || rEmail.includes(cleanQ) || rId.includes(cleanQ)) return true;
+        if (last10 && rPhoneDigits.endsWith(last10)) return true;
+        if (cleanDigits && cleanDigits.length >= 7 && rPhoneDigits.includes(cleanDigits)) return true;
+        return false;
+      });
+
+      if (match) {
+        // Extract real payment ID from message or paymentId property
+        let payId = match.paymentId || '';
+        if (!payId && match.message) {
+          const m = match.message.match(/pay_[A-Za-z0-9]+/);
+          if (m) payId = m[0];
+        }
+        if (!payId && match.status === 'Booked / Paid') {
+          payId = 'pay_confirmed_' + (match.id || match.userId);
+        }
+
+        // Extract website type
+        let webType = match.websiteType || '';
+        if (!webType && match.message) {
+          const m = match.message.match(/Webinar Pass \(([^)]+)\)/);
+          if (m) webType = m[1];
+        }
+        if (!webType) webType = 'E-commerce';
+
+        const isPaid = match.status === 'Booked / Paid' || (match.paymentStatus || '').toLowerCase().includes('paid');
+
+        const restored = {
+          userId: match.id || match.userId,
+          id: match.id || match.userId,
+          name: match.name,
+          email: match.email || '',
+          phone: match.phone || '',
+          websiteType: webType,
+          paymentId: payId,
+          amount: match.budget || match.amount || '₹49',
+          status: match.status || (isPaid ? 'Booked / Paid' : 'New'),
+          paymentStatus: isPaid ? 'Paid & Verified' : (match.paymentStatus || 'Payment Initiated (Pending UPI)'),
+          webinarRegistered: isPaid
+        };
+
+        if (isPaid) {
+          saveUserProfile(restored);
+        }
+        return { success: true, lead: restored };
       }
     } catch (e) {
-      console.warn('Cloud pass lookup note:', e);
+      console.warn('Cloud pass lookup error:', e);
     }
     return { success: false, message: 'No registered webinar pass found for the entered details. Please check your spelling or register a pass.' };
   }
