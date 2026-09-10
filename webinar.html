@@ -2800,8 +2800,7 @@ _Keep this User ID safe to unlock the live session!_
                     Authorization: `Bearer ${SUPABASE_SYNC_KEY}`
                   },
                   body: JSON.stringify({
-                    whatsappJoined: true,
-                    waGroupStatus: 'Joined'
+                    message: `[WhatsApp: Joined VIP Group] ` + (lead?.message || '')
                   })
                 }).catch(() => {});
               } catch (_) {}
@@ -3615,7 +3614,7 @@ https://flipcutcreation.in/webinar`;
               name: newName,
               phone: newPhone,
               email: newEmail,
-              notes: `Customer self-edited details (Edit #${editCount} of 2)`
+              message: `Customer self-edited details (Edit #${editCount} of 2)`
             })
           }).catch(() => {});
         } catch (_) {}
@@ -3941,13 +3940,11 @@ https://flipcutcreation.in/webinar`;
       }
     };
 
-    // STABILIZED ZERO-FLICKER MOBILE STICKY CTA CONTROLLER
+    // STABILIZED ZERO-FLICKER MOBILE STICKY CTA CONTROLLER (Integrated directly into Native Dock)
     (function initStableMobileStickyWebinarCta() {
       const stickyBar = document.getElementById('mobileStickyWebinarCta');
-      if (!stickyBar) return;
-
-      let isFormInViewport = false;
-      let isVisible = false;
+      if (stickyBar) stickyBar.style.display = 'none';
+      return; // Disabled in favor of permanent Native App Bottom Dock Book Pass ₹49 tab
 
       function updateStickyVisibility() {
         const isMobile = window.innerWidth <= 768;
@@ -4084,11 +4081,11 @@ https://flipcutcreation.in/webinar`;
       <span class="dock-label">Webinar</span>
     </a>
 
-    <a href="#webinarBriefCard" class="dock-tab" data-tab="book" onclick="smoothScrollToWebinar('webinarBriefCard'); return false;" aria-label="Book Pass">
-      <div class="dock-icon-wrap">
-        <i class="fa-solid fa-ticket"></i>
+    <a href="#webinarBriefCard" class="dock-tab dock-tab-highlight" data-tab="book" onclick="smoothScrollToWebinar('webinarBriefCard'); return false;" aria-label="Book Pass ₹49">
+      <div class="dock-icon-wrap" style="background: linear-gradient(135deg, #6366F1, #10B981); color: #fff; border-radius: 12px; padding: 4px 10px; box-shadow: 0 4px 12px rgba(99,102,241,0.4);">
+        <i class="fa-solid fa-ticket" style="font-size: 0.95rem;"></i>
       </div>
-      <span class="dock-label">Book Pass</span>
+      <span class="dock-label" style="color: #10B981; font-weight: 800;">Pass ₹49</span>
     </a>
 
     <a href="javascript:void(0)" class="dock-tab" data-tab="pass" onclick="openFindPassModal(); return false;" aria-label="Retrieve Pass">

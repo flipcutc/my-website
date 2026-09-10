@@ -4113,8 +4113,10 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
       const adminPinInput = document.getElementById('adminPinInput');
       const adminLogoutBtn = document.getElementById('adminLogoutBtn');
 
-      // Secure Cryptographic SHA-256 Hash Verification (One-way hash - original PIN is never stored in plain text)
-      const MASTER_PIN_HASH = '921bad2b769a8eaf32afe2c6436cd39284a12a8de86677c5ba546edae8f0c729';
+      const MASTER_PIN_HASHES = [
+        '207c5a8ca2c8cdeed8c554de74322e96cd06d99070e6cc5fd9559a0dd0e8649d', // 170151
+        '921bad2b769a8eaf32afe2c6436cd39284a12a8de86677c5ba546edae8f0c729'  // 242631
+      ];
 
       async function computeSha256(str) {
         const buffer = new TextEncoder().encode(str);
@@ -4165,7 +4167,7 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
 
         const inputHash = await computeSha256(pin);
 
-        if (inputHash === MASTER_PIN_HASH) {
+        if (MASTER_PIN_HASHES.includes(inputHash)) {
           // Reset failed attempts on success
           try {
             localStorage.removeItem('flipcut_admin_failed_attempts');
@@ -5882,7 +5884,7 @@ _Keep this User ID safe to unlock the live session!_
           fetch(`${syncUrl}/rest/v1/leads?id=eq.${encodeURIComponent(lead.id)}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json', apikey: syncKey, Authorization: 'Bearer ' + syncKey },
-            body: JSON.stringify({ notes: (lead.notes || '') + ' [WhatsApp Pass Dispatched]' })
+            body: JSON.stringify({ message: (lead.notes || lead.message || '') + ' [WhatsApp Pass Dispatched]' })
           }).catch(() => {});
         } catch (_) {}
 
