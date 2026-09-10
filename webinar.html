@@ -41,7 +41,7 @@
     "@context": "https://schema.org",
     "@type": "Event",
     "name": "FlipCut Creation Live Masterclass Webinar",
-    "description": "High-Retention Video Editing & Web Architecture Masterclass by FlipCut Creation.",
+    "description": "Live Website Creation & Scaling Masterclass by FlipCut Creation.",
     "image": "https://flipcutcreation.in/assets/logo.png",
     "url": "https://flipcutcreation.in/webinar",
     "organizer": {
@@ -51,7 +51,7 @@
     },
     "offers": {
       "@type": "Offer",
-      "price": "99",
+      "price": "49",
       "priceCurrency": "INR",
       "url": "https://flipcutcreation.in/webinar",
       "availability": "https://schema.org/InStock"
@@ -97,7 +97,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=22.0">
+  <link rel="stylesheet" href="styles.css?v=23.0">
 
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -917,7 +917,7 @@
 
               <div class="profile-detail-row">
                 <span class="detail-label"><i class="fa-solid fa-receipt"></i> Payment:</span>
-                <strong id="cardProfilePaymentStatus" class="detail-value" style="color: #10B981;">✅ ₹99 Confirmed (Razorpay)</strong>
+                <strong id="cardProfilePaymentStatus" class="detail-value" style="color: #10B981;">✅ ₹49 Confirmed (Razorpay)</strong>
               </div>
             </div>
 
@@ -1012,18 +1012,18 @@
   <section class="webinar-hero-section container" id="overview">
 
         <!-- LIVE MASTERCLASS COHORT CONFIRMED CARD -->
-    <div class="webinar-announcement-card">
-      <div class="announcement-badge">
+    <div class="webinar-announcement-card" id="webinarLiveCard">
+      <div class="announcement-badge" id="webinarAnnouncementBadgeWrap">
         <span style="width: 8px; height: 8px; border-radius: 50%; background: #EF4444; display: inline-block; animation: pulse 1.5s infinite;"></span>
         <span id="webinarBadgePill">🔥 LIVE MASTERCLASS • 27TH SEPTEMBER (SUNDAY)</span>
       </div>
       
-      <h2>
+      <h2 id="webinarHeroHeading">
         Live Masterclass Confirmed for 27th September, Sunday!
       </h2>
       
-      <p>
-        Registrations are now officially open! Join FlipCut Creation's lead architects on <strong>Sunday, 27th September 2026 at 10:00 AM IST</strong> for intensive practical training on building high-converting websites & cinematic visual storytelling. Limited seats available at an exclusive <strong>₹49 early pass fee</strong>!
+      <p id="webinarHeroDetail">
+        Registrations are now officially open! Join FlipCut Creation's lead architects on <strong>Sunday, 27th September 2026 at 10:00 AM IST</strong> for intensive practical training on building high-converting websites and scaling your online business. Limited seats available at an exclusive <strong>₹49 early pass fee</strong>!
       </p>
     </div>
 
@@ -1037,7 +1037,7 @@
       </form>
 
       <div style="margin-top: 18px; font-size: 0.82rem; color: #94A3B8;">
-        <span>Haven't registered for a ticket pass yet?</span> <a href="#webinarBriefCard" style="color: #818CF8; font-weight: 700; text-decoration: underline;">Book VIP Pass (₹99)</a>
+        <span>Haven't registered for a ticket pass yet?</span> <a href="#webinarBriefCard" style="color: #818CF8; font-weight: 700; text-decoration: underline;">Book VIP Pass (₹49)</a>
       </div>
     </div>
 
@@ -1260,16 +1260,22 @@
               <span>✅ Razorpay Payment Verified! Submit button unlocked below.</span>
             </div>
 
-            <!-- Step 1 Button: Pay via Razorpay -->
+            <!-- Step 1 Button: Pay via Razorpay (Active Live Mode) -->
             <button type="button" class="btn btn-primary" id="btnPayRazorpay" style="width: 100%; justify-content: center; padding: 15px 20px; font-size: 1.05rem; font-weight: 800; background: linear-gradient(135deg, #6366F1, #4F46E5); border: none; box-shadow: 0 6px 22px rgba(99,102,241,0.45); border-radius: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
               <i class="fa-solid fa-lock"></i>
               <span id="btnPayRazorpayText">Pay ₹49 & Unlock Registration</span>
             </button>
 
-            <!-- Step 2 Button: Final Submit (Visible after Payment Done) -->
+            <!-- Step 2 Button: Final Submit (Visible after Payment Done in Live Mode) -->
             <button type="submit" class="btn btn-primary" id="btnFinalSubmit" style="width: 100%; justify-content: center; padding: 14px; font-size: 1.05rem; display: none; background: #10B981; border-color: #10B981;">
               <i class="fa-solid fa-paper-plane"></i>
               <span>Submit Webinar Registration</span>
+            </button>
+
+            <!-- Waitlist Submit Button (Visible when Live Mode is OFF / Coming Soon) -->
+            <button type="button" class="btn btn-primary" id="btnWaitlistSubmit" style="width: 100%; justify-content: center; padding: 15px 20px; font-size: 1.05rem; font-weight: 800; background: linear-gradient(135deg, #F59E0B, #D97706); border: none; box-shadow: 0 6px 22px rgba(245,158,11,0.35); border-radius: 12px; cursor: pointer; display: none; align-items: center; gap: 8px;">
+              <i class="fa-solid fa-bell"></i>
+              <span>Join Priority Waitlist (Get Notified)</span>
             </button>
 
             <!-- Already Paid via UPI / Pass Self-Recovery Box -->
@@ -1614,7 +1620,7 @@
     function renderWebinarData(content) {
       if (!content) content = (typeof getSiteContent === 'function') ? getSiteContent() : null;
       if (!content) return;
-            const brandLogos = document.querySelectorAll('.brand-logo-img');
+      const brandLogos = document.querySelectorAll('.brand-logo-img');
       const logoH = (content.brand && content.brand.logoHeight) ? content.brand.logoHeight : 65;
       document.documentElement.style.setProperty('--brand-logo-height', `${logoH}px`);
       brandLogos.forEach(img => {
@@ -1628,27 +1634,89 @@
       }
 
       const webinarCfg = content.webinar || {};
+      const isMasterLive = (webinarCfg.masterLiveMode !== false) && (webinarCfg.enabled !== false);
       const price = String(webinarCfg.price !== undefined && webinarCfg.price !== '' ? webinarCfg.price : '49').replace(/[^0-9]/g, '') || '49';
       const origPrice = String(webinarCfg.originalPrice !== undefined && webinarCfg.originalPrice !== '' ? webinarCfg.originalPrice : '999').replace(/[^0-9]/g, '') || '999';
 
       const setTxt = (id, text) => { const el = document.getElementById(id); if (el && text !== undefined) el.textContent = text; };
-      if (webinarCfg.badge) setTxt('webinarBadgePill', webinarCfg.badge);
-      if (webinarCfg.title) setTxt('webinarHeroTitle', webinarCfg.title);
-      if (webinarCfg.description) setTxt('webinarHeroDesc', webinarCfg.description);
-      if (webinarCfg.date) {
-        setTxt('webinarDateText', webinarCfg.date);
-        setTxt('webinarModalDateText', webinarCfg.date);
-      }
-      if (webinarCfg.duration) setTxt('webinarDurationText', webinarCfg.duration);
-      if (webinarCfg.seats) setTxt('webinarSeatsText', webinarCfg.seats);
-      if (webinarCfg.formTitle) setTxt('webinarFormTitle', webinarCfg.formTitle);
-      if (webinarCfg.formSubtitle) setTxt('webinarFormSubtitle', webinarCfg.formSubtitle);
 
-      setTxt('webinarTicketFeeText', `₹${price}`);
-      setTxt('webinarPriceDisplay', `₹${price}`);
-      setTxt('webinarOrigPriceDisplay', `₹${origPrice}`);
-      setTxt('btnPayRazorpayText', `Pay ₹${price} & Unlock Registration`);
-      setTxt('ticketPassAmountText', `₹${price} (Confirmed via Razorpay)`);
+      // Elements
+      const heroBadge = document.getElementById('webinarBadgePill');
+      const heroHeading = document.getElementById('webinarHeroHeading');
+      const heroDetail = document.getElementById('webinarHeroDetail');
+      const btnRazorpay = document.getElementById('btnPayRazorpay');
+      const btnWaitlist = document.getElementById('btnWaitlistSubmit');
+      const btnFinal = document.getElementById('btnFinalSubmit');
+      const stickyBar = document.getElementById('mobileStickyWebinarCta');
+      const topAnnBar = document.getElementById('topAnnouncementBar');
+
+      if (!isMasterLive) {
+        // ==========================================
+        // 🔴 MASTER SWITCH IS OFF -> COMING SOON MODE
+        // ==========================================
+        if (heroBadge) heroBadge.textContent = '⏳ REGISTRATIONS CLOSED • NEXT BATCH COMING SOON';
+        if (heroHeading) heroHeading.textContent = 'Live Masterclass Webinar — Coming Soon!';
+        if (heroDetail) {
+          heroDetail.innerHTML = 'Registrations for the current live cohort are temporarily closed. We are scheduling the next live masterclass batch! Enter your details below to join the <strong>Priority Waitlist</strong> and get VIP WhatsApp alerts before seats open to the public.';
+        }
+        setTxt('webinarDateText', 'Next Batch Announced Soon');
+        setTxt('webinarModalDateText', 'Next Batch Announced Soon');
+        setTxt('webinarSeatsText', 'Waitlist Open');
+        setTxt('webinarFormTitle', 'Join Next Batch Priority Waitlist');
+        setTxt('webinarFormSubtitle', 'Enter your name & WhatsApp number below to get early priority notification and discount when registrations reopen.');
+        setTxt('webinarPriceDisplay', 'Next Batch: Coming Soon');
+        const origPriceEl = document.getElementById('webinarOrigPriceDisplay');
+        if (origPriceEl) origPriceEl.style.display = 'none';
+
+        // Payment Buttons
+        if (btnRazorpay) btnRazorpay.style.setProperty('display', 'none', 'important');
+        if (btnFinal) btnFinal.style.setProperty('display', 'none', 'important');
+        if (btnWaitlist) btnWaitlist.style.setProperty('display', 'inline-flex', 'important');
+
+        // Sticky mobile bar
+        if (stickyBar) stickyBar.style.setProperty('display', 'none', 'important');
+
+        // Top banner
+        if (topAnnBar) topAnnBar.style.setProperty('display', 'none', 'important');
+
+        const includesDesc = document.getElementById('webinarIncludesDesc');
+        if (includesDesc) includesDesc.textContent = 'Free Priority Notification • No payment required now. Get instant WhatsApp alert as soon as dates are announced.';
+      } else {
+        // ==========================================
+        // 🟢 MASTER SWITCH IS ON -> LIVE BOOKING MODE
+        // ==========================================
+        if (heroBadge) heroBadge.textContent = webinarCfg.badge || '🔥 LIVE MASTERCLASS • 27TH SEPTEMBER (SUNDAY)';
+        if (heroHeading) heroHeading.textContent = 'Live Masterclass Confirmed for 27th September, Sunday!';
+        if (heroDetail) {
+          heroDetail.innerHTML = 'Registrations are now officially open! Join FlipCut Creation\'s lead architects on <strong>Sunday, 27th September 2026 at 10:00 AM IST</strong> for intensive practical training on building high-converting websites and scaling your online business. Limited seats available at an exclusive <strong>₹' + price + ' early pass fee</strong>!';
+        }
+        setTxt('webinarDateText', webinarCfg.date || '27th September, Sunday • 10:00 AM IST');
+        setTxt('webinarModalDateText', webinarCfg.date || '27th September, Sunday • 10:00 AM IST');
+        setTxt('webinarDurationText', webinarCfg.duration || '2 Hours (Live + Q&A)');
+        setTxt('webinarSeatsText', webinarCfg.seats || 'Limited 150 Seats');
+        setTxt('webinarFormTitle', webinarCfg.formTitle || 'Book Your Live Masterclass Pass');
+        setTxt('webinarFormSubtitle', webinarCfg.formSubtitle || `Enter your details, select your website type, and complete payment of just ₹${price} via UPI / GPay / Netbanking to unlock your pass.`);
+
+        setTxt('webinarTicketFeeText', `₹${price}`);
+        setTxt('webinarPriceDisplay', `₹${price}`);
+        const origPriceEl = document.getElementById('webinarOrigPriceDisplay');
+        if (origPriceEl) {
+          origPriceEl.textContent = `₹${origPrice}`;
+          origPriceEl.style.display = '';
+        }
+        setTxt('btnPayRazorpayText', `Pay ₹${price} & Unlock Registration`);
+        setTxt('ticketPassAmountText', `₹${price} (Confirmed via Razorpay)`);
+
+        if (btnRazorpay) btnRazorpay.style.display = 'inline-flex';
+        if (btnWaitlist) btnWaitlist.style.display = 'none';
+
+        if (topAnnBar) topAnnBar.style.display = '';
+
+        const annTextEl = document.getElementById('topAnnouncementText');
+        if (annTextEl) {
+          annTextEl.innerHTML = `Live Masterclass Webinar Pass Registration at <strong>₹${price} Only!</strong> (Sunday, 27th September)`;
+        }
+      }
 
       const liveSectionElem = document.getElementById('vipLiveMasterclassSection');
       if (liveSectionElem) {
@@ -1658,19 +1726,14 @@
           window.lockVipLivePlayer();
         }
       }
-
-      const annTextEl = document.getElementById('topAnnouncementText');
-      if (annTextEl) {
-        annTextEl.innerHTML = `Live Masterclass Webinar Pass Registration at <strong>₹${price} Only!</strong>`;
-      }
     }
     window.renderWebinarData = renderWebinarData;
 
     // =========================================================================
-    // 5-LAYER AUTO-HEALING ZERO-CACHE-GLITCH PRICE ENGINE (STRICT ₹99 LOCK)
+    // 5-LAYER AUTO-HEALING ZERO-CACHE-GLITCH PRICE ENGINE (STRICT ₹49 LOCK)
     // =========================================================================
     (function sanitizeAndHardlockPrice() {
-      // Layer 1: Purge stale testing drafts from localStorage (cleans old ₹2 / ₹199 test cache)
+      // Layer 1: Purge stale testing drafts from localStorage (cleans old ₹2 / ₹199 / ₹99 test cache)
       try {
         const draftKeys = ['flipcut_webinar_active_draft', 'flipcut_webinar_pending_intent', 'flipcut_user_profile'];
         draftKeys.forEach(k => {
@@ -1685,17 +1748,21 @@
         });
       } catch (_) {}
 
-      // Layer 2: Self-Healing DOM Guardian (Instantly corrects any stale price display)
+      // Layer 2: Self-Healing DOM Guardian (Instantly corrects any stale price display to strictly ₹49)
       function healPriceElements() {
+        const c = (typeof getSiteContent === 'function') ? getSiteContent() : null;
+        const isLive = c?.webinar ? (c.webinar.masterLiveMode !== false && c.webinar.enabled !== false) : true;
+        if (!isLive) return; // Do not overwrite Coming Soon text
+
         const priceTargets = [
           'webinarPriceDisplay', 'webinarTicketFeeText', 'btnPayRazorpayText', 
-          'ticketPassAmountText', 'topAnnouncementText'
+          'ticketPassAmountText', 'topAnnouncementText', 'cardProfilePaymentStatus', 'stickyWebinarPrice'
         ];
         priceTargets.forEach(id => {
           const el = document.getElementById(id);
           if (el) {
             if (el.textContent.includes('₹2') || el.textContent.includes('₹199') || el.textContent.includes('₹99')) {
-              el.textContent = el.textContent.replace(/₹s*2|₹s*199/g, '₹99');
+              el.textContent = el.textContent.replace(/₹\s*(2|199|99)\b/g, '₹49');
             }
           }
         });
@@ -2421,6 +2488,42 @@
       async function handleWebinarFinalSubmit(e, explicitUid, explicitPayId, explicitName, explicitPhone, explicitEmail, explicitType, explicitAmount) {
         if (e && e.preventDefault) e.preventDefault();
 
+        // If Master Live Mode is OFF, handle as Free Priority Waitlist submission
+        const activeSiteContent = (typeof getSiteContent === 'function') ? getSiteContent() : null;
+        const isMasterLive = activeSiteContent?.webinar ? (activeSiteContent.webinar.masterLiveMode !== false && activeSiteContent.webinar.enabled !== false) : true;
+        if (!isMasterLive) {
+          const name = explicitName || (document.getElementById('webinarName')?.value || 'Valued Creator').trim();
+          const phone = explicitPhone || (document.getElementById('webinarPhone')?.value || '').trim();
+          const email = explicitEmail || (document.getElementById('webinarEmail')?.value || '').trim();
+          const websiteType = explicitType || getSelectedWebsiteType() || 'E-commerce';
+          if (!phone) {
+            alert('Please enter your WhatsApp / mobile number to receive waitlist notification.');
+            return;
+          }
+          const waitlistId = 'WAITLIST-' + Math.floor(10000 + Math.random() * 90000);
+          const waitlistLead = {
+            userId: waitlistId,
+            id: waitlistId,
+            name: name,
+            phone: phone,
+            email: email,
+            service: 'Webinar Waitlist (Coming Soon)',
+            packageName: `Waitlist (${websiteType})`,
+            budget: 'Free Waitlist',
+            amount: 'Free Waitlist',
+            paymentStatus: 'Waitlist Registered',
+            notes: `Priority Waitlist for Next Batch | Type: ${websiteType}`,
+            status: 'Waitlist',
+            date: new Date().toISOString().slice(0, 10)
+          };
+          if (typeof window.pushLeadToDualCloud === 'function') {
+            window.pushLeadToDualCloud(waitlistLead).catch(() => {});
+          }
+          alert(`🎉 Thank you, ${name}! You have been registered on the Priority Notification Waitlist. We will notify you directly on WhatsApp (${phone}) before registrations open to the public!`);
+          document.getElementById('webinarRegistrationForm')?.reset();
+          return;
+        }
+
         const savedDraft = JSON.parse(localStorage.getItem('flipcut_webinar_active_draft') || '{}');
         const webinarFeeAmount = explicitAmount || getCurrentWebinarFee();
         const payId = explicitPayId || verifiedPaymentId || localStorage.getItem('flipcut_webinar_last_pay_id') || `pay_${Date.now()}`;
@@ -2522,6 +2625,10 @@
       webinarForm.addEventListener('submit', handleWebinarFinalSubmit);
       if (btnFinalSubmit) {
         btnFinalSubmit.addEventListener('click', handleWebinarFinalSubmit);
+      }
+      const btnWaitlistSubmit = document.getElementById('btnWaitlistSubmit');
+      if (btnWaitlistSubmit) {
+        btnWaitlistSubmit.addEventListener('click', handleWebinarFinalSubmit);
       }
 
       // Check if user returned from UPI App / Razorpay Redirect with payment ID in URL
@@ -3851,7 +3958,7 @@ https://flipcutcreation.in/webinar`;
         phone: waNumber,
         email: email || 'not-provided@waitlist.in',
         service: 'Next Webinar Priority Waitlist',
-        budget: '₹99 (Reserved)',
+        budget: '₹49 (Reserved)',
         status: 'Waitlist',
         date: new Date().toISOString().slice(0, 10),
         message: 'Joined Priority Waitlist for Next Webinar Cohort (' + websiteType + ')'

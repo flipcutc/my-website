@@ -193,7 +193,7 @@ async function pushLeadToDualCloud(lead) {
               phone: leadPayload.phone || '',
               email: leadPayload.email || '',
               service: leadPayload.service || 'Webinar Masterclass',
-              amount: leadPayload.budget || '₹99',
+              amount: leadPayload.budget || '₹49',
               message: leadPayload.message || '',
               status: leadPayload.status || 'Booked / Paid',
               paymentId: leadPayload.paymentId || '',
@@ -222,7 +222,7 @@ async function pushLeadToDualCloud(lead) {
       const cleanPhone = rawPhone.length === 10 ? '91' + rawPhone : rawPhone;
       const uid = leadPayload.id || 'FC-WEB-00000';
       const name = leadPayload.name || 'Creator';
-      const price = leadPayload.budget || '₹99';
+      const price = leadPayload.budget || '₹49';
       const waGroup = siteContent.webinar?.whatsappGroupLink || 'https://chat.whatsapp.com/B5hdxy7LbkNCrWRsHMtW8h';
 
       const passMessage = 

@@ -1467,7 +1467,7 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
 
             <div class="visibility-row">
               <div class="visibility-info">
-                <h4><i class="fa-solid fa-ticket" style="color: #6366F1;"></i> Webinar (₹199) Ticket Nav Link</h4>
+                <h4><i class="fa-solid fa-ticket" style="color: #6366F1;"></i> Webinar (₹49) Ticket Nav Link</h4>
                 <p>Special masterclass link with live ticket price pill in the header menu</p>
               </div>
               <label class="switch-control">
@@ -1808,8 +1808,8 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
           </div>
 
           <div class="form-group" style="margin-bottom: 16px;">
-            <label>Offer Headline / Announcement Message (HTML allowed, e.g. &lt;strong&gt;₹99 Only!&lt;/strong&gt;)</label>
-            <input type="text" id="cfgTopAnnText" class="form-control" placeholder="Exclusive Web Creation & Scaling Masterclass at <strong>₹99 Only!</strong>">
+            <label>Offer Headline / Announcement Message (HTML allowed, e.g. &lt;strong&gt;₹49 Only!&lt;/strong&gt;)</label>
+            <input type="text" id="cfgTopAnnText" class="form-control" placeholder="Exclusive Web Creation & Scaling Masterclass at <strong>₹49 Only!</strong>">
           </div>
 
           <div class="form-group">
@@ -2587,6 +2587,36 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
             </div>
           </div>
 
+          <!-- ====================================================================
+               GLOBAL WEBINAR MASTER LIVE SWITCH CARD (ONE-CLICK MASTER CONTROL)
+               ==================================================================== -->
+          <div style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.16), rgba(16, 185, 129, 0.16)); border: 2px solid #6366F1; border-radius: var(--radius-lg); padding: 22px 26px; margin-bottom: 26px; box-shadow: 0 10px 30px rgba(0,0,0,0.35);">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
+              <div style="flex: 1; min-width: 280px;">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                  <span id="masterWebinarStatusBadge" style="background: #10B981; color: #FFF; font-weight: 900; font-size: 0.82rem; padding: 5px 14px; border-radius: 9999px; letter-spacing: 0.6px; text-transform: uppercase;">
+                    🟢 WEBINAR LIVE (ON)
+                  </span>
+                  <h3 style="margin: 0; font-size: 1.35rem; font-weight: 900; color: #FFF;">
+                    Webinar Ecosystem Master ON/OFF Switch
+                  </h3>
+                </div>
+                <p style="margin: 0; font-size: 0.92rem; color: #CBD5E1; line-height: 1.55;">
+                  <strong>One-click control for all webinar features across the entire site:</strong><br>
+                  • <strong>When ON:</strong> Homepage Entrance Popup is active, Top Offer Banner is visible, Razorpay Payment Gateway (₹49) is active, Live Ticket Passes are generated, and Mobile Sticky Checkout Bar is displayed.<br>
+                  • <strong>When OFF:</strong> Hides top banner, disables homepage popup, automatically switches webinar page to <em>"Live Webinar Class Coming Soon"</em>, disables Razorpay payments, and turns registration into Priority Waitlist mode.
+                </p>
+              </div>
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 140px; text-align: center;">
+                <span id="masterWebinarSwitchLabel" style="font-weight: 800; font-size: 1.05rem; color: #10B981; letter-spacing: 0.5px;">LIVE (ON)</span>
+                <label class="toggle-switch" style="transform: scale(1.4); transform-origin: center;">
+                  <input type="checkbox" id="cfgWebinarMasterSwitch" checked onchange="window.handleWebinarMasterSwitchToggle(this.checked)">
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+
           <div class="cms-grid-2">
             <div class="form-group">
               <label>Webinar Page Status</label>
@@ -2618,7 +2648,7 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
           <div class="cms-grid-2">
             <div class="form-group">
               <label>Ticket Registration Fee (₹ INR)</label>
-              <input type="text" id="cfgWebinarPrice" class="form-control" placeholder="199">
+              <input type="text" id="cfgWebinarPrice" class="form-control" placeholder="49">
             </div>
             <div class="form-group">
               <label>Original Strikethrough Price (₹ INR)</label>
@@ -3209,7 +3239,7 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
         }
 
         const topAnnBadge = document.getElementById('cfgTopAnnBadge')?.value.trim() || '🔥 LIVE MASTERCLASS';
-        const topAnnText = document.getElementById('cfgTopAnnText')?.value.trim() || 'Exclusive Web Creation & Scaling Masterclass at <strong>₹99 Only!</strong>';
+        const topAnnText = document.getElementById('cfgTopAnnText')?.value.trim() || 'Exclusive Web Creation & Scaling Masterclass at <strong>₹49 Only!</strong>';
         const topAnnBtnText = document.getElementById('cfgTopAnnBtnText')?.value.trim() || 'Book Ticket Pass';
         const topAnnBtnUrl = document.getElementById('cfgTopAnnBtnUrl')?.value.trim() || 'webinar.html';
 
@@ -3529,16 +3559,35 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
 
         // Webinar Masterclass CMS
         if (!content.webinar) content.webinar = {};
+
+        // Master Switch Sync
+        const masterSwitchEl = document.getElementById('cfgWebinarMasterSwitch');
+        const isMasterLive = masterSwitchEl ? masterSwitchEl.checked : (content.webinar.masterLiveMode !== false && content.webinar.enabled !== false);
+        content.webinar.masterLiveMode = isMasterLive;
+        content.webinar.enabled = isMasterLive;
+        content.webinar.autoPopupEnabled = isMasterLive;
+
+        // Auto-sync top announcement with master live state
+        if (!content.sectionsVisibility) content.sectionsVisibility = {};
+        if (!content.topAnnouncement) content.topAnnouncement = {};
+        if (!isMasterLive) {
+          content.sectionsVisibility.topAnnouncement = false;
+          content.topAnnouncement.enabled = false;
+        } else {
+          content.sectionsVisibility.topAnnouncement = true;
+          content.topAnnouncement.enabled = true;
+        }
+
         const priceEl = document.getElementById('cfgWebinarPrice');
         if (priceEl && priceEl.value && priceEl.value.trim()) {
-          content.webinar.price = priceEl.value.trim().replace(/[^0-9]/g, '') || content.webinar.price || '199';
+          content.webinar.price = priceEl.value.trim().replace(/[^0-9]/g, '') || content.webinar.price || '49';
         } else if (!content.webinar.price) {
-          content.webinar.price = '199';
+          content.webinar.price = '49';
         }
 
         // Auto-synchronize Top Announcement text with updated price
         if (content.topAnnouncement && content.webinar.price) {
-          const currentText = content.topAnnouncement.text || 'Exclusive Web Creation & Scaling Masterclass at <strong>₹199 Only!</strong>';
+          const currentText = content.topAnnouncement.text || 'Exclusive Web Creation & Scaling Masterclass at <strong>₹49 Only!</strong>';
           content.topAnnouncement.text = currentText.replace(/₹\s*\d+/g, '₹' + content.webinar.price);
         }
 
@@ -3550,17 +3599,15 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
         }
 
         if (document.getElementById('cfgWebinarTitle')) {
-          content.webinar.enabled = (getVal('cfgWebinarEnabled', content.webinar.enabled !== false ? 'true' : 'false') === 'true');
-          content.webinar.badge = getVal('cfgWebinarBadge', content.webinar.badge || 'Exclusive Live Masterclass Webinar');
+          content.webinar.badge = getVal('cfgWebinarBadge', content.webinar.badge || '🔥 Live Masterclass • 27th September, Sunday');
           content.webinar.title = getVal('cfgWebinarTitle', content.webinar.title || 'How to Build & Scale High-Converting Websites That Drive Real Sales');
           content.webinar.description = getVal('cfgWebinarDesc', content.webinar.description || '');
-          content.webinar.date = getVal('cfgWebinarDate', content.webinar.date || 'Saturday, 7:00 PM IST');
-          content.webinar.duration = getVal('cfgWebinarDuration', content.webinar.duration || '90 Minutes Live + Q&A');
-          content.webinar.seats = getVal('cfgWebinarSeats', content.webinar.seats || 'Limited 100 Seats');
-          content.webinar.formTitle = getVal('cfgWebinarFormTitle', content.webinar.formTitle || 'Fill Out Your Webinar Brief');
+          content.webinar.date = getVal('cfgWebinarDate', content.webinar.date || '27th September, Sunday • 10:00 AM IST');
+          content.webinar.duration = getVal('cfgWebinarDuration', content.webinar.duration || '2 Hours (Live + Q&A)');
+          content.webinar.seats = getVal('cfgWebinarSeats', content.webinar.seats || 'Limited 150 Seats');
+          content.webinar.formTitle = getVal('cfgWebinarFormTitle', content.webinar.formTitle || 'Book Your Live Masterclass Pass');
           content.webinar.formSubtitle = getVal('cfgWebinarFormSubtitle', content.webinar.formSubtitle || '');
           content.webinar.shareBannerImage = getVal('cfgWebinarShareImage', content.webinar.shareBannerImage || 'https://flipcutcreation.in/assets/logo.png');
-          content.webinar.autoPopupEnabled = getVal('cfgWebinarAutoPopup', 'true') === 'true';
           content.webinar.whatsappGroupLink = getVal('cfgWebinarWaGroupLink', content.webinar.whatsappGroupLink || 'https://chat.whatsapp.com/B5hdxy7LbkNCrWRsHMtW8h');
           content.webinar.whatsappGroupMsg = getVal('cfgWebinarWaMsg', content.webinar.whatsappGroupMsg || '');
           content.webinar.liveSectionVisible = isChecked('toggleWebinarLiveSection');
@@ -3571,7 +3618,7 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
           if (ytVal.includes('v=')) { const m = ytVal.match(/v=([a-zA-Z0-9_-]+)/); if (m) ytVal = m[1]; }
           else if (ytVal.includes('youtu.be/')) { const m = ytVal.match(/youtu\.be\/([a-zA-Z0-9_-]+)/); if (m) ytVal = m[1]; }
           content.webinar.liveYoutubeId = ytVal;
-          content.webinar.liveScheduledTime = getVal('cfgWebinarLiveTime', content.webinar.liveScheduledTime || 'Sunday, 9:00 AM IST');
+          content.webinar.liveScheduledTime = getVal('cfgWebinarLiveTime', content.webinar.liveScheduledTime || 'Sunday, 10:00 AM IST');
           content.webinar.liveDriveUrl = getVal('cfgWebinarLiveDriveUrl', content.webinar.liveDriveUrl || 'https://drive.google.com');
         }
       }
@@ -3983,8 +4030,8 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
                     email: r.email || '',
                     phone: r.phone || '',
                     service: r.service || (isWebinar ? 'Webinar Registration' : 'Website / Video Inquiry'),
-                    budget: r.budget || (isWebinar ? '₹99' : '₹25,000'),
-                    amount: r.budget || (isWebinar ? '₹99' : '₹25,000'),
+                    budget: r.budget || (isWebinar ? '₹49' : '₹25,000'),
+                    amount: r.budget || (isWebinar ? '₹49' : '₹25,000'),
                     paymentId: r.paymentId || (isWebinar ? (r.paymentId || 'rzp_verified_pass') : ''),
                     paymentStatus: r.paymentStatus || (isWebinar ? 'Paid & Verified (Razorpay)' : 'Inquiry / Quote Request'),
                     notes: r.message || '',
@@ -4570,7 +4617,7 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
         document.getElementById('adminEditLeadPhone').value = lead.phone || '';
         document.getElementById('adminEditLeadEmail').value = lead.email || '';
         document.getElementById('adminEditLeadWebsiteType').value = lead.websiteType || 'E-commerce';
-        document.getElementById('adminEditLeadAmount').value = lead.budget || lead.amount || '₹199';
+        document.getElementById('adminEditLeadAmount').value = lead.budget || lead.amount || '₹49';
         document.getElementById('adminEditLeadStatus').value = lead.status || 'New';
         document.getElementById('adminEditLeadPayId').value = lead.paymentId || '';
         document.getElementById('adminEditLeadNotes').value = lead.notes || '';
@@ -6026,8 +6073,23 @@ ${waGroup}
             setVal('cfgWebinarLiveYtId', content.webinar.liveYoutubeId || '');
             setVal('cfgWebinarLiveTime', content.webinar.liveScheduledTime || 'Sunday, 9:00 AM IST');
             setVal('cfgWebinarLiveDriveUrl', content.webinar.liveDriveUrl || 'https://drive.google.com');
+
+            // Master Live Switch State Loading
+            const isMasterLive = (content.webinar.masterLiveMode !== false) && (content.webinar.enabled !== false);
+            setCheck('cfgWebinarMasterSwitch', isMasterLive);
+            const badgeEl = document.getElementById('masterWebinarStatusBadge');
+            const lblEl = document.getElementById('masterWebinarSwitchLabel');
+            if (badgeEl) {
+              badgeEl.textContent = isMasterLive ? '🟢 WEBINAR LIVE (ON)' : '🔴 WEBINAR DISABLED (OFF)';
+              badgeEl.style.background = isMasterLive ? '#10B981' : '#EF4444';
+            }
+            if (lblEl) {
+              lblEl.textContent = isMasterLive ? 'LIVE (ON)' : 'DISABLED (OFF)';
+              lblEl.style.color = isMasterLive ? '#10B981' : '#EF4444';
+            }
+
             const statusSelect = document.getElementById('cfgWebinarEnabled');
-            if (statusSelect) statusSelect.value = content.webinar.enabled !== false ? 'true' : 'false';
+            if (statusSelect) statusSelect.value = isMasterLive ? 'true' : 'false';
           }
 
           // Top Header Announcement & Live Webinar Banner CMS Inputs
@@ -6036,7 +6098,7 @@ ${waGroup}
             const isEn = (ann.enabled !== false) && (content.sectionsVisibility?.topAnnouncement !== false);
             setCheck('cfgTopAnnEnabled', isEn);
             setVal('cfgTopAnnBadge', ann.badge || '🔥 LIVE MASTERCLASS');
-            setVal('cfgTopAnnText', ann.text || 'Exclusive Web Creation & Scaling Masterclass at <strong>₹99 Only!</strong>');
+            setVal('cfgTopAnnText', ann.text || 'Exclusive Web Creation & Scaling Masterclass at <strong>₹49 Only!</strong>');
             setVal('cfgTopAnnBtnText', ann.btnText || 'Book Ticket Pass');
             setVal('cfgTopAnnBtnUrl', ann.btnUrl || 'webinar.html');
           }
@@ -6046,6 +6108,58 @@ ${waGroup}
           console.error('Error in populateAllCmsInputs:', err);
         }
       }
+
+      window.handleWebinarMasterSwitchToggle = async function(isOn) {
+        const badgeEl = document.getElementById('masterWebinarStatusBadge');
+        const lblEl = document.getElementById('masterWebinarSwitchLabel');
+        const statusSelect = document.getElementById('cfgWebinarEnabled');
+        const topAnnSwitch = document.getElementById('cfgTopAnnEnabled');
+        const secTopAnnSwitch = document.getElementById('toggleSecTopAnnouncement');
+
+        if (badgeEl) {
+          badgeEl.textContent = isOn ? '🟢 WEBINAR LIVE (ON)' : '🔴 WEBINAR DISABLED (OFF)';
+          badgeEl.style.background = isOn ? '#10B981' : '#EF4444';
+        }
+        if (lblEl) {
+          lblEl.textContent = isOn ? 'LIVE (ON)' : 'DISABLED (OFF)';
+          lblEl.style.color = isOn ? '#10B981' : '#EF4444';
+        }
+        if (statusSelect) statusSelect.value = isOn ? 'true' : 'false';
+        if (topAnnSwitch) topAnnSwitch.checked = isOn;
+        if (secTopAnnSwitch) secTopAnnSwitch.checked = isOn;
+
+        // Immediately update in-memory content
+        if (!content) content = getSiteContent() || {};
+        if (!content.webinar) content.webinar = {};
+        content.webinar.masterLiveMode = isOn;
+        content.webinar.enabled = isOn;
+        content.webinar.autoPopupEnabled = isOn;
+        if (!content.sectionsVisibility) content.sectionsVisibility = {};
+        if (!content.topAnnouncement) content.topAnnouncement = {};
+        content.sectionsVisibility.topAnnouncement = isOn;
+        content.topAnnouncement.enabled = isOn;
+
+        // Auto-save to LocalStorage & Dual Cloud
+        await saveAdminDraft(false);
+
+        // 0ms Real-time broadcast to open website tabs
+        try {
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('flipcut:cms-updated', { detail: content }));
+            if (typeof BroadcastChannel !== 'undefined') {
+              const bc = new BroadcastChannel('flipcut_cms_channel');
+              bc.postMessage({ type: 'CMS_UPDATED', content: content });
+              bc.close();
+            }
+          }
+        } catch (_) {}
+
+        if (isOn) {
+          showAdminToast('🟢 Webinar Master Live Mode is ON! Popup, ₹49 Banner & Razorpay Checkout are LIVE across website!', '#10B981');
+        } else {
+          showAdminToast('🔴 Webinar Master Live Mode is OFF! Popup & Banner hidden, Webinar page switched to "Coming Soon" & payments disabled!', '#EF4444');
+        }
+      };
 
       window.syncTopAnnToggle = function(checked) {
         if (!content.topAnnouncement) content.topAnnouncement = { enabled: true };

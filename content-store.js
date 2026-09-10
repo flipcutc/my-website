@@ -460,11 +460,11 @@ const DEFAULT_SITE_CONTENT = {
     "budgetOptions": [
       {
         "value": "10k-25k",
-        "label": "₹10,000 - ₹995,000"
+        "label": "₹10,000 - ₹25,000"
       },
       {
         "value": "25k-50k",
-        "label": "₹995,000 - ₹50,000"
+        "label": "₹25,000 - ₹50,000"
       },
       {
         "value": "50k-100k",
@@ -523,9 +523,10 @@ const DEFAULT_SITE_CONTENT = {
   },
   "webinar": {
     "enabled": true,
+    "masterLiveMode": true,
     "badge": "🔥 Live Masterclass • 27th September, Sunday",
     "title": "How to Build & Scale High-Converting Websites That Drive Real Sales",
-    "description": "Join FlipCut Creation's lead architects for an interactive live session on building high-retention E-commerce, Portfolio, and Service sites with cinematic visual assets.",
+    "description": "Join FlipCut Creation's lead architects for an interactive live session on building high-retention E-commerce, Portfolio, and Service sites with high-converting web architecture.",
     "date": "27th September, Sunday • 10:00 AM IST",
     "targetDateTime": "2026-09-27T10:00:00+05:30",
     "registeredCount": 38,

@@ -249,7 +249,7 @@
             phone: lead.phone,
             websiteType: lead.websiteType || 'Webinar Masterclass',
             paymentId: lead.paymentId || 'Confirmed Pass',
-            amount: lead.budget || lead.amount || '₹99',
+            amount: lead.budget || lead.amount || '₹49',
             webinarRegistered: true
           };
           saveUserProfile(restored);
@@ -420,7 +420,7 @@
             </div>
             <div class="profile-detail-row">
               <span class="detail-label"><i class="fa-solid fa-receipt"></i> Payment:</span>
-              <strong id="cardProfilePaymentStatus" class="detail-value" style="color: #10B981;">✅ ${profile?.amount || '₹99'} Confirmed</strong>
+              <strong id="cardProfilePaymentStatus" class="detail-value" style="color: #10B981;">✅ ${profile?.amount || '₹49'} Confirmed</strong>
             </div>
           </div>
 

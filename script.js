@@ -153,12 +153,14 @@ function hydratePageFromCMS(customContent) {
     const annData = content.topAnnouncement || {
       enabled: true,
       badge: '🔥 LIVE MASTERCLASS',
-      text: 'Exclusive Web Creation & Scaling Masterclass at <strong>₹199 Only!</strong>',
-      btnText: 'Book Ticket Pass',
+      text: 'Exclusive Web Creation & Scaling Masterclass at <strong>₹49 Only!</strong>',
+      btnText: 'Book Ticket Pass (₹49)',
       btnUrl: 'webinar.html'
     };
 
-    const isTopAnnActive = (!content.sectionsVisibility || content.sectionsVisibility.topAnnouncement !== false) &&
+    const isMasterLive = content.webinar ? (content.webinar.masterLiveMode !== false && content.webinar.enabled !== false) : true;
+    const isTopAnnActive = isMasterLive &&
+                           (!content.sectionsVisibility || content.sectionsVisibility.topAnnouncement !== false) &&
                            (annData.enabled !== false);
 
     const webinarPrice = (content.webinar && content.webinar.price) ? String(content.webinar.price).replace(/[^0-9]/g, '') : '49';
@@ -166,10 +168,12 @@ function hydratePageFromCMS(customContent) {
     if (topBar) {
       if (!isTopAnnActive) {
         topBar.classList.add('is-hidden');
+        topBar.style.setProperty('display', 'none', 'important');
         document.documentElement.classList.remove('has-announcement');
         document.body.classList.remove('has-announcement');
       } else {
         topBar.classList.remove('is-hidden');
+        topBar.style.removeProperty('display');
         document.documentElement.classList.add('has-announcement');
         document.body.classList.add('has-announcement');
         const badgeText = document.getElementById('topAnnouncementBadgeText');
@@ -179,7 +183,7 @@ function hydratePageFromCMS(customContent) {
 
         if (badgeText && annData.badge) badgeText.textContent = annData.badge;
         if (textEl) {
-          let rawText = annData.text || 'Exclusive Web Creation & Scaling Masterclass at <strong>₹199 Only!</strong>';
+          let rawText = annData.text || 'Exclusive Web Creation & Scaling Masterclass at <strong>₹49 Only!</strong>';
           rawText = rawText.replace(/₹\s*\d+/g, '₹' + webinarPrice);
           textEl.innerHTML = rawText;
         }
@@ -195,13 +199,21 @@ function hydratePageFromCMS(customContent) {
     // Desktop Nav Link
     const navWebinarLink = document.querySelector('#navWebinarItem a');
     if (navWebinarLink) {
-      navWebinarLink.innerHTML = `<i class="fa-solid fa-ticket"></i> Webinar (₹${webinarPrice})`;
+      if (isMasterLive) {
+        navWebinarLink.innerHTML = `<i class="fa-solid fa-ticket"></i> Webinar (₹${webinarPrice})`;
+      } else {
+        navWebinarLink.innerHTML = `<i class="fa-solid fa-ticket"></i> Webinar (Coming Soon)`;
+      }
     }
 
     // Mobile Nav Drawer Link
     const mobileNavWebinarSpan = document.querySelector('.mobile-nav-links a[href="webinar.html"] span');
     if (mobileNavWebinarSpan) {
-      mobileNavWebinarSpan.textContent = `Live Masterclass Webinar (₹${webinarPrice})`;
+      if (isMasterLive) {
+        mobileNavWebinarSpan.textContent = `Live Masterclass Webinar (₹${webinarPrice})`;
+      } else {
+        mobileNavWebinarSpan.textContent = `Live Masterclass (Coming Soon)`;
+      }
     }
 
     const customLogoHeight = (content.brand && content.brand.logoHeight) ? content.brand.logoHeight : 65;
@@ -2453,15 +2465,19 @@ window.showWebinarEntrancePopup = function() {
   const content = (typeof getSiteContent === 'function') ? getSiteContent() : (window.flipcutSiteContent || {});
   const webinarCfg = content.webinar || {};
 
-  if (webinarCfg.autoPopupEnabled === false) {
-    return; // Admin turned off auto-popup
+  const isMasterLive = (webinarCfg.masterLiveMode !== false) && (webinarCfg.enabled !== false);
+  if (!isMasterLive || webinarCfg.autoPopupEnabled === false) {
+    if (modal.classList.contains('active')) {
+      window.closeWebinarEntrancePopup();
+    }
+    return; // Admin turned off master live mode or auto-popup
   }
 
   const price = String(webinarCfg.price !== undefined && webinarCfg.price !== '' ? webinarCfg.price : '49').replace(/[^0-9]/g, '') || '49';
   const origPrice = String(webinarCfg.originalPrice !== undefined && webinarCfg.originalPrice !== '' ? webinarCfg.originalPrice : '999').replace(/[^0-9]/g, '') || '999';
   const sessionDate = webinarCfg.date || '27th September, Sunday • 10:00 AM IST';
-  const title = webinarCfg.title || 'How to Build & Scale High-Converting Websites That Drive Real Sales';
-  const desc = webinarCfg.description || "Join FlipCut Creation's lead architects for an interactive live session on building high-retention E-commerce, Portfolio, and Service sites with cinematic visual assets.";
+  const title = webinarCfg.title || 'Live Website Creation & Scaling Masterclass 🚀';
+  const desc = webinarCfg.description || 'Build high-converting websites, launch your brand & master modern web design with FlipCut Creation!';
   const badge = webinarCfg.badge || '🔥 Live Masterclass • 27th September, Sunday';
 
   const setElText = (id, val) => {

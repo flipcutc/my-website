@@ -56,7 +56,7 @@
 
   <!-- Detail Row 2: Amount -->
   <text x="130" y="780" font-family="'Segoe UI', Inter, sans-serif" font-size="28" font-weight="500" fill="#9CA3AF">Amount Paid:</text>
-  <text x="950" y="780" font-family="'Segoe UI', Inter, sans-serif" font-size="32" font-weight="900" fill="#34D399" text-anchor="end">₹99 (Confirmed via Razorpay)</text>
+  <text x="950" y="780" font-family="'Segoe UI', Inter, sans-serif" font-size="32" font-weight="900" fill="#34D399" text-anchor="end">₹49 (Confirmed via Razorpay)</text>
 
   <!-- Detail Row 3: Session Date -->
   <text x="130" y="860" font-family="'Segoe UI', Inter, sans-serif" font-size="28" font-weight="500" fill="#9CA3AF">Session Date &amp; Time:</text>
