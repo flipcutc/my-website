@@ -2269,8 +2269,9 @@
           localStorage.setItem('flipcut_webinar_pending_intent', JSON.stringify(activeDraft));
         } catch (_) {}
 
-        // 3. Pre-Capture Lead to Dual Cloud BEFORE opening Razorpay
+        // 3. Pre-Capture Lead to Supabase & Dual Cloud BEFORE opening Razorpay
         const prePaymentLead = {
+          id: activeUserId,
           userId: activeUserId,
           name: name,
           email: email,
@@ -2286,6 +2287,31 @@
           date: new Date().toISOString().slice(0, 10),
           created_at: new Date().toISOString()
         };
+
+        // Direct Supabase POST upsert (guaranteed instant cloud sync across devices)
+        try {
+          fetch('https://cznixvdphwbjdnnmapvb.supabase.co/rest/v1/leads', {
+            method: 'POST',
+            keepalive: true,
+            headers: {
+              apikey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6bml4dmRwaHdiamRubm1hcHZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTgwMTgsImV4cCI6MjEwMzEzNDAxOH0.dTLN1DCbUiBawZq8YlS5Bol-i81JFKhKpPKCboyocuQ',
+              Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6bml4dmRwaHdiamRubm1hcHZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTgwMTgsImV4cCI6MjEwMzEzNDAxOH0.dTLN1DCbUiBawZq8YlS5Bol-i81JFKhKpPKCboyocuQ',
+              'Content-Type': 'application/json',
+              Prefer: 'resolution=merge-duplicates,return=representation'
+            },
+            body: JSON.stringify({
+              id: activeUserId,
+              name: name,
+              email: email,
+              phone: cleanPhone,
+              service: 'Webinar Registration',
+              budget: `₹${webinarFeeAmount}`,
+              message: `User initiated checkout for Webinar Pass (${websiteType}). User ID: ${activeUserId}`,
+              status: 'Payment Initiated (Pending UPI)'
+            })
+          }).catch(() => {});
+        } catch (_) {}
+
         if (typeof window.pushLeadToDualCloud === 'function') {
           window.pushLeadToDualCloud(prePaymentLead).catch(() => {});
         }
@@ -2400,6 +2426,25 @@
                     amount: `₹${guaranteedFee}`
                   });
                 }
+
+                // Immediate direct PATCH to Supabase Cloud to guarantee instant status transition to Booked / Paid
+                try {
+                  fetch('https://cznixvdphwbjdnnmapvb.supabase.co/rest/v1/leads?id=eq.' + encodeURIComponent(generatedUserId), {
+                    method: 'PATCH',
+                    keepalive: true,
+                    headers: {
+                      apikey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6bml4dmRwaHdiamRubm1hcHZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTgwMTgsImV4cCI6MjEwMzEzNDAxOH0.dTLN1DCbUiBawZq8YlS5Bol-i81JFKhKpPKCboyocuQ',
+                      Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6bml4dmRwaHdiamRubm1hcHZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTgwMTgsImV4cCI6MjEwMzEzNDAxOH0.dTLN1DCbUiBawZq8YlS5Bol-i81JFKhKpPKCboyocuQ',
+                      'Content-Type': 'application/json',
+                      Prefer: 'return=representation'
+                    },
+                    body: JSON.stringify({
+                      status: 'Booked / Paid',
+                      budget: `₹${guaranteedFee}`,
+                      message: `Webinar Pass (${websiteType}) | Razorpay Payment ID: ${verifiedPaymentId}`
+                    })
+                  }).catch(() => {});
+                } catch (_) {}
 
                 // 5. Submit confirmed lead to Dual Cloud non-blockingly
                 handleWebinarFinalSubmit(null, generatedUserId, verifiedPaymentId, name, cleanPhone, email, websiteType, guaranteedFee);

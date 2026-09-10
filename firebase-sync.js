@@ -212,6 +212,11 @@ async function pushLeadToDualCloud(lead) {
     // 1F. Push to Automated WhatsApp Cloud Gateway (Green-API / UltraMsg / Custom Webhook)
   const whatsappAutoDispatchPromise = (async () => {
     try {
+      // STRICT PAYMENT GATE: Only dispatch official VIP ticket pass if status is confirmed Booked / Paid!
+      const isPaidLead = String(leadPayload.status || '').toLowerCase().includes('paid');
+      if (!isPaidLead) {
+        return;
+      }
       const siteContent = (typeof getSiteContent === 'function') ? getSiteContent() : (window.flipcutSiteContent || {});
       const waWebhook = siteContent.contact?.whatsappWebhookUrl || siteContent.whatsappWebhookUrl || 'https://bin.webhookrelay.com/v1/webhooks/811da262-a0c0-4ae5-bb9c-1adaa541bfbf';
       const instanceId = siteContent.contact?.whatsappInstanceId || siteContent.whatsappInstanceId || '';
@@ -375,7 +380,11 @@ async function fetchLeadsFromDualCloud() {
               if (!mergedMap.has(docId)) {
                 mergedMap.set(docId, { ...data, id: docId, userId: docId });
               } else {
-                mergedMap.set(docId, { ...mergedMap.get(docId), ...data });
+                const prev = mergedMap.get(docId);
+                const isPrevPaid = String(prev.status || '').toLowerCase().includes('paid');
+                const isDataPaid = String(data.status || '').toLowerCase().includes('paid');
+                const mergedStatus = isPrevPaid && !isDataPaid ? prev.status : (data.status || prev.status);
+                mergedMap.set(docId, { ...prev, ...data, status: mergedStatus });
               }
             }
           });
@@ -389,7 +398,17 @@ async function fetchLeadsFromDualCloud() {
   await Promise.allSettled([supabasePromise, firestorePromise]);
 
   const result = Array.from(mergedMap.values());
-  result.sort((a, b) => new Date(b.created_at || b.date || 0) - new Date(a.created_at || a.date || 0));
+  function getSafeLeadEpoch(record) {
+    if (!record) return 0;
+    const val = record.created_at || record.date;
+    if (!val) return 0;
+    if (typeof val === 'number') return val;
+    if (typeof val.toDate === 'function') return val.toDate().getTime();
+    if (val.seconds) return val.seconds * 1000;
+    const parsed = new Date(val).getTime();
+    return isNaN(parsed) ? 0 : parsed;
+  }
+  result.sort((a, b) => getSafeLeadEpoch(b) - getSafeLeadEpoch(a));
   return result;
 }
 
