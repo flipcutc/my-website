@@ -528,6 +528,7 @@ const DEFAULT_SITE_CONTENT = {
     "title": "How to Build & Scale High-Converting Websites That Drive Real Sales",
     "description": "Join FlipCut Creation's lead architects for an interactive live session on building high-retention E-commerce, Portfolio, and Service sites with high-converting web architecture.",
     "date": "27th September, Sunday • 10:00 AM IST",
+    "activeBatchName": "Batch 2 - Sep/Oct 2026",
     "targetDateTime": "2026-09-27T10:00:00+05:30",
     "registeredCount": 38,
     "totalSeats": 150,

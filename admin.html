@@ -1170,6 +1170,11 @@
                 <i class="fa-solid fa-rotate"></i>
               </button>
               <input type="text" id="webinarSearchInput" oninput="renderCrmTable()" class="form-control" placeholder="Search attendee name, email, pass ID..." style="width: 220px;">
+              <select id="webinarBatchFilter" onchange="renderCrmTable()" class="form-control" style="width: auto; font-weight: 700; border-color: var(--brand-indigo); background: rgba(99, 102, 241, 0.08);">
+                <option value="active" selected>🟢 Current Active Batch</option>
+                <option value="completed">📁 Past Completed Batches</option>
+                <option value="all">📋 All Batches (Master List)</option>
+              </select>
               <select id="webinarStatusFilter" onchange="renderCrmTable()" class="form-control" style="width: auto;">
                 <option value="all" selected>All Attendees</option>
                 <option value="Booked / Paid">Paid / Confirmed Passes</option>
@@ -1223,6 +1228,7 @@
                   <th>Attendee Name</th>
                   <th>Mobile Number</th>
                   <th>Email</th>
+                  <th>Batch / Cohort</th>
                   <th>Website Type</th>
                   <th>Pass Fee</th>
                   <th>Pass Status</th>
@@ -2954,6 +2960,17 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
             </div>
           </div>
 
+          <div class="form-group" style="background: rgba(99, 102, 241, 0.08); border: 1.5px solid rgba(99, 102, 241, 0.35); border-radius: 10px; padding: 14px 18px; margin-bottom: 20px;">
+            <label style="font-weight: 800; color: #FFF; display: flex; align-items: center; justify-content: space-between;">
+              <span><i class="fa-solid fa-layer-group text-gradient"></i> Current Active Batch Name / Code *</span>
+              <span style="font-size: 0.74rem; background: rgba(16, 185, 129, 0.2); color: #10B981; border: 1px solid #10B981; padding: 2px 8px; border-radius: 4px;">Used to separate upcoming registrations from past batches</span>
+            </label>
+            <input type="text" id="cfgWebinarBatchName" class="form-control" placeholder="e.g. Batch 2 - Sep/Oct 2026" value="Batch 2 - Sep/Oct 2026" style="margin-top: 6px; font-weight: 700; border-color: var(--brand-indigo);">
+            <small style="color: var(--text-muted); display: block; margin-top: 4px;">
+              💡 <em>All new registrations will be automatically tagged with this Batch Name. When this batch concludes, simply update this to "Batch 3" for the next batch!</em>
+            </small>
+          </div>
+
           <div class="form-group">
             <label>Hero Headline Title</label>
             <input type="text" id="cfgWebinarTitle" class="form-control" placeholder="How to Build & Scale High-Converting Websites That Drive Real Sales">
@@ -3933,6 +3950,7 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
           content.webinar.date = getVal('cfgWebinarDate', content.webinar.date || '27th September, Sunday • 10:00 AM IST');
           content.webinar.duration = getVal('cfgWebinarDuration', content.webinar.duration || '2 Hours (Live + Q&A)');
           content.webinar.seats = getVal('cfgWebinarSeats', content.webinar.seats || 'Limited 150 Seats');
+          content.webinar.activeBatchName = getVal('cfgWebinarBatchName', content.webinar.activeBatchName || 'Batch 2 - Sep/Oct 2026');
           content.webinar.formTitle = getVal('cfgWebinarFormTitle', content.webinar.formTitle || 'Book Your Live Masterclass Pass');
           content.webinar.formSubtitle = getVal('cfgWebinarFormSubtitle', content.webinar.formSubtitle || '');
           content.webinar.shareBannerImage = getVal('cfgWebinarShareImage', content.webinar.shareBannerImage || 'https://flipcutcreation.in/assets/logo.png');
@@ -4419,6 +4437,8 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
                 const isWebinar = (r.service || '').toLowerCase().includes('webinar') || (r.id || '').startsWith('FC-WEB') || (r.status || '').toLowerCase().includes('paid');
                 const isWaJoined = r.whatsappJoined === true || r.waGroupStatus === 'Joined' || (r.message && r.message.includes('WhatsApp Group Joined'));
                 const isPaidStatus = String(r.status || '').toLowerCase().includes('paid');
+                const batchMatch = (r.message || r.notes || '').match(/\[Batch:\s*([^\]]+)\]/i);
+                const batchName = r.batchName || r.batch || (batchMatch ? batchMatch[1].trim() : (isWebinar ? 'Batch 1 (Past Completed)' : ''));
                 return {
                   id: r.id,
                   userId: r.id,
@@ -4430,6 +4450,8 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
                   amount: r.budget || (isWebinar ? '₹2' : '₹25,000'),
                   paymentId: r.paymentId || (r.message && r.message.match(/pay_[a-zA-Z0-9]+/)?.[0]) || (isPaidStatus ? 'rzp_verified_pass' : ''),
                   paymentStatus: isPaidStatus ? 'Paid & Verified (Razorpay)' : (r.paymentStatus || 'Payment Initiated (Pending UPI)'),
+                  batchName: batchName,
+                  batch: batchName,
                   notes: r.message || '',
                   message: r.message || '',
                   status: r.status || (isWebinar ? 'Payment Initiated (Pending UPI)' : 'New'),
@@ -4552,6 +4574,8 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
           websiteType: incomingLead.websiteType || 'E-commerce',
           paymentId: incomingLead.paymentId || (String(incomingLead.status || '').toLowerCase().includes('paid') ? 'rzp_live_paid' : ''),
           paymentStatus: incomingLead.paymentStatus || (String(incomingLead.status || '').toLowerCase().includes('paid') ? 'Paid & Verified (Razorpay)' : 'Payment Initiated (Pending UPI)'),
+          batchName: incomingLead.batchName || incomingLead.batch || (incomingLead.message && incomingLead.message.match(/\[Batch:\s*([^\]]+)\]/i)?.[1]?.trim()) || (content?.webinar?.activeBatchName || 'Batch 2 - Sep/Oct 2026'),
+          batch: incomingLead.batchName || incomingLead.batch || (incomingLead.message && incomingLead.message.match(/\[Batch:\s*([^\]]+)\]/i)?.[1]?.trim()) || (content?.webinar?.activeBatchName || 'Batch 2 - Sep/Oct 2026'),
           notes: incomingLead.message || incomingLead.notes || '',
           message: incomingLead.message || incomingLead.notes || '',
           status: incomingLead.status || (isWebinar ? 'Payment Initiated (Pending UPI)' : 'New'),
@@ -4951,6 +4975,8 @@ function renderCrmTable() {
           if (webinarBody) {
             const qW = (document.getElementById('webinarSearchInput')?.value || '').toLowerCase().trim();
             const sW = document.getElementById('webinarStatusFilter')?.value || 'all';
+            const bW = document.getElementById('webinarBatchFilter')?.value || 'active';
+            const activeBatchName = content?.webinar?.activeBatchName || 'Batch 2 - Sep/Oct 2026';
 
             let filteredW = webinarLeads.filter(l => {
               const safeName = String(l.name || '').toLowerCase();
@@ -4959,13 +4985,22 @@ function renderCrmTable() {
               const safeUid = String(l.userId || l.id || '').toLowerCase();
               const mQ = !qW || safeName.includes(qW) || safeEmail.includes(qW) || safePhone.includes(qW) || safeUid.includes(qW);
               const mS = (sW === 'all') || (String(l.status || '') === sW);
-              return mQ && mS;
+
+              const leadBatch = String(l.batchName || l.batch || '').trim();
+              let mB = true;
+              if (bW === 'active') {
+                mB = !leadBatch || leadBatch.toLowerCase().includes('batch 2') || leadBatch.toLowerCase() === activeBatchName.toLowerCase();
+              } else if (bW === 'completed') {
+                mB = leadBatch.toLowerCase().includes('batch 1') || (leadBatch && !leadBatch.toLowerCase().includes('batch 2') && leadBatch.toLowerCase() !== activeBatchName.toLowerCase());
+              }
+
+              return mQ && mS && mB;
             });
 
             // Webinar KPIs (Calculated & rendered BEFORE loop to guarantee display)
-            const paidWebinar = webinarLeads.filter(l => String(l.status || '').toLowerCase().includes('paid') || String(l.paymentStatus || '').toLowerCase().includes('paid'));
-            const pendingWebinar = webinarLeads.filter(l => String(l.status || '').toLowerCase().includes('pending') || String(l.paymentStatus || '').toLowerCase().includes('pending'));
-            const waJoinedWebinar = webinarLeads.filter(l => l.whatsappJoined === true || String(l.waGroupStatus || '') === 'Joined');
+            const paidWebinar = filteredW.filter(l => String(l.status || '').toLowerCase().includes('paid') || String(l.paymentStatus || '').toLowerCase().includes('paid'));
+            const pendingWebinar = filteredW.filter(l => String(l.status || '').toLowerCase().includes('pending') || String(l.paymentStatus || '').toLowerCase().includes('pending'));
+            const waJoinedWebinar = filteredW.filter(l => l.whatsappJoined === true || String(l.waGroupStatus || '') === 'Joined');
 
             const kwPass = document.getElementById('kpiWebinarPasses'); if (kwPass) kwPass.textContent = paidWebinar.length;
             const totalWebinarRevenue = paidWebinar.reduce((sum, l) => {
@@ -4978,7 +5013,7 @@ function renderCrmTable() {
 
             webinarBody.innerHTML = '';
             if (filteredW.length === 0) {
-              webinarBody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:35px; color:var(--text-muted);"><i class="fa-solid fa-ticket" style="font-size:1.8rem; opacity:0.4; display:block; margin-bottom:6px;"></i>No webinar bookings matching criteria.</td></tr>';
+              webinarBody.innerHTML = '<tr><td colspan="11" style="text-align:center; padding:35px; color:var(--text-muted);"><i class="fa-solid fa-ticket" style="font-size:1.8rem; opacity:0.4; display:block; margin-bottom:6px;"></i>No webinar bookings matching criteria.</td></tr>';
             } else {
               filteredW.forEach(l => {
                 try {
@@ -4987,6 +5022,8 @@ function renderCrmTable() {
                   const safeName = escapeHtml(String(l.name || 'Anonymous'));
                   const safeEmail = escapeHtml(String(l.email || '-'));
                   const safePhone = escapeHtml(String(l.phone || '-'));
+                  const leadBatch = String(l.batchName || l.batch || 'Batch 1 (Past Completed)');
+                  const isCurrentBatch = !leadBatch || leadBatch.toLowerCase().includes('batch 2') || leadBatch.toLowerCase() === activeBatchName.toLowerCase();
                   const safeType = escapeHtml(String(l.websiteType || 'Webinar Masterclass'));
                   const isPaid = String(l.status || '').toLowerCase().includes('paid') || String(l.paymentStatus || '').toLowerCase().includes('paid');
                   const isJoined = l.whatsappJoined === true || String(l.waGroupStatus || '') === 'Joined';
@@ -4999,6 +5036,7 @@ function renderCrmTable() {
                     <td><strong style="color:var(--text-primary); font-size:1rem;">${safeName}</strong></td>
                     <td><a href="tel:${safePhone}" style="color:var(--text-primary); font-weight:600; text-decoration:none;">${safePhone}</a></td>
                     <td><a href="mailto:${safeEmail}" style="color:var(--brand-indigo); font-weight:600; text-decoration:none;">${safeEmail}</a></td>
+                    <td><span style="font-size:0.76rem; font-weight:700; color:${isCurrentBatch ? '#10B981' : '#A78BFA'}; background:${isCurrentBatch ? 'rgba(16,185,129,0.12)' : 'rgba(139,92,246,0.12)'}; border:1px solid ${isCurrentBatch ? 'rgba(16,185,129,0.3)' : 'rgba(139,92,246,0.3)'}; padding:3px 8px; border-radius:6px; white-space:nowrap;">${isCurrentBatch ? '🟢 ' : '📁 '}${escapeHtml(leadBatch)}</span></td>
                     <td><span style="font-size:0.8rem; font-weight:700; color:var(--brand-indigo); background:rgba(99,102,241,0.12); padding:2px 8px; border-radius:6px;">${safeType}</span></td>
                     <td><strong style="color:#10B981; font-size:1.1rem;">${escapeHtml(String(l.budget || l.amount || '₹2'))}</strong></td>
                     <td><span class="status-badge ${isPaid ? 'status-completed' : 'status-contacted'}" onclick="cycleCrmStatus('${leadIdClean}')">● ${escapeHtml(String(l.status || 'Booked / Paid'))}</span></td>
@@ -5270,14 +5308,30 @@ function renderCrmTable() {
       }
 
 
-            window.exportWebinarCsv = function() {
-        const webinarLeads = currentLeads.filter(l => (l.service || '').toLowerCase().includes('webinar') || (l.userId || '').startsWith('FC-WEB'));
-        if (webinarLeads.length === 0) return alert('No webinar records to export.');
-        let csv = 'Pass ID,Date,Name,Phone,Email,Website Type,Amount,Status,WhatsApp Group\n';
+      window.exportWebinarCsv = function() {
+        const bW = document.getElementById('webinarBatchFilter')?.value || 'active';
+        const activeBatchName = content?.webinar?.activeBatchName || 'Batch 2 - Sep/Oct 2026';
+        let webinarLeads = currentLeads.filter(l => (l.service || '').toLowerCase().includes('webinar') || (l.userId || '').startsWith('FC-WEB'));
+        
+        if (bW === 'active') {
+          webinarLeads = webinarLeads.filter(l => {
+            const lb = String(l.batchName || l.batch || '').trim();
+            return !lb || lb.toLowerCase().includes('batch 2') || lb.toLowerCase() === activeBatchName.toLowerCase();
+          });
+        } else if (bW === 'completed') {
+          webinarLeads = webinarLeads.filter(l => {
+            const lb = String(l.batchName || l.batch || '').trim();
+            return lb.toLowerCase().includes('batch 1') || (lb && !lb.toLowerCase().includes('batch 2') && lb.toLowerCase() !== activeBatchName.toLowerCase());
+          });
+        }
+
+        if (webinarLeads.length === 0) return alert('No webinar records to export for the selected batch filter.');
+        let csv = '\uFEFFPass ID,Date,Name,Phone,Email,Batch,Website Type,Amount,Status,WhatsApp Group\n';
         webinarLeads.forEach(l => {
-          csv += `"${l.userId || l.id}","${l.date || ''}","${l.name || ''}","${l.phone || ''}","${l.email || ''}","${l.websiteType || ''}","${l.budget || l.amount || '49'}","${l.status || ''}","${l.whatsappJoined ? 'Joined' : 'Not Joined'}"\n`;
+          const leadBatch = String(l.batchName || l.batch || 'Batch 1 (Past Completed)');
+          csv += `"${l.userId || l.id}","${l.date || ''}","${(l.name || '').replace(/"/g, '""')}","${l.phone || ''}","${l.email || ''}","${leadBatch.replace(/"/g, '""')}","${l.websiteType || ''}","${l.budget || l.amount || '49'}","${l.status || ''}","${l.whatsappJoined ? 'Joined' : 'Not Joined'}"\n`;
         });
-        downloadCsvBlob(csv, 'FlipCut_Webinar_Attendees.csv');
+        downloadCsvBlob(csv, `FlipCut_Webinar_Attendees_${bW.toUpperCase()}.csv`);
       };
 
       window.exportProjectCsv = function() {
@@ -6186,6 +6240,12 @@ ${waGroup}
         lead.paymentId = cleanPayId;
         lead.status = 'Booked / Paid';
         lead.paymentStatus = `Paid & Verified (${cleanPayId})`;
+        if (!lead.batchName && !lead.batch) {
+          const ab = content?.webinar?.activeBatchName || 'Batch 2 - Sep/Oct 2026';
+          lead.batchName = ab;
+          lead.batch = ab;
+          lead.notes = (lead.notes || '') + ` | [Batch: ${ab}]`;
+        }
 
         // Save to local storage
         localStorage.setItem('flipcut_leads', JSON.stringify(currentLeads));
@@ -6340,6 +6400,7 @@ ${waGroup}
           const newUid = 'FC-WEB-' + Math.floor(10000 + Math.random() * 90000);
           const feeAmt = content.webinar?.price || '199';
 
+          const activeBatch = content?.webinar?.activeBatchName || 'Batch 2 - Sep/Oct 2026';
           const newPassLead = {
             id: newUid,
             userId: newUid,
@@ -6353,10 +6414,12 @@ ${waGroup}
             websiteType: type,
             paymentId: payRef,
             paymentStatus: `Paid & Verified (${payRef})`,
+            batchName: activeBatch,
+            batch: activeBatch,
             status: 'Booked / Paid',
             date: new Date().toISOString().slice(0, 10),
             time: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
-            notes: `Verified Pass Generated from Payment ID: ${payRef}`
+            notes: `Verified Pass Generated from Payment ID: ${payRef} | [Batch: ${activeBatch}]`
           };
 
           currentLeads.unshift(newPassLead);
@@ -6891,6 +6954,7 @@ ${waGroup}
             setVal('cfgWebinarDate', content.webinar.date);
             setVal('cfgWebinarDuration', content.webinar.duration);
             setVal('cfgWebinarSeats', content.webinar.seats);
+            setVal('cfgWebinarBatchName', content.webinar.activeBatchName || 'Batch 2 - Sep/Oct 2026');
             setVal('cfgWebinarFormTitle', content.webinar.formTitle);
             setVal('cfgWebinarFormSubtitle', content.webinar.formSubtitle);
             setVal('cfgWebinarWaGroupLink', content.webinar.whatsappGroupLink || 'https://chat.whatsapp.com/B5hdxy7LbkNCrWRsHMtW8h');

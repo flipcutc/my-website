@@ -2270,6 +2270,7 @@
         } catch (_) {}
 
         // 3. Pre-Capture Lead to Supabase & Dual Cloud BEFORE opening Razorpay
+        const activeBatch = (typeof getSiteContent === 'function' && getSiteContent()?.webinar?.activeBatchName) || 'Batch 2 - Sep/Oct 2026';
         const prePaymentLead = {
           id: activeUserId,
           userId: activeUserId,
@@ -2281,9 +2282,11 @@
           budget: `₹${webinarFeeAmount}`,
           amount: `₹${webinarFeeAmount}`,
           websiteType: websiteType,
+          batchName: activeBatch,
+          batch: activeBatch,
           paymentStatus: 'Payment Initiated (Pending UPI)',
           status: 'Payment Initiated (Pending UPI)',
-          notes: `User initiated UPI checkout for Webinar Pass (${websiteType}). User ID: ${activeUserId}`,
+          notes: `User initiated UPI checkout for Webinar Pass (${websiteType}) | [Batch: ${activeBatch}] | User ID: ${activeUserId}`,
           date: new Date().toISOString().slice(0, 10),
           created_at: new Date().toISOString()
         };
@@ -2306,7 +2309,7 @@
               phone: cleanPhone,
               service: 'Webinar Registration',
               budget: `₹${webinarFeeAmount}`,
-              message: `User initiated checkout for Webinar Pass (${websiteType}). User ID: ${activeUserId}`,
+              message: `User initiated checkout for Webinar Pass (${websiteType}) | [Batch: ${activeBatch}]. User ID: ${activeUserId}`,
               status: 'Payment Initiated (Pending UPI)'
             })
           }).catch(() => {});
@@ -2583,6 +2586,7 @@
           });
         }
 
+        const activeBatch = (typeof getSiteContent === 'function' && getSiteContent()?.webinar?.activeBatchName) || 'Batch 2 - Sep/Oct 2026';
         const leadPayload = {
           userId: generatedUserId,
           name: name,
@@ -2593,11 +2597,13 @@
           budget: `₹${webinarFeeAmount}`,
           amount: `₹${webinarFeeAmount}`,
           websiteType: websiteType,
+          batchName: activeBatch,
+          batch: activeBatch,
           footage: `Website Type: ${websiteType}`,
           paymentId: payId,
           orderId: verifiedOrderId || '',
           paymentStatus: 'Paid & Verified',
-          notes: `Webinar Registration Pass | User ID: ${generatedUserId} | Website Type: ${websiteType} | Payment ID: ${payId}`,
+          notes: `Webinar Registration Pass | [Batch: ${activeBatch}] | User ID: ${generatedUserId} | Website Type: ${websiteType} | Payment ID: ${payId}`,
           status: 'Booked / Paid'
         };
 
@@ -2607,7 +2613,7 @@
             ...leadPayload,
             service: 'Webinar Registration',
             budget: `₹${webinarFeeAmount}`,
-            message: `Webinar Pass (${websiteType}) | Razorpay Payment ID: ${payId}`,
+            message: `Webinar Pass (${websiteType}) | [Batch: ${activeBatch}] | Razorpay Payment ID: ${payId}`,
             status: 'Booked / Paid'
           }).catch(() => {});
         } else {
@@ -2620,7 +2626,7 @@
               phone: phone,
               service: 'Webinar Registration',
               budget: `₹${webinarFeeAmount}`,
-              message: `Webinar Pass (${websiteType}) | Razorpay Payment ID: ${payId}`,
+              message: `Webinar Pass (${websiteType}) | [Batch: ${activeBatch}] | Razorpay Payment ID: ${payId}`,
               status: 'Booked / Paid'
             };
             fetch('https://cznixvdphwbjdnnmapvb.supabase.co/rest/v1/leads', {
