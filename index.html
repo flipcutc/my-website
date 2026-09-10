@@ -73,7 +73,7 @@
     rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=21.0">
+  <link rel="stylesheet" href="styles.css?v=22.0">
 
   <!-- FontAwesome Icons for clean UI symbols -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -189,12 +189,12 @@
           <span id="topAnnouncementBadgeText">🔥 LIVE MASTERCLASS</span>
         </span>
         <span class="announcement-text" id="topAnnouncementText">
-          Exclusive Web Creation & Scaling Masterclass at <strong>₹99 Only!</strong>
+          Exclusive Web Creation & Scaling Masterclass at <strong>₹49 Only!</strong> (27th Sep, Sunday)
         </span>
       </div>
       <div class="announcement-action-wrap">
         <a href="webinar.html" class="announcement-cta-btn" id="topAnnouncementCtaBtn">
-          <span id="topAnnouncementBtnText">Book Ticket Pass</span>
+          <span id="topAnnouncementBtnText">Book Ticket Pass (₹49)</span>
           <i class="fa-solid fa-arrow-right"></i>
         </a>
         <button type="button" class="announcement-close-btn" onclick="dismissTopAnnouncement()" aria-label="Close Announcement">
@@ -220,7 +220,7 @@
           <li><a href="#services" class="nav-link">Services</a></li>
           <li><a href="#portfolio" class="nav-link">Portfolio</a></li>
           <li><a href="#pricing" class="nav-link">Pricing</a></li>
-          <li id="navWebinarItem"><a href="webinar.html" class="nav-link" style="color: var(--brand-indigo); font-weight: 700;"><i class="fa-solid fa-ticket"></i> Webinar (₹199)</a></li>
+          <li id="navWebinarItem"><a href="webinar.html" class="nav-link" style="color: var(--brand-indigo); font-weight: 700;"><i class="fa-solid fa-ticket"></i> Webinar (₹49)</a></li>
           <li><a href="#faq" class="nav-link">FAQ</a></li>
         </ul>
       </nav>
@@ -1327,6 +1327,80 @@
     </div>
   </div>
 
+  <!-- ==========================================================================
+       AUTOMATIC WEBINAR MASTERCLASS ENTRANCE POPUP MODAL (₹49 REGISTER NOW)
+       ========================================================================== -->
+  <div class="lightbox-modal" id="webinarEntrancePopupModal" role="dialog" aria-modal="true" style="display: none; background: rgba(5, 8, 22, 0.82); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 999999;">
+    <div class="lightbox-content-box" style="max-width: 520px; text-align: center; padding: 32px 26px; background: linear-gradient(160deg, #10162B, #0A0F1D); border-radius: 24px; border: 1.5px solid rgba(99, 102, 241, 0.35); box-shadow: 0 25px 70px rgba(0,0,0,0.85); position: relative; overflow: hidden;">
+      
+      <!-- Top Glowing Radial Orb -->
+      <div style="position: absolute; top: -80px; left: 50%; transform: translateX(-50%); width: 280px; height: 160px; background: radial-gradient(circle, rgba(99,102,241,0.45) 0%, rgba(99,102,241,0) 70%); pointer-events: none;"></div>
+
+      <!-- Close Button -->
+      <button class="modal-close-btn" onclick="closeWebinarEntrancePopup()" aria-label="Close Modal" style="position: absolute; top: 16px; right: 16px; width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #94A3B8; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <!-- Live Masterclass Pill Badge -->
+      <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(239, 68, 68, 0.15); border: 1px solid #EF4444; padding: 6px 14px; border-radius: 9999px; margin-bottom: 14px;">
+        <span style="width: 9px; height: 9px; border-radius: 50%; background: #EF4444; display: inline-block; animation: pulse 1.5s infinite;"></span>
+        <span id="webinarPopupBadge" style="font-size: 0.8rem; font-weight: 800; color: #FCA5A5; letter-spacing: 0.5px; text-transform: uppercase;">🔥 Live Masterclass • 27th September, Sunday</span>
+      </div>
+
+      <!-- Title & Headline -->
+      <h2 id="webinarPopupTitle" style="font-size: 1.55rem; font-weight: 900; color: #FFFFFF; line-height: 1.25; margin: 0 0 8px 0;">
+        Web Creation &amp; High-Retention Video Masterclass 🚀
+      </h2>
+      <p id="webinarPopupDesc" style="font-size: 0.92rem; color: #94A3B8; margin: 0 0 18px 0; line-height: 1.45;">
+        Transform your brand, build high-converting websites &amp; master viral video editing with <strong style="color: #FFF;">FlipCut Creation</strong>!
+      </p>
+
+      <!-- Key Value Points Box -->
+      <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 14px 16px; text-align: left; margin-bottom: 18px; display: flex; flex-direction: column; gap: 9px;">
+        <div style="display: flex; align-items: center; gap: 10px; font-size: 0.88rem; color: #F1F5F9;">
+          <i class="fa-solid fa-circle-check" style="color: #10B981; font-size: 1rem;"></i>
+          <span>Build Complete Business Websites (Zero coding required)</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px; font-size: 0.88rem; color: #F1F5F9;">
+          <i class="fa-solid fa-circle-check" style="color: #10B981; font-size: 1rem;"></i>
+          <span>Viral Post-Production, Sound Design &amp; Color Grading</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px; font-size: 0.88rem; color: #F1F5F9;">
+          <i class="fa-solid fa-circle-check" style="color: #10B981; font-size: 1rem;"></i>
+          <span>Instant Verified Digital Ticket Pass &amp; VIP WhatsApp Group</span>
+        </div>
+      </div>
+
+      <!-- Price Offer Box -->
+      <div style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(16, 185, 129, 0.12)); border: 1.5px solid #10B981; border-radius: 14px; padding: 12px 18px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+        <div style="text-align: left;">
+          <span style="font-size: 0.75rem; color: #94A3B8; display: block; text-transform: uppercase; font-weight: 700;">Exclusive Masterclass Fee</span>
+          <div style="display: flex; align-items: baseline; gap: 8px;">
+            <strong id="webinarPopupPrice" style="font-size: 1.6rem; font-weight: 900; color: #10B981;">₹49</strong>
+            <span id="webinarPopupOrigPrice" style="font-size: 0.95rem; color: #64748B; text-decoration: line-through;">₹999</span>
+            <span style="font-size: 0.75rem; font-weight: 800; color: #F59E0B; background: rgba(245,158,11,0.15); padding: 2px 6px; border-radius: 4px;">95% OFF</span>
+          </div>
+        </div>
+        <div style="text-align: right;">
+          <span style="font-size: 0.75rem; color: #94A3B8; display: block; font-weight: 600;">📅 Sunday Live</span>
+          <span id="webinarPopupDate" style="font-size: 0.88rem; color: #F1F5F9; font-weight: 800;">27th September, Sunday</span>
+        </div>
+      </div>
+
+      <!-- CTA Buttons -->
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <a href="webinar.html" class="btn btn-primary" onclick="closeWebinarEntrancePopup()" style="padding: 14px 20px; font-size: 1.05rem; font-weight: 800; justify-content: center; background: linear-gradient(135deg, #6366F1, #4F46E5); border: none; box-shadow: 0 6px 20px rgba(99,102,241,0.45); border-radius: 12px; text-decoration: none; color: #FFF; display: flex; align-items: center; gap: 8px;">
+          <i class="fa-solid fa-ticket"></i>
+          <span id="webinarPopupBtnText">Register Now for ₹49 &amp; Claim Seat</span>
+        </a>
+        <button type="button" onclick="closeWebinarEntrancePopup()" style="background: none; border: none; color: #64748B; font-size: 0.82rem; font-weight: 600; cursor: pointer; padding: 6px;">
+          Maybe later, explore portfolio first
+        </button>
+      </div>
+
+    </div>
+  </div>
+
   <!-- Razorpay Official Checkout SDK -->
   <!-- Razorpay SDK Disabled on Homepage -->
 
@@ -1373,7 +1447,7 @@
     </a>
   </nav>
 
-  <script src="script.js?v=19.0"></script>
+  <script src="script.js?v=20.0"></script>
 
 </body>
 

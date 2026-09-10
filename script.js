@@ -42,8 +42,11 @@ window.startPlanCheckout = function(packageName, rawAmount) {
     const rawContent = localStorage.getItem('flipcut_site_content');
     if (rawContent) {
       const parsed = JSON.parse(rawContent);
-      if (parsed?.webinar && (parsed.webinar.price === '2' || parsed.webinar.price === 2 || parsed.webinar.price === '199' || parsed.webinar.price === 199)) {
-        parsed.webinar.price = '99';
+      if (parsed?.webinar) {
+        parsed.webinar.price = '49';
+        parsed.webinar.date = '27th September, Sunday • 10:00 AM IST';
+        parsed.webinar.targetDateTime = '2026-09-27T10:00:00+05:30';
+        parsed.webinar.autoPopupEnabled = true;
         localStorage.setItem('flipcut_site_content', JSON.stringify(parsed));
       }
     }
@@ -158,7 +161,7 @@ function hydratePageFromCMS(customContent) {
     const isTopAnnActive = (!content.sectionsVisibility || content.sectionsVisibility.topAnnouncement !== false) &&
                            (annData.enabled !== false);
 
-    const webinarPrice = (content.webinar && content.webinar.price) ? String(content.webinar.price).replace(/[^0-9]/g, '') : '99';
+    const webinarPrice = (content.webinar && content.webinar.price) ? String(content.webinar.price).replace(/[^0-9]/g, '') : '49';
 
     if (topBar) {
       if (!isTopAnnActive) {
@@ -2444,8 +2447,6 @@ function startPopupCountdownTimer(targetDateStr) {
 }
 
 window.showWebinarEntrancePopup = function() {
-  // Session concluded: Popup permanently disabled
-  return;
   const modal = document.getElementById('webinarEntrancePopupModal');
   if (!modal) return;
 
@@ -2456,12 +2457,12 @@ window.showWebinarEntrancePopup = function() {
     return; // Admin turned off auto-popup
   }
 
-  const price = String(webinarCfg.price !== undefined && webinarCfg.price !== '' ? webinarCfg.price : '99').replace(/[^0-9]/g, '') || '99';
+  const price = String(webinarCfg.price !== undefined && webinarCfg.price !== '' ? webinarCfg.price : '49').replace(/[^0-9]/g, '') || '49';
   const origPrice = String(webinarCfg.originalPrice !== undefined && webinarCfg.originalPrice !== '' ? webinarCfg.originalPrice : '999').replace(/[^0-9]/g, '') || '999';
-  const sessionDate = webinarCfg.date || 'Saturday, Sep 5, 2026 • 10:00 AM IST';
+  const sessionDate = webinarCfg.date || '27th September, Sunday • 10:00 AM IST';
   const title = webinarCfg.title || 'How to Build & Scale High-Converting Websites That Drive Real Sales';
   const desc = webinarCfg.description || "Join FlipCut Creation's lead architects for an interactive live session on building high-retention E-commerce, Portfolio, and Service sites with cinematic visual assets.";
-  const badge = webinarCfg.badge || '🔴 Live Webinar • Sep 5th, 10:00 AM IST';
+  const badge = webinarCfg.badge || '🔥 Live Masterclass • 27th September, Sunday';
 
   const setElText = (id, val) => {
     const el = document.getElementById(id);
@@ -2476,9 +2477,9 @@ window.showWebinarEntrancePopup = function() {
   setElText('webinarPopupBadge', badge);
   setElText('webinarPopupBtnText', 'Register Now for ₹' + price + ' & Claim Seat');
 
-  // Live Real-Time Bookings Counter Calculation (Base 20, increments live with every new registration)
+  // Live Real-Time Bookings Counter Calculation (Base 38, increments live with every new registration)
   const totalSeats = Number(webinarCfg.totalSeats) || 150;
-  const baseMilestone = Number(webinarCfg.registeredCount) || 20;
+  const baseMilestone = Number(webinarCfg.registeredCount) || 38;
 
   function updateBookingUI(count) {
     const currentBookings = Math.min(totalSeats, Math.max(baseMilestone, count));
@@ -2507,8 +2508,7 @@ window.showWebinarEntrancePopup = function() {
       if (res.ok) {
         const rows = await res.json();
         if (Array.isArray(rows)) {
-          // Count verified webinar registrations created from launch baseline
-          const milestoneTime = new Date('2026-08-31T10:05:00Z').getTime();
+          const milestoneTime = new Date('2026-09-08T00:00:00Z').getTime();
           const liveNewRegistrations = rows.filter(r => {
             if (!r.created_at) return false;
             return new Date(r.created_at).getTime() >= milestoneTime;
@@ -2522,7 +2522,7 @@ window.showWebinarEntrancePopup = function() {
   })();
 
   // Start Countdown Timer
-  startPopupCountdownTimer(webinarCfg.targetDateTime || '2026-09-05T10:00:00+05:30');
+  startPopupCountdownTimer(webinarCfg.targetDateTime || '2026-09-27T10:00:00+05:30');
 
   modal.classList.add('active');
   modal.style.setProperty('display', 'flex', 'important');
@@ -2539,6 +2539,9 @@ window.closeWebinarEntrancePopup = function() {
     modal.style.setProperty('opacity', '0', 'important');
     modal.style.setProperty('visibility', 'hidden', 'important');
   }
+  try {
+    sessionStorage.setItem('flipcut_webinar_popup_dismissed', 'true');
+  } catch (_) {}
   if (__webinarCountdownTimer) clearInterval(__webinarCountdownTimer);
 };
 
@@ -2549,9 +2552,20 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// Webinar session concluded: Auto-popup disabled
+// Auto-popup trigger on Home Page after 1.5 seconds
 document.addEventListener('DOMContentLoaded', () => {
-  // Popups disabled as session is concluded
+  if (!location.pathname.includes('webinar')) {
+    setTimeout(() => {
+      try {
+        const isDismissed = sessionStorage.getItem('flipcut_webinar_popup_dismissed');
+        if (!isDismissed) {
+          window.showWebinarEntrancePopup();
+        }
+      } catch (_) {
+        window.showWebinarEntrancePopup();
+      }
+    }, 1500);
+  }
 });
 
 /* ==========================================================================
