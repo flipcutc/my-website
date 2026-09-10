@@ -4683,303 +4683,374 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
         container.appendChild(nextBtn);
       }
 
-      function renderCrmTable() {
+function renderCrmTable() {
         if (!currentLeads) currentLeads = [];
 
         // Classifier Functions
+        const isLeadRecord = (l) => l && l.id && !String(l.id).startsWith('CMS_');
+
         const isWebinarLead = (l) => {
-          const s = (l.service || '').toLowerCase();
-          const p = (l.packageName || '').toLowerCase();
-          const u = (l.userId || '');
-          return s.includes('webinar') || p.includes('webinar') || u.startsWith('FC-WEB');
+          if (!isLeadRecord(l)) return false;
+          const s = String(l.service || '').toLowerCase();
+          const p = String(l.packageName || '').toLowerCase();
+          const u = String(l.userId || l.id || '');
+          const stat = String(l.status || '').toLowerCase();
+          return s.includes('webinar') || p.includes('webinar') || u.startsWith('FC-WEB') || stat.includes('booked / paid');
         };
 
         const isGoogleAuthLead = (l) => {
-          const s = l.service || '';
-          const u = l.userId || '';
+          if (!isLeadRecord(l)) return false;
+          const s = String(l.service || '');
+          const u = String(l.userId || '');
           const id = String(l.id || '');
           return s === 'Google Authenticated User' || u.startsWith('AUTH-') || id.startsWith('AUTH-');
         };
 
         const isProjectBriefLead = (l) => {
+          if (!isLeadRecord(l)) return false;
           return !isWebinarLead(l) && !isGoogleAuthLead(l);
         };
 
-        // Live Counts
-        const webinarLeads = currentLeads.filter(isWebinarLead);
-        const projectLeads = currentLeads.filter(isProjectBriefLead);
-        const googleUsers = currentLeads.filter(isGoogleAuthLead);
+        // Live Leads Collections
+        const validLeads = currentLeads.filter(isLeadRecord);
+        const webinarLeads = validLeads.filter(isWebinarLead);
+        const projectLeads = validLeads.filter(isProjectBriefLead);
+        const googleUsers = validLeads.filter(isGoogleAuthLead);
 
-        // Update Sidebar Counts
-        const sbW = document.getElementById('sidebarWebinarCount'); if (sbW) sbW.textContent = webinarLeads.length;
-        const sbP = document.getElementById('sidebarProjectCount'); if (sbP) sbP.textContent = projectLeads.length;
-        const sbG = document.getElementById('sidebarGoogleCount'); if (sbG) sbG.textContent = googleUsers.length;
-        if (sidebarLeadCount) sidebarLeadCount.textContent = currentLeads.length;
+        // Update Sidebar Counts Safely
+        try {
+          const sbW = document.getElementById('sidebarWebinarCount'); if (sbW) sbW.textContent = webinarLeads.length;
+          const sbP = document.getElementById('sidebarProjectCount'); if (sbP) sbP.textContent = projectLeads.length;
+          const sbG = document.getElementById('sidebarGoogleCount'); if (sbG) sbG.textContent = googleUsers.length;
+          const sbMaster = document.getElementById('sidebarLeadCount'); if (sbMaster) sbMaster.textContent = validLeads.length;
+        } catch (sbErr) {
+          console.warn('Sidebar badge update note:', sbErr);
+        }
 
+        // ====================================================================
         // 1. RENDER WEBINAR TABLE
-        const webinarBody = document.getElementById('webinarTableBody');
-        if (webinarBody) {
-          const qW = (document.getElementById('webinarSearchInput')?.value || '').toLowerCase();
-          const sW = document.getElementById('webinarStatusFilter')?.value || 'all';
+        // ====================================================================
+        try {
+          const webinarBody = document.getElementById('webinarTableBody');
+          if (webinarBody) {
+            const qW = (document.getElementById('webinarSearchInput')?.value || '').toLowerCase().trim();
+            const sW = document.getElementById('webinarStatusFilter')?.value || 'all';
 
-          let filteredW = webinarLeads.filter(l => {
-            const mQ = !qW || (l.name || '').toLowerCase().includes(qW) || (l.email || '').toLowerCase().includes(qW) || (l.phone || '').toLowerCase().includes(qW) || (l.userId || '').toLowerCase().includes(qW);
-            const mS = (sW === 'all') || (l.status === sW);
-            return mQ && mS;
-          });
-
-          // Webinar KPIs
-          const paidWebinar = webinarLeads.filter(l => l.status === 'Booked / Paid' || l.paymentStatus?.includes('Paid'));
-          const pendingWebinar = webinarLeads.filter(l => l.status?.includes('Pending') || l.paymentStatus?.includes('Pending'));
-          const waJoinedWebinar = webinarLeads.filter(l => l.whatsappJoined === true || l.waGroupStatus === 'Joined');
-
-          const kwPass = document.getElementById('kpiWebinarPasses'); if (kwPass) kwPass.textContent = paidWebinar.length;
-          const kwRev = document.getElementById('kpiWebinarRevenue'); if (kwRev) kwRev.textContent = '₹' + (paidWebinar.length * 49).toLocaleString('en-IN');
-          const kwPend = document.getElementById('kpiWebinarPending'); if (kwPend) kwPend.textContent = pendingWebinar.length;
-          const kwWa = document.getElementById('kpiWebinarWaJoined'); if (kwWa) kwWa.textContent = waJoinedWebinar.length;
-
-          webinarBody.innerHTML = '';
-          if (filteredW.length === 0) {
-            webinarBody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:35px; color:var(--text-muted);"><i class="fa-solid fa-ticket" style="font-size:1.8rem; opacity:0.4; display:block; margin-bottom:6px;"></i>No webinar bookings matching criteria.</td></tr>';
-          } else {
-            filteredW.forEach(l => {
-              const tr = document.createElement('tr');
-              const leadUid = escapeHtml(l.userId || l.id);
-              const safeName = escapeHtml(l.name || 'Anonymous');
-              const safeEmail = escapeHtml(l.email || '-');
-              const safePhone = escapeHtml(l.phone || '-');
-              const safeType = escapeHtml(l.websiteType || 'Webinar Masterclass');
-              const isPaid = l.status === 'Booked / Paid' || l.paymentStatus?.includes('Paid');
-              const isJoined = l.whatsappJoined === true || l.waGroupStatus === 'Joined';
-              const waNum = l.phone ? l.phone.replace(/[^0-9]/g, '') : '917010270151';
-
-              tr.innerHTML = `
-                <td><span class="user-id-badge" onclick="copyLeadUserId('${leadUid}')" style="background:rgba(99,102,241,0.15); border-color:#6366F1; color:#A5B4FC;">${leadUid} <i class="fa-solid fa-copy" style="font-size:0.75rem;"></i></span></td>
-                <td><div style="font-weight:700; color:var(--text-primary);">${escapeHtml(l.date || 'Today')}</div></td>
-                <td><strong style="color:var(--text-primary); font-size:1rem;">${safeName}</strong></td>
-                <td><a href="tel:${safePhone}" style="color:var(--text-primary); font-weight:600; text-decoration:none;">${safePhone}</a></td>
-                <td><a href="mailto:${safeEmail}" style="color:var(--brand-indigo); font-weight:600; text-decoration:none;">${safeEmail}</a></td>
-                <td><span style="font-size:0.8rem; font-weight:700; color:var(--brand-indigo); background:rgba(99,102,241,0.12); padding:2px 8px; border-radius:6px;">${safeType}</span></td>
-                <td><strong style="color:#10B981; font-size:1.1rem;">₹49</strong></td>
-                <td><span class="status-badge ${isPaid ? 'status-completed' : 'status-contacted'}" onclick="cycleCrmStatus('${l.id}')">● ${escapeHtml(l.status || 'Booked / Paid')}</span></td>
-                <td>
-                  ${isJoined ? '<span style="background:rgba(37,211,102,0.15); color:#10B981; border:1px solid #10B981; padding:3px 8px; border-radius:12px; font-size:0.78rem; font-weight:700;"><i class="fa-brands fa-whatsapp"></i> Joined</span>' : `<button type="button" class="btn btn-secondary" onclick="sendWhatsAppGroupInviteDirect('${l.id}')" style="padding:3px 8px; font-size:0.76rem; color:#D97706; border-color:#F59E0B;"><i class="fa-brands fa-whatsapp"></i> Invite</button>`}
-                </td>
-                <td>
-                  <div class="action-btn-group">
-                    ${isPaid ? `
-                      <button class="action-btn-sm" onclick="sendWebinarPassOnWhatsApp('${l.id}')" title="Send Official Ticket Pass on WhatsApp" style="color:#25D366; background:rgba(37,211,102,0.12); border:1px solid rgba(37,211,102,0.4);"><i class="fa-solid fa-ticket"></i></button>
-                      <button class="action-btn-sm" onclick="sendTicketImageOnWhatsApp('${l.id}')" title="Send HD Graphic Ticket Image" style="color:#38BDF8; background:rgba(56,189,248,0.12); border:1px solid rgba(56,189,248,0.4);"><i class="fa-solid fa-image"></i></button>
-                    ` : `
-                      <button class="action-btn-sm" onclick="verifyPendingWebinarLead('${l.id}')" title="Confirm Payment & Issue Pass" style="color:#10B981; background:rgba(16,185,129,0.15); border:1.5px solid #10B981;"><i class="fa-solid fa-user-check"></i></button>
-                    `}
-                    <button class="action-btn-sm" onclick="openAdminEditLeadModal('${l.id}')" title="Edit Customer Details" style="color:#F59E0B; background:rgba(245,158,11,0.12);"><i class="fa-solid fa-pen-to-square"></i></button>
-                    <button class="action-btn-sm" onclick="viewLeadDetails('${l.id}')" title="View Details" style="color:var(--brand-indigo);"><i class="fa-solid fa-eye"></i></button>
-                    <a href="https://wa.me/${waNum}?text=Hi%20${encodeURIComponent(safeName)}%2C%20reaching%20out%20from%20FlipCut%20Creation%20regarding%20your%20Webinar%20Pass!" target="_blank" class="action-btn-sm" title="WhatsApp Attendee"><i class="fa-brands fa-whatsapp" style="color:#10B981;"></i></a>
-                    <button class="action-btn-sm delete-btn" onclick="deleteCrmLead('${l.id}')" title="Delete"><i class="fa-solid fa-trash"></i></button>
-                  </div>
-                </td>
-              `;
-              webinarBody.appendChild(tr);
+            let filteredW = webinarLeads.filter(l => {
+              const safeName = String(l.name || '').toLowerCase();
+              const safeEmail = String(l.email || '').toLowerCase();
+              const safePhone = String(l.phone || '').toLowerCase();
+              const safeUid = String(l.userId || l.id || '').toLowerCase();
+              const mQ = !qW || safeName.includes(qW) || safeEmail.includes(qW) || safePhone.includes(qW) || safeUid.includes(qW);
+              const mS = (sW === 'all') || (String(l.status || '') === sW);
+              return mQ && mS;
             });
-          }
-        }
 
-        // 2. RENDER PROJECT INQUIRIES TABLE
-        const projectBody = document.getElementById('projectTableBody');
-        if (projectBody) {
-          const qP = (document.getElementById('projectSearchInput')?.value || '').toLowerCase();
-          const sP = document.getElementById('projectStatusFilter')?.value || 'all';
+            // Webinar KPIs (Calculated & rendered BEFORE loop to guarantee display)
+            const paidWebinar = webinarLeads.filter(l => String(l.status || '').toLowerCase().includes('paid') || String(l.paymentStatus || '').toLowerCase().includes('paid'));
+            const pendingWebinar = webinarLeads.filter(l => String(l.status || '').toLowerCase().includes('pending') || String(l.paymentStatus || '').toLowerCase().includes('pending'));
+            const waJoinedWebinar = webinarLeads.filter(l => l.whatsappJoined === true || String(l.waGroupStatus || '') === 'Joined');
 
-          let filteredP = projectLeads.filter(l => {
-            const mQ = !qP || (l.name || '').toLowerCase().includes(qP) || (l.email || '').toLowerCase().includes(qP) || (l.phone || '').toLowerCase().includes(qP) || (l.service || '').toLowerCase().includes(qP);
-            const mS = (sP === 'all') || (l.status === sP);
-            return mQ && mS;
-          });
+            const kwPass = document.getElementById('kpiWebinarPasses'); if (kwPass) kwPass.textContent = paidWebinar.length;
+            const kwRev = document.getElementById('kpiWebinarRevenue'); if (kwRev) kwRev.textContent = '₹' + (paidWebinar.length * 49).toLocaleString('en-IN');
+            const kwPend = document.getElementById('kpiWebinarPending'); if (kwPend) kwPend.textContent = pendingWebinar.length;
+            const kwWa = document.getElementById('kpiWebinarWaJoined'); if (kwWa) kwWa.textContent = waJoinedWebinar.length;
 
-          // Project KPIs
-          const kpCount = document.getElementById('kpiProjectCount'); if (kpCount) kpCount.textContent = projectLeads.length;
-          const kpPipe = document.getElementById('kpiProjectPipeline'); if (kpPipe) kpPipe.textContent = '₹' + projectLeads.reduce((acc, l) => acc + parseLeadAmount(l.budget || l.amount), 0).toLocaleString('en-IN');
-          const kpNew = document.getElementById('kpiProjectNew'); if (kpNew) kpNew.textContent = projectLeads.filter(l => l.status === 'New').length;
-          const kpClosed = document.getElementById('kpiProjectClosed'); if (kpClosed) kpClosed.textContent = projectLeads.filter(l => l.status === 'Completed').length;
+            webinarBody.innerHTML = '';
+            if (filteredW.length === 0) {
+              webinarBody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:35px; color:var(--text-muted);"><i class="fa-solid fa-ticket" style="font-size:1.8rem; opacity:0.4; display:block; margin-bottom:6px;"></i>No webinar bookings matching criteria.</td></tr>';
+            } else {
+              filteredW.forEach(l => {
+                try {
+                  const tr = document.createElement('tr');
+                  const leadUid = escapeHtml(String(l.userId || l.id || ''));
+                  const safeName = escapeHtml(String(l.name || 'Anonymous'));
+                  const safeEmail = escapeHtml(String(l.email || '-'));
+                  const safePhone = escapeHtml(String(l.phone || '-'));
+                  const safeType = escapeHtml(String(l.websiteType || 'Webinar Masterclass'));
+                  const isPaid = String(l.status || '').toLowerCase().includes('paid') || String(l.paymentStatus || '').toLowerCase().includes('paid');
+                  const isJoined = l.whatsappJoined === true || String(l.waGroupStatus || '') === 'Joined';
+                  const waNum = String(l.phone || '').replace(/[^0-9]/g, '') || '917010270151';
+                  const leadIdClean = String(l.id || l.userId || '').replace(/[^a-zA-Z0-9_.-]/g, '');
 
-          projectBody.innerHTML = '';
-          if (filteredP.length === 0) {
-            projectBody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:35px; color:var(--text-muted);"><i class="fa-solid fa-briefcase" style="font-size:1.8rem; opacity:0.4; display:block; margin-bottom:6px;"></i>No project inquiries matching criteria.</td></tr>';
-          } else {
-            filteredP.forEach(l => {
-              const tr = document.createElement('tr');
-              const leadUid = escapeHtml(l.userId || l.id);
-              const safeName = escapeHtml(l.name || 'Anonymous Client');
-              const safeEmail = escapeHtml(l.email || '-');
-              const safePhone = escapeHtml(l.phone || '-');
-              const safeService = escapeHtml(l.service || l.packageName || 'Video Editing');
-              const safeBudget = escapeHtml(l.budget || l.amount || '₹25,000');
-              const waNum = l.phone ? l.phone.replace(/[^0-9]/g, '') : '917010270151';
-
-              tr.innerHTML = `
-                <td><span class="user-id-badge" onclick="copyLeadUserId('${leadUid}')" style="background:rgba(16,185,129,0.12); border-color:#10B981; color:#34D399;">${leadUid} <i class="fa-solid fa-copy" style="font-size:0.75rem;"></i></span></td>
-                <td><div style="font-weight:700; color:var(--text-primary);">${escapeHtml(l.date || 'Today')}</div></td>
-                <td><strong style="color:var(--text-primary); font-size:1rem;">${safeName}</strong></td>
-                <td><a href="tel:${safePhone}" style="color:var(--text-primary); font-weight:600; text-decoration:none;">${safePhone}</a></td>
-                <td><a href="mailto:${safeEmail}" style="color:var(--brand-indigo); font-weight:600; text-decoration:none;">${safeEmail}</a></td>
-                <td><strong style="color:var(--text-primary);">${safeService}</strong></td>
-                <td><strong style="color:#10B981; font-size:1.1rem;">${safeBudget}</strong></td>
-                <td><span class="status-badge ${l.status === 'Completed' ? 'status-completed' : 'status-new'}" onclick="cycleCrmStatus('${l.id}')">● ${escapeHtml(l.status || 'New')}</span></td>
-                <td><a href="https://wa.me/${waNum}?text=Hi%20${encodeURIComponent(safeName)}%2C%20reaching%20out%20from%20FlipCut%20Creation%20regarding%20your%20project%20inquiry!" target="_blank" style="color:#10B981; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:4px;"><i class="fa-brands fa-whatsapp" style="font-size:1.1rem;"></i> Chat</a></td>
-                <td>
-                  <div class="action-btn-group">
-                    <button class="action-btn-sm" onclick="toggleLeadComplete('${l.id}')" title="Accept & Close Project (Add to Earnings)" style="${l.status === 'Completed' ? 'background:rgba(16,185,129,0.18); color:#10B981; border:1.5px solid #10B981;' : 'color:#10B981;'}"><i class="fa-solid fa-circle-check"></i></button>
-                    <button class="action-btn-sm" onclick="openAdminEditLeadModal('${l.id}')" title="Edit Client Details" style="color:#F59E0B; background:rgba(245,158,11,0.12);"><i class="fa-solid fa-pen-to-square"></i></button>
-                    <button class="action-btn-sm" onclick="viewLeadDetails('${l.id}')" title="View Full Project Brief" style="color:var(--brand-indigo);"><i class="fa-solid fa-eye"></i></button>
-                    <button class="action-btn-sm delete-btn" onclick="deleteCrmLead('${l.id}')" title="Delete"><i class="fa-solid fa-trash"></i></button>
-                  </div>
-                </td>
-              `;
-              projectBody.appendChild(tr);
-            });
-          }
-        }
-
-        // 3. RENDER GOOGLE AUTH USERS TABLE
-        const googleBody = document.getElementById('googleTableBody');
-        if (googleBody) {
-          const qG = (document.getElementById('googleSearchInput')?.value || '').toLowerCase();
-
-          let filteredG = googleUsers.filter(l => {
-            return !qG || (l.name || '').toLowerCase().includes(qG) || (l.email || '').toLowerCase().includes(qG) || (l.id || '').toLowerCase().includes(qG);
-          });
-
-          // Google KPIs
-          const kgCount = document.getElementById('kpiGoogleCount'); if (kgCount) kgCount.textContent = googleUsers.length;
-          const kgActive = document.getElementById('kpiGoogleActive'); if (kgActive) kgActive.textContent = googleUsers.length;
-
-          googleBody.innerHTML = '';
-          if (filteredG.length === 0) {
-            googleBody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:35px; color:var(--text-muted);"><i class="fa-brands fa-google" style="font-size:1.8rem; opacity:0.4; display:block; margin-bottom:6px;"></i>No Google authenticated accounts found.</td></tr>';
-          } else {
-            filteredG.forEach(l => {
-              const tr = document.createElement('tr');
-              const leadUid = escapeHtml(l.userId || l.id);
-              const safeName = escapeHtml(l.name || 'Google User');
-              const safeEmail = escapeHtml(l.email || '-');
-              const safePhone = escapeHtml(l.phone || '-');
-              const waNum = l.phone ? l.phone.replace(/[^0-9]/g, '') : '';
-
-              tr.innerHTML = `
-                <td><span class="user-id-badge" onclick="copyLeadUserId('${leadUid}')" style="background:rgba(234,67,53,0.12); border-color:#EA4335; color:#F87171;">${leadUid} <i class="fa-solid fa-copy" style="font-size:0.75rem;"></i></span></td>
-                <td><div style="font-weight:700; color:var(--text-primary);">${escapeHtml(l.date || 'Today')}</div></td>
-                <td><strong style="color:var(--text-primary); font-size:1rem;">${safeName}</strong></td>
-                <td>${safePhone !== '-' ? `<a href="tel:${safePhone}" style="color:var(--text-primary); font-weight:600; text-decoration:none;">${safePhone}</a>` : '<span style="color:var(--text-dim);">-</span>'}</td>
-                <td><a href="mailto:${safeEmail}" style="color:var(--brand-indigo); font-weight:600; text-decoration:none;">${safeEmail}</a></td>
-                <td><span style="font-size:0.8rem; font-weight:700; color:#EA4335; background:rgba(234,67,53,0.12); padding:2px 8px; border-radius:6px;"><i class="fa-brands fa-google"></i> Google</span></td>
-                <td><span class="status-badge status-completed">● Active User</span></td>
-                <td>
-                  ${safePhone !== '-' ? `<a href="https://wa.me/${waNum}?text=Hi%20${encodeURIComponent(safeName)}%2C%20reaching%20out%20from%20FlipCut%20Creation!" target="_blank" style="color:#10B981; font-weight:700; text-decoration:none;"><i class="fa-brands fa-whatsapp"></i> Chat</a>` : '<span style="color:var(--text-dim); font-size:0.82rem;">Email Only</span>'}
-                </td>
-                <td>
-                  <div class="action-btn-group">
-                    <button class="action-btn-sm" onclick="viewLeadDetails('${l.id}')" title="View Details" style="color:var(--brand-indigo);"><i class="fa-solid fa-eye"></i></button>
-                    ${safeEmail !== '-' ? `<a href="mailto:${safeEmail}" class="action-btn-sm" title="Send Email" style="color:#38BDF8;"><i class="fa-solid fa-envelope"></i></a>` : ''}
-                    <button class="action-btn-sm delete-btn" onclick="deleteCrmLead('${l.id}')" title="Delete"><i class="fa-solid fa-trash"></i></button>
-                  </div>
-                </td>
-              `;
-              googleBody.appendChild(tr);
-            });
-          }
-        }
-
-        // 4. RENDER MASTER OVERVIEW TABLE (tab-crm)
-        const crmTableBody = document.getElementById('crmTableBody');
-        if (crmTableBody) {
-          const searchVal = (crmSearchInput?.value || '').trim();
-          const statusVal = crmStatusFilter?.value || 'all';
-          const monthVal = crmMonthFilter?.value || 'all';
-
-          let filtered = currentLeads.filter(lead => {
-            const query = searchVal.toLowerCase();
-            const matchQuery = !query ||
-                                (lead.name || '').toLowerCase().includes(query) ||
-                                (lead.email || '').toLowerCase().includes(query) ||
-                                (lead.phone || '').toLowerCase().includes(query) ||
-                                (lead.service || '').toLowerCase().includes(query) ||
-                                (lead.packageName || '').toLowerCase().includes(query) ||
-                                (lead.paymentId || '').toLowerCase().includes(query);
-            const matchStatus = statusVal === 'all' || lead.status === statusVal;
-
-            let matchMonth = true;
-            if (monthVal !== 'all') {
-              const dateStr = lead.date || (lead.created_at ? lead.created_at.slice(0, 10) : new Date().toISOString().slice(0, 10));
-              matchMonth = dateStr.startsWith(monthVal);
+                  tr.innerHTML = `
+                    <td><span class="user-id-badge" onclick="copyLeadUserId('${leadUid}')" style="background:rgba(99,102,241,0.15); border-color:#6366F1; color:#A5B4FC;">${leadUid} <i class="fa-solid fa-copy" style="font-size:0.75rem;"></i></span></td>
+                    <td><div style="font-weight:700; color:var(--text-primary);">${escapeHtml(String(l.date || 'Today'))}</div></td>
+                    <td><strong style="color:var(--text-primary); font-size:1rem;">${safeName}</strong></td>
+                    <td><a href="tel:${safePhone}" style="color:var(--text-primary); font-weight:600; text-decoration:none;">${safePhone}</a></td>
+                    <td><a href="mailto:${safeEmail}" style="color:var(--brand-indigo); font-weight:600; text-decoration:none;">${safeEmail}</a></td>
+                    <td><span style="font-size:0.8rem; font-weight:700; color:var(--brand-indigo); background:rgba(99,102,241,0.12); padding:2px 8px; border-radius:6px;">${safeType}</span></td>
+                    <td><strong style="color:#10B981; font-size:1.1rem;">₹49</strong></td>
+                    <td><span class="status-badge ${isPaid ? 'status-completed' : 'status-contacted'}" onclick="cycleCrmStatus('${leadIdClean}')">● ${escapeHtml(String(l.status || 'Booked / Paid'))}</span></td>
+                    <td>
+                      ${isJoined ? '<span style="background:rgba(37,211,102,0.15); color:#10B981; border:1px solid #10B981; padding:3px 8px; border-radius:12px; font-size:0.78rem; font-weight:700;"><i class="fa-brands fa-whatsapp"></i> Joined</span>' : `<button type="button" class="btn btn-secondary" onclick="sendWhatsAppGroupInviteDirect('${leadIdClean}')" style="padding:3px 8px; font-size:0.76rem; color:#D97706; border-color:#F59E0B;"><i class="fa-brands fa-whatsapp"></i> Invite</button>`}
+                    </td>
+                    <td>
+                      <div class="action-btn-group">
+                        ${isPaid ? `
+                          <button class="action-btn-sm" onclick="sendWebinarPassOnWhatsApp('${leadIdClean}')" title="Send Official Ticket Pass on WhatsApp" style="color:#25D366; background:rgba(37,211,102,0.12); border:1px solid rgba(37,211,102,0.4);"><i class="fa-solid fa-ticket"></i></button>
+                          <button class="action-btn-sm" onclick="sendTicketImageOnWhatsApp('${leadIdClean}')" title="Send HD Graphic Ticket Image" style="color:#38BDF8; background:rgba(56,189,248,0.12); border:1px solid rgba(56,189,248,0.4);"><i class="fa-solid fa-image"></i></button>
+                        ` : `
+                          <button class="action-btn-sm" onclick="verifyPendingWebinarLead('${leadIdClean}')" title="Confirm Payment & Issue Pass" style="color:#10B981; background:rgba(16,185,129,0.15); border:1.5px solid #10B981;"><i class="fa-solid fa-user-check"></i></button>
+                        `}
+                        <button class="action-btn-sm" onclick="openAdminEditLeadModal('${leadIdClean}')" title="Edit Customer Details" style="color:#F59E0B; background:rgba(245,158,11,0.12);"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button class="action-btn-sm" onclick="viewLeadDetails('${leadIdClean}')" title="View Details" style="color:var(--brand-indigo);"><i class="fa-solid fa-eye"></i></button>
+                        <a href="https://wa.me/${waNum}?text=Hi%20${encodeURIComponent(safeName)}%2C%20reaching%20out%20from%20FlipCut%20Creation%20regarding%20your%20Webinar%20Pass!" target="_blank" class="action-btn-sm" title="WhatsApp Attendee"><i class="fa-brands fa-whatsapp" style="color:#10B981;"></i></a>
+                        <button class="action-btn-sm delete-btn" onclick="deleteCrmLead('${leadIdClean}')" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                      </div>
+                    </td>
+                  `;
+                  webinarBody.appendChild(tr);
+                } catch (rowErr) {
+                  console.error('Error rendering webinar row:', rowErr, l);
+                }
+              });
             }
-
-            return matchQuery && matchStatus && matchMonth;
-          });
-
-          if (kpiTotalLeads) kpiTotalLeads.textContent = filtered.length;
-          if (kpiNewLeads) kpiNewLeads.textContent = filtered.filter(l => l.status === 'New').length;
-
-          const totalEarnings = filtered
-            .filter(l => l.status === 'Completed' || l.status === 'Booked / Paid')
-            .reduce((acc, l) => acc + parseLeadAmount(l.budget || l.amount), 0);
-          if (kpiMonthEarnings) kpiMonthEarnings.textContent = `₹${totalEarnings.toLocaleString('en-IN')}`;
-
-          const totalPipeline = filtered
-            .filter(l => l.status === 'New' || l.status === 'Contacted' || l.status === 'In Progress' || !l.status)
-            .reduce((acc, l) => acc + parseLeadAmount(l.budget || l.amount), 0);
-          if (kpiPipelineVal) kpiPipelineVal.textContent = `₹${totalPipeline.toLocaleString('en-IN')}`;
-
-          crmTableBody.innerHTML = '';
-          if (filtered.length === 0) {
-            crmTableBody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:35px; color:var(--text-muted);"><i class="fa-solid fa-inbox" style="font-size:1.8rem; opacity:0.4; display:block; margin-bottom:6px;"></i>No inquiries matching criteria in pipeline.</td></tr>';
-          } else {
-            filtered.forEach(lead => {
-              const tr = document.createElement('tr');
-              const isWebinar = isWebinarLead(lead);
-              const isGoogle = isGoogleAuthLead(lead);
-              const isProj = !isWebinar && !isGoogle;
-              const isPaid = lead.status === 'Booked / Paid' || lead.paymentStatus?.includes('Paid');
-              const leadUid = escapeHtml(lead.userId || lead.id);
-              const safeName = escapeHtml(lead.name || 'Anonymous');
-              const safeEmail = escapeHtml(lead.email || '-');
-              const safePhone = escapeHtml(lead.phone || '-');
-              const safeService = escapeHtml(lead.service || lead.packageName || 'Video Project');
-              const safeBudget = escapeHtml(lead.budget || lead.amount || (isWebinar ? '₹49' : '₹25,000'));
-              const waNum = lead.phone ? lead.phone.replace(/[^0-9]/g, '') : '917010270151';
-
-              let badgeStyle = 'background:rgba(99,102,241,0.15); border-color:#6366F1; color:#A5B4FC;';
-              if (isGoogle) badgeStyle = 'background:rgba(234,67,53,0.12); border-color:#EA4335; color:#F87171;';
-              if (isProj) badgeStyle = 'background:rgba(16,185,129,0.12); border-color:#10B981; color:#34D399;';
-
-              tr.innerHTML = `
-                <td><span class="user-id-badge" onclick="copyLeadUserId('${leadUid}')" style="${badgeStyle}">${leadUid} <i class="fa-solid fa-copy" style="font-size:0.75rem;"></i></span></td>
-                <td><div style="font-weight:700; color:var(--text-primary);">${escapeHtml(lead.date || 'Today')}</div></td>
-                <td><strong style="color:var(--text-primary); font-size:1rem;">${safeName}</strong></td>
-                <td><a href="tel:${safePhone}" style="color:var(--text-primary); font-weight:600; text-decoration:none;">${safePhone}</a></td>
-                <td><a href="mailto:${safeEmail}" style="color:var(--brand-indigo); font-weight:600; text-decoration:none;">${safeEmail}</a></td>
-                <td>${safeService}</td>
-                <td><strong style="color:#10B981; font-size:1.1rem;">${safeBudget}</strong></td>
-                <td><span class="status-badge ${isPaid ? 'status-completed' : 'status-new'}">● ${escapeHtml(lead.status || 'New')}</span></td>
-                <td>${isWebinar ? (lead.whatsappJoined ? '<span style="color:#10B981; font-weight:700;">Joined</span>' : '<span style="color:#F59E0B; font-weight:700;">Not Joined</span>') : '-'}</td>
-                <td>
-                  <div class="action-btn-group">
-                    ${isWebinar && isPaid ? `
-                      <button class="action-btn-sm" onclick="sendWebinarPassOnWhatsApp('${lead.id}')" title="Send WhatsApp Pass" style="color:#25D366;"><i class="fa-solid fa-ticket"></i></button>
-                    ` : ''}
-                    <button class="action-btn-sm" onclick="viewLeadDetails('${lead.id}')" title="View Details" style="color:var(--brand-indigo);"><i class="fa-solid fa-eye"></i></button>
-                    <button class="action-btn-sm delete-btn" onclick="deleteCrmLead('${lead.id}')" title="Delete"><i class="fa-solid fa-trash"></i></button>
-                  </div>
-                </td>
-              `;
-              crmTableBody.appendChild(tr);
-            });
           }
+        } catch (wErr) {
+          console.error('Webinar table render error:', wErr);
+        }
+
+        // ====================================================================
+        // 2. RENDER PROJECT INQUIRIES TABLE
+        // ====================================================================
+        try {
+          const projectBody = document.getElementById('projectTableBody');
+          if (projectBody) {
+            const qP = (document.getElementById('projectSearchInput')?.value || '').toLowerCase().trim();
+            const sP = document.getElementById('projectStatusFilter')?.value || 'all';
+
+            let filteredP = projectLeads.filter(l => {
+              const safeName = String(l.name || '').toLowerCase();
+              const safeEmail = String(l.email || '').toLowerCase();
+              const safePhone = String(l.phone || '').toLowerCase();
+              const safeService = String(l.service || l.packageName || '').toLowerCase();
+              const safeUid = String(l.userId || l.id || '').toLowerCase();
+              const mQ = !qP || safeName.includes(qP) || safeEmail.includes(qP) || safePhone.includes(qP) || safeService.includes(qP) || safeUid.includes(qP);
+              const mS = (sP === 'all') || (String(l.status || '') === sP);
+              return mQ && mS;
+            });
+
+            // Project KPIs (Calculated & rendered BEFORE loop)
+            const kpCount = document.getElementById('kpiProjectCount'); if (kpCount) kpCount.textContent = projectLeads.length;
+            const kpPipe = document.getElementById('kpiProjectPipeline'); if (kpPipe) kpPipe.textContent = '₹' + projectLeads.reduce((acc, l) => acc + parseLeadAmount(l.budget || l.amount), 0).toLocaleString('en-IN');
+            const kpNew = document.getElementById('kpiProjectNew'); if (kpNew) kpNew.textContent = projectLeads.filter(l => String(l.status || '') === 'New').length;
+            const kpClosed = document.getElementById('kpiProjectClosed'); if (kpClosed) kpClosed.textContent = projectLeads.filter(l => String(l.status || '') === 'Completed').length;
+
+            projectBody.innerHTML = '';
+            if (filteredP.length === 0) {
+              projectBody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:35px; color:var(--text-muted);"><i class="fa-solid fa-briefcase" style="font-size:1.8rem; opacity:0.4; display:block; margin-bottom:6px;"></i>No project inquiries matching criteria.</td></tr>';
+            } else {
+              filteredP.forEach(l => {
+                try {
+                  const tr = document.createElement('tr');
+                  const leadUid = escapeHtml(String(l.userId || l.id || ''));
+                  const safeName = escapeHtml(String(l.name || 'Anonymous Client'));
+                  const safeEmail = escapeHtml(String(l.email || '-'));
+                  const safePhone = escapeHtml(String(l.phone || '-'));
+                  const safeService = escapeHtml(String(l.service || l.packageName || 'Video Editing'));
+                  const safeBudget = escapeHtml(String(l.budget || l.amount || '₹25,000'));
+                  const waNum = String(l.phone || '').replace(/[^0-9]/g, '') || '917010270151';
+                  const leadIdClean = String(l.id || l.userId || '').replace(/[^a-zA-Z0-9_.-]/g, '');
+
+                  tr.innerHTML = `
+                    <td><span class="user-id-badge" onclick="copyLeadUserId('${leadUid}')" style="background:rgba(16,185,129,0.12); border-color:#10B981; color:#34D399;">${leadUid} <i class="fa-solid fa-copy" style="font-size:0.75rem;"></i></span></td>
+                    <td><div style="font-weight:700; color:var(--text-primary);">${escapeHtml(String(l.date || 'Today'))}</div></td>
+                    <td><strong style="color:var(--text-primary); font-size:1rem;">${safeName}</strong></td>
+                    <td><a href="tel:${safePhone}" style="color:var(--text-primary); font-weight:600; text-decoration:none;">${safePhone}</a></td>
+                    <td><a href="mailto:${safeEmail}" style="color:var(--brand-indigo); font-weight:600; text-decoration:none;">${safeEmail}</a></td>
+                    <td><strong style="color:var(--text-primary);">${safeService}</strong></td>
+                    <td><strong style="color:#10B981; font-size:1.1rem;">${safeBudget}</strong></td>
+                    <td><span class="status-badge ${String(l.status || '') === 'Completed' ? 'status-completed' : 'status-new'}" onclick="cycleCrmStatus('${leadIdClean}')">● ${escapeHtml(String(l.status || 'New'))}</span></td>
+                    <td><a href="https://wa.me/${waNum}?text=Hi%20${encodeURIComponent(safeName)}%2C%20reaching%20out%20from%20FlipCut%20Creation%20regarding%20your%20project%20inquiry!" target="_blank" style="color:#10B981; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:4px;"><i class="fa-brands fa-whatsapp" style="font-size:1.1rem;"></i> Chat</a></td>
+                    <td>
+                      <div class="action-btn-group">
+                        <button class="action-btn-sm" onclick="toggleLeadComplete('${leadIdClean}')" title="Accept & Close Project (Add to Earnings)" style="${String(l.status || '') === 'Completed' ? 'background:rgba(16,185,129,0.18); color:#10B981; border:1.5px solid #10B981;' : 'color:#10B981;'}"><i class="fa-solid fa-circle-check"></i></button>
+                        <button class="action-btn-sm" onclick="openAdminEditLeadModal('${leadIdClean}')" title="Edit Client Details" style="color:#F59E0B; background:rgba(245,158,11,0.12);"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button class="action-btn-sm" onclick="viewLeadDetails('${leadIdClean}')" title="View Full Project Brief" style="color:var(--brand-indigo);"><i class="fa-solid fa-eye"></i></button>
+                        <button class="action-btn-sm delete-btn" onclick="deleteCrmLead('${leadIdClean}')" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                      </div>
+                    </td>
+                  `;
+                  projectBody.appendChild(tr);
+                } catch (rowErr) {
+                  console.error('Error rendering project row:', rowErr, l);
+                }
+              });
+            }
+          }
+        } catch (pErr) {
+          console.error('Project table render error:', pErr);
+        }
+
+        // ====================================================================
+        // 3. RENDER GOOGLE AUTH USERS TABLE
+        // ====================================================================
+        try {
+          const googleBody = document.getElementById('googleTableBody');
+          if (googleBody) {
+            const qG = (document.getElementById('googleSearchInput')?.value || '').toLowerCase().trim();
+
+            let filteredG = googleUsers.filter(l => {
+              const safeName = String(l.name || '').toLowerCase();
+              const safeEmail = String(l.email || '').toLowerCase();
+              const safeId = String(l.id || l.userId || '').toLowerCase();
+              return !qG || safeName.includes(qG) || safeEmail.includes(qG) || safeId.includes(qG);
+            });
+
+            // Google KPIs (Calculated & rendered BEFORE loop)
+            const kgCount = document.getElementById('kpiGoogleCount'); if (kgCount) kgCount.textContent = googleUsers.length;
+            const kgActive = document.getElementById('kpiGoogleActive'); if (kgActive) kgActive.textContent = googleUsers.length;
+
+            googleBody.innerHTML = '';
+            if (filteredG.length === 0) {
+              googleBody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:35px; color:var(--text-muted);"><i class="fa-brands fa-google" style="font-size:1.8rem; opacity:0.4; display:block; margin-bottom:6px;"></i>No Google authenticated accounts found.</td></tr>';
+            } else {
+              filteredG.forEach(l => {
+                try {
+                  const tr = document.createElement('tr');
+                  const leadUid = escapeHtml(String(l.userId || l.id || ''));
+                  const safeName = escapeHtml(String(l.name || 'Google User'));
+                  const safeEmail = escapeHtml(String(l.email || '-'));
+                  const safePhone = escapeHtml(String(l.phone || '-'));
+                  const waNum = String(l.phone || '').replace(/[^0-9]/g, '');
+                  const leadIdClean = String(l.id || l.userId || '').replace(/[^a-zA-Z0-9_.-]/g, '');
+
+                  tr.innerHTML = `
+                    <td><span class="user-id-badge" onclick="copyLeadUserId('${leadUid}')" style="background:rgba(234,67,53,0.12); border-color:#EA4335; color:#F87171;">${leadUid} <i class="fa-solid fa-copy" style="font-size:0.75rem;"></i></span></td>
+                    <td><div style="font-weight:700; color:var(--text-primary);">${escapeHtml(String(l.date || 'Today'))}</div></td>
+                    <td><strong style="color:var(--text-primary); font-size:1rem;">${safeName}</strong></td>
+                    <td>${safePhone !== '-' ? `<a href="tel:${safePhone}" style="color:var(--text-primary); font-weight:600; text-decoration:none;">${safePhone}</a>` : '<span style="color:var(--text-dim);">-</span>'}</td>
+                    <td><a href="mailto:${safeEmail}" style="color:var(--brand-indigo); font-weight:600; text-decoration:none;">${safeEmail}</a></td>
+                    <td><span style="font-size:0.8rem; font-weight:700; color:#EA4335; background:rgba(234,67,53,0.12); padding:2px 8px; border-radius:6px;"><i class="fa-brands fa-google"></i> Google</span></td>
+                    <td><span class="status-badge status-completed">● Active User</span></td>
+                    <td>
+                      ${safePhone !== '-' && waNum ? `<a href="https://wa.me/${waNum}?text=Hi%20${encodeURIComponent(safeName)}%2C%20reaching%20out%20from%20FlipCut%20Creation!" target="_blank" style="color:#10B981; font-weight:700; text-decoration:none;"><i class="fa-brands fa-whatsapp"></i> Chat</a>` : '<span style="color:var(--text-dim); font-size:0.82rem;">Email Only</span>'}
+                    </td>
+                    <td>
+                      <div class="action-btn-group">
+                        <button class="action-btn-sm" onclick="viewLeadDetails('${leadIdClean}')" title="View Details" style="color:var(--brand-indigo);"><i class="fa-solid fa-eye"></i></button>
+                        ${safeEmail !== '-' ? `<a href="mailto:${safeEmail}" class="action-btn-sm" title="Send Email" style="color:#38BDF8;"><i class="fa-solid fa-envelope"></i></a>` : ''}
+                        <button class="action-btn-sm delete-btn" onclick="deleteCrmLead('${leadIdClean}')" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                      </div>
+                    </td>
+                  `;
+                  googleBody.appendChild(tr);
+                } catch (rowErr) {
+                  console.error('Error rendering google row:', rowErr, l);
+                }
+              });
+            }
+          }
+        } catch (gErr) {
+          console.error('Google table render error:', gErr);
+        }
+
+        // ====================================================================
+        // 4. RENDER MASTER OVERVIEW TABLE (tab-crm)
+        // ====================================================================
+        try {
+          const crmTableBody = document.getElementById('crmTableBody');
+          if (crmTableBody) {
+            const searchVal = (typeof crmSearchInput !== 'undefined' && crmSearchInput?.value ? crmSearchInput.value : (document.getElementById('crmSearchInput')?.value || '')).trim().toLowerCase();
+            const statusVal = (typeof crmStatusFilter !== 'undefined' && crmStatusFilter?.value ? crmStatusFilter.value : (document.getElementById('crmStatusFilter')?.value || 'all'));
+            const monthVal = (typeof crmMonthFilter !== 'undefined' && crmMonthFilter?.value ? crmMonthFilter.value : (document.getElementById('crmMonthFilter')?.value || 'all'));
+
+            let filtered = validLeads.filter(lead => {
+              const safeName = String(lead.name || '').toLowerCase();
+              const safeEmail = String(lead.email || '').toLowerCase();
+              const safePhone = String(lead.phone || '').toLowerCase();
+              const safeService = String(lead.service || '').toLowerCase();
+              const safePkg = String(lead.packageName || '').toLowerCase();
+              const safePayId = String(lead.paymentId || '').toLowerCase();
+              const safeUid = String(lead.userId || lead.id || '').toLowerCase();
+
+              const matchQuery = !searchVal || safeName.includes(searchVal) || safeEmail.includes(searchVal) || safePhone.includes(searchVal) || safeService.includes(searchVal) || safePkg.includes(searchVal) || safePayId.includes(searchVal) || safeUid.includes(searchVal);
+              const matchStatus = statusVal === 'all' || String(lead.status || '') === statusVal;
+
+              let matchMonth = true;
+              if (monthVal !== 'all') {
+                const dateStr = String(lead.date || (lead.created_at ? lead.created_at.slice(0, 10) : new Date().toISOString().slice(0, 10)));
+                matchMonth = dateStr.startsWith(monthVal);
+              }
+
+              return matchQuery && matchStatus && matchMonth;
+            });
+
+            if (typeof kpiTotalLeads !== 'undefined' && kpiTotalLeads) kpiTotalLeads.textContent = filtered.length;
+            if (typeof kpiNewLeads !== 'undefined' && kpiNewLeads) kpiNewLeads.textContent = filtered.filter(l => String(l.status || '') === 'New').length;
+
+            const totalEarnings = filtered
+              .filter(l => String(l.status || '') === 'Completed' || String(l.status || '').toLowerCase().includes('paid'))
+              .reduce((acc, l) => acc + parseLeadAmount(l.budget || l.amount), 0);
+            if (typeof kpiMonthEarnings !== 'undefined' && kpiMonthEarnings) kpiMonthEarnings.textContent = `₹${totalEarnings.toLocaleString('en-IN')}`;
+
+            const totalPipeline = filtered
+              .filter(l => {
+                const st = String(l.status || '');
+                return st === 'New' || st === 'Contacted' || st === 'In Progress' || !st;
+              })
+              .reduce((acc, l) => acc + parseLeadAmount(l.budget || l.amount), 0);
+            if (typeof kpiPipelineVal !== 'undefined' && kpiPipelineVal) kpiPipelineVal.textContent = `₹${totalPipeline.toLocaleString('en-IN')}`;
+
+            crmTableBody.innerHTML = '';
+            if (filtered.length === 0) {
+              crmTableBody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:35px; color:var(--text-muted);"><i class="fa-solid fa-inbox" style="font-size:1.8rem; opacity:0.4; display:block; margin-bottom:6px;"></i>No inquiries matching criteria in pipeline.</td></tr>';
+            } else {
+              filtered.forEach(lead => {
+                try {
+                  const tr = document.createElement('tr');
+                  const isWebinar = isWebinarLead(lead);
+                  const isGoogle = isGoogleAuthLead(lead);
+                  const isProj = !isWebinar && !isGoogle;
+                  const isPaid = String(lead.status || '').toLowerCase().includes('paid') || String(lead.paymentStatus || '').toLowerCase().includes('paid');
+                  const leadUid = escapeHtml(String(lead.userId || lead.id || ''));
+                  const safeName = escapeHtml(String(lead.name || 'Anonymous'));
+                  const safeEmail = escapeHtml(String(lead.email || '-'));
+                  const safePhone = escapeHtml(String(lead.phone || '-'));
+                  const safeService = escapeHtml(String(lead.service || lead.packageName || 'Video Project'));
+                  const safeBudget = escapeHtml(String(lead.budget || lead.amount || (isWebinar ? '₹49' : '₹25,000')));
+                  const waNum = String(lead.phone || '').replace(/[^0-9]/g, '') || '917010270151';
+                  const leadIdClean = String(lead.id || lead.userId || '').replace(/[^a-zA-Z0-9_.-]/g, '');
+
+                  let badgeStyle = 'background:rgba(99,102,241,0.15); border-color:#6366F1; color:#A5B4FC;';
+                  if (isGoogle) badgeStyle = 'background:rgba(234,67,53,0.12); border-color:#EA4335; color:#F87171;';
+                  if (isProj) badgeStyle = 'background:rgba(16,185,129,0.12); border-color:#10B981; color:#34D399;';
+
+                  tr.innerHTML = `
+                    <td><span class="user-id-badge" onclick="copyLeadUserId('${leadUid}')" style="${badgeStyle}">${leadUid} <i class="fa-solid fa-copy" style="font-size:0.75rem;"></i></span></td>
+                    <td><div style="font-weight:700; color:var(--text-primary);">${escapeHtml(String(lead.date || 'Today'))}</div></td>
+                    <td><strong style="color:var(--text-primary); font-size:1rem;">${safeName}</strong></td>
+                    <td><a href="tel:${safePhone}" style="color:var(--text-primary); font-weight:600; text-decoration:none;">${safePhone}</a></td>
+                    <td><a href="mailto:${safeEmail}" style="color:var(--brand-indigo); font-weight:600; text-decoration:none;">${safeEmail}</a></td>
+                    <td>${safeService}</td>
+                    <td><strong style="color:#10B981; font-size:1.1rem;">${safeBudget}</strong></td>
+                    <td><span class="status-badge ${isPaid ? 'status-completed' : 'status-new'}">● ${escapeHtml(String(lead.status || 'New'))}</span></td>
+                    <td>${isWebinar ? (lead.whatsappJoined ? '<span style="color:#10B981; font-weight:700;">Joined</span>' : '<span style="color:#F59E0B; font-weight:700;">Not Joined</span>') : '-'}</td>
+                    <td>
+                      <div class="action-btn-group">
+                        ${isWebinar && isPaid ? `
+                          <button class="action-btn-sm" onclick="sendWebinarPassOnWhatsApp('${leadIdClean}')" title="Send WhatsApp Pass" style="color:#25D366;"><i class="fa-solid fa-ticket"></i></button>
+                        ` : ''}
+                        <button class="action-btn-sm" onclick="viewLeadDetails('${leadIdClean}')" title="View Details" style="color:var(--brand-indigo);"><i class="fa-solid fa-eye"></i></button>
+                        <button class="action-btn-sm delete-btn" onclick="deleteCrmLead('${leadIdClean}')" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                      </div>
+                    </td>
+                  `;
+                  crmTableBody.appendChild(tr);
+                } catch (rowErr) {
+                  console.error('Error rendering master CRM row:', rowErr, lead);
+                }
+              });
+            }
+          }
+        } catch (mErr) {
+          console.error('Master CRM table render error:', mErr);
         }
       }
 
-      
-      window.exportWebinarCsv = function() {
+
+            window.exportWebinarCsv = function() {
         const webinarLeads = currentLeads.filter(l => (l.service || '').toLowerCase().includes('webinar') || (l.userId || '').startsWith('FC-WEB'));
         if (webinarLeads.length === 0) return alert('No webinar records to export.');
         let csv = 'Pass ID,Date,Name,Phone,Email,Website Type,Amount,Status,WhatsApp Group\n';
@@ -5058,7 +5129,7 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
       }
 
       window.viewLeadDetails = function(id) {
-        const lead = currentLeads.find(l => String(l.id) === String(id));
+        const lead = currentLeads.find(l => String(l.id) === String(id) || String(l.userId) === String(id));
         if (!lead || !leadDetailModal) return;
         activeDetailLeadId = id;
 
@@ -5078,7 +5149,7 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
 
         const waBtn = document.getElementById('ldModalWaBtn');
         if (waBtn) {
-          const num = lead.phone ? lead.phone.replace(/[^0-9]/g, '') : (content.contact ? content.contact.whatsappNum.replace(/[^0-9]/g, '') : '919999999999');
+          const num = lead.phone ? String(lead.phone).replace(/[^0-9]/g, '') : (content.contact ? String(content.contact.whatsappNum).replace(/[^0-9]/g, '') : '919999999999');
           waBtn.href = `https://wa.me/${num}?text=Hi%20${encodeURIComponent(lead.name || 'there')}%20(User%20ID:%20${encodeURIComponent(leadUid)}),%20reaching%20out%20from%20FlipCut%20Creation%20regarding%20your%20booking!`;
         }
 
@@ -5090,8 +5161,8 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
 
         const payStatusEl = document.getElementById('ldModalPaymentStatus');
         if (payStatusEl) {
-          const isWebinar = (lead.service || '').toLowerCase().includes('webinar') || (lead.packageName || '').toLowerCase().includes('webinar') || (lead.userId || '').startsWith('FC-WEB') || lead.status === 'Booked / Paid';
-          const isPaid = lead.paymentId || isWebinar || (lead.paymentStatus && lead.paymentStatus.includes('Paid'));
+          const isWebinar = String(lead.service || '').toLowerCase().includes('webinar') || String(lead.packageName || '').toLowerCase().includes('webinar') || String(lead.userId || '').startsWith('FC-WEB') || String(lead.status || '') === 'Booked / Paid';
+          const isPaid = lead.paymentId || isWebinar || String(lead.paymentStatus || '').includes('Paid');
           payStatusEl.textContent = isPaid ? '● Paid & Verified (Razorpay)' : '○ Quote Request / Inquiry';
           payStatusEl.style.color = isPaid ? '#10B981' : 'var(--text-muted)';
         }
@@ -5207,7 +5278,7 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
         lead.status = updatedStatus;
         lead.paymentId = updatedPayId;
         lead.notes = updatedNotes;
-        if (updatedPayId && (!lead.paymentStatus || lead.paymentStatus.includes('Pending'))) {
+        if (updatedPayId && (!lead.paymentStatus || String(lead.paymentStatus).includes('Pending'))) {
           lead.paymentStatus = `Paid & Verified (${updatedPayId})`;
         }
 
@@ -6165,7 +6236,7 @@ ${waGroup}
           const emailStr = l.email || '';
           const serviceStr = l.service || l.packageName || 'Webinar Masterclass';
           const isWebinar = (l.service || '').toLowerCase().includes('webinar') || (l.packageName || '').toLowerCase().includes('webinar') || (l.userId || '').startsWith('FC-WEB') || l.status === 'Booked / Paid';
-          const isPaid = l.paymentId || isWebinar || (l.paymentStatus && l.paymentStatus.includes('Paid'));
+          const isPaid = l.paymentId || isWebinar || String(l.paymentStatus || '').includes('Paid');
           const payStatusStr = l.paymentStatus || (isPaid ? 'Paid & Verified (Razorpay)' : 'Quote Request / Inquiry');
           const typeStr = l.websiteType || '';
           const statusStr = l.status || 'New';
