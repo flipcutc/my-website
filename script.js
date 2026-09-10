@@ -184,8 +184,8 @@ function hydratePageFromCMS(customContent) {
                            (!content.sectionsVisibility || content.sectionsVisibility.topAnnouncement !== false) &&
                            (annData.enabled !== false);
 
-    let webinarPrice = (content.webinar && content.webinar.price) ? String(content.webinar.price).replace(/[^0-9]/g, '') : '49';
-    if (!webinarPrice || webinarPrice === '2' || webinarPrice === '99' || webinarPrice === '199' || webinarPrice === '0') webinarPrice = '49';
+    let webinarPrice = (content.webinar && content.webinar.price !== undefined && content.webinar.price !== '') ? String(content.webinar.price).replace(/[^0-9]/g, '') : '49';
+    if (!webinarPrice || Number(webinarPrice) < 1) webinarPrice = '49';
 
     if (topBar) {
       if (!isTopAnnActive) {
@@ -2496,7 +2496,7 @@ window.showWebinarEntrancePopup = function() {
   }
 
   let price = String(webinarCfg.price !== undefined && webinarCfg.price !== '' ? webinarCfg.price : '49').replace(/[^0-9]/g, '') || '49';
-  if (price === '2' || price === '99' || price === '199' || price === '0') price = '49';
+  if (!price || Number(price) < 1) price = '49';
   const origPrice = String(webinarCfg.originalPrice !== undefined && webinarCfg.originalPrice !== '' ? webinarCfg.originalPrice : '999').replace(/[^0-9]/g, '') || '999';
   const sessionDate = webinarCfg.date || '27th September, Sunday • 10:00 AM IST';
   const title = webinarCfg.title || 'Live Website Creation & Scaling Masterclass 🚀';

@@ -6857,7 +6857,7 @@ ${waGroup}
             setVal('cfgWebinarBadge', content.webinar.badge);
             setVal('cfgWebinarTitle', content.webinar.title);
             setVal('cfgWebinarDesc', content.webinar.description);
-            setVal('cfgWebinarPrice', (content.webinar.price && content.webinar.price !== '2' && content.webinar.price !== '99' && content.webinar.price !== '199') ? content.webinar.price : '49');
+            setVal('cfgWebinarPrice', content.webinar.price || '49');
             setVal('cfgWebinarOrigPrice', content.webinar.originalPrice);
             setVal('cfgWebinarDate', content.webinar.date);
             setVal('cfgWebinarDuration', content.webinar.duration);
