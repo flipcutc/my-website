@@ -82,6 +82,9 @@
   <meta name="theme-color" content="#0B0F19">
   <meta name="msapplication-TileColor" content="#0B0F19">
 
+  <!-- FlipCut Autonomous Self-Healing Sentinel & Zero-Downtime Immunization Engine -->
+  <script src="flipcut-sentinel.js?v=2.0"></script>
+
   <!-- Google tag (gtag.js) Firebase Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q01GLLJ4H4"></script>
   <script>
@@ -2343,7 +2346,15 @@
           }
 
           if (!window.Razorpay) {
-            showToast('Payment gateway is loading. Please check internet connection.', '#F59E0B');
+            // Self-Healing Payment Fallback (AdBlocker / Network disruption protection)
+            if (typeof window.showPaymentFallbackModal === 'function') {
+              window.showPaymentFallbackModal(activeUserId, name, phone, email, websiteType, webinarFeeAmount);
+            } else {
+              const directUpiLink = `upi://pay?pa=7010270151@okbizaxis&pn=FlipCut%20Creation&am=${webinarFeeAmount}&cu=INR&tn=${activeUserId}`;
+              const waText = encodeURIComponent(`Hi FlipCut Team! Razorpay was blocked on my browser. I want to pay ₹${webinarFeeAmount} directly via UPI for my Webinar Pass!\n\n👤 Name: ${name}\n📱 Phone: ${phone}\n🎟 Pass ID: ${activeUserId}`);
+              window.open('https://wa.me/917010270151?text=' + waText, '_blank');
+              showToast('Opening Direct WhatsApp Payment Support...', '#10B981');
+            }
             return;
           }
 
