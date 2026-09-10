@@ -1635,7 +1635,8 @@
 
       const webinarCfg = content.webinar || {};
       const isMasterLive = (webinarCfg.masterLiveMode !== false) && (webinarCfg.enabled !== false);
-      const price = String(webinarCfg.price !== undefined && webinarCfg.price !== '' ? webinarCfg.price : '49').replace(/[^0-9]/g, '') || '49';
+      let price = String(webinarCfg.price !== undefined && webinarCfg.price !== '' ? webinarCfg.price : '49').replace(/[^0-9]/g, '') || '49';
+      if (price === '2' || price === '99' || price === '199' || price === '0') price = '49';
       const origPrice = String(webinarCfg.originalPrice !== undefined && webinarCfg.originalPrice !== '' ? webinarCfg.originalPrice : '999').replace(/[^0-9]/g, '') || '999';
 
       const setTxt = (id, text) => { const el = document.getElementById(id); if (el && text !== undefined) el.textContent = text; };
@@ -2056,8 +2057,8 @@
       function getCurrentWebinarFee() {
         const c = (typeof getSiteContent === 'function') ? getSiteContent() : siteContent;
         const p = c?.webinar?.price;
-        const parsedFee = parseInt(String(p).replace(/[^0-9]/g, '')) || 99;
-        return (parsedFee >= 99) ? parsedFee : 99;
+        const parsedFee = parseInt(String(p).replace(/[^0-9]/g, '')) || 49;
+        return (parsedFee > 0) ? parsedFee : 49;
       }
 
       // State variables
@@ -2828,7 +2829,7 @@ _Keep this User ID safe to unlock the live session!_
           const type = opts.websiteType || opts.type || 'Webinar Masterclass';
           const dateText = opts.dateText || opts.date || 'Sunday, 9:00 AM IST';
           const payId = opts.paymentId || opts.payId || 'rzp_verified_paid';
-          const price = opts.price || '99';
+          const price = opts.price || '49';
 
           const canvas = document.createElement('canvas');
           canvas.width = 1080;
@@ -3291,7 +3292,7 @@ https://flipcutcreation.in/webinar`;
           const dateText = document.getElementById('ticketModalDateText')?.textContent?.trim() || 'Sunday, 9:00 AM IST';
           const payId = document.getElementById('ticketPaymentId')?.textContent?.trim() || 'rzp_paid_verified';
           
-          let priceAmt = '99';
+          let priceAmt = '49';
           const amtElem = document.getElementById('ticketPassAmountText');
           if (amtElem && amtElem.textContent) {
             const m = amtElem.textContent.match(/\d+/);
@@ -3884,7 +3885,7 @@ https://flipcutcreation.in/webinar`;
   <!-- ==========================================================================
        STICKY MOBILE QUICK CHECKOUT DOCK BAR (ONE-TAP FAST REGISTRATION)
        ========================================================================== -->
-  <div id="mobileStickyWebinarCta" style="display: none; position: fixed; bottom: calc(64px + env(safe-area-inset-bottom, 0px)); left: 0; right: 0; background: rgba(10, 15, 29, 0.96); backdrop-filter: blur(16px); border-top: 1.5px solid #6366F1; padding: 10px 16px; z-index: 9995; box-shadow: 0 -10px 30px rgba(0,0,0,0.7); transition: all 0.3s ease;">
+  <div id="mobileStickyWebinarCta" style="display: none; position: fixed; bottom: calc(64px + env(safe-area-inset-bottom, 0px)); left: 0; right: 0; background: rgba(10, 15, 29, 0.96); backdrop-filter: blur(16px); border-top: 1.5px solid #6366F1; padding: 10px 16px; z-index: 9995; box-shadow: 0 -10px 30px rgba(0,0,0,0.7); transform: translateY(120%); opacity: 0; pointer-events: none; transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;">
     <div style="max-width: 600px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
       <div style="text-align: left;">
         <div style="display: flex; align-items: baseline; gap: 6px;">
@@ -3912,22 +3913,71 @@ https://flipcutcreation.in/webinar`;
       }
     };
 
-    // Sticky Quick CTA floats right above the native app dock on mobile
-    window.addEventListener('scroll', () => {
+    // STABILIZED ZERO-FLICKER MOBILE STICKY CTA CONTROLLER
+    (function initStableMobileStickyWebinarCta() {
       const stickyBar = document.getElementById('mobileStickyWebinarCta');
       if (!stickyBar) return;
-      if (window.innerWidth <= 768) {
-        const formBox = document.getElementById('webinarBriefCard');
-        const formTop = formBox ? formBox.getBoundingClientRect().top : 9999;
-        if (window.scrollY > 250 && formTop > 200) {
+
+      let isFormInViewport = false;
+      let isVisible = false;
+
+      function updateStickyVisibility() {
+        const isMobile = window.innerWidth <= 768;
+        const isPastHero = window.scrollY > 240;
+
+        // Verify Master Live Mode is active
+        const content = (typeof getSiteContent === 'function') ? getSiteContent() : null;
+        const isMasterLive = content && content.webinar ? (content.webinar.masterLiveMode !== false && content.webinar.enabled !== false) : true;
+
+        const shouldShow = isMobile && isPastHero && !isFormInViewport && isMasterLive;
+
+        if (shouldShow && !isVisible) {
           stickyBar.style.display = 'block';
-        } else {
-          stickyBar.style.display = 'none';
+          requestAnimationFrame(() => {
+            stickyBar.style.transform = 'translateY(0)';
+            stickyBar.style.opacity = '1';
+            stickyBar.style.pointerEvents = 'auto';
+          });
+          isVisible = true;
+        } else if (!shouldShow && isVisible) {
+          stickyBar.style.transform = 'translateY(120%)';
+          stickyBar.style.opacity = '0';
+          stickyBar.style.pointerEvents = 'none';
+          setTimeout(() => {
+            if (!isVisible) {
+              stickyBar.style.display = 'none';
+            }
+          }, 360);
+          isVisible = false;
         }
-      } else {
-        stickyBar.style.display = 'none';
       }
-    }, { passive: true });
+
+      // Smooth IntersectionObserver for the registration form (hides when form is visible)
+      const formCard = document.getElementById('webinarBriefCard') || document.getElementById('webinarFormContainer');
+      if (formCard && window.IntersectionObserver) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            isFormInViewport = entry.isIntersecting;
+            updateStickyVisibility();
+          });
+        }, { threshold: 0.1 });
+        observer.observe(formCard);
+      }
+
+      // Smooth throttled scroll listener
+      let ticking = false;
+      window.addEventListener('scroll', () => {
+        if (!ticking) {
+          window.requestAnimationFrame(() => {
+            updateStickyVisibility();
+            ticking = false;
+          });
+          ticking = true;
+        }
+      }, { passive: true });
+
+      window.addEventListener('resize', updateStickyVisibility, { passive: true });
+    })();
   </script>
 
   <script>

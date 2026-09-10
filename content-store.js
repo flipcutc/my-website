@@ -550,6 +550,30 @@ const DEFAULT_SITE_CONTENT = {
 };
 // === END_DEFAULT_SITE_CONTENT ===
 
+
+function sanitizeWebinarContent(data) {
+  if (!data || typeof data !== 'object') return data;
+  if (!data.webinar) data.webinar = {};
+  const rawPrice = String(data.webinar.price || '').replace(/[^0-9]/g, '');
+  if (!rawPrice || rawPrice === '2' || rawPrice === '99' || rawPrice === '199' || rawPrice === '0') {
+    data.webinar.price = '49';
+  }
+  if (!data.webinar.originalPrice || data.webinar.originalPrice === '899' || data.webinar.originalPrice === '199') {
+    data.webinar.originalPrice = '999';
+  }
+  if (!data.webinar.date || data.webinar.date.includes('Saturday') || data.webinar.date.includes('7:00 PM')) {
+    data.webinar.date = '27th September, Sunday • 10:00 AM IST';
+    data.webinar.targetDateTime = '2026-09-27T10:00:00+05:30';
+  }
+  if (data.topAnnouncement && typeof data.topAnnouncement.text === 'string') {
+    data.topAnnouncement.text = data.topAnnouncement.text
+      .replace(/₹\s*2\b/g, '₹49')
+      .replace(/₹\s*99\b/g, '₹49')
+      .replace(/₹\s*199\b/g, '₹49');
+  }
+  return data;
+}
+
 function isObject(item) {
   return (item && typeof item === 'object' && !Array.isArray(item));
 }
@@ -604,13 +628,14 @@ function getSiteContent() {
           merged.portfolio = JSON.parse(JSON.stringify(DEFAULT_SITE_CONTENT.portfolio));
         }
 
+        sanitizeWebinarContent(merged);
         return merged;
       }
     }
   } catch (e) {
     console.error('Safe fallback to master default content:', e);
   }
-  return JSON.parse(JSON.stringify(DEFAULT_SITE_CONTENT));
+  return sanitizeWebinarContent(JSON.parse(JSON.stringify(DEFAULT_SITE_CONTENT)));
 }
 
 function getContentApiBase() {
@@ -646,6 +671,7 @@ async function fetchAndSyncSiteContent() {
         const json = await res.json();
         if (json && json.success && json.data) {
           const merged = deepMergeObjects(JSON.parse(JSON.stringify(DEFAULT_SITE_CONTENT)), json.data);
+          sanitizeWebinarContent(merged);
           if (typeof localStorage !== 'undefined') {
             try {
               localStorage.setItem('flipcut_site_content', JSON.stringify(merged));
@@ -673,6 +699,7 @@ async function fetchAndSyncSiteContent() {
         const cloudData = JSON.parse(rows[0].message);
         if (cloudData && typeof cloudData === 'object') {
           const merged = deepMergeObjects(JSON.parse(JSON.stringify(DEFAULT_SITE_CONTENT)), cloudData);
+          sanitizeWebinarContent(merged);
           if (typeof localStorage !== 'undefined') {
             try {
               localStorage.setItem('flipcut_site_content', JSON.stringify(merged));
@@ -694,6 +721,7 @@ async function fetchAndSyncSiteContent() {
  * Save updated site content to localStorage, backup layer, Node backend, and Supabase Cloud Database
  */
 async function saveSiteContent(content) {
+  sanitizeWebinarContent(content);
   let localSaved = false;
   let serverSaved = false;
   let cloudSaved = false;

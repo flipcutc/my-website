@@ -1,4 +1,25 @@
 
+// Immediate Client-Side Self-Healing: Purge stale ₹2 / ₹99 / ₹199 from localStorage
+(function selfHealLocalCache() {
+  try {
+    ['flipcut_site_content', 'flipcut_cms_draft', 'flipcut_site_content_backup'].forEach(k => {
+      const raw = localStorage.getItem(k);
+      if (raw && (raw.includes('"price":"2"') || raw.includes('"price":2') || raw.includes('"price":"99"') || raw.includes('"price":"199"'))) {
+        try {
+          const parsed = JSON.parse(raw);
+          if (parsed.webinar) parsed.webinar.price = '49';
+          if (parsed.topAnnouncement && parsed.topAnnouncement.text) {
+            parsed.topAnnouncement.text = parsed.topAnnouncement.text.replace(/₹\s*(2|99|199)\b/g, '₹49');
+          }
+          localStorage.setItem(k, JSON.stringify(parsed));
+        } catch (_) {}
+      }
+    });
+    sessionStorage.removeItem('flipcut_webinar_popup_dismissed');
+  } catch (_) {}
+})();
+
+
 // 1-Click WhatsApp Inquiry for the 3 Pricing Plans (Direct to Owner WhatsApp: 917010270151)
 window.inquirePlanViaWhatsApp = function(packageName, price) {
   const cleanPkg = packageName || 'Retainer Plan';
@@ -163,7 +184,8 @@ function hydratePageFromCMS(customContent) {
                            (!content.sectionsVisibility || content.sectionsVisibility.topAnnouncement !== false) &&
                            (annData.enabled !== false);
 
-    const webinarPrice = (content.webinar && content.webinar.price) ? String(content.webinar.price).replace(/[^0-9]/g, '') : '49';
+    let webinarPrice = (content.webinar && content.webinar.price) ? String(content.webinar.price).replace(/[^0-9]/g, '') : '49';
+    if (!webinarPrice || webinarPrice === '2' || webinarPrice === '99' || webinarPrice === '199' || webinarPrice === '0') webinarPrice = '49';
 
     if (topBar) {
       if (!isTopAnnActive) {
@@ -2473,7 +2495,8 @@ window.showWebinarEntrancePopup = function() {
     return; // Admin turned off master live mode or auto-popup
   }
 
-  const price = String(webinarCfg.price !== undefined && webinarCfg.price !== '' ? webinarCfg.price : '49').replace(/[^0-9]/g, '') || '49';
+  let price = String(webinarCfg.price !== undefined && webinarCfg.price !== '' ? webinarCfg.price : '49').replace(/[^0-9]/g, '') || '49';
+  if (price === '2' || price === '99' || price === '199' || price === '0') price = '49';
   const origPrice = String(webinarCfg.originalPrice !== undefined && webinarCfg.originalPrice !== '' ? webinarCfg.originalPrice : '999').replace(/[^0-9]/g, '') || '999';
   const sessionDate = webinarCfg.date || '27th September, Sunday • 10:00 AM IST';
   const title = webinarCfg.title || 'Live Website Creation & Scaling Masterclass 🚀';
@@ -2555,9 +2578,7 @@ window.closeWebinarEntrancePopup = function() {
     modal.style.setProperty('opacity', '0', 'important');
     modal.style.setProperty('visibility', 'hidden', 'important');
   }
-  try {
-    sessionStorage.setItem('flipcut_webinar_popup_dismissed', 'true');
-  } catch (_) {}
+  window.__webinarPopupClosedThisView = true;
   if (__webinarCountdownTimer) clearInterval(__webinarCountdownTimer);
 };
 
@@ -2568,19 +2589,18 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// Auto-popup trigger on Home Page after 1.5 seconds
+// Auto-popup trigger on Home Page on EVERY page load / reload (after 1.2s delay)
 document.addEventListener('DOMContentLoaded', () => {
+  try {
+    sessionStorage.removeItem('flipcut_webinar_popup_dismissed');
+  } catch (_) {}
+
   if (!location.pathname.includes('webinar')) {
     setTimeout(() => {
-      try {
-        const isDismissed = sessionStorage.getItem('flipcut_webinar_popup_dismissed');
-        if (!isDismissed) {
-          window.showWebinarEntrancePopup();
-        }
-      } catch (_) {
+      if (!window.__webinarPopupClosedThisView) {
         window.showWebinarEntrancePopup();
       }
-    }, 1500);
+    }, 1200);
   }
 });
 
