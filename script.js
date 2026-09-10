@@ -2319,7 +2319,7 @@ function hydratePageFromCMS(customContent) {
       }
 
       // Get Razorpay Key from CMS content or default live key
-      const razorpayKey = (content && content.paymentGateway && content.paymentGateway.razorpayKeyId) ? content.paymentGateway.razorpayKeyId : 'rzp_live_TTd5UPSpFLKLor';
+      const razorpayKey = (content && content.paymentGateway && content.paymentGateway.razorpayKeyId) ? content.paymentGateway.razorpayKeyId : 'rzp_live_TaHUNxu4DyCZbk';
 
       // Check if Razorpay SDK is loaded
       if (typeof window.Razorpay !== 'function') {
