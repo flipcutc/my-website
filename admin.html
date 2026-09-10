@@ -94,12 +94,15 @@
     }
 
     /* Left Vertical Sidebar */
+    /* Left Vertical Sidebar (Permanently Fixed & Independent Scrolling) */
     .admin-sidebar {
       width: 280px;
       min-width: 280px;
       height: 100vh;
-      position: sticky;
+      position: fixed;
       top: 0;
+      left: 0;
+      bottom: 0;
       background: var(--bg-surface);
       border-right: 1px solid var(--border-subtle);
       display: flex;
@@ -109,6 +112,7 @@
       z-index: 1000;
       box-shadow: 2px 0 20px rgba(0,0,0,0.02);
       overflow-y: auto;
+      overflow-x: hidden;
     }
 
     .sidebar-header {
@@ -242,6 +246,8 @@
 
     /* Main Content Area */
     .admin-main-wrapper {
+      margin-left: 280px;
+      width: calc(100% - 280px);
       flex: 1;
       min-width: 0;
       display: flex;
@@ -736,10 +742,15 @@
       }
       .admin-sidebar {
         width: 100%;
+        min-width: 100%;
         height: auto;
         position: static;
         border-right: none;
         border-bottom: 1px solid var(--border-medium);
+      }
+      .admin-main-wrapper {
+        margin-left: 0;
+        width: 100%;
       }
       .admin-sidebar-nav {
         flex-direction: row;
@@ -1147,8 +1158,8 @@
               </button>
               <input type="text" id="webinarSearchInput" oninput="renderCrmTable()" class="form-control" placeholder="Search attendee name, email, pass ID..." style="width: 220px;">
               <select id="webinarStatusFilter" onchange="renderCrmTable()" class="form-control" style="width: auto;">
-                <option value="all">All Attendees</option>
-                <option value="Booked / Paid" selected>Paid / Confirmed Passes</option>
+                <option value="all" selected>All Attendees</option>
+                <option value="Booked / Paid">Paid / Confirmed Passes</option>
                 <option value="Payment Initiated (Pending UPI)">⚠️ Pending UPI</option>
               </select>
               <button class="btn btn-secondary" onclick="exportWebinarCsv()" style="padding: 10px 16px;">
@@ -6048,16 +6059,16 @@ ${waGroup}
         });
       }
 
-      document.getElementById('refreshLeadsBtn').addEventListener('click', () => {
+      document.getElementById('refreshLeadsBtn')?.addEventListener('click', () => {
         fetchLeadsFromDatabase();
         showAdminToast('Refreshed leads from SQL database.');
       });
 
-      crmSearchInput.addEventListener('input', () => {
+      crmSearchInput?.addEventListener('input', () => {
         crmCurrentPage = 1;
         renderCrmTable();
       });
-      crmStatusFilter.addEventListener('change', () => {
+      crmStatusFilter?.addEventListener('change', () => {
         crmCurrentPage = 1;
         renderCrmTable();
       });
@@ -7966,7 +7977,7 @@ ${waGroup}
         renderPortfolioEditor();
       };
 
-      document.getElementById('addPortfolioItemBtn').addEventListener('click', () => {
+      document.getElementById('addPortfolioItemBtn')?.addEventListener('click', () => {
         addNewWorkWithPreset('uiux');
       });
 

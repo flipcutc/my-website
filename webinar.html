@@ -2260,34 +2260,35 @@
         if (!validateWebinarInputs()) return;
 
         const name = document.getElementById('webinarName').value.trim();
-        const phone = document.getElementById('webinarPhone').value.trim();
+        const rawPhone = document.getElementById('webinarPhone').value.trim();
         const email = document.getElementById('webinarEmail').value.trim();
         const websiteType = getSelectedWebsiteType();
         const webinarFeeAmount = getCurrentWebinarFee();
 
+        let cleanPhone = rawPhone.replace(/[^0-9]/g, '');
+        if (cleanPhone.startsWith('91') && cleanPhone.length === 12) cleanPhone = cleanPhone.substring(2);
+        if (cleanPhone.startsWith('0') && cleanPhone.length === 11) cleanPhone = cleanPhone.substring(1);
+
+        const payBtnText = document.getElementById('btnPayRazorpayText');
+        const origBtnText = payBtnText ? payBtnText.innerHTML : 'Pay ₹49 & Unlock Registration';
+
         // Check if user already registered for Webinar (Anti-Duplicate Check)
         if (typeof window.checkDuplicateLead === 'function') {
-          const dupResult = await window.checkDuplicateLead(email, phone);
-          if (dupResult && dupResult.isDuplicate) {
-            const isWebinarPass = (dupResult.existingLead?.service || '').toLowerCase().includes('webinar') || (dupResult.userId || '').startsWith('FC-WEB') || dupResult.existingLead?.status === 'Booked / Paid';
-            if (isWebinarPass) {
-              showValidationGuideModal(
-                dupResult.matchedBy,
-                `You have ALREADY booked a Webinar Pass with this ${dupResult.matchedBy === 'email' ? 'Email Address' : 'Mobile Number'} under Pass ID: ${dupResult.userId}! Your seat is confirmed. No need to pay again.`
-              );
-              if (typeof saveUserProfileLocally === 'function') {
-                saveUserProfileLocally({
-                  name: dupResult.existingLead?.name || name,
-                  phone: dupResult.existingLead?.phone || phone,
-                  email: dupResult.existingLead?.email || email,
-                  userId: dupResult.userId,
-                  paymentId: dupResult.existingLead?.paymentId || 'rzp_confirmed_pass',
-                  passType: 'Webinar Live Masterclass Pass',
-                  paymentStatus: '✅ Confirmed (Razorpay)'
-                });
+          try {
+            const dupResult = await window.checkDuplicateLead(email, cleanPhone);
+            if (dupResult && dupResult.isDuplicate) {
+              const lead = dupResult.existingLead;
+              const isTrulyPaid = lead?.status === 'Booked / Paid' || (lead?.paymentStatus || '').toLowerCase().includes('paid') || (lead?.paymentStatus || '').toLowerCase().includes('confirmed');
+              if (isTrulyPaid) {
+                const proceedNew = confirm(`Notice: An active VIP Pass (${dupResult.userId}) is already registered for ${dupResult.matchedBy === 'email' ? email : cleanPhone}.\n\n• Click OK to retrieve / view your existing Ticket Pass.\n• Click CANCEL to register a new seat / proceed to payment.`);
+                if (proceedNew) {
+                  showTicketModal(lead?.name || name, lead?.websiteType || websiteType, lead?.paymentId || 'rzp_verified_paid', dupResult.userId, cleanPhone);
+                  return;
+                }
               }
-              return;
             }
+          } catch (dupErr) {
+            console.warn('Duplicate check non-blocking note:', dupErr);
           }
         }
 
@@ -2297,7 +2298,7 @@
         // 2. Save active draft with timestamp & intent
         const activeDraft = {
           userId: activeUserId,
-          name, phone, email, websiteType, webinarFeeAmount,
+          name, phone: cleanPhone, email, websiteType, webinarFeeAmount,
           status: 'Payment Initiated (Pending UPI)',
           timestamp: Date.now()
         };
@@ -2307,12 +2308,11 @@
         } catch (_) {}
 
         // 3. Pre-Capture Lead to Dual Cloud BEFORE opening Razorpay
-        // (Guarantees that even if user closes the tab in GPay/PhonePe, Admin has their full lead details!)
         const prePaymentLead = {
           userId: activeUserId,
           name: name,
           email: email,
-          phone: phone,
+          phone: cleanPhone,
           service: 'Webinar Registration',
           packageName: `Webinar Pass (${websiteType})`,
           budget: `₹${webinarFeeAmount}`,
@@ -2327,6 +2327,10 @@
         if (typeof window.pushLeadToDualCloud === 'function') {
           window.pushLeadToDualCloud(prePaymentLead).catch(() => {});
         }
+
+        // Visual loading state on button
+        if (payBtnText) payBtnText.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Opening Razorpay...';
+        btnPayRazorpay.disabled = true;
 
         showToast('Opening Razorpay Payment Gateway (GPay, UPI, Cards)...', 'var(--brand-indigo)');
 
@@ -2346,44 +2350,49 @@
           }
 
           if (!window.Razorpay) {
-            // Self-Healing Payment Fallback (AdBlocker / Network disruption protection)
+            if (payBtnText) payBtnText.innerHTML = origBtnText;
+            btnPayRazorpay.disabled = false;
+            // Self-Healing Payment Fallback
             if (typeof window.showPaymentFallbackModal === 'function') {
-              window.showPaymentFallbackModal(activeUserId, name, phone, email, websiteType, webinarFeeAmount);
+              window.showPaymentFallbackModal(activeUserId, name, cleanPhone, email, websiteType, webinarFeeAmount);
             } else {
               const directUpiLink = `upi://pay?pa=7010270151@okbizaxis&pn=FlipCut%20Creation&am=${webinarFeeAmount}&cu=INR&tn=${activeUserId}`;
-              const waText = encodeURIComponent(`Hi FlipCut Team! Razorpay was blocked on my browser. I want to pay ₹${webinarFeeAmount} directly via UPI for my Webinar Pass!\n\n👤 Name: ${name}\n📱 Phone: ${phone}\n🎟 Pass ID: ${activeUserId}`);
+              const waText = encodeURIComponent(`Hi FlipCut Team! Razorpay was blocked on my browser. I want to pay ₹${webinarFeeAmount} directly via UPI for my Webinar Pass!\n\n👤 Name: ${name}\n📱 Phone: ${cleanPhone}\n🎟 Pass ID: ${activeUserId}`);
               window.open('https://wa.me/917010270151?text=' + waText, '_blank');
               showToast('Opening Direct WhatsApp Payment Support...', '#10B981');
             }
             return;
           }
 
+          const logoImgUrl = window.location.origin + '/assets/logo.png';
+
           const options = {
             key: liveKey,
             amount: amountInPaise,
             currency: "INR",
             name: "FlipCut Creation",
-            description: `Live Masterclass Pass - ${websiteType} (₹${webinarFeeAmount})`,
-            image: "assets/logo.png",
+            description: `Live Masterclass Pass - ${websiteType} (₹${guaranteedFee})`,
+            image: logoImgUrl,
             prefill: {
               name: name,
               email: email,
-              contact: phone
+              contact: cleanPhone
             },
             notes: {
               userId: activeUserId,
               service: "Webinar Masterclass Registration",
               websiteType: websiteType,
-              amount: `₹${webinarFeeAmount}`
+              amount: `₹${guaranteedFee}`
             },
             theme: {
               color: "#4F46E5"
             },
             modal: {
               ondismiss: function() {
+                if (payBtnText) payBtnText.innerHTML = origBtnText;
+                btnPayRazorpay.disabled = false;
                 if (!isPaymentCompleted) {
                   showToast('Payment window closed. If you completed payment in your UPI app, click "Retrieve My Pass" below!', 'var(--brand-indigo)');
-                  // Show return banner if draft exists
                   const banner = document.getElementById('webinarPendingPaymentBanner');
                   const nameEl = document.getElementById('pendingDraftUserName');
                   if (banner) {
@@ -2394,6 +2403,9 @@
               }
             },
             handler: function(response) {
+              if (payBtnText) payBtnText.innerHTML = origBtnText;
+              btnPayRazorpay.disabled = false;
+
               if (response && response.razorpay_payment_id) {
                 verifiedPaymentId = response.razorpay_payment_id;
                 try {
@@ -2421,7 +2433,7 @@
                 if (banner) banner.style.display = 'none';
 
                 // 3. Show Ticket Pass (Both In-Page & Modal) IMMEDIATELY (0ms latency)
-                showTicketModal(name, websiteType, verifiedPaymentId, generatedUserId, phone);
+                showTicketModal(name, websiteType, verifiedPaymentId, generatedUserId, cleanPhone);
 
                 // 4. Save User Profile in Header across all pages
                 if (typeof window.saveUserProfile === 'function') {
@@ -2429,15 +2441,16 @@
                     userId: generatedUserId,
                     name: name,
                     email: email,
-                    phone: phone,
+                    phone: cleanPhone,
                     websiteType: websiteType,
                     paymentId: verifiedPaymentId,
-                    amount: `₹${webinarFeeAmount}`
+                    amount: `₹${guaranteedFee}`
                   });
                 }
 
                 // 5. Submit confirmed lead to Dual Cloud non-blockingly
-                handleWebinarFinalSubmit(null, generatedUserId, verifiedPaymentId, name, phone, email, websiteType, webinarFeeAmount);
+                handleWebinarFinalSubmit(null, generatedUserId, verifiedPaymentId, name, cleanPhone, email, websiteType, guaranteedFee);
+                showToast('🎉 Pass Created Successfully! Official Ticket Pass Issued.', '#10B981');
               } else {
                 showToast('Payment verification pending. Please try again.', '#EF4444');
               }
@@ -2446,11 +2459,13 @@
 
           const rzp = new window.Razorpay(options);
           rzp.on('payment.failed', function(response) {
+            if (payBtnText) payBtnText.innerHTML = origBtnText;
+            btnPayRazorpay.disabled = false;
             const errDesc = response?.error?.description || 'Payment was not completed';
             showToast(`❌ Payment Issue: ${errDesc}`, '#EF4444');
             const waSupport = document.getElementById('btnWebinarWaSupport');
             if (waSupport) {
-              const msg = encodeURIComponent(`Hi FlipCut Team! I experienced an issue paying on your website: "${errDesc}". Please help me register! Name: ${name}, Phone: ${phone}`);
+              const msg = encodeURIComponent(`Hi FlipCut Team! I experienced an issue paying on your website: "${errDesc}". Please help me register! Name: ${name}, Phone: ${cleanPhone}`);
               waSupport.href = `https://wa.me/917010270151?text=${msg}`;
               waSupport.style.background = 'rgba(239, 68, 68, 0.12)';
               waSupport.style.borderColor = '#EF4444';
@@ -2461,11 +2476,13 @@
           rzp.open();
 
         } catch (err) {
+          if (payBtnText) payBtnText.innerHTML = origBtnText;
+          btnPayRazorpay.disabled = false;
           console.error('Razorpay Error:', err);
           showToast(`Payment Gateway Error: ${err.message}`, '#EF4444');
           const waSupport = document.getElementById('btnWebinarWaSupport');
           if (waSupport) {
-            const msg = encodeURIComponent(`Hi FlipCut Team! Payment Gateway Error: "${err.message}". Name: ${name}, Phone: ${phone}`);
+            const msg = encodeURIComponent(`Hi FlipCut Team! Payment Gateway Error: "${err.message}". Name: ${name}, Phone: ${cleanPhone}`);
             waSupport.href = `https://wa.me/917010270151?text=${msg}`;
           }
         }
