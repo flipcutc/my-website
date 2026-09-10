@@ -2646,7 +2646,12 @@
         const waUrl = groupInviteLink;
 
         // Construct Official Formatted WhatsApp VIP Ticket Pass
-        const rawPhone = (explicitPhone || document.getElementById('webinarPhone')?.value || savedDraft?.phone || '').replace(/[^0-9]/g, '');
+        let draftPhone = '';
+        try {
+          const d = JSON.parse(localStorage.getItem('flipcut_webinar_active_draft') || '{}');
+          draftPhone = d.phone || '';
+        } catch (_) {}
+        const rawPhone = (explicitPhone || document.getElementById('webinarPhone')?.value || draftPhone || '').replace(/[^0-9]/g, '');
         const cleanPhone = rawPhone.length === 10 ? '91' + rawPhone : rawPhone;
         const passMsg = 
 `🎟️ *FLIPCUT CREATION - WEBINAR VIP PASS* 🎟️
@@ -2761,7 +2766,7 @@ _Keep this User ID safe to unlock the live session!_
                     Authorization: `Bearer ${SUPABASE_SYNC_KEY}`
                   },
                   body: JSON.stringify({
-                    message: `[WhatsApp: Joined VIP Group] ` + (lead?.message || '')
+                    message: `[WhatsApp: Joined VIP Group] ` + (typeof lead !== 'undefined' && lead?.message ? lead.message : '')
                   })
                 }).catch(() => {});
               } catch (_) {}
@@ -3603,7 +3608,7 @@ https://flipcutcreation.in/webinar`;
 
         const existingProfile = (typeof window.getUserProfile === 'function') ? window.getUserProfile() : null;
         if (existingProfile && existingProfile.userId && existingProfile.webinarRegistered && isAuthenticRazorpayPaymentId(existingProfile.paymentId)) {
-          showTicketModal(existingProfile.name, existingProfile.websiteType, existingProfile.paymentId, existingProfile.userId);
+          showTicketModal(existingProfile.name, existingProfile.websiteType, existingProfile.paymentId, existingProfile.userId, existingProfile.phone);
         } else if (existingProfile && !isAuthenticRazorpayPaymentId(existingProfile.paymentId)) {
           localStorage.removeItem('flipcut_user_profile');
         }
@@ -3614,6 +3619,17 @@ https://flipcutcreation.in/webinar`;
       const findPassFeedback = document.getElementById('findPassFeedback');
       const btnFindPassSubmit = document.getElementById('btnFindPassSubmit');
       const btnFindPassSubmitText = document.getElementById('btnFindPassSubmitText');
+
+      function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+      window.escapeHtml = escapeHtml;
 
       window.openFindPassModal = function() {
         if (findPassModal) {
@@ -3639,8 +3655,6 @@ https://flipcutcreation.in/webinar`;
         }
       };
 
-// verifyAndUnlockSelfPass removed - user self-unlock disabled.
-
       window.handleFindPassSubmit = async function(e) {
         if (e && e.preventDefault) e.preventDefault();
         const query = document.getElementById('findPassInput')?.value?.trim();
@@ -3656,32 +3670,58 @@ https://flipcutcreation.in/webinar`;
           findPassFeedback.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Checking verified payment records for "<strong>${escapeHtml(query)}</strong>"...`;
         }
 
-        const result = (typeof window.lookupUserPass === 'function') 
-          ? await window.lookupUserPass(query)
-          : { success: false, message: 'Lookup engine unavailable.' };
+        try {
+          const result = (typeof window.lookupUserPass === 'function') 
+            ? await window.lookupUserPass(query)
+            : { success: false, message: 'Lookup engine unavailable.' };
 
-        if (btnFindPassSubmit) btnFindPassSubmit.removeAttribute('disabled');
-        if (btnFindPassSubmitText) btnFindPassSubmitText.textContent = 'Find My Ticket Pass';
+          if (result && result.success && result.lead) {
+            const lead = result.lead;
+            const isFakePass = String(lead.paymentId || '').startsWith('pay_upi_');
+            const isRealPaid = !isFakePass && (lead.status === 'Booked / Paid' || (lead.paymentStatus || '').toLowerCase().includes('paid'));
 
-        if (result && result.success && result.lead) {
-          const lead = result.lead;
-          const isFakePass = String(lead.paymentId || '').startsWith('pay_upi_');
-          const isRealPaid = !isFakePass && (lead.status === 'Booked / Paid' || (lead.paymentStatus || '').toLowerCase().includes('paid'));
-
-          if (isRealPaid) {
-            if (findPassFeedback) {
-              findPassFeedback.style.background = 'rgba(16, 185, 129, 0.15)';
-              findPassFeedback.style.border = '1.5px solid #10B981';
-              findPassFeedback.style.color = '#10B981';
-              findPassFeedback.innerHTML = `✅ <strong>Paid Pass Verified:</strong> ${escapeHtml(lead.name)} (${lead.userId})<br><span style="font-size:0.82rem; color:var(--text-primary);">Opening your Digital Ticket Pass now...</span>`;
+            if (isRealPaid) {
+              if (findPassFeedback) {
+                findPassFeedback.style.background = 'rgba(16, 185, 129, 0.15)';
+                findPassFeedback.style.border = '1.5px solid #10B981';
+                findPassFeedback.style.color = '#10B981';
+                findPassFeedback.innerHTML = `✅ <strong>Paid Pass Verified:</strong> ${escapeHtml(lead.name)} (${lead.userId})<br><span style="font-size:0.82rem; color:var(--text-primary);">Opening your Digital Ticket Pass now...</span>`;
+              }
+              setTimeout(() => {
+                closeFindPassModal();
+                showTicketModal(lead.name, lead.websiteType, lead.paymentId, lead.userId, lead.phone);
+                showToast(`🎉 Welcome back, ${lead.name}! Here is your Digital Ticket Pass.`, '#10B981');
+              }, 700);
+            } else {
+              // Found registration but payment is UNPAID / PENDING
+              const currFee = getCurrentWebinarFee();
+              if (findPassFeedback) {
+                findPassFeedback.style.background = 'rgba(239, 68, 68, 0.08)';
+                findPassFeedback.style.border = '1.5px solid #EF4444';
+                findPassFeedback.style.color = 'var(--text-primary)';
+                findPassFeedback.innerHTML = `
+                  <div style="text-align: left;">
+                    <div style="font-weight: 700; color: #EF4444; margin-bottom: 4px;">
+                      <i class="fa-solid fa-circle-exclamation"></i> Payment Incomplete / Not Verified
+                    </div>
+                    <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 10px; line-height: 1.35;">
+                      Registration record found for <strong>${escapeHtml(lead.name)}</strong>, but payment has <strong>not been completed</strong>. Official Ticket Passes are strictly generated only after payment is confirmed.
+                    </p>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                      <button type="button" onclick="closeFindPassModal(); document.querySelector('.webinar-card-wrapper')?.scrollIntoView({behavior:'smooth', block:'start'});" class="btn btn-primary" style="flex: 1; font-size: 0.82rem; justify-content: center; padding: 7px 12px;">
+                        <i class="fa-solid fa-bolt"></i> Complete Payment Now (₹${currFee})
+                      </button>
+                      <a href="https://wa.me/917010270151?text=Hi%20FlipCut!%20I%20registered%20for%20the%20Webinar%20(${encodeURIComponent(lead.name)}%20-%20${encodeURIComponent(lead.userId)}).%20Please%20verify%20my%20payment." target="_blank" class="btn btn-secondary" style="flex: 1; font-size: 0.82rem; justify-content: center; padding: 7px 12px; color: #25D366; border-color: #25D366;">
+                        <i class="fa-brands fa-whatsapp"></i> WhatsApp Support
+                      </a>
+                    </div>
+                  </div>
+                `;
+              }
             }
-            setTimeout(() => {
-              closeFindPassModal();
-              showTicketModal(lead.name, lead.websiteType, lead.paymentId, lead.userId, lead.phone);
-              showToast(`🎉 Welcome back, ${lead.name}! Here is your Digital Ticket Pass.`, '#10B981');
-            }, 700);
           } else {
-            // Found registration but payment is UNPAID / PENDING
+            // If not found in database, require payment ID or prompt to pay
+            const currFee = getCurrentWebinarFee();
             if (findPassFeedback) {
               findPassFeedback.style.background = 'rgba(239, 68, 68, 0.08)';
               findPassFeedback.style.border = '1.5px solid #EF4444';
@@ -3689,48 +3729,34 @@ https://flipcutcreation.in/webinar`;
               findPassFeedback.innerHTML = `
                 <div style="text-align: left;">
                   <div style="font-weight: 700; color: #EF4444; margin-bottom: 4px;">
-                    <i class="fa-solid fa-circle-exclamation"></i> Payment Incomplete / Not Verified
+                    <i class="fa-solid fa-circle-xmark"></i> No Verified Paid Registration Found
                   </div>
                   <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 10px; line-height: 1.35;">
-                    Registration record found for <strong>${escapeHtml(lead.name)}</strong>, but payment has <strong>not been completed</strong>. Official Ticket Passes are strictly generated only after payment is confirmed.
+                    No paid registration record exists for "<strong>${escapeHtml(query)}</strong>". Ticket Passes are only issued for confirmed payments.
                   </p>
                   <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                     <button type="button" onclick="closeFindPassModal(); document.querySelector('.webinar-card-wrapper')?.scrollIntoView({behavior:'smooth', block:'start'});" class="btn btn-primary" style="flex: 1; font-size: 0.82rem; justify-content: center; padding: 7px 12px;">
-                      <i class="fa-solid fa-bolt"></i> Complete Payment Now (₹49)
+                      <i class="fa-solid fa-bolt"></i> Register & Pay Now (₹${currFee})
                     </button>
-                    <a href="https://wa.me/917010270151?text=Hi%20FlipCut!%20I%20registered%20for%20the%20Webinar%20(${encodeURIComponent(lead.name)}%20-%20${encodeURIComponent(lead.userId)}).%20Please%20verify%20my%20payment." target="_blank" class="btn btn-secondary" style="flex: 1; font-size: 0.82rem; justify-content: center; padding: 7px 12px; color: #25D366; border-color: #25D366;">
-                      <i class="fa-brands fa-whatsapp"></i> WhatsApp Support
+                    <a href="https://wa.me/917010270151?text=Hi%20FlipCut!%20I%20completed%20payment%20for%20the%20Webinar.%20Please%20verify%20my%20payment%20proof%20for:%20${encodeURIComponent(query)}" target="_blank" class="btn btn-secondary" style="flex: 1; font-size: 0.82rem; justify-content: center; padding: 7px 12px; color: #25D366; border-color: #25D366;">
+                      <i class="fa-brands fa-whatsapp"></i> Send Payment Proof
                     </a>
                   </div>
                 </div>
               `;
             }
           }
-        } else {
-          // If not found in database, require payment ID or prompt to pay
+        } catch (err) {
+          console.error('[Find Pass Error]', err);
           if (findPassFeedback) {
             findPassFeedback.style.background = 'rgba(239, 68, 68, 0.08)';
             findPassFeedback.style.border = '1.5px solid #EF4444';
             findPassFeedback.style.color = 'var(--text-primary)';
-            findPassFeedback.innerHTML = `
-              <div style="text-align: left;">
-                <div style="font-weight: 700; color: #EF4444; margin-bottom: 4px;">
-                  <i class="fa-solid fa-circle-xmark"></i> No Verified Paid Registration Found
-                </div>
-                <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 10px; line-height: 1.35;">
-                  No paid registration record exists for "<strong>${escapeHtml(query)}</strong>". Ticket Passes are only issued for confirmed payments.
-                </p>
-                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                  <button type="button" onclick="closeFindPassModal(); document.querySelector('.webinar-card-wrapper')?.scrollIntoView({behavior:'smooth', block:'start'});" class="btn btn-primary" style="flex: 1; font-size: 0.82rem; justify-content: center; padding: 7px 12px;">
-                    <i class="fa-solid fa-bolt"></i> Register & Pay Now
-                  </button>
-                  <a href="https://wa.me/917010270151?text=Hi%20FlipCut!%20I%20completed%20payment%20for%20the%20Webinar.%20Please%20verify%20my%20payment%20proof%20for:%20${encodeURIComponent(query)}" target="_blank" class="btn btn-secondary" style="flex: 1; font-size: 0.82rem; justify-content: center; padding: 7px 12px; color: #25D366; border-color: #25D366;">
-                    <i class="fa-brands fa-whatsapp"></i> Send Payment Proof
-                  </a>
-                </div>
-              </div>
-            `;
+            findPassFeedback.innerHTML = `<span style="color:#EF4444;"><i class="fa-solid fa-circle-exclamation"></i> Lookup note: ${escapeHtml(err.message || 'Error occurred during lookup')}</span>`;
           }
+        } finally {
+          if (btnFindPassSubmit) btnFindPassSubmit.removeAttribute('disabled');
+          if (btnFindPassSubmitText) btnFindPassSubmitText.textContent = 'Find My Ticket Pass';
         }
       };
 

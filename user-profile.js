@@ -9,6 +9,17 @@
 (function () {
   'use strict';
 
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+  window.escapeHtml = escapeHtml;
+
   function getCookie(name) {
     try {
       const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
@@ -238,14 +249,8 @@
     const SUPABASE_SYNC_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6bml4dmRwaHdiamRubm1hcHZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTgwMTgsImV4cCI6MjEwMzEzNDAxOH0.dTLN1DCbUiBawZq8YlS5Bol-i81JFKhKpPKCboyocuQ';
 
     try {
-      // 1. Check local storage cache first
+      // 1. Fetch fresh leads from Supabase Cloud first
       let candidates = [];
-      try {
-        const local = JSON.parse(localStorage.getItem('flipcut_leads') || '[]');
-        if (Array.isArray(local)) candidates.push(...local);
-      } catch (_) {}
-
-      // 2. Fetch fresh leads from Supabase Cloud
       try {
         const res = await fetch(`${SUPABASE_SYNC_URL}/rest/v1/leads?id=neq.CMS_SITE_CONTENT_LIVE&order=created_at.desc&limit=100`, {
           headers: { apikey: SUPABASE_SYNC_KEY, Authorization: 'Bearer ' + SUPABASE_SYNC_KEY }
@@ -258,8 +263,14 @@
         console.warn('Cloud pass fetch note:', cloudErr);
       }
 
+      // 2. Local storage cache as fallback
+      try {
+        const local = JSON.parse(localStorage.getItem('flipcut_leads') || '[]');
+        if (Array.isArray(local)) candidates.push(...local);
+      } catch (_) {}
+
       // 3. Smart Match Algorithm (Normalizes phone numbers, handles +91 and spaces)
-      const match = candidates.find(r => {
+      const matches = candidates.filter(r => {
         if (!r || r.id === 'CMS_SITE_CONTENT_LIVE') return false;
         const rName = (r.name || '').toLowerCase();
         const rEmail = (r.email || '').toLowerCase();
@@ -271,6 +282,9 @@
         if (cleanDigits && cleanDigits.length >= 7 && rPhoneDigits.includes(cleanDigits)) return true;
         return false;
       });
+
+      // Prioritize confirmed paid match if user has multiple registration attempts
+      const match = matches.find(r => r.status === 'Booked / Paid' || (r.paymentStatus || '').toLowerCase().includes('paid')) || matches[0];
 
       if (match) {
         // Extract real payment ID from message or paymentId property
