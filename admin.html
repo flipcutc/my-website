@@ -1867,9 +1867,9 @@
 
             <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
               <input type="text" id="analyticsSearchInput" oninput="renderAnalyticsTable()" class="form-control" placeholder="Search IP, City, Page, Device..." style="width: 220px;">
-              <select id="analyticsFilterSelect" onchange="renderAnalyticsTable()" class="form-control" style="width: auto; font-weight: 700; border-color: #6366F1; background: rgba(99, 102, 241, 0.08);">
-                <option value="all" selected>All Visitors</option>
-                <option value="online">🟢 Active Now (Online)</option>
+              <select id="analyticsFilterSelect" onchange="renderAnalyticsTable()" class="form-control" style="width: auto; font-weight: 700; border-color: #10B981; background: rgba(16, 185, 129, 0.08); color: #10B981;">
+                <option value="online" selected>🟢 Active Now (Online)</option>
+                <option value="all">👥 All Visitors (History)</option>
                 <option value="mobile">📱 Mobile Devices</option>
                 <option value="desktop">💻 Desktop / Laptops</option>
                 <option value="instagram">📸 Instagram</option>
@@ -6327,14 +6327,21 @@ function renderCrmTable() {
         // Update live table & SaaS visual charts simultaneously
         renderSaaSCharts();
 
-        // Update sidebar live pulse badge
+        // Update sidebar live pulse badge & filter option counts
         if (currentLiveVisitors) {
           const activeCount = currentLiveVisitors.filter(v => v.isOnline).length;
+          const totalCount = currentLiveVisitors.length;
+
           const sidebarPulse = document.getElementById('sidebarLiveVisitorCount');
           if (sidebarPulse) {
             sidebarPulse.textContent = activeCount;
             sidebarPulse.style.display = activeCount > 0 ? 'inline-block' : 'none';
           }
+
+          const optOnline = document.querySelector('#analyticsFilterSelect option[value="online"]');
+          if (optOnline) optOnline.textContent = `🟢 Active Now (Online: ${activeCount})`;
+          const optAll = document.querySelector('#analyticsFilterSelect option[value="all"]');
+          if (optAll) optAll.textContent = `👥 All Visitors (Total: ${totalCount})`;
         }
       }
 
@@ -6343,7 +6350,7 @@ function renderCrmTable() {
         if (!tableBody) return;
 
         const searchQ = (document.getElementById('analyticsSearchInput')?.value || '').toLowerCase().trim();
-        const filterVal = document.getElementById('analyticsFilterSelect')?.value || 'all';
+        const filterVal = document.getElementById('analyticsFilterSelect')?.value || 'online';
 
         let filtered = currentLiveVisitors || [];
 
@@ -6379,11 +6386,24 @@ function renderCrmTable() {
         }
 
         if (filtered.length === 0) {
+          const isOnlineFilter = filterVal === 'online';
           tableBody.innerHTML = `
             <tr>
-              <td colspan="7" style="text-align: center; padding: 40px; color: var(--text-muted);">
-                <i class="fa-solid fa-user-slash" style="font-size: 1.5rem; margin-bottom: 8px;"></i>
-                <p>No visitors found matching current filter.</p>
+              <td colspan="8" style="text-align: center; padding: 48px 20px; color: var(--text-muted);">
+                <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(16, 185, 129, 0.12); color: #10B981; display: inline-flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 12px; box-shadow: 0 0 16px rgba(16, 185, 129, 0.2);">
+                  <i class="fa-solid fa-satellite-dish fa-spin"></i>
+                </div>
+                <h4 style="margin: 0 0 6px 0; color: var(--text-primary); font-size: 1.05rem; font-weight: 700;">
+                  ${isOnlineFilter ? 'No Active Visitors Browsing Right Now' : 'No Visitors Matching Current Filter'}
+                </h4>
+                <p style="margin: 0 0 16px 0; font-size: 0.85rem; color: var(--text-muted);">
+                  ${isOnlineFilter ? 'Live radar is active and scanning for new visitor traffic in real time.' : 'Try changing your search keywords or switching filters.'}
+                </p>
+                ${isOnlineFilter ? `
+                  <button type="button" onclick="document.getElementById('analyticsFilterSelect').value='all'; renderAnalyticsTable();" class="btn btn-secondary" style="padding: 7px 16px; font-size: 0.82rem; background: rgba(99, 102, 241, 0.12); color: #6366F1; border: 1px solid rgba(99, 102, 241, 0.35); border-radius: 6px; font-weight: 700; cursor: pointer;">
+                    <i class="fa-solid fa-clock-rotate-left"></i> View All Recent Visitor Sessions (${(currentLiveVisitors || []).length})
+                  </button>
+                ` : ''}
               </td>
             </tr>
           `;
