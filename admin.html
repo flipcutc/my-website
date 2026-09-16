@@ -974,6 +974,12 @@
             <span class="tab-count-pill" id="sidebarLeadCount" style="background: #38BDF8;">0</span>
           </button>
         </li>
+        <li>
+          <button class="tab-btn-vertical" data-tab="tab-live-analytics" data-title="🌐 Live Visitors &amp; Web Analytics">
+            <span class="btn-inner"><i class="fa-solid fa-satellite-dish" style="color: #06B6D4;"></i> Live Visitors</span>
+            <span class="tab-count-pill" id="sidebarLiveVisitorCount" style="background: #06B6D4;">0</span>
+          </button>
+        </li>
       </ul>
 
       <!-- System & Integrations -->
@@ -1505,6 +1511,104 @@
         </div>
       </div>
 
+
+      <!-- ====================================================================
+           TAB: LIVE VISITORS & WEB ANALYTICS (Realtime Stream)
+           ==================================================================== -->
+      <div class="tab-pane" id="tab-live-analytics">
+        
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-info">
+              <h4>Active Visitors Right Now</h4>
+              <span class="kpi-value" id="kpiActiveVisitors" style="color: #10B981; display: flex; align-items: center; gap: 8px;">
+                <span style="width: 10px; height: 10px; border-radius: 50%; background: #10B981; box-shadow: 0 0 10px #10B981; animation: pulse 1.8s infinite;"></span>
+                0 Online
+              </span>
+            </div>
+            <div class="kpi-icon" style="color: #10B981; background: rgba(16,185,129,0.12);"><i class="fa-solid fa-users-viewfinder"></i></div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-info">
+              <h4>Top Visitor City / State</h4>
+              <span class="kpi-value" id="kpiTopLocation" style="color: #8B5CF6; font-size: 1.35rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;">-</span>
+            </div>
+            <div class="kpi-icon" style="color: #8B5CF6; background: rgba(139,92,246,0.12);"><i class="fa-solid fa-earth-americas"></i></div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-info">
+              <h4>Mobile vs Desktop</h4>
+              <span class="kpi-value" id="kpiDeviceRatio" style="color: #06B6D4; font-size: 1.35rem;">0% Mobile</span>
+            </div>
+            <div class="kpi-icon" style="color: #06B6D4; background: rgba(6,182,212,0.12);"><i class="fa-solid fa-mobile-screen-button"></i></div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-info">
+              <h4>Top Traffic Channel</h4>
+              <span class="kpi-value" id="kpiTopTraffic" style="color: #F59E0B; font-size: 1.35rem;">Direct Traffic</span>
+            </div>
+            <div class="kpi-icon" style="color: #F59E0B; background: rgba(245,158,11,0.12);"><i class="fa-solid fa-chart-pie"></i></div>
+          </div>
+        </div>
+
+        <div class="cms-card">
+          <div class="cms-header">
+            <div>
+              <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <h2>🌐 Real-Time Live Visitors &amp; Web Analytics</h2>
+                <span style="display: inline-flex; align-items: center; gap: 6px; background: rgba(6, 182, 212, 0.12); color: #06B6D4; border: 1px solid rgba(6, 182, 212, 0.3); padding: 3px 9px; border-radius: 9999px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+                  <span style="width: 7px; height: 7px; border-radius: 50%; background: #06B6D4; box-shadow: 0 0 8px #06B6D4;"></span>
+                  ⚡ 0ms Live Radar Active
+                </span>
+              </div>
+              <p>Live stream of incoming visitors, IP geolocation, current active pages, device types, traffic referrers, and real-time button clicks.</p>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+              <button class="btn btn-secondary" onclick="fetchLiveAnalytics(false)" title="Refresh Live Visitors" style="padding: 10px 14px;">
+                <i class="fa-solid fa-rotate"></i>
+              </button>
+              <input type="text" id="analyticsSearchInput" oninput="renderAnalyticsTable()" class="form-control" placeholder="Search IP, City, Page, Device..." style="width: 220px;">
+              <select id="analyticsFilterSelect" onchange="renderAnalyticsTable()" class="form-control" style="width: auto; font-weight: 700; border-color: #06B6D4; background: rgba(6, 182, 212, 0.08);">
+                <option value="all" selected>All Visitors (Recent 100)</option>
+                <option value="online">🟢 Active Now (Online)</option>
+                <option value="mobile">📱 Mobile Devices</option>
+                <option value="desktop">💻 Desktop / Laptops</option>
+                <option value="instagram">📸 Instagram</option>
+                <option value="google">🔍 Google Search</option>
+                <option value="direct">🔗 Direct Traffic</option>
+              </select>
+              <button class="btn btn-primary" onclick="exportAnalyticsCsv()" style="padding: 10px 18px; background: #06B6D4; border-color: #06B6D4;">
+                <i class="fa-solid fa-download"></i> Export CSV
+              </button>
+            </div>
+          </div>
+
+          <div class="table-wrapper">
+            <table class="comparison-table">
+              <thead>
+                <tr>
+                  <th style="width: 130px;">Live Status</th>
+                  <th>Location &amp; IP Address</th>
+                  <th>Current Active Page</th>
+                  <th>Traffic Source</th>
+                  <th>Device &amp; Browser</th>
+                  <th>Recent Action / Clicks</th>
+                  <th style="width: 170px;">Last Activity</th>
+                </tr>
+              </thead>
+              <tbody id="analyticsTableBody">
+                <tr>
+                  <td colspan="7" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                    <i class="fa-solid fa-satellite-dish fa-spin" style="font-size: 1.5rem; margin-bottom: 8px; color: #06B6D4;"></i>
+                    <p>Scanning for live visitors and click-stream pulses...</p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
 <!-- ====================================================================
            TAB 3: GOOGLE DRIVE (5TB CLOUD STORAGE & BACKUPS)
@@ -4299,6 +4403,8 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
             if (typeof loadRazorpayConfig === 'function') loadRazorpayConfig();
           } else if (tabId === 'tab-gdrive') {
             if (typeof loadDriveConfig === 'function') loadDriveConfig();
+          } else if (tabId === 'tab-live-analytics') {
+            if (typeof fetchLiveAnalytics === 'function') fetchLiveAnalytics();
           }
         } catch (e) {
           console.warn('Tab activation note:', e);
@@ -4421,7 +4527,7 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
         try {
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 4000);
-          const sbRes = await fetch(`${PERM_SUPABASE_URL}/rest/v1/leads?id=neq.CMS_SITE_CONTENT_LIVE&order=created_at.desc`, {
+          const sbRes = await fetch(`${PERM_SUPABASE_URL}/rest/v1/leads?id=neq.CMS_SITE_CONTENT_LIVE&id=not.like.VIS_*&order=created_at.desc`, {
             headers: {
               apikey: PERM_SUPABASE_KEY,
               Authorization: `Bearer ${PERM_SUPABASE_KEY}`
@@ -4433,7 +4539,7 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
           if (sbRes.ok) {
             const rows = await sbRes.json();
             if (Array.isArray(rows) && rows.length > 0) {
-              fetchedLeads = rows.map(r => {
+              fetchedLeads = rows.filter(r => r && r.id && !r.id.startsWith('VIS_') && r.id !== 'CMS_SITE_CONTENT_LIVE').map(r => {
                 const isWebinar = (r.service || '').toLowerCase().includes('webinar') || (r.id || '').startsWith('FC-WEB') || (r.status || '').toLowerCase().includes('paid');
                 const isWaJoined = r.whatsappJoined === true || r.waGroupStatus === 'Joined' || (r.message && r.message.includes('WhatsApp Group Joined'));
                 const isPaidStatus = String(r.status || '').toLowerCase().includes('paid');
@@ -4474,7 +4580,7 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
             if (Array.isArray(dualLeads) && dualLeads.length > 0) {
               const leadMap = new Map();
               dualLeads.forEach(dl => {
-                if (dl && dl.id && !dl.id.startsWith('CMS_')) leadMap.set(dl.id, dl);
+                if (dl && dl.id && !dl.id.startsWith('CMS_') && !dl.id.startsWith('VIS_')) leadMap.set(dl.id, dl);
               });
               // Overwrite with fresh Supabase data (Supabase is source of truth)
               fetchedLeads.forEach(sl => {
@@ -4927,7 +5033,7 @@ function renderCrmTable() {
         if (!currentLeads) currentLeads = [];
 
         // Classifier Functions
-        const isLeadRecord = (l) => l && l.id && !String(l.id).startsWith('CMS_');
+        const isLeadRecord = (l) => l && l.id && !String(l.id).startsWith('CMS_') && !String(l.id).startsWith('VIS_');
 
         const isWebinarLead = (l) => {
           if (!isLeadRecord(l)) return false;
@@ -5361,6 +5467,352 @@ function renderCrmTable() {
         link.download = filename;
         link.click();
       }
+
+      // ====================================================================
+      // 5B. REAL-TIME LIVE VISITORS & WEB ANALYTICS ENGINE
+      // ====================================================================
+      let currentLiveVisitors = [];
+      let isFetchingAnalytics = false;
+
+      async function fetchLiveAnalytics(silent = false) {
+        if (isFetchingAnalytics) return;
+        isFetchingAnalytics = true;
+
+        const tableBody = document.getElementById('analyticsTableBody');
+        if (!silent && tableBody && currentLiveVisitors.length === 0) {
+          tableBody.innerHTML = `
+            <tr>
+              <td colspan="7" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                <i class="fa-solid fa-satellite-dish fa-spin" style="font-size: 1.5rem; margin-bottom: 8px; color: #06B6D4;"></i>
+                <p>Connecting to Live Supabase Radar...</p>
+              </td>
+            </tr>
+          `;
+        }
+
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 4000);
+          const res = await fetch(`${PERM_SUPABASE_URL}/rest/v1/leads?id=like.VIS_*&order=created_at.desc&limit=100`, {
+            headers: {
+              apikey: PERM_SUPABASE_KEY,
+              Authorization: `Bearer ${PERM_SUPABASE_KEY}`
+            },
+            signal: controller.signal,
+            cache: 'no-store'
+          });
+          clearTimeout(timeoutId);
+
+          if (res.ok) {
+            const rows = await res.json();
+            if (Array.isArray(rows)) {
+              currentLiveVisitors = rows.map(r => {
+                let meta = {};
+                try {
+                  if (r.message && r.message.startsWith('{')) {
+                    meta = JSON.parse(r.message);
+                  }
+                } catch (_) {}
+
+                const lastSeenDate = new Date(meta.lastSeen || r.created_at || Date.now());
+                const diffMinutes = (Date.now() - lastSeenDate.getTime()) / 60000;
+                
+                // Active if seen in last 3 minutes and status is ONLINE
+                const isStillOnline = diffMinutes <= 3 && (r.status === 'ONLINE' || meta.isOnline === true);
+                const isIdle = !isStillOnline && diffMinutes <= 10;
+
+                return {
+                  sessionId: r.id,
+                  ip: meta.ip || r.email || 'Anonymous',
+                  city: meta.city || 'Unknown City',
+                  region: meta.region || '',
+                  country: meta.country || 'India',
+                  countryCode: meta.countryCode || 'IN',
+                  flag: meta.flag || '🇮🇳',
+                  locationLabel: r.name || `${meta.city || 'India'}, ${meta.country || ''}`,
+                  device: meta.device || 'Desktop',
+                  os: meta.os || '',
+                  browser: meta.browser || '',
+                  screen: meta.screen || '',
+                  deviceLabel: r.phone || `${meta.device || 'Device'} • ${meta.browser || ''}`,
+                  referrer: meta.referrer || r.budget || 'Direct Traffic',
+                  page: meta.page || '/',
+                  pageTitle: meta.pageTitle || 'FlipCut Creation',
+                  lastAction: meta.lastAction || 'Active Browsing',
+                  isOnline: isStillOnline,
+                  isIdle: isIdle,
+                  status: isStillOnline ? 'ONLINE' : (isIdle ? 'IDLE' : 'LEFT'),
+                  durationSeconds: meta.durationSeconds || 0,
+                  firstSeen: meta.firstSeen || r.created_at,
+                  lastSeen: meta.lastSeen || r.created_at,
+                  created_at: r.created_at
+                };
+              });
+            }
+          }
+        } catch (err) {
+          console.warn('[Analytics Fetch Note]', err);
+        } finally {
+          isFetchingAnalytics = false;
+        }
+
+        renderAnalyticsTable();
+        updateAnalyticsKPIs();
+      }
+
+      function updateAnalyticsKPIs() {
+        if (!currentLiveVisitors) return;
+
+        // 1. Active Visitors Right Now
+        const activeCount = currentLiveVisitors.filter(v => v.isOnline).length;
+        const kpiActive = document.getElementById('kpiActiveVisitors');
+        const sidebarPulse = document.getElementById('sidebarLiveVisitorCount');
+        if (kpiActive) {
+          kpiActive.innerHTML = `
+            <span style="width: 10px; height: 10px; border-radius: 50%; background: #10B981; box-shadow: 0 0 10px #10B981; animation: pulse 1.8s infinite;"></span>
+            ${activeCount} Online
+          `;
+        }
+        if (sidebarPulse) {
+          sidebarPulse.textContent = activeCount;
+          sidebarPulse.style.display = activeCount > 0 ? 'inline-block' : 'none';
+        }
+
+        // 2. Top Location
+        const locCounts = {};
+        currentLiveVisitors.forEach(v => {
+          const loc = v.city && v.city !== 'Unknown City' ? `${v.flag} ${v.city}` : `${v.flag} ${v.country}`;
+          locCounts[loc] = (locCounts[loc] || 0) + 1;
+        });
+        const sortedLocs = Object.entries(locCounts).sort((a, b) => b[1] - a[1]);
+        const topLocEl = document.getElementById('kpiTopLocation');
+        if (topLocEl) {
+          topLocEl.textContent = sortedLocs.length > 0 ? `${sortedLocs[0][0]} (${sortedLocs[0][1]})` : 'Global';
+        }
+
+        // 3. Mobile vs Desktop
+        const mobileCount = currentLiveVisitors.filter(v => v.device === 'Mobile' || v.device === 'Tablet').length;
+        const total = currentLiveVisitors.length || 1;
+        const mobilePct = Math.round((mobileCount / total) * 100);
+        const devRatioEl = document.getElementById('kpiDeviceRatio');
+        if (devRatioEl) {
+          devRatioEl.textContent = `${mobilePct}% Mobile / ${100 - mobilePct}% PC`;
+        }
+
+        // 4. Top Traffic Source
+        const refCounts = {};
+        currentLiveVisitors.forEach(v => {
+          const ref = v.referrer || 'Direct Traffic';
+          refCounts[ref] = (refCounts[ref] || 0) + 1;
+        });
+        const sortedRefs = Object.entries(refCounts).sort((a, b) => b[1] - a[1]);
+        const topTrafficEl = document.getElementById('kpiTopTraffic');
+        if (topTrafficEl) {
+          topTrafficEl.textContent = sortedRefs.length > 0 ? `${sortedRefs[0][0]} (${sortedRefs[0][1]})` : 'Direct Traffic';
+        }
+      }
+
+      function renderAnalyticsTable() {
+        const tableBody = document.getElementById('analyticsTableBody');
+        if (!tableBody) return;
+
+        const searchQ = (document.getElementById('analyticsSearchInput')?.value || '').toLowerCase().trim();
+        const filterVal = document.getElementById('analyticsFilterSelect')?.value || 'all';
+
+        let filtered = currentLiveVisitors || [];
+
+        // Apply Category Filter
+        if (filterVal === 'online') {
+          filtered = filtered.filter(v => v.isOnline);
+        } else if (filterVal === 'mobile') {
+          filtered = filtered.filter(v => v.device === 'Mobile' || v.device === 'Tablet');
+        } else if (filterVal === 'desktop') {
+          filtered = filtered.filter(v => v.device === 'Desktop');
+        } else if (filterVal === 'instagram') {
+          filtered = filtered.filter(v => (v.referrer || '').toLowerCase().includes('instagram'));
+        } else if (filterVal === 'google') {
+          filtered = filtered.filter(v => (v.referrer || '').toLowerCase().includes('google'));
+        } else if (filterVal === 'direct') {
+          filtered = filtered.filter(v => (v.referrer || '').toLowerCase().includes('direct'));
+        }
+
+        // Apply Search Filter
+        if (searchQ) {
+          filtered = filtered.filter(v => 
+            (v.ip || '').toLowerCase().includes(searchQ) ||
+            (v.city || '').toLowerCase().includes(searchQ) ||
+            (v.country || '').toLowerCase().includes(searchQ) ||
+            (v.page || '').toLowerCase().includes(searchQ) ||
+            (v.pageTitle || '').toLowerCase().includes(searchQ) ||
+            (v.device || '').toLowerCase().includes(searchQ) ||
+            (v.os || '').toLowerCase().includes(searchQ) ||
+            (v.browser || '').toLowerCase().includes(searchQ) ||
+            (v.referrer || '').toLowerCase().includes(searchQ) ||
+            (v.lastAction || '').toLowerCase().includes(searchQ)
+          );
+        }
+
+        if (filtered.length === 0) {
+          tableBody.innerHTML = `
+            <tr>
+              <td colspan="7" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                <i class="fa-solid fa-user-slash" style="font-size: 1.5rem; margin-bottom: 8px;"></i>
+                <p>No visitors found matching current filter.</p>
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        tableBody.innerHTML = filtered.map(v => {
+          // Status Pill
+          let statusBadge = '';
+          if (v.isOnline) {
+            statusBadge = `
+              <span style="display: inline-flex; align-items: center; gap: 6px; background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3); padding: 4px 10px; border-radius: 9999px; font-size: 0.76rem; font-weight: 800;">
+                <span style="width: 7px; height: 7px; border-radius: 50%; background: #10B981; box-shadow: 0 0 8px #10B981; animation: pulse 1.5s infinite;"></span>
+                ONLINE
+              </span>
+            `;
+          } else if (v.isIdle) {
+            statusBadge = `
+              <span style="display: inline-flex; align-items: center; gap: 6px; background: rgba(245, 158, 11, 0.15); color: #F59E0B; border: 1px solid rgba(245, 158, 11, 0.3); padding: 4px 10px; border-radius: 9999px; font-size: 0.76rem; font-weight: 800;">
+                <span style="width: 7px; height: 7px; border-radius: 50%; background: #F59E0B;"></span>
+                IDLE
+              </span>
+            `;
+          } else {
+            statusBadge = `
+              <span style="display: inline-flex; align-items: center; gap: 6px; background: rgba(148, 163, 184, 0.12); color: #94A3B8; border: 1px solid rgba(148, 163, 184, 0.25); padding: 4px 10px; border-radius: 9999px; font-size: 0.76rem; font-weight: 700;">
+                <span style="width: 7px; height: 7px; border-radius: 50%; background: #94A3B8;"></span>
+                LEFT
+              </span>
+            `;
+          }
+
+          // Traffic Source Icon
+          let trafficIcon = 'fa-solid fa-link';
+          let trafficColor = '#64748B';
+          const refLower = (v.referrer || '').toLowerCase();
+          if (refLower.includes('instagram')) {
+            trafficIcon = 'fa-brands fa-instagram';
+            trafficColor = '#E1306C';
+          } else if (refLower.includes('google')) {
+            trafficIcon = 'fa-brands fa-google';
+            trafficColor = '#4285F4';
+          } else if (refLower.includes('facebook')) {
+            trafficIcon = 'fa-brands fa-facebook';
+            trafficColor = '#1877F2';
+          } else if (refLower.includes('youtube')) {
+            trafficIcon = 'fa-brands fa-youtube';
+            trafficColor = '#FF0000';
+          } else if (refLower.includes('whatsapp')) {
+            trafficIcon = 'fa-brands fa-whatsapp';
+            trafficColor = '#25D366';
+          } else if (refLower.includes('direct')) {
+            trafficIcon = 'fa-solid fa-arrow-pointer';
+            trafficColor = '#06B6D4';
+          }
+
+          // Device Icon
+          let devIcon = v.device === 'Mobile' ? 'fa-solid fa-mobile-screen' : (v.device === 'Tablet' ? 'fa-solid fa-tablet-screen-button' : 'fa-solid fa-laptop');
+
+          // Page Badge
+          const isWebinarPage = (v.page || '').includes('webinar');
+          const pageBadgeColor = isWebinarPage ? '#6366F1' : '#10B981';
+
+          // Format relative time
+          const lastDate = new Date(v.lastSeen || v.created_at || Date.now());
+          const diffSec = Math.max(1, Math.round((Date.now() - lastDate.getTime()) / 1000));
+          let timeAgo = '';
+          if (diffSec < 60) timeAgo = `${diffSec}s ago`;
+          else if (diffSec < 3600) timeAgo = `${Math.round(diffSec / 60)}m ago`;
+          else timeAgo = `${Math.round(diffSec / 3600)}h ago`;
+
+          return `
+            <tr>
+              <td>${statusBadge}</td>
+              <td>
+                <div style="font-weight: 700; color: var(--text-primary); font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
+                  <span>${v.flag || '🌐'}</span>
+                  <span>${v.city || 'India'}${v.region ? ', ' + v.region : ''}</span>
+                </div>
+                <div style="font-size: 0.78rem; color: var(--text-muted); font-family: monospace; margin-top: 2px;">
+                  IP: ${v.ip || 'Hidden'}
+                </div>
+              </td>
+              <td>
+                <div style="display: inline-flex; align-items: center; gap: 6px; background: rgba(99, 102, 241, 0.08); padding: 4px 10px; border-radius: 6px; border-left: 3px solid ${pageBadgeColor};">
+                  <span style="font-weight: 700; color: ${pageBadgeColor}; font-size: 0.88rem;">${v.page || '/'}</span>
+                </div>
+                <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
+                  ${v.pageTitle || 'FlipCut Creation'}
+                </div>
+              </td>
+              <td>
+                <span style="display: inline-flex; align-items: center; gap: 6px; font-weight: 600; font-size: 0.88rem; color: ${trafficColor};">
+                  <i class="${trafficIcon}"></i>
+                  ${v.referrer || 'Direct Traffic'}
+                </span>
+              </td>
+              <td>
+                <div style="font-weight: 600; font-size: 0.88rem; display: flex; align-items: center; gap: 6px;">
+                  <i class="${devIcon}" style="color: var(--brand-indigo);"></i>
+                  <span>${v.device || 'Desktop'} (${v.os || 'OS'})</span>
+                </div>
+                <div style="font-size: 0.78rem; color: var(--text-muted);">
+                  ${v.browser || 'Browser'}
+                </div>
+              </td>
+              <td>
+                <div style="max-width: 220px; font-size: 0.86rem; color: var(--text-primary); background: rgba(0,0,0,0.03); padding: 4px 8px; border-radius: 6px; border: 1px dashed var(--border-subtle); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${v.lastAction || 'Browsing'}">
+                  <i class="fa-solid fa-computer-mouse" style="color: #06B6D4; margin-right: 4px;"></i>
+                  ${v.lastAction || 'Active Browsing'}
+                </div>
+              </td>
+              <td>
+                <div style="font-weight: 700; font-size: 0.88rem; color: var(--text-primary);">
+                  ${timeAgo}
+                </div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">
+                  ${new Date(v.lastSeen || v.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      window.exportAnalyticsCsv = function() {
+        if (!currentLiveVisitors || currentLiveVisitors.length === 0) {
+          return alert('No visitor records to export.');
+        }
+        let csv = '\uFEFFSession ID,Status,IP Address,City,Region,Country,Current Page,Page Title,Traffic Source,Device,OS,Browser,Last Action,First Seen,Last Active\n';
+        currentLiveVisitors.forEach(v => {
+          csv += `"${v.sessionId}","${v.status}","${v.ip}","${(v.city || '').replace(/"/g, '""')}","${(v.region || '').replace(/"/g, '""')}","${(v.country || '').replace(/"/g, '""')}","${v.page}","${(v.pageTitle || '').replace(/"/g, '""')}","${(v.referrer || '').replace(/"/g, '""')}","${v.device}","${v.os}","${v.browser}","${(v.lastAction || '').replace(/"/g, '""')}","${v.firstSeen || ''}","${v.lastSeen || ''}"\n`;
+        });
+        downloadCsvBlob(csv, `FlipCut_Live_Visitors_Analytics_${new Date().toISOString().slice(0, 10)}.csv`);
+      };
+
+      // BroadcastChannel listener for 0ms local tab sync
+      try {
+        if (typeof BroadcastChannel !== 'undefined') {
+          const bc = new BroadcastChannel('flipcut_live_analytics');
+          bc.onmessage = function(ev) {
+            if (ev.data && ev.data.type === 'VISITOR_UPDATE') {
+              fetchLiveAnalytics(true);
+            }
+          };
+        }
+      } catch (_) {}
+
+      // Auto-refresh interval (every 8 seconds when on Live Visitors tab)
+      setInterval(() => {
+        const analyticsPane = document.getElementById('tab-live-analytics');
+        if (analyticsPane && analyticsPane.classList.contains('active')) {
+          fetchLiveAnalytics(true);
+        }
+      }, 8000);
 
       // Lead Details View Modal Handlers
       let activeDetailLeadId = null;
