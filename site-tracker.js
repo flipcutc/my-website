@@ -1,6 +1,6 @@
 /**
  * FlipCut Creation - Real-time Site Visitor Tracker & Click-Stream Engine
- * Captures IP, Geolocation, Current Page, Device/OS, Traffic Referrer, and User Interactions.
+ * Captures IP, Geolocation, Current Page, Device/OS, Traffic Referrer, Granular User Journey, and Instant Exit.
  * 100% Non-blocking, isolated from payments and leads.
  */
 (function() {
@@ -36,7 +36,43 @@
   const sessionId = getSessionId();
   const sessionStartTime = Date.now();
 
-  // 2. Device, OS & Browser Detection
+  // 2. Granular User Journey Timeline Store (sessionStorage cached)
+  function getJourney() {
+    try {
+      const raw = sessionStorage.getItem('fc_journey');
+      if (raw) return JSON.parse(raw);
+    } catch (_) {}
+    return [];
+  }
+
+  function addJourneyStep(action, type = 'action', details = '') {
+    try {
+      const journey = getJourney();
+      const elapsedSec = Math.round((Date.now() - sessionStartTime) / 1000);
+      const minutes = Math.floor(elapsedSec / 60);
+      const seconds = elapsedSec % 60;
+      const timeOffset = `+${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+      const step = {
+        action: action,
+        type: type, // 'land', 'scroll', 'click', 'input', 'tab', 'exit'
+        details: details,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+        timeOffset: timeOffset,
+        timestamp: Date.now()
+      };
+
+      journey.push(step);
+      // Keep last 30 events max to keep payload light and fast
+      if (journey.length > 30) journey.shift();
+      sessionStorage.setItem('fc_journey', JSON.stringify(journey));
+      return journey;
+    } catch (_) {
+      return [];
+    }
+  }
+
+  // 3. Device, OS & Browser Detection
   function detectClientInfo() {
     const ua = navigator.userAgent || '';
     let deviceType = 'Desktop';
@@ -69,7 +105,7 @@
     };
   }
 
-  // 3. Traffic Source & Referrer Detection
+  // 4. Traffic Source & Referrer Detection
   function detectTrafficSource() {
     const urlParams = new URLSearchParams(window.location.search);
     const utmSource = urlParams.get('utm_source');
@@ -103,7 +139,7 @@
     }
   }
 
-  // 4. IP & Geolocation Resolver (Fast, free, cached in sessionStorage)
+  // 5. IP & Geolocation Resolver (Fast, free, cached in sessionStorage)
   async function resolveGeoLocation() {
     const cachedGeo = sessionStorage.getItem('fc_geo');
     if (cachedGeo) {
@@ -173,16 +209,18 @@
     return String.fromCodePoint(...codePoints);
   }
 
-  // 5. State & Sync Manager
+  // 6. State & Sync Manager
   const clientInfo = detectClientInfo();
   const trafficSource = detectTrafficSource();
   let currentGeo = null;
   let lastAction = 'Landed on page';
   let isSending = false;
 
-  async function pushVisitorSession(status = 'ONLINE') {
-    if (isSending) return;
-    isSending = true;
+  async function pushVisitorSession(status = 'ONLINE', customAction = null) {
+    if (customAction) {
+      lastAction = customAction;
+    }
+    const isOnline = status === 'ONLINE';
 
     try {
       if (!currentGeo) {
@@ -192,6 +230,7 @@
       const durationSeconds = Math.round((Date.now() - sessionStartTime) / 1000);
       const locationLabel = `${currentGeo.city}, ${currentGeo.region}, ${currentGeo.country}`;
       const deviceLabel = `${clientInfo.device} (${clientInfo.os}) • ${clientInfo.browser}`;
+      const journey = getJourney();
 
       const meta = {
         sessionId: sessionId,
@@ -210,11 +249,13 @@
         page: window.location.pathname || '/',
         pageTitle: document.title || 'FlipCut Creation',
         lastAction: lastAction,
-        isOnline: status === 'ONLINE',
+        isOnline: isOnline,
         status: status,
         durationSeconds: durationSeconds,
         firstSeen: new Date(sessionStartTime).toISOString(),
-        lastSeen: new Date().toISOString()
+        lastSeen: new Date().toISOString(),
+        exitTime: isOnline ? null : new Date().toISOString(),
+        journey: journey
       };
 
       const payload = {
@@ -228,10 +269,25 @@
         status: status
       };
 
-      // Non-blocking background push to Supabase
-      if (navigator.sendBeacon && status !== 'ONLINE') {
-        const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
-        navigator.sendBeacon(`${SUPABASE_SYNC_URL}/rest/v1/leads`, blob);
+      // If exiting or hidden, use navigator.sendBeacon or fetch with keepalive for guaranteed delivery
+      if (status === 'OFFLINE' || status === 'LEFT') {
+        const payloadStr = JSON.stringify(payload);
+        if (navigator.sendBeacon) {
+          const blob = new Blob([payloadStr], { type: 'application/json' });
+          navigator.sendBeacon(`${SUPABASE_SYNC_URL}/rest/v1/leads`, blob);
+        } else {
+          fetch(`${SUPABASE_SYNC_URL}/rest/v1/leads`, {
+            method: 'POST',
+            keepalive: true,
+            headers: {
+              apikey: SUPABASE_SYNC_KEY,
+              Authorization: `Bearer ${SUPABASE_SYNC_KEY}`,
+              'Content-Type': 'application/json',
+              Prefer: 'resolution=merge-duplicates,return=minimal'
+            },
+            body: payloadStr
+          }).catch(() => {});
+        }
       } else {
         await fetch(`${SUPABASE_SYNC_URL}/rest/v1/leads`, {
           method: 'POST',
@@ -256,77 +312,137 @@
       }
     } catch (err) {
       // Gracefully silent - never disrupt website
-    } finally {
-      isSending = false;
     }
   }
 
-  // 6. User Click & Interaction Listener
-  function initClickTracking() {
+  // 7. User Scroll & Interaction Tracking
+  let trackedScrollMilestones = { 25: false, 50: false, 75: false, 100: false };
+
+  function initScrollTracking() {
+    window.addEventListener('scroll', function() {
+      try {
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        if (docHeight <= 0) return;
+        const scrollPct = Math.min(100, Math.round((window.scrollY / docHeight) * 100));
+
+        [25, 50, 75, 100].forEach(milestone => {
+          if (scrollPct >= milestone && !trackedScrollMilestones[milestone]) {
+            trackedScrollMilestones[milestone] = true;
+            const actionText = `Scrolled ${milestone}% of page`;
+            addJourneyStep(actionText, 'scroll', `${scrollPct}% depth reached`);
+            lastAction = actionText;
+          }
+        });
+      } catch (_) {}
+    }, { passive: true });
+  }
+
+  // 8. User Click & Form Field Tracking
+  function initInteractionTracking() {
     document.addEventListener('click', function(e) {
       try {
-        const target = e.target.closest('button, a, [role="button"], .btn, input[type="submit"], .cta-button, .pricing-card, .faq-question');
+        const target = e.target.closest('button, a, [role="button"], .btn, input[type="submit"], .cta-button, .pricing-card, .faq-question, .hero-cta, .whatsapp-btn');
         if (!target) return;
 
         let label = (target.innerText || target.value || target.getAttribute('aria-label') || target.title || '').trim();
         if (!label && target.querySelector('i')) {
           label = target.querySelector('i').className;
         }
-        if (label.length > 50) label = label.substring(0, 50) + '...';
+        if (label.length > 40) label = label.substring(0, 40) + '...';
 
         const tagName = target.tagName.toLowerCase();
-        const actionText = label ? `Clicked "${label}" (${tagName})` : `Clicked <${tagName}>`;
+        const actionText = label ? `Clicked "${label}"` : `Clicked <${tagName}>`;
 
+        addJourneyStep(actionText, 'click', `${tagName} element`);
         lastAction = actionText;
 
-        // Debounced sync for high-value clicks
+        // Immediate debounced sync for clicks
         clearTimeout(window.__fc_click_timer);
         window.__fc_click_timer = setTimeout(() => {
           pushVisitorSession('ONLINE');
-        }, 800);
+        }, 600);
+      } catch (_) {}
+    }, { passive: true });
+
+    // Form input focus tracking (captures user engagement before form submission)
+    document.addEventListener('focusin', function(e) {
+      try {
+        const el = e.target;
+        if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT')) {
+          const fieldName = el.name || el.placeholder || el.id || 'Field';
+          if (fieldName.toLowerCase().includes('card') || fieldName.toLowerCase().includes('cvv')) return; // skip sensitive
+          const actionText = `Interacting with "${fieldName}"`;
+          addJourneyStep(actionText, 'input', el.type || 'input');
+          lastAction = actionText;
+        }
       } catch (_) {}
     }, { passive: true });
   }
 
-  // 7. Lifecycle & Heartbeat Setup
+  // 9. Lifecycle & Instant Exit Detection (Mobile + Desktop)
   function initLifecycle() {
-    // Initial land
+    // Initial land event
+    const landingAction = `Landed on ${window.location.pathname || '/'}`;
+    addJourneyStep(landingAction, 'land', document.title || 'FlipCut Creation');
+    lastAction = landingAction;
+
     setTimeout(() => {
       pushVisitorSession('ONLINE');
-    }, 500);
+    }, 400);
 
-    // Heartbeat every 30 seconds while tab is active
+    // Heartbeat every 20 seconds while tab is active
     setInterval(() => {
       if (document.visibilityState === 'visible') {
         pushVisitorSession('ONLINE');
       }
-    }, 30000);
+    }, 20000);
 
-    // Visibility change handling
+    let hasExited = false;
+
+    function handleInstantExit(reason) {
+      if (hasExited) return;
+      hasExited = true;
+      const exitAction = reason === 'hidden' ? 'Minimized browser / Switched app' : 'Closed browser / Left website';
+      addJourneyStep(exitAction, 'exit', `At ${new Date().toLocaleTimeString()}`);
+      lastAction = exitAction;
+      pushVisitorSession('OFFLINE', exitAction);
+    }
+
+    // Visibility change handling (Mobile App Switch / Lock Screen / Tab Switch)
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'hidden') {
-        pushVisitorSession('IDLE');
+        // On mobile, hidden almost always means user switched app or locked phone
+        handleInstantExit('hidden');
       } else {
-        lastAction = 'Returned to tab';
-        pushVisitorSession('ONLINE');
+        // Returned to tab
+        hasExited = false;
+        const returnAction = 'Returned to website tab';
+        addJourneyStep(returnAction, 'tab', 'Tab focused again');
+        lastAction = returnAction;
+        pushVisitorSession('ONLINE', returnAction);
       }
     });
 
-    // Page exit / unload
-    window.addEventListener('pagehide', () => {
-      lastAction = 'Left website';
-      pushVisitorSession('LEFT');
+    // Page exit / unload / tab closed (W3C standard)
+    window.addEventListener('pagehide', (e) => {
+      handleInstantExit(e.persisted ? 'persisted' : 'pagehide');
+    });
+
+    window.addEventListener('beforeunload', () => {
+      handleInstantExit('beforeunload');
     });
   }
 
-  // Run tracker after page loads
+  // Initialize tracker
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-      initClickTracking();
+      initScrollTracking();
+      initInteractionTracking();
       initLifecycle();
     });
   } else {
-    initClickTracking();
+    initScrollTracking();
+    initInteractionTracking();
     initLifecycle();
   }
 })();

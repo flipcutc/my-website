@@ -1883,18 +1883,19 @@
             <table class="comparison-table">
               <thead>
                 <tr>
-                  <th style="width: 130px;">Live Status</th>
+                  <th style="width: 140px;">Live Status</th>
                   <th>Location &amp; IP Address</th>
                   <th>Current Active Page</th>
                   <th>Traffic Source</th>
                   <th>Device &amp; Browser</th>
                   <th>Recent Action / Clicks</th>
-                  <th style="width: 170px;">Last Activity</th>
+                  <th style="width: 130px;">Last Activity</th>
+                  <th style="width: 130px; text-align: center;">Journey Log</th>
                 </tr>
               </thead>
               <tbody id="analyticsTableBody">
                 <tr>
-                  <td colspan="7" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                  <td colspan="8" style="text-align: center; padding: 40px; color: var(--text-muted);">
                     <i class="fa-solid fa-satellite-dish fa-spin" style="font-size: 1.5rem; margin-bottom: 8px; color: #6366F1;"></i>
                     <p>Scanning for live visitors and click-stream pulses...</p>
                   </td>
@@ -3759,6 +3760,101 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
           </button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Real-Time Visitor Granular Journey & Interaction Timeline Modal (Hotjar / Mixpanel Style) -->
+  <div class="lightbox-modal" id="visitorJourneyModal">
+    <div class="lightbox-content-box" style="max-width: 680px; max-height: 90vh; display: flex; flex-direction: column; background: var(--bg-surface); border-radius: var(--radius-lg); border: 1px solid var(--border-medium); box-shadow: 0 25px 60px rgba(0,0,0,0.6); padding: 0; text-align: left; overflow: hidden;">
+      
+      <!-- Modal Header -->
+      <div style="padding: 20px 24px 16px 24px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; background: rgba(99, 102, 241, 0.04); flex-shrink: 0;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #6366F1, #8B5CF6); color: #FFF; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);">
+            <i class="fa-solid fa-route"></i>
+          </div>
+          <div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <h3 id="vjModalTitle" style="margin: 0; font-size: 1.15rem; color: var(--text-primary); font-weight: 800;">Visitor Journey Stream</h3>
+              <span id="vjModalStatusBadge" style="display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 9999px; font-size: 0.72rem; font-weight: 800;"></span>
+            </div>
+            <span id="vjModalSubtitle" style="font-size: 0.78rem; color: var(--text-muted);">Real-time Chronological Action Stream (Hotjar / FullStory Level)</span>
+          </div>
+        </div>
+
+        <button type="button" onclick="closeUserJourneyModal()" aria-label="Close" style="background: var(--bg-tertiary); border: 1px solid var(--border-subtle); width: 34px; height: 34px; border-radius: 8px; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1rem; transition: all 0.2s;" onmouseover="this.style.color='var(--text-primary)'">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body (Scrollable) -->
+      <div style="padding: 20px 24px; overflow-y: auto; flex: 1;">
+        
+        <!-- Visitor Info Card -->
+        <div style="background: var(--bg-tertiary); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 14px 16px; margin-bottom: 18px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; border-bottom: 1px dashed var(--border-subtle); padding-bottom: 10px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span id="vjModalFlag" style="font-size: 1.5rem;">🇮🇳</span>
+              <div>
+                <strong id="vjModalLocation" style="font-size: 0.95rem; color: var(--text-primary); display: block;">Chennai, Tamil Nadu, India</strong>
+                <span id="vjModalIp" style="font-size: 0.78rem; font-family: monospace; color: var(--text-muted);">IP: 49.37.128.45</span>
+              </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+              <span id="vjModalTraffic" style="font-size: 0.76rem; font-weight: 700; background: rgba(99, 102, 241, 0.12); color: #6366F1; padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(99, 102, 241, 0.25);">
+                <i class="fa-solid fa-link"></i> Instagram
+              </span>
+              <span id="vjModalDevice" style="font-size: 0.76rem; font-weight: 700; background: rgba(16, 185, 129, 0.12); color: #10B981; padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(16, 185, 129, 0.25);">
+                <i class="fa-solid fa-mobile-screen"></i> Mobile (Android)
+              </span>
+            </div>
+          </div>
+
+          <!-- 4 Summary Metrics -->
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+            <div style="background: var(--bg-surface); padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border-subtle); text-align: center;">
+              <div style="font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase;">Landing Page</div>
+              <div id="vjStatPage" style="font-weight: 700; color: var(--brand-indigo); font-size: 0.82rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">/</div>
+            </div>
+            <div style="background: var(--bg-surface); padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border-subtle); text-align: center;">
+              <div style="font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase;">Max Scroll</div>
+              <div id="vjStatScroll" style="font-weight: 700; color: #06B6D4; font-size: 0.82rem;">0%</div>
+            </div>
+            <div style="background: var(--bg-surface); padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border-subtle); text-align: center;">
+              <div style="font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase;">Total Events</div>
+              <div id="vjStatEvents" style="font-weight: 700; color: #10B981; font-size: 0.82rem;">0</div>
+            </div>
+            <div style="background: var(--bg-surface); padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border-subtle); text-align: center;">
+              <div style="font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase;">Session Time</div>
+              <div id="vjStatDuration" style="font-weight: 700; color: #F59E0B; font-size: 0.82rem;">0s</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section Title -->
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+          <h4 style="margin: 0; font-size: 0.9rem; font-weight: 800; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-list-check" style="color: #6366F1;"></i> Chronological Action Timeline
+          </h4>
+          <span style="font-size: 0.74rem; color: var(--text-muted);">Step-by-step user behavior</span>
+        </div>
+
+        <!-- Timeline Container -->
+        <div id="vjTimelineList" style="position: relative; padding-left: 28px; margin-left: 10px;">
+          <!-- Populated dynamically -->
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div style="padding: 12px 24px; border-top: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; background: var(--bg-tertiary); flex-shrink: 0;">
+        <span id="vjModalFooterTime" style="font-size: 0.76rem; color: var(--text-muted);">First seen: Today</span>
+        <button type="button" class="btn btn-secondary" onclick="closeUserJourneyModal()" style="padding: 6px 16px; font-size: 0.82rem;">
+          Close Timeline
+        </button>
+      </div>
+
     </div>
   </div>
 
@@ -5811,11 +5907,12 @@ function renderCrmTable() {
                 } catch (_) {}
 
                 const lastSeenDate = new Date(meta.lastSeen || r.created_at || Date.now());
-                const diffMinutes = (Date.now() - lastSeenDate.getTime()) / 60000;
+                const diffSec = Math.max(1, Math.round((Date.now() - lastSeenDate.getTime()) / 1000));
                 
-                // Active if seen in last 3 minutes and status is ONLINE
-                const isStillOnline = diffMinutes <= 3 && (r.status === 'ONLINE' || meta.isOnline === true);
-                const isIdle = !isStillOnline && diffMinutes <= 10;
+                // Instant Exit Detection: Mark offline if explicitly exited OR if no heartbeat for > 40s
+                const isExplicitOffline = r.status === 'OFFLINE' || r.status === 'LEFT' || meta.isOnline === false || meta.status === 'OFFLINE' || meta.status === 'LEFT';
+                const isStillOnline = !isExplicitOffline && diffSec <= 40;
+                const isIdle = !isStillOnline && !isExplicitOffline && diffSec <= 90;
 
                 return {
                   sessionId: r.id,
@@ -5824,7 +5921,7 @@ function renderCrmTable() {
                   region: meta.region || '',
                   country: meta.country || 'India',
                   countryCode: meta.countryCode || 'IN',
-                  flag: meta.flag || '🇮🇳',
+                  flag: meta.flag || '🌐',
                   locationLabel: r.name || `${meta.city || 'India'}, ${meta.country || ''}`,
                   device: meta.device || 'Desktop',
                   os: meta.os || '',
@@ -5834,13 +5931,15 @@ function renderCrmTable() {
                   referrer: meta.referrer || r.budget || 'Direct Traffic',
                   page: meta.page || '/',
                   pageTitle: meta.pageTitle || 'FlipCut Creation',
-                  lastAction: meta.lastAction || 'Active Browsing',
+                  lastAction: meta.lastAction || (isExplicitOffline ? 'Closed browser / Left website' : 'Active Browsing'),
                   isOnline: isStillOnline,
                   isIdle: isIdle,
                   status: isStillOnline ? 'ONLINE' : (isIdle ? 'IDLE' : 'LEFT'),
                   durationSeconds: meta.durationSeconds || 0,
                   firstSeen: meta.firstSeen || r.created_at,
                   lastSeen: meta.lastSeen || r.created_at,
+                  exitTime: meta.exitTime || (isExplicitOffline ? (meta.lastSeen || r.created_at) : null),
+                  journey: Array.isArray(meta.journey) ? meta.journey : [],
                   created_at: r.created_at
                 };
               });
@@ -6292,27 +6391,28 @@ function renderCrmTable() {
         }
 
         tableBody.innerHTML = filtered.map(v => {
-          // Status Pill
+          // Status Pill - Instant Exit detection
           let statusBadge = '';
           if (v.isOnline) {
             statusBadge = `
-              <span style="display: inline-flex; align-items: center; gap: 6px; background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3); padding: 4px 10px; border-radius: 9999px; font-size: 0.76rem; font-weight: 800;">
+              <span style="display: inline-flex; align-items: center; gap: 6px; background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3); padding: 4px 10px; border-radius: 9999px; font-size: 0.75rem; font-weight: 800;">
                 <span style="width: 7px; height: 7px; border-radius: 50%; background: #10B981; box-shadow: 0 0 8px #10B981; animation: pulse 1.5s infinite;"></span>
                 ONLINE
               </span>
             `;
           } else if (v.isIdle) {
             statusBadge = `
-              <span style="display: inline-flex; align-items: center; gap: 6px; background: rgba(245, 158, 11, 0.15); color: #F59E0B; border: 1px solid rgba(245, 158, 11, 0.3); padding: 4px 10px; border-radius: 9999px; font-size: 0.76rem; font-weight: 800;">
+              <span style="display: inline-flex; align-items: center; gap: 6px; background: rgba(245, 158, 11, 0.15); color: #F59E0B; border: 1px solid rgba(245, 158, 11, 0.3); padding: 4px 10px; border-radius: 9999px; font-size: 0.75rem; font-weight: 800;">
                 <span style="width: 7px; height: 7px; border-radius: 50%; background: #F59E0B;"></span>
                 IDLE
               </span>
             `;
           } else {
+            const exitTooltip = v.exitTime ? `Closed browser / Left website at ${new Date(v.exitTime).toLocaleTimeString()}` : 'Visitor exited website';
             statusBadge = `
-              <span style="display: inline-flex; align-items: center; gap: 6px; background: rgba(148, 163, 184, 0.12); color: #94A3B8; border: 1px solid rgba(148, 163, 184, 0.25); padding: 4px 10px; border-radius: 9999px; font-size: 0.76rem; font-weight: 700;">
-                <span style="width: 7px; height: 7px; border-radius: 50%; background: #94A3B8;"></span>
-                LEFT
+              <span style="display: inline-flex; align-items: center; gap: 6px; background: rgba(239, 68, 68, 0.12); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.25); padding: 4px 10px; border-radius: 9999px; font-size: 0.75rem; font-weight: 800;" title="${exitTooltip}">
+                <span style="width: 7px; height: 7px; border-radius: 50%; background: #EF4444;"></span>
+                LEFT / OUT
               </span>
             `;
           }
@@ -6356,8 +6456,10 @@ function renderCrmTable() {
           else if (diffSec < 3600) timeAgo = `${Math.round(diffSec / 60)}m ago`;
           else timeAgo = `${Math.round(diffSec / 3600)}h ago`;
 
+          const journeyCount = (v.journey && v.journey.length > 0) ? v.journey.length : 1;
+
           return `
-            <tr>
+            <tr style="cursor: pointer;" title="Double click to inspect user journey timeline" ondblclick="openUserJourneyModal('${v.sessionId}')">
               <td>${statusBadge}</td>
               <td>
                 <div style="font-weight: 700; color: var(--text-primary); font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
@@ -6405,9 +6507,159 @@ function renderCrmTable() {
                   ${new Date(v.lastSeen || v.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </div>
               </td>
+              <td style="text-align: center;">
+                <button type="button" onclick="openUserJourneyModal('${v.sessionId}')" class="btn-sm" style="background: rgba(99, 102, 241, 0.12); color: #6366F1; border: 1px solid rgba(99, 102, 241, 0.35); padding: 5px 12px; border-radius: 6px; font-weight: 700; font-size: 0.78rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;" onmouseover="this.style.background='#6366F1'; this.style.color='#fff';" onmouseout="this.style.background='rgba(99, 102, 241, 0.12)'; this.style.color='#6366F1';">
+                  <i class="fa-solid fa-route"></i> Journey (${journeyCount})
+                </button>
+              </td>
             </tr>
           `;
         }).join('');
+      }
+
+      // ====================================================================
+      // 5C. USER JOURNEY TIMELINE MODAL HANDLERS (Hotjar / Mixpanel Style)
+      // ====================================================================
+      window.openUserJourneyModal = function(sessionId) {
+        const visitor = (currentLiveVisitors || []).find(v => v.sessionId === sessionId);
+        if (!visitor) {
+          showAdminToast('Visitor session data not found.', '#EF4444');
+          return;
+        }
+
+        const modal = document.getElementById('visitorJourneyModal');
+        if (!modal) return;
+
+        // Header info
+        document.getElementById('vjModalFlag').textContent = visitor.flag || '🌐';
+        document.getElementById('vjModalLocation').textContent = visitor.locationLabel || 'Unknown Location';
+        document.getElementById('vjModalIp').textContent = `IP: ${visitor.ip || 'Anonymous'}`;
+
+        // Traffic badge
+        document.getElementById('vjModalTraffic').innerHTML = `<i class="fa-solid fa-link"></i> ${visitor.referrer || 'Direct Traffic'}`;
+        
+        // Device badge
+        const devIcon = visitor.device === 'Mobile' ? 'fa-mobile-screen' : (visitor.device === 'Tablet' ? 'fa-tablet-screen-button' : 'fa-laptop');
+        document.getElementById('vjModalDevice').innerHTML = `<i class="fa-solid ${devIcon}"></i> ${visitor.device} (${visitor.os || 'OS'}) • ${visitor.browser || 'Browser'}`;
+
+        // Live Status Badge
+        const statusBadge = document.getElementById('vjModalStatusBadge');
+        if (visitor.isOnline) {
+          statusBadge.style.background = 'rgba(16, 185, 129, 0.15)';
+          statusBadge.style.color = '#10B981';
+          statusBadge.style.border = '1px solid rgba(16, 185, 129, 0.3)';
+          statusBadge.innerHTML = '<span style="width: 6px; height: 6px; border-radius: 50%; background: #10B981; animation: pulse 1.5s infinite;"></span> ONLINE NOW';
+        } else if (visitor.isIdle) {
+          statusBadge.style.background = 'rgba(245, 158, 11, 0.15)';
+          statusBadge.style.color = '#F59E0B';
+          statusBadge.style.border = '1px solid rgba(245, 158, 11, 0.3)';
+          statusBadge.innerHTML = '<span style="width: 6px; height: 6px; border-radius: 50%; background: #F59E0B;"></span> IDLE';
+        } else {
+          statusBadge.style.background = 'rgba(239, 68, 68, 0.12)';
+          statusBadge.style.color = '#EF4444';
+          statusBadge.style.border = '1px solid rgba(239, 68, 68, 0.25)';
+          const exitTimeStr = visitor.exitTime ? new Date(visitor.exitTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+          statusBadge.innerHTML = `<span style="width: 6px; height: 6px; border-radius: 50%; background: #EF4444;"></span> OFFLINE / LEFT ${exitTimeStr ? `(${exitTimeStr})` : ''}`;
+        }
+
+        // Footer time
+        const fDate = new Date(visitor.firstSeen || visitor.created_at || Date.now());
+        const lDate = new Date(visitor.lastSeen || visitor.created_at || Date.now());
+        document.getElementById('vjModalFooterTime').textContent = `First Seen: ${fDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} | Last Activity: ${lDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+
+        renderUserJourneyTimeline(visitor);
+        modal.classList.add('active');
+      };
+
+      window.closeUserJourneyModal = function() {
+        const modal = document.getElementById('visitorJourneyModal');
+        if (modal) modal.classList.remove('active');
+      };
+
+      function renderUserJourneyTimeline(v) {
+        const container = document.getElementById('vjTimelineList');
+        if (!container) return;
+
+        const journey = (v.journey && v.journey.length > 0) ? v.journey : [
+          { action: `Landed on ${v.page || '/'}`, type: 'land', details: v.pageTitle || 'FlipCut Creation', time: new Date(v.firstSeen || v.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }), timeOffset: '+00:00' },
+          { action: v.lastAction || 'Active Browsing', type: (v.status === 'OFFLINE' || v.status === 'LEFT') ? 'exit' : 'click', details: `${v.device} • ${v.referrer}`, time: new Date(v.lastSeen || v.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }), timeOffset: `+${Math.round(v.durationSeconds || 0)}s` }
+        ];
+
+        // Update Summary Stats
+        const pageEl = document.getElementById('vjStatPage');
+        if (pageEl) pageEl.textContent = v.page || '/';
+        
+        const scrollItem = [...journey].reverse().find(j => j.type === 'scroll' || (j.action || '').toLowerCase().includes('scrolled'));
+        const scrollEl = document.getElementById('vjStatScroll');
+        if (scrollEl) scrollEl.textContent = scrollItem ? (scrollItem.action.replace('Scrolled ', '')) : '0%';
+        
+        const eventsEl = document.getElementById('vjStatEvents');
+        if (eventsEl) eventsEl.textContent = journey.length;
+        
+        const min = Math.floor((v.durationSeconds || 0) / 60);
+        const sec = (v.durationSeconds || 0) % 60;
+        const durEl = document.getElementById('vjStatDuration');
+        if (durEl) durEl.textContent = min > 0 ? `${min}m ${sec}s` : `${sec}s`;
+
+        // Draw Vertical Guide Line
+        let html = `<div style="position: absolute; left: -18px; top: 12px; bottom: 16px; width: 2px; background: linear-gradient(to bottom, #6366F1, #06B6D4, #10B981, #EF4444); opacity: 0.4;"></div>`;
+
+        html += journey.map((step, idx) => {
+          let icon = 'fa-solid fa-circle-dot';
+          let iconBg = 'rgba(99, 102, 241, 0.15)';
+          let iconColor = '#6366F1';
+
+          if (step.type === 'land') {
+            icon = 'fa-solid fa-flag';
+            iconBg = 'rgba(99, 102, 241, 0.15)';
+            iconColor = '#6366F1';
+          } else if (step.type === 'scroll') {
+            icon = 'fa-solid fa-arrow-down';
+            iconBg = 'rgba(6, 182, 212, 0.15)';
+            iconColor = '#06B6D4';
+          } else if (step.type === 'click') {
+            icon = 'fa-solid fa-computer-mouse';
+            iconBg = 'rgba(16, 185, 129, 0.15)';
+            iconColor = '#10B981';
+          } else if (step.type === 'input') {
+            icon = 'fa-solid fa-keyboard';
+            iconBg = 'rgba(245, 158, 11, 0.15)';
+            iconColor = '#F59E0B';
+          } else if (step.type === 'tab') {
+            icon = 'fa-solid fa-arrow-right-arrow-left';
+            iconBg = 'rgba(139, 92, 246, 0.15)';
+            iconColor = '#8B5CF6';
+          } else if (step.type === 'exit' || (step.action || '').toLowerCase().includes('left') || (step.action || '').toLowerCase().includes('closed') || (step.action || '').toLowerCase().includes('minimized')) {
+            icon = 'fa-solid fa-door-open';
+            iconBg = 'rgba(239, 68, 68, 0.15)';
+            iconColor = '#EF4444';
+          }
+
+          const isLast = idx === journey.length - 1;
+
+          return `
+            <div style="position: relative; margin-bottom: 16px; display: flex; align-items: flex-start; gap: 14px;">
+              <!-- Timeline Icon Node -->
+              <div style="position: absolute; left: -28px; top: 2px; width: 22px; height: 22px; border-radius: 50%; background: ${iconBg}; border: 2px solid ${iconColor}; color: ${iconColor}; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; z-index: 2; box-shadow: 0 0 8px ${iconBg};">
+                <i class="${icon}"></i>
+              </div>
+
+              <!-- Timeline Card -->
+              <div style="flex: 1; background: var(--bg-tertiary); border: 1px solid ${isLast ? iconColor : 'var(--border-subtle)'}; border-radius: 8px; padding: 10px 14px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; gap: 8px;">
+                  <strong style="font-size: 0.86rem; color: var(--text-primary);">${step.action || 'User Action'}</strong>
+                  <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0;">
+                    <span style="font-family: monospace; font-size: 0.72rem; font-weight: 700; background: rgba(99, 102, 241, 0.1); color: var(--brand-indigo); padding: 2px 6px; border-radius: 4px;">${step.timeOffset || '+00:00'}</span>
+                    <span style="font-size: 0.72rem; color: var(--text-muted);">${step.time || ''}</span>
+                  </div>
+                </div>
+                ${step.details ? `<div style="font-size: 0.76rem; color: var(--text-muted); display: flex; align-items: center; gap: 5px;"><i class="fa-solid fa-circle-info" style="font-size: 0.65rem;"></i> ${step.details}</div>` : ''}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        container.innerHTML = html;
       }
 
       window.exportAnalyticsCsv = function() {
