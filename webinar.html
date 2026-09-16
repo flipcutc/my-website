@@ -2660,6 +2660,23 @@
           existing.unshift({ ...leadPayload, id: Date.now(), date: new Date().toISOString().slice(0,10) });
           localStorage.setItem('flipcut_leads', JSON.stringify(existing));
         } catch (_) {}
+
+        // 4. Dispatch Instant Mobile (Telegram) & Email (Gmail) Order Alerts
+        try {
+          if (typeof window.sendFlipCutOrderAlert === 'function') {
+            window.sendFlipCutOrderAlert({
+              type: 'WEBINAR_PASS',
+              id: generatedUserId,
+              name: name,
+              phone: phone,
+              email: email,
+              service: `Webinar Pass (${websiteType}) - ${activeBatch}`,
+              amount: `₹${webinarFeeAmount}`,
+              paymentId: payId,
+              notes: `Batch: ${activeBatch} | Interest: ${websiteType}`
+            });
+          }
+        } catch (_) {}
       }
 
       webinarForm.addEventListener('submit', handleWebinarFinalSubmit);
@@ -4090,6 +4107,8 @@ https://flipcutcreation.in/webinar`;
     </a>
   </nav>
 
+  <!-- Instant Order Alert Notification Engine (Non-blocking) -->
+  <script src="notification-service.js" defer></script>
   <!-- Real-time Live Visitor & Analytics Tracker (Non-blocking) -->
   <script src="site-tracker.js" defer></script>
 </body>

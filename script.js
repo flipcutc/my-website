@@ -2116,6 +2116,22 @@ function hydratePageFromCMS(customContent) {
         localStorage.setItem('flipcut_leads', JSON.stringify(existingLeads));
       } catch (_) {}
 
+      // 3B. Dispatch Instant Mobile (Telegram) & Email (Gmail) Order Alerts
+      try {
+        if (typeof window.sendFlipCutOrderAlert === 'function') {
+          window.sendFlipCutOrderAlert({
+            type: 'PROJECT_INQUIRY',
+            id: assignedUserId,
+            name: name,
+            phone: phone,
+            email: email,
+            service: serviceLabels[serviceType] || serviceType,
+            amount: budgetLabels[budget] || budget,
+            notes: `Footage: ${footage || 'None'} | Notes: ${notes || 'None'}`
+          });
+        }
+      } catch (_) {}
+
       // 4. Automatically forward complete client inquiry details directly to owner WhatsApp (917010270151)
       const waBriefText = encodeURIComponent(
         '🎬 *NEW CLIENT INQUIRY - FLIPCUT CREATION* 🎬\n' +
