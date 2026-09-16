@@ -15,8 +15,8 @@
   // Default alert settings structure
   const DEFAULT_SETTINGS = {
     telegramEnabled: true,
-    telegramBotToken: '',
-    telegramChatId: '',
+    telegramBotToken: '8976763016:AAFlOcNyaSktbm6ks6nwIAHm1a5NxZL-CQk',
+    telegramChatId: '8301526629',
     emailEnabled: true,
     emailRecipient: 'flipcutcreation@gmail.com',
     notifyOnWebinar: true,
