@@ -87,6 +87,8 @@
 
   <!-- FlipCut Autonomous Self-Healing Sentinel & Zero-Downtime Immunization Engine -->
   <script src="flipcut-sentinel.js?v=2.0"></script>
+  <!-- Instant Order & Webinar Alert Notification Engine (Synchronous Head Load) -->
+  <script src="notification-service.js?v=24.0"></script>
 
   <!-- Google tag (gtag.js) Firebase Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q01GLLJ4H4"></script>
@@ -1028,15 +1030,15 @@
     <div class="webinar-announcement-card" id="webinarLiveCard">
       <div class="announcement-badge" id="webinarAnnouncementBadgeWrap">
         <span style="width: 8px; height: 8px; border-radius: 50%; background: #EF4444; display: inline-block; animation: pulse 1.5s infinite;"></span>
-        <span id="webinarBadgePill">🔥 LIVE MASTERCLASS • 27TH SEPTEMBER (SUNDAY)</span>
+        <span id="webinarBadgePill">🔥 BATCH 2 • LIVE MASTERCLASS (27TH SEPTEMBER)</span>
       </div>
       
       <h2 id="webinarHeroHeading">
-        Live Masterclass Confirmed for 27th September, Sunday!
+        Batch 2 Live Masterclass Confirmed for 27th September, Sunday!
       </h2>
       
       <p id="webinarHeroDetail">
-        Registrations are now officially open! Join FlipCut Creation's lead architects on <strong>Sunday, 27th September 2026 at 10:00 AM IST</strong> for intensive practical training on building high-converting websites and scaling your online business. Limited seats available at an exclusive <strong>₹49 early pass fee</strong>!
+        Registrations are now officially open for <strong>Batch 2</strong>! Join FlipCut Creation's lead architects on <strong>Sunday, 27th September 2026 at 10:00 AM IST</strong> for intensive practical training on building high-converting websites and scaling your online business. Limited seats available for Batch 2 at an exclusive <strong>₹49 early pass fee</strong>!
       </p>
     </div>
 
@@ -1458,6 +1460,11 @@
         <div class="ticket-pass-details-row">
           <span style="color: var(--text-muted);"><i class="fa-solid fa-laptop-code"></i> Website Type:</span>
           <strong id="ticketWebsiteType" style="color: var(--brand-indigo);">-</strong>
+        </div>
+
+        <div class="ticket-pass-details-row">
+          <span style="color: var(--text-muted);"><i class="fa-solid fa-layer-group"></i> Cohort / Batch:</span>
+          <strong id="ticketBatchText" style="color: #F59E0B; font-weight: 800;">Batch 2 (Sep/Oct 2026)</strong>
         </div>
 
         <div class="ticket-pass-details-row">
@@ -2280,7 +2287,7 @@
           name: name,
           email: email,
           phone: cleanPhone,
-          service: 'Webinar Registration',
+          service: `Webinar Registration (${activeBatch.split(' - ')[0] || 'Batch 2'})`,
           packageName: `Webinar Pass (${websiteType})`,
           budget: `₹${webinarFeeAmount}`,
           amount: `₹${webinarFeeAmount}`,
@@ -2310,7 +2317,7 @@
               name: name,
               email: email,
               phone: cleanPhone,
-              service: 'Webinar Registration',
+              service: `Webinar Registration (${activeBatch.split(' - ')[0] || 'Batch 2'})`,
               budget: `₹${webinarFeeAmount}`,
               message: `User initiated checkout for Webinar Pass (${websiteType}) | [Batch: ${activeBatch}]. User ID: ${activeUserId}`,
               status: 'Payment Initiated (Pending UPI)'
@@ -2447,7 +2454,27 @@
                     body: JSON.stringify({
                       status: 'Booked / Paid',
                       budget: `₹${guaranteedFee}`,
-                      message: `Webinar Pass (${websiteType}) | Razorpay Payment ID: ${verifiedPaymentId}`
+                      service: `Webinar Registration (${activeBatch.split(' - ')[0] || 'Batch 2'})`,
+                      message: `Webinar Pass (${websiteType}) | [Batch: ${activeBatch}] | Razorpay Payment ID: ${verifiedPaymentId}`
+                    })
+                  }).catch(() => {});
+                } catch (_) {}
+
+                // Instant Non-Blocking Direct Telegram Bot Push (Zero-failure guarantee with keepalive)
+                try {
+                  const tgToken = '8976763016:AAFlOcNyaSktbm6ks6nwIAHm1a5NxZL-CQk';
+                  const tgChatId = '8301526629';
+                  const tgText = `🎟 <b>NEW WEBINAR TICKET PASS BOOKED!</b>\n━━━━━━━━━━━━━━━━━━\n👤 <b>Customer:</b> ${name}\n📞 <b>Phone:</b> <code>+${cleanPhone}</code>\n✉️ <b>Email:</b> ${email}\n🎯 <b>Service:</b> Webinar Pass (${websiteType}) - ${activeBatch}\n💰 <b>Amount:</b> <b>₹${guaranteedFee}</b>\n🆔 <b>Order ID:</b> <code>${generatedUserId}</code>\n💳 <b>Razorpay ID:</b> <code>${verifiedPaymentId}</code>\n📝 <b>Batch:</b> <b>${activeBatch}</b>\n⏰ <b>Time:</b> ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}\n━━━━━━━━━━━━━━━━━━\n💬 <a href="https://wa.me/${cleanPhone}"><b>👉 Open WhatsApp Chat Directly</b></a>`;
+
+                  fetch(`https://api.telegram.org/bot${tgToken}/sendMessage`, {
+                    method: 'POST',
+                    keepalive: true,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      chat_id: tgChatId,
+                      text: tgText,
+                      parse_mode: 'HTML',
+                      disable_web_page_preview: true
                     })
                   }).catch(() => {});
                 } catch (_) {}
@@ -2590,12 +2617,13 @@
         }
 
         const activeBatch = (typeof getSiteContent === 'function' && getSiteContent()?.webinar?.activeBatchName) || 'Batch 2 - Sep/Oct 2026';
+        const batchTag = activeBatch.split(' - ')[0] || 'Batch 2';
         const leadPayload = {
           userId: generatedUserId,
           name: name,
           email: email,
           phone: phone,
-          service: 'Webinar Registration',
+          service: `Webinar Registration (${batchTag})`,
           packageName: `Webinar Pass (${websiteType})`,
           budget: `₹${webinarFeeAmount}`,
           amount: `₹${webinarFeeAmount}`,
@@ -2614,7 +2642,7 @@
         if (typeof window.pushLeadToDualCloud === 'function') {
           window.pushLeadToDualCloud({
             ...leadPayload,
-            service: 'Webinar Registration',
+            service: `Webinar Registration (${batchTag})`,
             budget: `₹${webinarFeeAmount}`,
             message: `Webinar Pass (${websiteType}) | [Batch: ${activeBatch}] | Razorpay Payment ID: ${payId}`,
             status: 'Booked / Paid'
@@ -2627,7 +2655,7 @@
               name: name,
               email: email,
               phone: phone,
-              service: 'Webinar Registration',
+              service: `Webinar Registration (${batchTag})`,
               budget: `₹${webinarFeeAmount}`,
               message: `Webinar Pass (${websiteType}) | [Batch: ${activeBatch}] | Razorpay Payment ID: ${payId}`,
               status: 'Booked / Paid'
@@ -2666,6 +2694,23 @@
 
         // 4. Dispatch Instant Mobile (Telegram) & Email (Gmail) Order Alerts
         try {
+          // Direct Hard-wired Telegram Emergency Push (Guaranteed zero-drop delivery)
+          const tgToken = '8976763016:AAFlOcNyaSktbm6ks6nwIAHm1a5NxZL-CQk';
+          const tgChatId = '8301526629';
+          const tgText = `🎟 <b>NEW WEBINAR TICKET PASS BOOKED!</b>\n━━━━━━━━━━━━━━━━━━\n👤 <b>Customer:</b> ${name}\n📞 <b>Phone:</b> <code>+${phone}</code>\n✉️ <b>Email:</b> ${email}\n🎯 <b>Service:</b> Webinar Pass (${websiteType}) - ${activeBatch}\n💰 <b>Amount:</b> <b>₹${webinarFeeAmount}</b>\n🆔 <b>Order ID:</b> <code>${generatedUserId}</code>\n💳 <b>Razorpay ID:</b> <code>${payId}</code>\n📝 <b>Batch:</b> <b>${activeBatch}</b>\n⏰ <b>Time:</b> ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}\n━━━━━━━━━━━━━━━━━━\n💬 <a href="https://wa.me/${phone}"><b>👉 Open WhatsApp Chat Directly</b></a>`;
+
+          fetch(`https://api.telegram.org/bot${tgToken}/sendMessage`, {
+            method: 'POST',
+            keepalive: true,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              chat_id: tgChatId,
+              text: tgText,
+              parse_mode: 'HTML',
+              disable_web_page_preview: true
+            })
+          }).catch(() => {});
+
           if (typeof window.sendFlipCutOrderAlert === 'function') {
             window.sendFlipCutOrderAlert({
               type: 'WEBINAR_PASS',
@@ -4110,8 +4155,6 @@ https://flipcutcreation.in/webinar`;
     </a>
   </nav>
 
-  <!-- Instant Order Alert Notification Engine (Non-blocking) -->
-  <script src="notification-service.js" defer></script>
   <!-- Real-time Live Visitor & Analytics Tracker (Non-blocking) -->
   <script src="site-tracker.js" defer></script>
 </body>

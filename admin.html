@@ -5070,8 +5070,9 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
                 const isWebinar = (r.service || '').toLowerCase().includes('webinar') || (r.id || '').startsWith('FC-WEB') || (r.status || '').toLowerCase().includes('paid');
                 const isWaJoined = r.whatsappJoined === true || r.waGroupStatus === 'Joined' || (r.message && r.message.includes('WhatsApp Group Joined'));
                 const isPaidStatus = String(r.status || '').toLowerCase().includes('paid');
-                const batchMatch = (r.message || r.notes || '').match(/\[Batch:\s*([^\]]+)\]/i);
-                const batchName = r.batchName || r.batch || (batchMatch ? batchMatch[1].trim() : (isWebinar ? 'Batch 1 (Past Completed)' : ''));
+                const isPastBatch1 = (r.created_at && r.created_at < '2026-09-12') || (r.date && r.date < '2026-09-12');
+                const defaultWebinarBatch = isPastBatch1 ? 'Batch 1 (Past Completed)' : 'Batch 2 - Sep/Oct 2026';
+                const batchName = r.batchName || r.batch || (batchMatch ? batchMatch[1].trim() : (isWebinar ? defaultWebinarBatch : ''));
                 return {
                   id: r.id,
                   userId: r.id,
@@ -5654,8 +5655,8 @@ function renderCrmTable() {
                   const leadUid = escapeHtml(String(l.userId || l.id || ''));
                   const safeName = escapeHtml(String(l.name || 'Anonymous'));
                   const safeEmail = escapeHtml(String(l.email || '-'));
-                  const safePhone = escapeHtml(String(l.phone || '-'));
-                  const leadBatch = String(l.batchName || l.batch || 'Batch 1 (Past Completed)');
+                  const isPastLead = (l.created_at && l.created_at < '2026-09-12') || (l.date && l.date < '2026-09-12');
+                  const leadBatch = String(l.batchName || l.batch || (isPastLead ? 'Batch 1 (Past Completed)' : 'Batch 2 - Sep/Oct 2026'));
                   const isCurrentBatch = !leadBatch || leadBatch.toLowerCase().includes('batch 2') || leadBatch.toLowerCase() === activeBatchName.toLowerCase();
                   const safeType = escapeHtml(String(l.websiteType || 'Webinar Masterclass'));
                   const isPaid = String(l.status || '').toLowerCase().includes('paid') || String(l.paymentStatus || '').toLowerCase().includes('paid');
@@ -5961,7 +5962,8 @@ function renderCrmTable() {
         if (webinarLeads.length === 0) return alert('No webinar records to export for the selected batch filter.');
         let csv = '\uFEFFPass ID,Date,Name,Phone,Email,Batch,Website Type,Amount,Status,WhatsApp Group\n';
         webinarLeads.forEach(l => {
-          const leadBatch = String(l.batchName || l.batch || 'Batch 1 (Past Completed)');
+          const isPastLead = (l.created_at && l.created_at < '2026-09-12') || (l.date && l.date < '2026-09-12');
+          const leadBatch = String(l.batchName || l.batch || (isPastLead ? 'Batch 1 (Past Completed)' : 'Batch 2 - Sep/Oct 2026'));
           csv += `"${l.userId || l.id}","${l.date || ''}","${(l.name || '').replace(/"/g, '""')}","${l.phone || ''}","${l.email || ''}","${leadBatch.replace(/"/g, '""')}","${l.websiteType || ''}","${l.budget || l.amount || '49'}","${l.status || ''}","${l.whatsappJoined ? 'Joined' : 'Not Joined'}"\n`;
         });
         downloadCsvBlob(csv, `FlipCut_Webinar_Attendees_${bW.toUpperCase()}.csv`);

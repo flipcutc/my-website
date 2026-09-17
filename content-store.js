@@ -524,7 +524,7 @@ const DEFAULT_SITE_CONTENT = {
   "webinar": {
     "enabled": true,
     "masterLiveMode": true,
-    "badge": "🔥 Live Masterclass • 27th September, Sunday",
+    "badge": "🔥 BATCH 2 • LIVE MASTERCLASS (27TH SEPTEMBER)",
     "title": "How to Build & Scale High-Converting Websites That Drive Real Sales",
     "description": "Join FlipCut Creation's lead architects for an interactive live session on building high-retention E-commerce, Portfolio, and Service sites with high-converting web architecture.",
     "date": "27th September, Sunday • 10:00 AM IST",
