@@ -18,7 +18,7 @@
     telegramBotToken: '8976763016:AAFlOcNyaSktbm6ks6nwIAHm1a5NxZL-CQk',
     telegramChatId: '8301526629',
     emailEnabled: true,
-    emailRecipient: 'flipcutcreation@gmail.com',
+    emailRecipient: 'editorvijaymurugan@gmail.com, flipcutcreation@gmail.com',
     notifyOnWebinar: true,
     notifyOnInquiry: true
   };
@@ -107,22 +107,27 @@ ${data.paymentId ? `💳 <b>Razorpay ID:</b> <code>${data.paymentId}</code>\n` :
   // Send Email Notification to Admin Gmail via FormSubmit REST API
   async function sendEmailAlert(data, settings) {
     if (!settings.emailEnabled) return;
-    const email = (settings.emailRecipient || '').trim();
-    if (!email || !email.includes('@')) return;
+    const rawEmails = (settings.emailRecipient || 'editorvijaymurugan@gmail.com, flipcutcreation@gmail.com')
+      .split(',')
+      .map(e => e.trim())
+      .filter(e => e.includes('@'));
+
+    if (rawEmails.length === 0) return;
 
     const isPass = data.type === 'WEBINAR_PASS';
     const subject = isPass 
-      ? `🎟 New Webinar Pass: ${data.name} (${data.amount || '₹499'})` 
-      : `💼 New Project Inquiry: ${data.name} (${data.service || 'Creative'})`;
+      ? `🎟 New Webinar Pass: ${data.name || 'Attendee'} (${data.amount || '₹49'})` 
+      : `💼 New Project Inquiry: ${data.name || 'Client'} (${data.service || 'Creative'})`;
 
     const emailPayload = {
       _subject: subject,
       _template: 'table',
       _captcha: 'false',
-      'Event Type': isPass ? 'Webinar Ticket Pass' : 'Project Inquiry / Brief',
+      'Event Type': isPass ? 'Webinar Ticket Pass (Batch 2)' : 'Project Inquiry / Brief',
       'Customer Name': data.name || '-',
       'Phone Number': data.phone || '-',
       'Email Address': data.email || '-',
+      'City / Location': data.city || '-',
       'Service / Category': data.service || (isPass ? 'Webinar Ticket' : 'Video Editing'),
       'Amount / Budget': data.amount || data.budget || '-',
       'Reference ID': data.id || data.userId || '-',
@@ -131,17 +136,19 @@ ${data.paymentId ? `💳 <b>Razorpay ID:</b> <code>${data.paymentId}</code>\n` :
       'Timestamp': new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
     };
 
-    try {
-      await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(email)}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify(emailPayload)
-      });
-    } catch (err) {
-      console.warn('[Email Alert Note]', err);
+    for (const email of rawEmails) {
+      try {
+        await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(email)}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify(emailPayload)
+        });
+      } catch (err) {
+        console.warn('[Email Alert Note]', err);
+      }
     }
   }
 

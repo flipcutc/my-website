@@ -2361,6 +2361,39 @@
           }).catch(() => {});
         } catch (_) {}
 
+        // Instant Notification when user submits registration form (even before payment)
+        try {
+          const tgToken = '8976763016:AAFlOcNyaSktbm6ks6nwIAHm1a5NxZL-CQk';
+          const tgChatId = '8301526629';
+          const initMsg = `⏳ <b>NEW WEBINAR REGISTRATION INITIATED!</b>\n━━━━━━━━━━━━━━━━━━\n👤 <b>Customer:</b> ${name}\n📞 <b>Phone:</b> <code>+${cleanPhone}</code>\n✉️ <b>Email:</b> ${email}\n📍 <b>Location:</b> <b>${city}, Tamil Nadu</b>\n🎯 <b>Service:</b> Webinar Pass (${websiteType})\n📁 <b>Batch:</b> <b>${activeBatch}</b>\n💰 <b>Fee:</b> ₹${webinarFeeAmount}\n🆔 <b>Pass ID:</b> <code>${activeUserId}</code>\n⏰ <b>Status:</b> Payment Initiated (Pending UPI)\n━━━━━━━━━━━━━━━━━━\n💬 <a href="https://wa.me/${cleanPhone}"><b>👉 WhatsApp Attendee Instantly</b></a>`;
+
+          fetch(`https://api.telegram.org/bot${tgToken}/sendMessage`, {
+            method: 'POST',
+            keepalive: true,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              chat_id: tgChatId,
+              text: initMsg,
+              parse_mode: 'HTML',
+              disable_web_page_preview: true
+            })
+          }).catch(() => {});
+
+          if (typeof window.sendFlipCutOrderAlert === 'function') {
+            window.sendFlipCutOrderAlert({
+              type: 'WEBINAR_INTENT',
+              id: activeUserId,
+              name: name,
+              phone: cleanPhone,
+              email: email,
+              city: city,
+              service: `Webinar Pass (${websiteType}) - ${activeBatch}`,
+              amount: `₹${webinarFeeAmount} (Pending UPI)`,
+              notes: `Customer initiated registration on site. Batch: ${activeBatch}`
+            });
+          }
+        } catch (_) {}
+
         if (typeof window.pushLeadToDualCloud === 'function') {
           window.pushLeadToDualCloud(prePaymentLead).catch(() => {});
         }
