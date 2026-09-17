@@ -1157,9 +1157,16 @@
             </div>
           </div>
 
-          <div class="form-group">
-            <label for="webinarEmail">Email Address *</label>
-            <input type="email" id="webinarEmail" class="form-control" placeholder="vikram@creator.in" required>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="webinarEmail">Email Address *</label>
+              <input type="email" id="webinarEmail" class="form-control" placeholder="vikram@creator.in" required>
+            </div>
+
+            <div class="form-group">
+              <label for="webinarCity"><i class="fa-solid fa-location-dot" style="color: #F59E0B; margin-right: 4px;"></i> Your City / District *</label>
+              <input type="text" id="webinarCity" class="form-control" placeholder="e.g. Madurai, Chennai, Coimbatore" required>
+            </div>
           </div>
 
           <!-- 2. What Type of Website? -->
@@ -2186,6 +2193,7 @@
         const rawName = document.getElementById('webinarName').value.trim();
         const rawPhone = document.getElementById('webinarPhone').value.trim();
         const rawEmail = document.getElementById('webinarEmail').value.trim();
+        const rawCity = (document.getElementById('webinarCity')?.value || '').trim();
 
         const nameVal = validateFullName(rawName);
         if (!nameVal.valid) {
@@ -2202,6 +2210,12 @@
         const phoneVal = validatePhoneNumber(rawPhone);
         if (!phoneVal.valid) {
           showValidationGuideModal('phone', phoneVal.message);
+          return false;
+        }
+
+        if (!rawCity || rawCity.length < 2) {
+          showToast('Please enter your City / District (e.g. Madurai, Chennai)', '#F59E0B');
+          document.getElementById('webinarCity')?.focus();
           return false;
         }
 
@@ -2225,7 +2239,22 @@
         if (savedDraft.email && document.getElementById('webinarEmail') && !document.getElementById('webinarEmail').value) {
           document.getElementById('webinarEmail').value = savedDraft.email;
         }
+        if (savedDraft.city && document.getElementById('webinarCity') && !document.getElementById('webinarCity').value) {
+          document.getElementById('webinarCity').value = savedDraft.city;
+        }
       } catch (_) {}
+
+      // Real-Time Visitor City Sync: When visitor types city, instantly update visitor tracking
+      document.getElementById('webinarCity')?.addEventListener('input', (e) => {
+        const c = e.target.value.trim();
+        if (c.length >= 2) {
+          sessionStorage.setItem('fc_user_city', c);
+          const n = document.getElementById('webinarName')?.value.trim() || '';
+          if (typeof window.updateVisitorExactLocation === 'function') {
+            window.updateVisitorExactLocation(c, 'Tamil Nadu', n);
+          }
+        }
+      });
 
       // Step 1: Pay via Razorpay
       btnPayRazorpay.addEventListener('click', async () => {
@@ -2234,12 +2263,18 @@
         const name = document.getElementById('webinarName').value.trim();
         const rawPhone = document.getElementById('webinarPhone').value.trim();
         const email = document.getElementById('webinarEmail').value.trim();
+        const city = (document.getElementById('webinarCity')?.value || '').trim() || 'Tamil Nadu';
         const websiteType = getSelectedWebsiteType();
         const webinarFeeAmount = getCurrentWebinarFee();
 
         let cleanPhone = rawPhone.replace(/[^0-9]/g, '');
         if (cleanPhone.startsWith('91') && cleanPhone.length === 12) cleanPhone = cleanPhone.substring(2);
         if (cleanPhone.startsWith('0') && cleanPhone.length === 11) cleanPhone = cleanPhone.substring(1);
+
+        // Instantly notify live tracker of verified attendee identity & exact city
+        if (typeof window.updateVisitorExactLocation === 'function') {
+          window.updateVisitorExactLocation(city, 'Tamil Nadu', name);
+        }
 
         const payBtnText = document.getElementById('btnPayRazorpayText');
         const origBtnText = payBtnText ? payBtnText.innerHTML : 'Pay ₹49 & Unlock Registration';
@@ -2270,7 +2305,7 @@
         // 2. Save active draft with timestamp & intent
         const activeDraft = {
           userId: activeUserId,
-          name, phone: cleanPhone, email, websiteType, webinarFeeAmount,
+          name, phone: cleanPhone, email, city, websiteType, webinarFeeAmount,
           status: 'Payment Initiated (Pending UPI)',
           timestamp: Date.now()
         };
@@ -2287,6 +2322,7 @@
           name: name,
           email: email,
           phone: cleanPhone,
+          city: city,
           service: `Webinar Registration (${activeBatch.split(' - ')[0] || 'Batch 2'})`,
           packageName: `Webinar Pass (${websiteType})`,
           budget: `₹${webinarFeeAmount}`,
@@ -2296,7 +2332,7 @@
           batch: activeBatch,
           paymentStatus: 'Payment Initiated (Pending UPI)',
           status: 'Payment Initiated (Pending UPI)',
-          notes: `User initiated UPI checkout for Webinar Pass (${websiteType}) | [Batch: ${activeBatch}] | User ID: ${activeUserId}`,
+          notes: `User initiated UPI checkout for Webinar Pass (${websiteType}) | [Batch: ${activeBatch}] | City: ${city} | User ID: ${activeUserId}`,
           date: new Date().toISOString().slice(0, 10),
           created_at: new Date().toISOString()
         };
@@ -2319,7 +2355,7 @@
               phone: cleanPhone,
               service: `Webinar Registration (${activeBatch.split(' - ')[0] || 'Batch 2'})`,
               budget: `₹${webinarFeeAmount}`,
-              message: `User initiated checkout for Webinar Pass (${websiteType}) | [Batch: ${activeBatch}]. User ID: ${activeUserId}`,
+              message: `User initiated checkout for Webinar Pass (${websiteType}) | [Batch: ${activeBatch}] | City: ${city}. User ID: ${activeUserId}`,
               status: 'Payment Initiated (Pending UPI)'
             })
           }).catch(() => {});
@@ -2455,7 +2491,7 @@
                       status: 'Booked / Paid',
                       budget: `₹${guaranteedFee}`,
                       service: `Webinar Registration (${activeBatch.split(' - ')[0] || 'Batch 2'})`,
-                      message: `Webinar Pass (${websiteType}) | [Batch: ${activeBatch}] | Razorpay Payment ID: ${verifiedPaymentId}`
+                      message: `Webinar Pass (${websiteType}) | [Batch: ${activeBatch}] | City: ${city} | Razorpay Payment ID: ${verifiedPaymentId}`
                     })
                   }).catch(() => {});
                 } catch (_) {}
@@ -2464,7 +2500,7 @@
                 try {
                   const tgToken = '8976763016:AAFlOcNyaSktbm6ks6nwIAHm1a5NxZL-CQk';
                   const tgChatId = '8301526629';
-                  const tgText = `🎟 <b>NEW WEBINAR TICKET PASS BOOKED!</b>\n━━━━━━━━━━━━━━━━━━\n👤 <b>Customer:</b> ${name}\n📞 <b>Phone:</b> <code>+${cleanPhone}</code>\n✉️ <b>Email:</b> ${email}\n🎯 <b>Service:</b> Webinar Pass (${websiteType}) - ${activeBatch}\n💰 <b>Amount:</b> <b>₹${guaranteedFee}</b>\n🆔 <b>Order ID:</b> <code>${generatedUserId}</code>\n💳 <b>Razorpay ID:</b> <code>${verifiedPaymentId}</code>\n📝 <b>Batch:</b> <b>${activeBatch}</b>\n⏰ <b>Time:</b> ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}\n━━━━━━━━━━━━━━━━━━\n💬 <a href="https://wa.me/${cleanPhone}"><b>👉 Open WhatsApp Chat Directly</b></a>`;
+                  const tgText = `🎟 <b>NEW WEBINAR TICKET PASS BOOKED!</b>\n━━━━━━━━━━━━━━━━━━\n👤 <b>Customer:</b> ${name}\n📞 <b>Phone:</b> <code>+${cleanPhone}</code>\n✉️ <b>Email:</b> ${email}\n📍 <b>Location:</b> <b>${city}, Tamil Nadu</b>\n🎯 <b>Service:</b> Webinar Pass (${websiteType}) - ${activeBatch}\n💰 <b>Amount:</b> <b>₹${guaranteedFee}</b>\n🆔 <b>Order ID:</b> <code>${generatedUserId}</code>\n💳 <b>Razorpay ID:</b> <code>${verifiedPaymentId}</code>\n📝 <b>Batch:</b> <b>${activeBatch}</b>\n⏰ <b>Time:</b> ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}\n━━━━━━━━━━━━━━━━━━\n💬 <a href="https://wa.me/${cleanPhone}"><b>👉 Open WhatsApp Chat Directly</b></a>`;
 
                   fetch(`https://api.telegram.org/bot${tgToken}/sendMessage`, {
                     method: 'POST',
@@ -2479,8 +2515,13 @@
                   }).catch(() => {});
                 } catch (_) {}
 
+                // Update live visitor analytics with verified attendee and exact location
+                if (typeof window.updateVisitorExactLocation === 'function') {
+                  window.updateVisitorExactLocation(city, 'Tamil Nadu', name);
+                }
+
                 // 5. Submit confirmed lead to Dual Cloud non-blockingly
-                handleWebinarFinalSubmit(null, generatedUserId, verifiedPaymentId, name, cleanPhone, email, websiteType, guaranteedFee);
+                handleWebinarFinalSubmit(null, generatedUserId, verifiedPaymentId, name, cleanPhone, email, websiteType, guaranteedFee, city);
                 showToast('🎉 Pass Created Successfully! Official Ticket Pass Issued.', '#10B981');
               } else {
                 showToast('Payment verification pending. Please try again.', '#EF4444');
@@ -2545,7 +2586,7 @@
       };
 
       // Step 2: Final Submit & Cloud Database Sync
-      async function handleWebinarFinalSubmit(e, explicitUid, explicitPayId, explicitName, explicitPhone, explicitEmail, explicitType, explicitAmount) {
+      async function handleWebinarFinalSubmit(e, explicitUid, explicitPayId, explicitName, explicitPhone, explicitEmail, explicitType, explicitAmount, explicitCity) {
         if (e && e.preventDefault) e.preventDefault();
 
         // If Master Live Mode is OFF, handle as Free Priority Waitlist submission
@@ -2555,6 +2596,7 @@
           const name = explicitName || (document.getElementById('webinarName')?.value || 'Valued Creator').trim();
           const phone = explicitPhone || (document.getElementById('webinarPhone')?.value || '').trim();
           const email = explicitEmail || (document.getElementById('webinarEmail')?.value || '').trim();
+          const city = explicitCity || (document.getElementById('webinarCity')?.value || '').trim() || 'Tamil Nadu';
           const websiteType = explicitType || getSelectedWebsiteType() || 'E-commerce';
           if (!phone) {
             alert('Please enter your WhatsApp / mobile number to receive waitlist notification.');
@@ -2567,12 +2609,13 @@
             name: name,
             phone: phone,
             email: email,
+            city: city,
             service: 'Webinar Waitlist (Coming Soon)',
             packageName: `Waitlist (${websiteType})`,
             budget: 'Free Waitlist',
             amount: 'Free Waitlist',
             paymentStatus: 'Waitlist Registered',
-            notes: `Priority Waitlist for Next Batch | Type: ${websiteType}`,
+            notes: `Priority Waitlist for Next Batch | City: ${city} | Type: ${websiteType}`,
             status: 'Waitlist',
             date: new Date().toISOString().slice(0, 10)
           };
@@ -2597,11 +2640,17 @@
         const name = explicitName || (document.getElementById('webinarName')?.value || savedDraft.name || 'Valued Creator').trim();
         const phone = explicitPhone || (document.getElementById('webinarPhone')?.value || savedDraft.phone || '').trim();
         const email = explicitEmail || (document.getElementById('webinarEmail')?.value || savedDraft.email || '').trim();
+        const city = explicitCity || (document.getElementById('webinarCity')?.value || savedDraft.city || '').trim() || 'Tamil Nadu';
         const websiteType = explicitType || getSelectedWebsiteType() || savedDraft.websiteType || 'E-commerce';
         const generatedUserId = explicitUid || ('FC-WEB-' + Math.floor(10000 + Math.random() * 90000));
 
         // Display Ticket Modal synchronously
         showTicketModal(name, websiteType, payId, generatedUserId, phone);
+
+        // Update visitor exact location immediately
+        if (typeof window.updateVisitorExactLocation === 'function') {
+          window.updateVisitorExactLocation(city, 'Tamil Nadu', name);
+        }
 
         // Create / Update VIP User Profile in Header across all pages
         if (typeof window.saveUserProfile === 'function') {
@@ -2610,6 +2659,7 @@
             name: name,
             email: email,
             phone: phone,
+            city: city,
             websiteType: websiteType,
             paymentId: payId,
             amount: `₹${webinarFeeAmount}`
@@ -2623,6 +2673,7 @@
           name: name,
           email: email,
           phone: phone,
+          city: city,
           service: `Webinar Registration (${batchTag})`,
           packageName: `Webinar Pass (${websiteType})`,
           budget: `₹${webinarFeeAmount}`,
@@ -2630,11 +2681,11 @@
           websiteType: websiteType,
           batchName: activeBatch,
           batch: activeBatch,
-          footage: `Website Type: ${websiteType}`,
+          footage: `Website Type: ${websiteType} | City: ${city}`,
           paymentId: payId,
           orderId: verifiedOrderId || '',
           paymentStatus: 'Paid & Verified',
-          notes: `Webinar Registration Pass | [Batch: ${activeBatch}] | User ID: ${generatedUserId} | Website Type: ${websiteType} | Payment ID: ${payId}`,
+          notes: `Webinar Registration Pass | [Batch: ${activeBatch}] | City: ${city} | User ID: ${generatedUserId} | Website Type: ${websiteType} | Payment ID: ${payId}`,
           status: 'Booked / Paid'
         };
 
@@ -2644,7 +2695,7 @@
             ...leadPayload,
             service: `Webinar Registration (${batchTag})`,
             budget: `₹${webinarFeeAmount}`,
-            message: `Webinar Pass (${websiteType}) | [Batch: ${activeBatch}] | Razorpay Payment ID: ${payId}`,
+            message: `Webinar Pass (${websiteType}) | [Batch: ${activeBatch}] | City: ${city} | Razorpay Payment ID: ${payId}`,
             status: 'Booked / Paid'
           }).catch(() => {});
         } else {
@@ -2657,7 +2708,7 @@
               phone: phone,
               service: `Webinar Registration (${batchTag})`,
               budget: `₹${webinarFeeAmount}`,
-              message: `Webinar Pass (${websiteType}) | [Batch: ${activeBatch}] | Razorpay Payment ID: ${payId}`,
+              message: `Webinar Pass (${websiteType}) | [Batch: ${activeBatch}] | City: ${city} | Razorpay Payment ID: ${payId}`,
               status: 'Booked / Paid'
             };
             fetch('https://cznixvdphwbjdnnmapvb.supabase.co/rest/v1/leads', {
@@ -2697,7 +2748,7 @@
           // Direct Hard-wired Telegram Emergency Push (Guaranteed zero-drop delivery)
           const tgToken = '8976763016:AAFlOcNyaSktbm6ks6nwIAHm1a5NxZL-CQk';
           const tgChatId = '8301526629';
-          const tgText = `🎟 <b>NEW WEBINAR TICKET PASS BOOKED!</b>\n━━━━━━━━━━━━━━━━━━\n👤 <b>Customer:</b> ${name}\n📞 <b>Phone:</b> <code>+${phone}</code>\n✉️ <b>Email:</b> ${email}\n🎯 <b>Service:</b> Webinar Pass (${websiteType}) - ${activeBatch}\n💰 <b>Amount:</b> <b>₹${webinarFeeAmount}</b>\n🆔 <b>Order ID:</b> <code>${generatedUserId}</code>\n💳 <b>Razorpay ID:</b> <code>${payId}</code>\n📝 <b>Batch:</b> <b>${activeBatch}</b>\n⏰ <b>Time:</b> ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}\n━━━━━━━━━━━━━━━━━━\n💬 <a href="https://wa.me/${phone}"><b>👉 Open WhatsApp Chat Directly</b></a>`;
+          const tgText = `🎟 <b>NEW WEBINAR TICKET PASS BOOKED!</b>\n━━━━━━━━━━━━━━━━━━\n👤 <b>Customer:</b> ${name}\n📞 <b>Phone:</b> <code>+${phone}</code>\n✉️ <b>Email:</b> ${email}\n📍 <b>Location:</b> <b>${city}, Tamil Nadu</b>\n🎯 <b>Service:</b> Webinar Pass (${websiteType}) - ${activeBatch}\n💰 <b>Amount:</b> <b>₹${webinarFeeAmount}</b>\n🆔 <b>Order ID:</b> <code>${generatedUserId}</code>\n💳 <b>Razorpay ID:</b> <code>${payId}</code>\n📝 <b>Batch:</b> <b>${activeBatch}</b>\n⏰ <b>Time:</b> ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}\n━━━━━━━━━━━━━━━━━━\n💬 <a href="https://wa.me/${phone}"><b>👉 Open WhatsApp Chat Directly</b></a>`;
 
           fetch(`https://api.telegram.org/bot${tgToken}/sendMessage`, {
             method: 'POST',
@@ -2718,6 +2769,7 @@
               name: name,
               phone: phone,
               email: email,
+              city: city,
               service: `Webinar Pass (${websiteType}) - ${activeBatch}`,
               amount: `₹${webinarFeeAmount}`,
               paymentId: payId,

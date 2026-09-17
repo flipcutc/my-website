@@ -139,61 +139,130 @@
     }
   }
 
-  // 5. IP & Geolocation Resolver (Fast, free, cached in sessionStorage)
+  // 5. IP & Geolocation Resolver (Cascaded High-Accuracy Engine)
   async function resolveGeoLocation() {
     const cachedGeo = sessionStorage.getItem('fc_geo');
+    const customUserCity = sessionStorage.getItem('fc_user_city');
     if (cachedGeo) {
-      try { return JSON.parse(cachedGeo); } catch (_) {}
+      try {
+        const parsed = JSON.parse(cachedGeo);
+        if (customUserCity && parsed.city !== customUserCity) {
+          parsed.city = customUserCity;
+          parsed.isExact = true;
+          sessionStorage.setItem('fc_geo', JSON.stringify(parsed));
+        }
+        return parsed;
+      } catch (_) {}
     }
 
     const defaultGeo = {
       ip: 'Anonymous',
-      city: 'Unknown City',
-      region: 'Unknown Region',
+      city: customUserCity || 'Tamil Nadu',
+      region: 'Tamil Nadu',
       country: 'India',
       countryCode: 'IN',
-      flag: '🇮🇳'
+      flag: '🇮🇳',
+      isExact: !!customUserCity
     };
 
-    // Attempt primary fast API (ipapi.co)
+    // Tier 1: User-Specified Exact City (From Form / Profile)
+    if (customUserCity) {
+      sessionStorage.setItem('fc_geo', JSON.stringify(defaultGeo));
+      return defaultGeo;
+    }
+
+    // Tier 2: ipinfo.io (Super fast, reliable HTTPS, 50k free req/mo, accurate Indian cities)
     try {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 3000);
+      const timeout = setTimeout(() => controller.abort(), 2500);
+      const res = await fetch('https://ipinfo.io/json', { signal: controller.signal });
+      clearTimeout(timeout);
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.city) {
+          const geo = {
+            ip: data.ip || 'Anonymous',
+            city: data.city || 'Tamil Nadu',
+            region: data.region || 'Tamil Nadu',
+            country: data.country === 'IN' ? 'India' : (data.country || 'India'),
+            countryCode: data.country || 'IN',
+            flag: getCountryFlag(data.country || 'IN'),
+            postal: data.postal || '',
+            coords: data.loc || ''
+          };
+          sessionStorage.setItem('fc_geo', JSON.stringify(geo));
+          return geo;
+        }
+      }
+    } catch (_) {}
+
+    // Tier 3: ipwho.is (Reliable HTTPS, zero API key, high telecom accuracy)
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 2500);
+      const res = await fetch('https://ipwho.is/', { signal: controller.signal });
+      clearTimeout(timeout);
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.success !== false && data.city) {
+          const geo = {
+            ip: data.ip || 'Anonymous',
+            city: data.city || 'Tamil Nadu',
+            region: data.region || 'Tamil Nadu',
+            country: data.country || 'India',
+            countryCode: data.country_code || 'IN',
+            flag: getCountryFlag(data.country_code || 'IN'),
+            postal: data.postal || ''
+          };
+          sessionStorage.setItem('fc_geo', JSON.stringify(geo));
+          return geo;
+        }
+      }
+    } catch (_) {}
+
+    // Tier 4: ipapi.co
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 2500);
       const res = await fetch('https://ipapi.co/json/', { signal: controller.signal });
       clearTimeout(timeout);
       if (res.ok) {
         const data = await res.json();
-        const geo = {
-          ip: data.ip || 'Anonymous',
-          city: data.city || 'Unknown City',
-          region: data.region || 'Unknown Region',
-          country: data.country_name || 'India',
-          countryCode: data.country_code || 'IN',
-          flag: getCountryFlag(data.country_code || 'IN')
-        };
-        sessionStorage.setItem('fc_geo', JSON.stringify(geo));
-        return geo;
+        if (data && data.city) {
+          const geo = {
+            ip: data.ip || 'Anonymous',
+            city: data.city || 'Tamil Nadu',
+            region: data.region || 'Tamil Nadu',
+            country: data.country_name || 'India',
+            countryCode: data.country_code || 'IN',
+            flag: getCountryFlag(data.country_code || 'IN')
+          };
+          sessionStorage.setItem('fc_geo', JSON.stringify(geo));
+          return geo;
+        }
       }
     } catch (_) {}
 
-    // Fallback API (freeipapi.com)
+    // Tier 5: Fallback API (freeipapi.com)
     try {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 3000);
+      const timeout = setTimeout(() => controller.abort(), 2500);
       const res = await fetch('https://freeipapi.com/api/json', { signal: controller.signal });
       clearTimeout(timeout);
       if (res.ok) {
         const data = await res.json();
-        const geo = {
-          ip: data.ipAddress || 'Anonymous',
-          city: data.cityName || 'Unknown City',
-          region: data.regionName || 'Unknown Region',
-          country: data.countryName || 'India',
-          countryCode: data.countryCode || 'IN',
-          flag: getCountryFlag(data.countryCode || 'IN')
-        };
-        sessionStorage.setItem('fc_geo', JSON.stringify(geo));
-        return geo;
+        if (data && data.cityName) {
+          const geo = {
+            ip: data.ipAddress || 'Anonymous',
+            city: data.cityName || 'Tamil Nadu',
+            region: data.regionName || 'Tamil Nadu',
+            country: data.countryName || 'India',
+            countryCode: data.countryCode || 'IN',
+            flag: getCountryFlag(data.countryCode || 'IN')
+          };
+          sessionStorage.setItem('fc_geo', JSON.stringify(geo));
+          return geo;
+        }
       }
     } catch (_) {}
 
@@ -208,6 +277,90 @@
       .map(char => 127397 + char.charCodeAt(0));
     return String.fromCodePoint(...codePoints);
   }
+
+  // GPS High-Precision Reverse Geocoder (HTML5 + OpenStreetMap Nominatim)
+  let isGpsAttempted = false;
+  function tryRequestGpsAccuracy() {
+    if (isGpsAttempted || !navigator.geolocation) return;
+    isGpsAttempted = true;
+
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+      try {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 4500);
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`, {
+          signal: controller.signal,
+          headers: { 'Accept': 'application/json' }
+        });
+        clearTimeout(timeout);
+        if (res.ok) {
+          const data = await res.json();
+          const addr = data.address || {};
+          const exactCity = addr.city || addr.town || addr.municipality || addr.village || addr.suburb || addr.county || addr.state_district;
+          const exactState = addr.state || 'Tamil Nadu';
+          const exactCountry = addr.country || 'India';
+          const exactCode = (addr.country_code || 'in').toUpperCase();
+
+          if (exactCity) {
+            currentGeo = {
+              ip: currentGeo?.ip || 'Anonymous',
+              city: exactCity,
+              region: exactState,
+              country: exactCountry,
+              countryCode: exactCode,
+              flag: getCountryFlag(exactCode),
+              isGpsExact: true
+            };
+            sessionStorage.setItem('fc_geo', JSON.stringify(currentGeo));
+            sessionStorage.setItem('fc_user_city', exactCity);
+            const vName = sessionStorage.getItem('fc_visitor_name') || '';
+            pushVisitorSession('ONLINE', `📍 Exact GPS Verified: ${exactCity}${vName ? ' (' + vName + ')' : ''}`);
+          }
+        }
+      } catch (_) {}
+    }, () => {}, { timeout: 6000, maximumAge: 300000, enableHighAccuracy: true });
+  }
+
+  // Automatic permission-based GPS verification (0 user prompts if already allowed)
+  try {
+    if (navigator.permissions && navigator.permissions.query) {
+      navigator.permissions.query({ name: 'geolocation' }).then(st => {
+        if (st.state === 'granted') tryRequestGpsAccuracy();
+      }).catch(() => {});
+    }
+  } catch (_) {}
+
+  // Global Function: Allows any form (Webinar, Contact, Lead) to immediately associate exact city & user name
+  window.updateVisitorExactLocation = function(city, region = 'Tamil Nadu', visitorName = '') {
+    if (!city || city.trim().length < 2) return;
+    const cleanCity = city.trim();
+    sessionStorage.setItem('fc_user_city', cleanCity);
+
+    if (currentGeo) {
+      currentGeo.city = cleanCity;
+      if (region) currentGeo.region = region;
+      currentGeo.isExact = true;
+    } else {
+      currentGeo = {
+        ip: 'Anonymous',
+        city: cleanCity,
+        region: region,
+        country: 'India',
+        countryCode: 'IN',
+        flag: '🇮🇳',
+        isExact: true
+      };
+    }
+    sessionStorage.setItem('fc_geo', JSON.stringify(currentGeo));
+
+    if (visitorName) {
+      sessionStorage.setItem('fc_visitor_name', visitorName.trim());
+    }
+
+    pushVisitorSession('ONLINE', `📍 Exact City Verified: ${cleanCity}${visitorName ? ' (' + visitorName + ')' : ''}`);
+  };
 
   // 6. State & Sync Manager
   const clientInfo = detectClientInfo();
@@ -228,13 +381,20 @@
       }
 
       const durationSeconds = Math.round((Date.now() - sessionStartTime) / 1000);
-      const locationLabel = `${currentGeo.city}, ${currentGeo.region}, ${currentGeo.country}`;
-      const deviceLabel = `${clientInfo.device} (${clientInfo.os}) • ${clientInfo.browser}`;
+      const visitorName = sessionStorage.getItem('fc_visitor_name') || '';
+      const locationLabel = visitorName 
+        ? `${visitorName} • ${currentGeo.city}, ${currentGeo.region}`
+        : `${currentGeo.city}, ${currentGeo.region}, ${currentGeo.country}`;
+      const deviceLabel = visitorName
+        ? `${visitorName} • ${clientInfo.device} (${clientInfo.os}) • ${clientInfo.browser}`
+        : `${clientInfo.device} (${clientInfo.os}) • ${clientInfo.browser}`;
       const journey = getJourney();
 
       const meta = {
         sessionId: sessionId,
         visitorId: visitorId,
+        visitorName: visitorName,
+        isGpsExact: currentGeo.isGpsExact || currentGeo.isExact || false,
         ip: currentGeo.ip,
         city: currentGeo.city,
         region: currentGeo.region,

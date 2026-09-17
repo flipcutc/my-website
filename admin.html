@@ -6053,8 +6053,13 @@ function renderCrmTable() {
                 const isStillOnline = !isExplicitOffline && diffSec <= 40;
                 const isIdle = !isStillOnline && !isExplicitOffline && diffSec <= 90;
 
+                const visitorName = meta.visitorName || (r.phone && r.phone.includes('•') && !r.phone.startsWith('Desktop') && !r.phone.startsWith('Mobile') && !r.phone.startsWith('Tablet') ? r.phone.split('•')[0].trim() : '');
+                const isGpsExact = meta.isGpsExact === true || meta.isExact === true;
+
                 return {
                   sessionId: r.id,
+                  visitorName: visitorName,
+                  isGpsExact: isGpsExact,
                   ip: meta.ip || r.email || 'Anonymous',
                   city: meta.city || 'Unknown City',
                   region: meta.region || '',
@@ -6621,9 +6626,10 @@ function renderCrmTable() {
             <tr style="cursor: pointer;" title="Double click to inspect user journey timeline" ondblclick="openUserJourneyModal('${v.sessionId}')">
               <td>${statusBadge}</td>
               <td>
-                <div style="font-weight: 700; color: var(--text-primary); font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
+                <div style="font-weight: 800; color: var(--text-primary); font-size: 0.95rem; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
                   <span>${v.flag || '🌐'}</span>
-                  <span>${v.city || 'India'}${v.region ? ', ' + v.region : ''}</span>
+                  <span>${v.visitorName ? `<strong style="color: #F59E0B;">${escapeHtml(v.visitorName)}</strong> • ` : ''}${escapeHtml(v.city || 'Tamil Nadu')}${v.region ? ', ' + escapeHtml(v.region) : ''}</span>
+                  ${v.isGpsExact ? `<span style="font-size: 0.65rem; background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid #10B981; border-radius: 4px; padding: 1px 5px; font-weight: 800; letter-spacing: 0.5px;">📍 EXACT</span>` : ''}
                 </div>
                 <div style="font-size: 0.78rem; color: var(--text-muted); font-family: monospace; margin-top: 2px;">
                   IP: ${v.ip || 'Hidden'}
