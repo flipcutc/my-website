@@ -1777,10 +1777,14 @@
                 </div>
               </div>
             </div>
-            <div style="font-size: 0.72rem; font-weight: 600; color: #6366F1; display: inline-flex; align-items: center; gap: 5px; margin-bottom: 8px;">
-              <span style="width: 8px; height: 8px; background: #6366F1; border-radius: 2px;"></span> Unique Visitors
+            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
+              <div>
+                <span id="saasDailyVisitorsToday" style="font-size: 1.65rem; font-weight: 900; color: #6366F1; letter-spacing: -0.5px;">0</span>
+                <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-left: 4px;">today</span>
+              </div>
+              <span id="saasDailyVisitorsSub" style="font-size: 0.75rem; color: #10B981; font-weight: 700; background: rgba(16, 185, 129, 0.1); padding: 2px 8px; border-radius: 9999px;">0 total logged</span>
             </div>
-            <div class="saas-chart-container" style="height: 185px;">
+            <div class="saas-chart-container" style="height: 165px;">
               <canvas id="chartVisitorsTrend"></canvas>
             </div>
           </div>
@@ -1858,6 +1862,46 @@
           </div>
 
         </div>
+ 
+        <!-- Daily Visitors Traffic Breakdown Strip & Quick Date Selector -->
+        <div class="cms-card" style="margin-top: 24px; padding: 20px 24px; background: var(--bg-surface); border: 1px solid var(--border-medium); border-radius: 12px; box-shadow: var(--shadow-sm);">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-bottom: 14px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(99, 102, 241, 0.12); color: #6366F1; display: inline-flex; align-items: center; justify-content: center; font-size: 1.15rem;">
+                <i class="fa-solid fa-calendar-days"></i>
+              </div>
+              <div>
+                <h3 style="margin: 0; font-size: 1.05rem; font-weight: 800; color: var(--text-primary);">Daily Visitor Traffic Breakdown</h3>
+                <div style="font-size: 0.8rem; color: var(--text-muted);">Accurate day-by-day visitor volume and interactive quick date filter</div>
+              </div>
+            </div>
+
+            <!-- Quick Metrics Badges -->
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+              <div style="background: rgba(16, 185, 129, 0.1); border: 1.5px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 6px 14px; display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 0.72rem; font-weight: 800; color: #10B981; text-transform: uppercase; letter-spacing: 0.5px;">Today</span>
+                <strong id="kpiTodayCount" style="font-size: 1.2rem; color: #10B981; font-weight: 900;">0</strong>
+              </div>
+              <div style="background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.25); border-radius: 8px; padding: 6px 14px; display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 0.72rem; font-weight: 700; color: #6366F1; text-transform: uppercase; letter-spacing: 0.5px;">Yesterday</span>
+                <strong id="kpiYesterdayCount" style="font-size: 1.2rem; color: #6366F1; font-weight: 900;">0</strong>
+              </div>
+              <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 8px; padding: 6px 14px; display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 0.72rem; font-weight: 700; color: #F59E0B; text-transform: uppercase; letter-spacing: 0.5px;">Last 7 Days</span>
+                <strong id="kpiWeekCount" style="font-size: 1.2rem; color: #F59E0B; font-weight: 900;">0</strong>
+              </div>
+              <div style="background: var(--bg-tertiary); border: 1px solid var(--border-medium); border-radius: 8px; padding: 6px 14px; display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Total Logged</span>
+                <strong id="kpiTotalLoggedCount" style="font-size: 1.2rem; color: var(--text-primary); font-weight: 900;">0</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Day-by-Day Interactive Filter Pills -->
+          <div style="display: flex; align-items: center; gap: 8px; overflow-x: auto; padding-top: 4px; padding-bottom: 2px;" id="dailyVisitorPillsRow">
+            <span style="font-size: 0.8rem; color: var(--text-muted);">Calculating daily visitor traffic...</span>
+          </div>
+        </div>
 
         <!-- Real-Time Activity Feed Stream Section -->
         <div class="cms-card" style="margin-top: 24px;">
@@ -1877,6 +1921,8 @@
               <input type="text" id="analyticsSearchInput" oninput="renderAnalyticsTable()" class="form-control" placeholder="Search IP, City, Page, Device..." style="width: 220px;">
               <select id="analyticsFilterSelect" onchange="renderAnalyticsTable()" class="form-control" style="width: auto; font-weight: 700; border-color: #10B981; background: rgba(16, 185, 129, 0.08); color: #10B981;">
                 <option value="online" selected>🟢 Active Now (Online)</option>
+                <option value="today">📅 Today's Visitors</option>
+                <option value="yesterday">⏪ Yesterday's Visitors</option>
                 <option value="all">👥 All Visitors (History)</option>
                 <option value="mobile">📱 Mobile Devices</option>
                 <option value="desktop">💻 Desktop / Laptops</option>
@@ -6024,10 +6070,11 @@ function renderCrmTable() {
         try {
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 4000);
-          const res = await fetch(`${PERM_SUPABASE_URL}/rest/v1/leads?id=like.VIS_*&order=created_at.desc&limit=100`, {
+          const res = await fetch(`${PERM_SUPABASE_URL}/rest/v1/leads?id=like.VIS_*&order=created_at.desc&limit=2000`, {
             headers: {
               apikey: PERM_SUPABASE_KEY,
-              Authorization: `Bearer ${PERM_SUPABASE_KEY}`
+              Authorization: `Bearer ${PERM_SUPABASE_KEY}`,
+              'Prefer': 'count=exact'
             },
             signal: controller.signal,
             cache: 'no-store'
@@ -6134,13 +6181,122 @@ function renderCrmTable() {
         }
       }
 
+      // ====================================================================
+      // 5B-1. DAILY VISITOR STATS & INTERACTIVE DATE SELECTOR
+      // ====================================================================
+      function getDailyVisitorStats(visitors) {
+        const now = new Date();
+        const todayStr = new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString().slice(0, 10);
+        
+        const yDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+        const yesterdayStr = new Date(yDate.getTime() - (yDate.getTimezoneOffset() * 60000)).toISOString().slice(0, 10);
+
+        const daysMap = {};
+        // 7 days window (from 6 days ago up to today)
+        for (let i = 6; i >= 0; i--) {
+          const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+          const dateKey = new Date(d.getTime() - (d.getTimezoneOffset() * 60000)).toISOString().slice(0, 10);
+          daysMap[dateKey] = {
+            dateKey: dateKey,
+            label: d.toLocaleDateString([], { month: 'short', day: 'numeric' }),
+            dayName: i === 0 ? 'Today' : (i === 1 ? 'Yesterday' : d.toLocaleDateString([], { weekday: 'short' })),
+            count: 0
+          };
+        }
+
+        let todayCount = 0;
+        let yesterdayCount = 0;
+        let weekCount = 0;
+
+        (visitors || []).forEach(v => {
+          const vDate = v.created_at ? new Date(v.created_at) : (v.firstSeen ? new Date(v.firstSeen) : null);
+          if (!vDate || isNaN(vDate.getTime())) return;
+          const dateKey = new Date(vDate.getTime() - (vDate.getTimezoneOffset() * 60000)).toISOString().slice(0, 10);
+
+          if (daysMap[dateKey]) {
+            daysMap[dateKey].count++;
+            weekCount++;
+          }
+          if (dateKey === todayStr) {
+            todayCount++;
+          } else if (dateKey === yesterdayStr) {
+            yesterdayCount++;
+          }
+        });
+
+        return {
+          todayStr,
+          yesterdayStr,
+          todayCount,
+          yesterdayCount,
+          weekCount,
+          daysList: Object.values(daysMap)
+        };
+      }
+
+      window.setAnalyticsDateFilter = function(filterVal) {
+        const select = document.getElementById('analyticsFilterSelect');
+        if (select) {
+          let option = select.querySelector(`option[value="${filterVal}"]`);
+          if (!option && filterVal.startsWith('date:')) {
+            const dateStr = filterVal.replace('date:', '');
+            option = document.createElement('option');
+            option.value = filterVal;
+            option.textContent = `📅 ${dateStr} Traffic`;
+            select.appendChild(option);
+          }
+          select.value = filterVal;
+          renderAnalyticsTable();
+        }
+      };
+
+      function renderDailyVisitorPills(dailyStats, currentFilter) {
+        const row = document.getElementById('dailyVisitorPillsRow');
+        if (!row) return;
+
+        const totalCount = (currentLiveVisitors || []).length;
+        let pillsHtml = `
+          <button type="button" onclick="setAnalyticsDateFilter('all')" class="btn-sm" style="padding: 5px 12px; font-size: 0.78rem; font-weight: 700; border-radius: 9999px; cursor: pointer; white-space: nowrap; border: 1px solid ${currentFilter === 'all' ? '#6366F1' : 'var(--border-medium)'}; background: ${currentFilter === 'all' ? '#6366F1' : 'var(--bg-surface)'}; color: ${currentFilter === 'all' ? '#FFFFFF' : 'var(--text-secondary)'}; transition: all 0.2s;">
+            All Records (${totalCount})
+          </button>
+          <button type="button" onclick="setAnalyticsDateFilter('today')" class="btn-sm" style="padding: 5px 12px; font-size: 0.78rem; font-weight: 800; border-radius: 9999px; cursor: pointer; white-space: nowrap; border: 1.5px solid ${currentFilter === 'today' ? '#10B981' : 'rgba(16, 185, 129, 0.4)'}; background: ${currentFilter === 'today' ? '#10B981' : 'rgba(16, 185, 129, 0.1)'}; color: ${currentFilter === 'today' ? '#FFFFFF' : '#10B981'}; transition: all 0.2s;">
+            🟢 Today (${dailyStats.todayCount})
+          </button>
+          <button type="button" onclick="setAnalyticsDateFilter('yesterday')" class="btn-sm" style="padding: 5px 12px; font-size: 0.78rem; font-weight: 700; border-radius: 9999px; cursor: pointer; white-space: nowrap; border: 1px solid ${currentFilter === 'yesterday' ? '#6366F1' : 'rgba(99, 102, 241, 0.3)'}; background: ${currentFilter === 'yesterday' ? '#6366F1' : 'rgba(99, 102, 241, 0.08)'}; color: ${currentFilter === 'yesterday' ? '#FFFFFF' : '#6366F1'}; transition: all 0.2s;">
+            ⏪ Yesterday (${dailyStats.yesterdayCount})
+          </button>
+        `;
+
+        const sortedDays = [...dailyStats.daysList].reverse();
+        sortedDays.forEach(d => {
+          if (d.dayName === 'Today' || d.dayName === 'Yesterday') return;
+          const isSelected = currentFilter === `date:${d.dateKey}`;
+          pillsHtml += `
+            <button type="button" onclick="setAnalyticsDateFilter('date:${d.dateKey}')" class="btn-sm" style="padding: 5px 11px; font-size: 0.76rem; font-weight: 600; border-radius: 9999px; cursor: pointer; white-space: nowrap; border: 1px solid ${isSelected ? '#6366F1' : 'var(--border-subtle)'}; background: ${isSelected ? '#6366F1' : 'var(--bg-tertiary)'}; color: ${isSelected ? '#FFFFFF' : 'var(--text-muted)'}; transition: all 0.2s;">
+              ${d.label}: <strong>${d.count}</strong>
+            </button>
+          `;
+        });
+
+        row.innerHTML = pillsHtml;
+      }
+
       function renderSaaSCharts() {
         if (typeof Chart === 'undefined') return;
 
         const tf = currentSaaSTimeframe || '30d';
         const mult = tf === 'live' ? 0.2 : (tf === '24h' ? 0.45 : (tf === '7d' ? 0.75 : 1.0));
         const visitors = currentLiveVisitors || [];
-        const totalVisCount = Math.max(visitors.length, 1);
+        const totalVisCount = visitors.length;
+
+        // Calculate accurate real daily stats
+        const dailyStats = getDailyVisitorStats(visitors);
+
+        // Update Card 3 big header stats
+        const elToday = document.getElementById('saasDailyVisitorsToday');
+        if (elToday) elToday.textContent = dailyStats.todayCount.toLocaleString();
+        const elSub = document.getElementById('saasDailyVisitorsSub');
+        if (elSub) elSub.textContent = `${totalVisCount.toLocaleString()} total logged`;
 
         // Real Leads & Paid Passes stats
         const allLeads = (typeof currentLeads !== 'undefined' && Array.isArray(currentLeads)) ? currentLeads : [];
@@ -6214,46 +6370,37 @@ function renderCrmTable() {
         }
 
         // ----------------------------------------------------
-        // Chart 3: Daily Visitor Growth & Traffic Trend (Area Wave Chart)
+        // Chart 3: Real Daily Visitor Traffic Trend
         // ----------------------------------------------------
         const canvasTrend = document.getElementById('chartVisitorsTrend');
         if (canvasTrend) {
           const ctx3 = canvasTrend.getContext('2d');
           if (saasCharts.trend) saasCharts.trend.destroy();
 
-          const grad = ctx3.createLinearGradient(0, 0, 0, 180);
+          const grad = ctx3.createLinearGradient(0, 0, 0, 160);
           grad.addColorStop(0, 'rgba(99, 102, 241, 0.45)');
           grad.addColorStop(1, 'rgba(99, 102, 241, 0.0)');
 
-          // Dynamic 6-date labels for FlipCut
-          const dateLabels = [];
-          const now = new Date();
-          for (let i = 5; i >= 0; i--) {
-            const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000 * (tf === '24h' ? 0.16 : (tf === '7d' ? 1 : 4)));
-            dateLabels.push(d.toLocaleDateString([], { month: 'short', day: 'numeric' }));
-          }
+          const dateLabels = dailyStats.daysList.map(d => d.label);
+          const dateData = dailyStats.daysList.map(d => d.count);
 
           saasCharts.trend = new Chart(ctx3, {
             type: 'line',
             data: {
               labels: dateLabels,
               datasets: [{
-                label: 'Unique Website Visitors',
-                data: [
-                  Math.round(48 * mult),
-                  Math.round(82 * mult),
-                  Math.round(65 * mult),
-                  Math.round(112 * mult),
-                  Math.round(94 * mult),
-                  Math.round(Math.max(totalVisCount, 135) * mult)
-                ],
+                label: 'Unique Daily Visitors',
+                data: dateData,
                 borderColor: '#6366F1',
                 borderWidth: 2.5,
                 backgroundColor: grad,
                 fill: true,
                 tension: 0.35,
-                pointRadius: 0,
-                pointHoverRadius: 5
+                pointRadius: 4,
+                pointBackgroundColor: '#6366F1',
+                pointBorderColor: '#FFFFFF',
+                pointBorderWidth: 2,
+                pointHoverRadius: 6
               }]
             },
             options: {
@@ -6273,10 +6420,12 @@ function renderCrmTable() {
                   ticks: { font: { size: 9, weight: '700' }, color: '#64748B' }
                 },
                 y: {
+                  beginAtZero: true,
                   grid: { color: 'rgba(226, 232, 240, 0.6)' },
                   ticks: {
                     font: { size: 9 },
-                    color: '#94A3B8'
+                    color: '#94A3B8',
+                    precision: 0
                   }
                 }
               }
@@ -6471,22 +6620,39 @@ function renderCrmTable() {
         // Update live table & SaaS visual charts simultaneously
         renderSaaSCharts();
 
+        const visitors = currentLiveVisitors || [];
+        const dailyStats = getDailyVisitorStats(visitors);
+        const totalCount = visitors.length;
+        const activeCount = visitors.filter(v => v.isOnline).length;
+
+        // Update Daily Visitor KPI Card numbers
+        const kpiToday = document.getElementById('kpiTodayCount');
+        if (kpiToday) kpiToday.textContent = dailyStats.todayCount.toLocaleString();
+        const kpiYest = document.getElementById('kpiYesterdayCount');
+        if (kpiYest) kpiYest.textContent = dailyStats.yesterdayCount.toLocaleString();
+        const kpiWeek = document.getElementById('kpiWeekCount');
+        if (kpiWeek) kpiWeek.textContent = dailyStats.weekCount.toLocaleString();
+        const kpiTotal = document.getElementById('kpiTotalLoggedCount');
+        if (kpiTotal) kpiTotal.textContent = totalCount.toLocaleString();
+
+        const currentFilter = document.getElementById('analyticsFilterSelect')?.value || 'online';
+        renderDailyVisitorPills(dailyStats, currentFilter);
+
         // Update sidebar live pulse badge & filter option counts
-        if (currentLiveVisitors) {
-          const activeCount = currentLiveVisitors.filter(v => v.isOnline).length;
-          const totalCount = currentLiveVisitors.length;
-
-          const sidebarPulse = document.getElementById('sidebarLiveVisitorCount');
-          if (sidebarPulse) {
-            sidebarPulse.textContent = activeCount;
-            sidebarPulse.style.display = activeCount > 0 ? 'inline-block' : 'none';
-          }
-
-          const optOnline = document.querySelector('#analyticsFilterSelect option[value="online"]');
-          if (optOnline) optOnline.textContent = `🟢 Active Now (Online: ${activeCount})`;
-          const optAll = document.querySelector('#analyticsFilterSelect option[value="all"]');
-          if (optAll) optAll.textContent = `👥 All Visitors (Total: ${totalCount})`;
+        const sidebarPulse = document.getElementById('sidebarLiveVisitorCount');
+        if (sidebarPulse) {
+          sidebarPulse.textContent = activeCount;
+          sidebarPulse.style.display = activeCount > 0 ? 'inline-block' : 'none';
         }
+
+        const optOnline = document.querySelector('#analyticsFilterSelect option[value="online"]');
+        if (optOnline) optOnline.textContent = `🟢 Active Now (Online: ${activeCount})`;
+        const optToday = document.querySelector('#analyticsFilterSelect option[value="today"]');
+        if (optToday) optToday.textContent = `📅 Today's Visitors (${dailyStats.todayCount})`;
+        const optYest = document.querySelector('#analyticsFilterSelect option[value="yesterday"]');
+        if (optYest) optYest.textContent = `⏪ Yesterday's Visitors (${dailyStats.yesterdayCount})`;
+        const optAll = document.querySelector('#analyticsFilterSelect option[value="all"]');
+        if (optAll) optAll.textContent = `👥 All Visitors (Total: ${totalCount})`;
       }
 
       function renderAnalyticsTable() {
@@ -6497,10 +6663,39 @@ function renderCrmTable() {
         const filterVal = document.getElementById('analyticsFilterSelect')?.value || 'online';
 
         let filtered = currentLiveVisitors || [];
+        const dailyStats = getDailyVisitorStats(filtered);
+        renderDailyVisitorPills(dailyStats, filterVal);
+
+        const now = new Date();
+        const todayStr = new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString().slice(0, 10);
+        const yDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+        const yesterdayStr = new Date(yDate.getTime() - (yDate.getTimezoneOffset() * 60000)).toISOString().slice(0, 10);
 
         // Apply Category Filter
         if (filterVal === 'online') {
           filtered = filtered.filter(v => v.isOnline);
+        } else if (filterVal === 'today') {
+          filtered = filtered.filter(v => {
+            const vDate = v.created_at ? new Date(v.created_at) : (v.firstSeen ? new Date(v.firstSeen) : null);
+            if (!vDate || isNaN(vDate.getTime())) return false;
+            const k = new Date(vDate.getTime() - (vDate.getTimezoneOffset() * 60000)).toISOString().slice(0, 10);
+            return k === todayStr;
+          });
+        } else if (filterVal === 'yesterday') {
+          filtered = filtered.filter(v => {
+            const vDate = v.created_at ? new Date(v.created_at) : (v.firstSeen ? new Date(v.firstSeen) : null);
+            if (!vDate || isNaN(vDate.getTime())) return false;
+            const k = new Date(vDate.getTime() - (vDate.getTimezoneOffset() * 60000)).toISOString().slice(0, 10);
+            return k === yesterdayStr;
+          });
+        } else if (filterVal.startsWith('date:')) {
+          const targetDate = filterVal.replace('date:', '');
+          filtered = filtered.filter(v => {
+            const vDate = v.created_at ? new Date(v.created_at) : (v.firstSeen ? new Date(v.firstSeen) : null);
+            if (!vDate || isNaN(vDate.getTime())) return false;
+            const k = new Date(vDate.getTime() - (vDate.getTimezoneOffset() * 60000)).toISOString().slice(0, 10);
+            return k === targetDate;
+          });
         } else if (filterVal === 'mobile') {
           filtered = filtered.filter(v => v.device === 'Mobile' || v.device === 'Tablet');
         } else if (filterVal === 'desktop') {
@@ -6544,9 +6739,14 @@ function renderCrmTable() {
                   ${isOnlineFilter ? 'Live radar is active and scanning for new visitor traffic in real time.' : 'Try changing your search keywords or switching filters.'}
                 </p>
                 ${isOnlineFilter ? `
-                  <button type="button" onclick="document.getElementById('analyticsFilterSelect').value='all'; renderAnalyticsTable();" class="btn btn-secondary" style="padding: 7px 16px; font-size: 0.82rem; background: rgba(99, 102, 241, 0.12); color: #6366F1; border: 1px solid rgba(99, 102, 241, 0.35); border-radius: 6px; font-weight: 700; cursor: pointer;">
-                    <i class="fa-solid fa-clock-rotate-left"></i> View All Recent Visitor Sessions (${(currentLiveVisitors || []).length})
-                  </button>
+                  <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 8px;">
+                    <button type="button" onclick="setAnalyticsDateFilter('today');" class="btn btn-primary" style="padding: 8px 18px; font-size: 0.84rem; background: #6366F1; border-color: #6366F1; border-radius: 8px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                      <i class="fa-solid fa-calendar-day"></i> View Today's Visitors (${dailyStats.todayCount})
+                    </button>
+                    <button type="button" onclick="setAnalyticsDateFilter('all');" class="btn btn-secondary" style="padding: 8px 18px; font-size: 0.84rem; background: rgba(99, 102, 241, 0.12); color: #6366F1; border: 1px solid rgba(99, 102, 241, 0.35); border-radius: 8px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                      <i class="fa-solid fa-clock-rotate-left"></i> View All Visitor Sessions (${(currentLiveVisitors || []).length})
+                    </button>
+                  </div>
                 ` : ''}
               </td>
             </tr>
@@ -6612,13 +6812,19 @@ function renderCrmTable() {
           const isWebinarPage = (v.page || '').includes('webinar');
           const pageBadgeColor = isWebinarPage ? '#6366F1' : '#10B981';
 
-          // Format relative time
-          const lastDate = new Date(v.lastSeen || v.created_at || Date.now());
-          const diffSec = Math.max(1, Math.round((Date.now() - lastDate.getTime()) / 1000));
+          // Format relative time & date
+          const visitDateObj = new Date(v.lastSeen || v.created_at || Date.now());
+          const diffSec = Math.max(1, Math.round((Date.now() - visitDateObj.getTime()) / 1000));
           let timeAgo = '';
           if (diffSec < 60) timeAgo = `${diffSec}s ago`;
           else if (diffSec < 3600) timeAgo = `${Math.round(diffSec / 60)}m ago`;
           else timeAgo = `${Math.round(diffSec / 3600)}h ago`;
+
+          const isVisitToday = visitDateObj.toDateString() === new Date().toDateString();
+          const isVisitYesterday = visitDateObj.toDateString() === new Date(Date.now() - 86400000).toDateString();
+          const dayBadge = isVisitToday ? 'Today' : (isVisitYesterday ? 'Yesterday' : visitDateObj.toLocaleDateString([], { month: 'short', day: 'numeric' }));
+          const dayBadgeBg = isVisitToday ? 'rgba(16, 185, 129, 0.14)' : (isVisitYesterday ? 'rgba(99, 102, 241, 0.12)' : 'rgba(100, 116, 139, 0.1)');
+          const dayBadgeColor = isVisitToday ? '#10B981' : (isVisitYesterday ? '#6366F1' : '#64748B');
 
           const journeyCount = (v.journey && v.journey.length > 0) ? v.journey.length : 1;
 
@@ -6665,11 +6871,12 @@ function renderCrmTable() {
                 </div>
               </td>
               <td>
-                <div style="font-weight: 700; font-size: 0.88rem; color: var(--text-primary);">
-                  ${timeAgo}
+                <div style="font-weight: 700; font-size: 0.88rem; color: var(--text-primary); display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                  <span style="font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; background: ${dayBadgeBg}; color: ${dayBadgeColor}; font-weight: 800;">${dayBadge}</span>
+                  <span>${timeAgo}</span>
                 </div>
-                <div style="font-size: 0.75rem; color: var(--text-muted);">
-                  ${new Date(v.lastSeen || v.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">
+                  ${visitDateObj.toLocaleDateString([], { month: 'short', day: 'numeric' })}, ${visitDateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </div>
               </td>
               <td style="text-align: center;">
