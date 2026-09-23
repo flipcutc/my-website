@@ -43,21 +43,37 @@ if (typeof firebase !== 'undefined') {
 /**
  * 1. Save Lead to Dual Cloud (Firestore + Supabase)
  */
+// Anti-XSS and Injection Defense Sanitizer
+function sanitizeSafeText(str) {
+  if (typeof str !== 'string') return str || '';
+  return str
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/<[^>]+>/g, '')
+    .replace(/[<>'";]/g, '')
+    .trim();
+}
+
 async function pushLeadToDualCloud(lead) {
-  const userId = lead.userId || lead.id || ('FC-REG-' + Math.floor(10000 + Math.random() * 90000));
+  // 0. Bot Honeypot Trap - If automated bot fills hidden field, drop silently
+  if (lead._hp_trap || lead.honeypot || lead.hp_check) {
+    console.warn('🛡️ Bot submission trapped and discarded.');
+    return { success: true, botTrapped: true };
+  }
+
+  const userId = sanitizeSafeText(lead.userId || lead.id || ('FC-REG-' + Math.floor(10000 + Math.random() * 90000)));
   const leadPayload = {
     id: userId,
     userId: userId,
-    name: lead.name || 'Valued Client',
-    email: lead.email || '',
-    phone: lead.phone || '',
-    service: lead.service || 'Video Production',
-    budget: lead.budget || lead.amount || 'Custom',
-    message: lead.message || lead.notes || lead.footage || '',
-    status: lead.status || 'New',
+    name: sanitizeSafeText(lead.name || 'Valued Client'),
+    email: sanitizeSafeText(lead.email || ''),
+    phone: sanitizeSafeText(lead.phone || ''),
+    service: sanitizeSafeText(lead.service || 'Video Production'),
+    budget: sanitizeSafeText(lead.budget || lead.amount || 'Custom'),
+    message: sanitizeSafeText(lead.message || lead.notes || lead.footage || ''),
+    status: sanitizeSafeText(lead.status || 'New'),
     created_at: lead.created_at || new Date().toISOString(),
-    paymentId: lead.paymentId || lead.payment_id || '',
-    websiteType: lead.websiteType || ''
+    paymentId: sanitizeSafeText(lead.paymentId || lead.payment_id || ''),
+    websiteType: sanitizeSafeText(lead.websiteType || '')
   };
 
   // 1A. Push to Google Firebase Firestore

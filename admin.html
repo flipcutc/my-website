@@ -1042,42 +1042,273 @@
       color: #FFF;
     }
 
+    /* ==========================================================================
+       FLIPCUT MASTER 2FA SECURITY VAULT GATE (GOOGLE AUTH + PASSWORD)
+       ========================================================================== */
+    body.vault-locked .admin-sidebar,
+    body.vault-locked .admin-main-wrapper {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+    .vault-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 999999999;
+      background: radial-gradient(circle at 50% 20%, #161F38 0%, #060913 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      transition: opacity 0.35s ease, visibility 0.35s ease;
+    }
+    .vault-overlay.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .vault-card {
+      width: 100%;
+      max-width: 480px;
+      background: rgba(15, 23, 42, 0.94);
+      border: 1.5px solid rgba(99, 102, 241, 0.45);
+      border-radius: 24px;
+      padding: 36px 30px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 45px rgba(99, 102, 241, 0.25);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .vault-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #6366F1, #EC4899, #10B981);
+    }
+    .vault-icon-wrap {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(236, 72, 153, 0.25));
+      border: 2px solid rgba(99, 102, 241, 0.5);
+      color: #FFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      margin: 0 auto 16px;
+      box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+      animation: vaultShieldPulse 3s infinite ease-in-out;
+    }
+    @keyframes vaultShieldPulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4); }
+      50% { transform: scale(1.05); box-shadow: 0 12px 36px rgba(236, 72, 153, 0.55); }
+    }
+    .vault-title {
+      margin: 0;
+      font-size: 1.45rem;
+      font-weight: 900;
+      color: #FFF;
+      letter-spacing: -0.5px;
+    }
+    .vault-subtitle {
+      margin: 6px 0 20px;
+      font-size: 0.85rem;
+      color: #94A3B8;
+      line-height: 1.5;
+    }
+    .vault-field-group {
+      text-align: left;
+      margin-bottom: 16px;
+    }
+    .vault-field-group label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #CBD5E1;
+      margin-bottom: 7px;
+    }
+    .vault-input {
+      width: 100%;
+      padding: 12px 16px;
+      background: rgba(7, 11, 20, 0.95);
+      border: 1.5px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      color: #FFF;
+      font-size: 0.96rem;
+      font-family: inherit;
+      box-sizing: border-box;
+      outline: none;
+      transition: all 0.25s ease;
+    }
+    .vault-input:focus {
+      border-color: #6366F1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+    }
+    .vault-otp-input {
+      text-align: center;
+      letter-spacing: 0.45em;
+      font-size: 1.55rem;
+      font-weight: 800;
+      color: #38BDF8;
+      font-family: monospace;
+    }
+    .vault-btn {
+      width: 100%;
+      padding: 13px;
+      font-size: 0.98rem;
+      font-weight: 800;
+      color: #FFF;
+      background: linear-gradient(135deg, #4F46E5, #6366F1);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
+      transition: all 0.2s ease;
+      margin-top: 6px;
+    }
+    .vault-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(99, 102, 241, 0.6);
+    }
+    .vault-error {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #F87171;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: none;
+      align-items: center;
+      gap: 8px;
+    }
+    .vault-setup-toggle {
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 0.82rem;
+      color: #818CF8;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      user-select: none;
+      transition: color 0.2s;
+    }
+    .vault-setup-toggle:hover {
+      color: #A5B4FC;
+    }
+    .vault-setup-box {
+      margin-top: 14px;
+      background: rgba(7, 11, 20, 0.95);
+      border: 1.5px solid rgba(99, 102, 241, 0.35);
+      border-radius: 14px;
+      padding: 18px;
+      display: none;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+
 </style>
 </head>
-<body class="admin-layout-body">
+<body class="admin-layout-body vault-locked">
 
   <!-- ==========================================================================
-       ADMIN AUTH PIN OVERLAY (Master PIN: 1234)
+       FLIPCUT MASTER 2FA SECURITY VAULT GATE (GOOGLE AUTHENTICATOR + PASSWORD)
        ========================================================================== -->
-  <div class="auth-overlay" id="authOverlay">
-    <div class="auth-card" style="max-width: 440px;">
-      <div style="width:68px; height:68px; border-radius:50%; background:var(--grad-brand-horizontal); color:#FFF; display:flex; align-items:center; justify-content:center; font-size:1.8rem; margin:0 auto 16px; box-shadow:0 10px 25px rgba(37,99,235,0.4);">
-        <i class="fa-solid fa-lock"></i>
-      </div>
-      <h2>FlipCut Master Admin</h2>
-      <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">
-        Local admin access is protected by the master security PIN.
-      </p>
-
-      <div style="display: flex; gap: 8px; background: var(--bg-tertiary); padding: 4px; border-radius: var(--radius-md); margin: 16px 0;">
-        <button type="button" id="tabLoginPin" class="btn btn-secondary" style="flex: 1; padding: 8px; font-size: 0.85rem; background: var(--bg-surface); border: 1px solid var(--border-medium);">
-          <i class="fa-solid fa-key text-gradient"></i> Master PIN
-        </button>
+  <div class="vault-overlay" id="adminSecurityVault">
+    <div class="vault-card">
+      <div class="vault-icon-wrap">
+        <i class="fa-solid fa-shield-halved"></i>
       </div>
       
-      <!-- Master PIN Form -->
-      <form id="adminAuthForm">
-        <input type="password" id="adminPinInput" class="pin-input" placeholder="••••••" maxlength="6" autofocus required style="letter-spacing: 0.35em; font-size: 1.4rem; text-align: center;">
-        <div style="display: flex; gap: 10px; flex-direction: column;">
-          <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; font-weight: 700;">
-            <span>Unlock Master Dashboard</span>
-            <i class="fa-solid fa-arrow-right"></i>
-          </button>
+      <div style="display: inline-block; background: rgba(99,102,241,0.18); border: 1px solid #6366F1; color: #818CF8; font-weight: 800; font-size: 0.74rem; padding: 3px 12px; border-radius: 9999px; text-transform: uppercase; margin-bottom: 8px;">
+        🔐 2-Factor Authentication Vault
+      </div>
+      <h2 class="vault-title">FlipCut Master Admin</h2>
+      <p class="vault-subtitle">
+        Enter your <strong>Master Password</strong> &amp; the <strong>6-digit OTP code</strong> from your Google Authenticator app.
+      </p>
+
+      <!-- Error / Lockout Banner -->
+      <div class="vault-error" id="vaultErrorNotice">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span id="vaultErrorMsg">Incorrect Password or Authenticator Code.</span>
+      </div>
+
+      <!-- 2FA Form -->
+      <form id="vault2FAForm" onsubmit="window.handleVaultUnlock(event)">
+        <!-- Step 1: Password -->
+        <div class="vault-field-group">
+          <label for="vaultPasswordInput">
+            <span><i class="fa-solid fa-key" style="color: #F59E0B; margin-right: 5px;"></i> Step 1: Master Password</span>
+            <span style="font-size: 0.72rem; color: #64748B;">Encrypted SHA-256</span>
+          </label>
+          <input type="password" id="vaultPasswordInput" class="vault-input" placeholder="Enter Master Password" required autocomplete="current-password" autofocus>
         </div>
+
+        <!-- Step 2: Google Authenticator 6-Digit Code -->
+        <div class="vault-field-group">
+          <label for="vaultOtpInput">
+            <span><i class="fa-brands fa-google" style="color: #38BDF8; margin-right: 5px;"></i> Step 2: Google Authenticator (6-Digit OTP)</span>
+            <span style="font-size: 0.72rem; color: #10B981;">● 30s Rolling Code</span>
+          </label>
+          <input type="text" id="vaultOtpInput" class="vault-input vault-otp-input" placeholder="••••••" maxlength="6" inputmode="numeric" pattern="[0-9]{6}" required autocomplete="one-time-code">
+        </div>
+
+        <button type="submit" class="vault-btn" id="btnUnlockVault">
+          <i class="fa-solid fa-unlock-keyhole"></i>
+          <span>Verify &amp; Unlock Dashboard</span>
+        </button>
       </form>
 
-      <div style="margin-top: 16px; font-size: 0.82rem; color: var(--text-dim);">
-        <span><i class="fa-solid fa-shield-halved text-gradient"></i> Protected by FlipCut 6-Digit Master Security PIN</span>
+      <!-- Google Authenticator QR Code Setup Toggle -->
+      <div class="vault-setup-toggle" id="btnToggleVaultSetup" onclick="window.toggleVaultSetupGuide()">
+        <i class="fa-solid fa-qrcode"></i>
+        <span>📱 First-Time Setup: Scan Google Authenticator QR Code</span>
+        <i class="fa-solid fa-chevron-down" id="vaultSetupChevron" style="font-size: 0.7rem; transition: transform 0.2s;"></i>
+      </div>
+
+      <!-- QR Code & Secret Key Box (Collapsible) -->
+      <div class="vault-setup-box" id="vaultSetupBox">
+        <p style="font-size: 0.82rem; color: #CBD5E1; margin: 0 0 12px; line-height: 1.45;">
+          <strong>How to link your phone:</strong><br>
+          1. Open <strong>Google Authenticator</strong> app on your Android or iPhone.<br>
+          2. Tap the <strong>+</strong> button and select <strong>Scan a QR code</strong>.<br>
+          3. Point your camera at this QR code:
+        </p>
+
+        <div style="background: #FFF; padding: 10px; border-radius: 12px; display: inline-block; box-shadow: 0 4px 15px rgba(0,0,0,0.4);">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=otpauth%3A%2F%2Ftotp%2FFlipCut%2520Creation%3AAdmin%3Fsecret%3DJBSWY3DPEHPK3PXPFLIPCUT2026ADMIN%26issuer%3DFlipCut%2520Creation%26algorithm%3DSHA1%26digits%3D6%26period%3D30" alt="Google Authenticator QR Code" width="180" height="180" style="display: block; border-radius: 4px;">
+        </div>
+
+        <div style="margin-top: 14px;">
+          <span style="font-size: 0.76rem; color: #94A3B8; display: block; margin-bottom: 4px;">Or enter this Secret Key manually:</span>
+          <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
+            <code style="background: #000; color: #38BDF8; padding: 6px 12px; border-radius: 6px; font-size: 0.86rem; letter-spacing: 0.08em; font-weight: 700; user-select: all;">JBSWY3DPEHPK3PXPFLIPCUT2026ADMIN</code>
+            <button type="button" class="btn btn-secondary" onclick="window.copyVaultKey()" style="padding: 6px 10px; font-size: 0.76rem;">
+              <i class="fa-solid fa-copy"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 18px; font-size: 0.78rem; color: #64748B; display: flex; align-items: center; justify-content: center; gap: 6px;">
+        <i class="fa-solid fa-lock" style="color: #10B981;"></i>
+        <span>Bank-Grade RFC 6238 TOTP + 256-Bit SHA Encryption</span>
       </div>
     </div>
   </div>
@@ -1263,6 +1494,10 @@
         <button type="button" class="btn btn-primary" id="topPublishBtn" onclick="window.publishLiveToWebsite && window.publishLiveToWebsite()" style="padding: 9px 22px; font-size: 0.9rem; font-weight: 800; background: linear-gradient(135deg, #10B981, #059669); border: none; box-shadow: 0 4px 14px rgba(16,185,129,0.35); display: flex; align-items: center; gap: 8px;">
           <i class="fa-solid fa-rocket"></i>
           <span>Publish to Website</span>
+        </button>
+        <button type="button" class="btn btn-secondary" onclick="window.adminLogout()" style="padding: 9px 14px; font-size: 0.88rem; font-weight: 700; color: #EF4444; border: 1.5px solid rgba(239,68,68,0.3); display: flex; align-items: center; gap: 6px;" title="Lock Admin Session (2FA)">
+          <i class="fa-solid fa-lock"></i>
+          <span>Lock</span>
         </button>
       </div>
     </header>
@@ -11368,10 +11603,296 @@ ${waGroup}
       fastLiveLeadHeartbeat();
 
     }
+
+    /* ==========================================================================
+       FLIPCUT MASTER 2FA SECURITY VAULT ENGINE (GOOGLE AUTHENTICATOR + PASSWORD)
+       ========================================================================== */
+    const VAULT_SALT = 'flipcut_admin_vault_salt_2026_';
+    const VAULT_PASSWORD_HASH = 'f8d66ff88098f80c86499f1f981e5831df1d2fc82a9c891701363aec8614d28f';
+    const VAULT_TOTP_SECRET = 'JBSWY3DPEHPK3PXPFLIPCUT2026ADMIN';
+    const VAULT_SESSION_KEY = 'flipcut_vault_auth_session';
+    const VAULT_LOCKOUT_KEY = 'flipcut_vault_lockout_until';
+    const VAULT_ATTEMPTS_KEY = 'flipcut_vault_failed_attempts';
+    const VAULT_SESSION_TTL = 2 * 60 * 60 * 1000; // 2 hours
+
+    // TOTP RFC 6238 Verification
+    async function verifyTOTP(token, secret) {
+      try {
+        const base32chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+        let bits = '';
+        let hex = '';
+        const cleanSecret = secret.replace(/[\s-]/g, '').toUpperCase();
+        for (let i = 0; i < cleanSecret.length; i++) {
+          const val = base32chars.indexOf(cleanSecret.charAt(i));
+          if (val === -1) continue;
+          bits += val.toString(2).padStart(5, '0');
+        }
+        for (let i = 0; i + 4 <= bits.length; i += 4) {
+          hex += parseInt(bits.substr(i, 4), 2).toString(16);
+        }
+
+        const keyBytes = new Uint8Array(hex.length / 2);
+        for (let i = 0; i < hex.length; i += 2) {
+          keyBytes[i / 2] = parseInt(hex.substr(i, 2), 16);
+        }
+
+        const cryptoKey = await crypto.subtle.importKey(
+          'raw',
+          keyBytes,
+          { name: 'HMAC', hash: 'SHA-1' },
+          false,
+          ['sign']
+        );
+
+        const epoch = Math.floor(Date.now() / 1000);
+        const currentStep = Math.floor(epoch / 30);
+        const cleanToken = String(token).replace(/\s+/g, '');
+
+        // Allow -1, 0, +1 window (tolerance for 30s clock drift)
+        for (let delta = -1; delta <= 1; delta++) {
+          const step = currentStep + delta;
+          const buf = new ArrayBuffer(8);
+          const view = new DataView(buf);
+          view.setUint32(4, step);
+
+          const sig = await crypto.subtle.sign('HMAC', cryptoKey, buf);
+          const hmacBytes = new Uint8Array(sig);
+          const offset = hmacBytes[hmacBytes.length - 1] & 0x0f;
+          const binary =
+            ((hmacBytes[offset] & 0x7f) << 24) |
+            ((hmacBytes[offset + 1] & 0xff) << 16) |
+            ((hmacBytes[offset + 2] & 0xff) << 8) |
+            (hmacBytes[offset + 3] & 0xff);
+
+          const otp = (binary % 1000000).toString().padStart(6, '0');
+          if (otp === cleanToken) {
+            return true;
+          }
+        }
+        return false;
+      } catch (e) {
+        console.error('TOTP verification error:', e);
+        return false;
+      }
+    }
+
+    // SHA-256 Password Hash verification
+    async function verifyPassword(plainText) {
+      try {
+        const enc = new TextEncoder();
+        const data = enc.encode(VAULT_SALT + plainText);
+        const hashBuf = await crypto.subtle.digest('SHA-256', data);
+        const hashArr = Array.from(new Uint8Array(hashBuf));
+        const computedHash = hashArr.map(b => b.toString(16).padStart(2, '0')).join('');
+        return computedHash === VAULT_PASSWORD_HASH;
+      } catch (e) {
+        console.error('Password hash error:', e);
+        return false;
+      }
+    }
+
+    // Check if session is already authenticated
+    function isVaultAuthenticated() {
+      try {
+        const raw = sessionStorage.getItem(VAULT_SESSION_KEY);
+        if (!raw) return false;
+        const session = JSON.parse(raw);
+        if (session && session.authorized && (Date.now() - session.timestamp < VAULT_SESSION_TTL)) {
+          return true;
+        }
+      } catch (_) {}
+      return false;
+    }
+
+    function checkLockout() {
+      try {
+        const until = parseInt(localStorage.getItem(VAULT_LOCKOUT_KEY) || '0', 10);
+        if (until && Date.now() < until) {
+          const remainingSecs = Math.ceil((until - Date.now()) / 1000);
+          const mins = Math.floor(remainingSecs / 60);
+          const secs = remainingSecs % 60;
+          showVaultError(`⚠️ Too many failed attempts. Locked for ${mins}m ${secs}s.`);
+          const btn = document.getElementById('btnUnlockVault');
+          if (btn) btn.disabled = true;
+          return true;
+        }
+      } catch (_) {}
+      const btn = document.getElementById('btnUnlockVault');
+      if (btn) btn.disabled = false;
+      return false;
+    }
+
+    function showVaultError(msg) {
+      const banner = document.getElementById('vaultErrorNotice');
+      const text = document.getElementById('vaultErrorMsg');
+      if (banner && text) {
+        text.textContent = msg;
+        banner.style.display = 'flex';
+      }
+    }
+
+    let adminHasInitialized = false;
+    function unlockDashboard() {
+      document.body.classList.remove('vault-locked');
+      const vaultEl = document.getElementById('adminSecurityVault');
+      if (vaultEl) {
+        vaultEl.classList.add('hidden');
+        setTimeout(() => { vaultEl.style.display = 'none'; }, 400);
+      }
+      if (!adminHasInitialized) {
+        adminHasInitialized = true;
+        runAdminInit();
+      }
+    }
+
+    window.handleVaultUnlock = async function(e) {
+      if (e) e.preventDefault();
+      if (checkLockout()) return;
+
+      const passInput = document.getElementById('vaultPasswordInput');
+      const otpInput = document.getElementById('vaultOtpInput');
+      const btn = document.getElementById('btnUnlockVault');
+
+      const passVal = (passInput ? passInput.value : '').trim();
+      const otpVal = (otpInput ? otpInput.value : '').trim();
+
+      if (!passVal) {
+        showVaultError('Please enter your Master Password.');
+        if (passInput) passInput.focus();
+        return;
+      }
+      if (!otpVal || otpVal.length !== 6) {
+        showVaultError('Please enter the 6-digit code from Google Authenticator.');
+        if (otpInput) otpInput.focus();
+        return;
+      }
+
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Verifying 2FA...</span>';
+      }
+
+      // 1. Verify Password
+      const passValid = await verifyPassword(passVal);
+      if (!passValid) {
+        handleFailedAttempt('❌ Incorrect Master Password. Access Denied.');
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-unlock-keyhole"></i> <span>Verify &amp; Unlock Dashboard</span>';
+        }
+        return;
+      }
+
+      // 2. Verify Google Authenticator TOTP
+      const otpValid = await verifyTOTP(otpVal, VAULT_TOTP_SECRET);
+      if (!otpValid) {
+        handleFailedAttempt('❌ Invalid Google Authenticator 6-digit code. Please verify the code on your phone.');
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-unlock-keyhole"></i> <span>Verify &amp; Unlock Dashboard</span>';
+        }
+        return;
+      }
+
+      // Success! Reset attempts & save session
+      localStorage.removeItem(VAULT_ATTEMPTS_KEY);
+      localStorage.removeItem(VAULT_LOCKOUT_KEY);
+      sessionStorage.setItem(VAULT_SESSION_KEY, JSON.stringify({ authorized: true, timestamp: Date.now() }));
+
+      if (btn) {
+        btn.style.background = 'linear-gradient(135deg, #10B981, #059669)';
+        btn.innerHTML = '<i class="fa-solid fa-circle-check"></i> <span>2FA Verified! Unlocking...</span>';
+      }
+
+      setTimeout(() => {
+        unlockDashboard();
+      }, 500);
+    };
+
+    function handleFailedAttempt(errorMsg) {
+      let attempts = parseInt(localStorage.getItem(VAULT_ATTEMPTS_KEY) || '0', 10) + 1;
+      localStorage.setItem(VAULT_ATTEMPTS_KEY, String(attempts));
+
+      if (attempts >= 5) {
+        const lockoutUntil = Date.now() + 15 * 60 * 1000; // 15 mins
+        localStorage.setItem(VAULT_LOCKOUT_KEY, String(lockoutUntil));
+        showVaultError('🚨 Maximum failed attempts exceeded! Security lockout for 15 minutes.');
+        checkLockout();
+      } else {
+        const remaining = 5 - attempts;
+        showVaultError(`${errorMsg} (${remaining} attempts remaining before 15m lockout)`);
+      }
+    }
+
+    window.toggleVaultSetupGuide = function() {
+      const box = document.getElementById('vaultSetupBox');
+      const chev = document.getElementById('vaultSetupChevron');
+      if (!box) return;
+      if (box.style.display === 'none' || box.style.display === '') {
+        box.style.display = 'block';
+        if (chev) chev.style.transform = 'rotate(180deg)';
+      } else {
+        box.style.display = 'none';
+        if (chev) chev.style.transform = 'rotate(0deg)';
+      }
+    };
+
+    window.copyVaultKey = function() {
+      navigator.clipboard.writeText(VAULT_TOTP_SECRET).then(() => {
+        alert('Copied Secret Key: ' + VAULT_TOTP_SECRET + '\nPaste this in Google Authenticator (Enter a setup key).');
+      });
+    };
+
+    window.adminLogout = function() {
+      sessionStorage.removeItem(VAULT_SESSION_KEY);
+      location.reload();
+    };
+
+    // Initialize 2FA Check
+    function initVaultGuard() {
+      const passInput = document.getElementById('vaultPasswordInput');
+      const otpInput = document.getElementById('vaultOtpInput');
+      const logoutBtn = document.getElementById('adminLogoutBtn');
+
+      if (logoutBtn) {
+        logoutBtn.onclick = (e) => {
+          if (e) e.preventDefault();
+          window.adminLogout();
+        };
+      }
+
+      if (passInput) {
+        passInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            if (otpInput) otpInput.focus();
+          }
+        });
+      }
+
+      if (otpInput) {
+        otpInput.addEventListener('input', (e) => {
+          const clean = e.target.value.replace(/[^0-9]/g, '');
+          e.target.value = clean;
+          if (clean.length === 6 && passInput && passInput.value) {
+            window.handleVaultUnlock();
+          }
+        });
+      }
+
+      // Check existing session
+      if (isVaultAuthenticated()) {
+        unlockDashboard();
+      } else {
+        checkLockout();
+        document.body.classList.add('vault-locked');
+      }
+    }
+
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', runAdminInit);
+      document.addEventListener('DOMContentLoaded', initVaultGuard);
     } else {
-      runAdminInit();
+      initVaultGuard();
     }
   </script>
 
