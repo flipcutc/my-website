@@ -138,7 +138,7 @@
     // Instant 0ms Pre-Hydration & Zero-Flicker Brand Renderer (100% Identical to Home Page)
     (function() {
       try {
-        var FLIPCUT_BUILD = '20260910_V22';
+        var FLIPCUT_BUILD = '20260923_V25';
         if (localStorage.getItem('flipcut_build_ver') !== FLIPCUT_BUILD) {
           localStorage.setItem('flipcut_build_ver', FLIPCUT_BUILD);
           localStorage.removeItem('flipcut_site_content');
@@ -339,6 +339,39 @@
 
     .submit-unlocked-banner.active {
       display: flex;
+    }
+
+    /* Magnetic Shining CTA Register Button */
+    .btn-shine-sweep {
+      position: absolute !important;
+      top: 0 !important;
+      left: -130% !important;
+      width: 80% !important;
+      height: 100% !important;
+      background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.55) 50%, transparent 100%) !important;
+      transform: skewX(-25deg) !important;
+      animation: btnShimmerSweep 2.2s ease-in-out infinite !important;
+      pointer-events: none !important;
+      z-index: 1 !important;
+    }
+    @keyframes btnShimmerSweep {
+      0% { left: -130%; }
+      38% { left: 160%; }
+      100% { left: 160%; }
+    }
+    @keyframes btnMagneticPop {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 8px 24px rgba(79, 70, 229, 0.45);
+      }
+      35% {
+        transform: scale(1.035);
+        box-shadow: 0 14px 34px rgba(79, 70, 229, 0.7), 0 0 24px rgba(236, 72, 153, 0.4);
+      }
+      55% {
+        transform: scale(1.015);
+        box-shadow: 0 10px 28px rgba(79, 70, 229, 0.55);
+      }
     }
 
     html, body {
@@ -570,11 +603,11 @@
         white-space: nowrap;
       }
 
-      /* 4. Announcement Card Styling (Centered & Bounded) */
+      /* 4. Compact Clean Header Card on Mobile */
       .webinar-announcement-card {
-        padding: 20px 16px !important;
-        border-radius: 18px !important;
-        margin: 0 auto 22px !important;
+        padding: 12px 14px !important;
+        border-radius: 16px !important;
+        margin: 0 auto 12px !important;
         width: 100% !important;
         max-width: 100% !important;
         box-sizing: border-box !important;
@@ -582,35 +615,45 @@
       }
 
       .webinar-announcement-card .announcement-badge {
-        font-size: 0.74rem !important;
-        padding: 4px 12px !important;
-        margin-bottom: 10px !important;
+        font-size: 0.7rem !important;
+        padding: 3px 10px !important;
+        margin-bottom: 6px !important;
         display: inline-flex !important;
       }
 
       .webinar-announcement-card h2 {
-        font-size: 1.28rem !important;
-        margin-bottom: 8px !important;
+        font-size: 1.2rem !important;
+        margin-bottom: 6px !important;
         line-height: 1.25 !important;
         text-align: center !important;
       }
 
       .webinar-announcement-card p {
-        font-size: 0.86rem !important;
-        line-height: 1.55 !important;
+        font-size: 0.82rem !important;
+        line-height: 1.4 !important;
         text-align: center !important;
         padding: 0 4px !important;
       }
 
-      /* 5. Registration / Waitlist Card Form - Proper Clean Alignment */
+      /* 5. Registration Form Card - Immediate Mobile Focus */
       .webinar-card-wrapper {
-        padding: 22px 16px !important;
-        border-radius: 20px !important;
-        margin: 0 auto 24px !important;
+        padding: 16px 14px !important;
+        border-radius: 18px !important;
+        margin: 0 auto 16px !important;
         width: 100% !important;
         max-width: 100% !important;
         box-sizing: border-box !important;
         box-shadow: 0 8px 30px rgba(15, 23, 42, 0.06) !important;
+      }
+
+      .webinar-hero-section {
+        padding-top: calc(56px + 10px) !important;
+        padding-bottom: 4px !important;
+      }
+
+      html.has-announcement .webinar-hero-section,
+      body.has-announcement .webinar-hero-section {
+        padding-top: calc(56px + var(--top-ann-height, 34px) + 6px) !important;
       }
 
       .webinar-card-wrapper > div:first-child {
@@ -1033,34 +1076,31 @@
   <!-- Hero Headline -->
   <section class="webinar-hero-section container" id="overview">
 
-        <!-- LIVE MASTERCLASS COHORT CONFIRMED CARD -->
-    <div class="webinar-announcement-card" id="webinarLiveCard">
-      <div class="announcement-badge" id="webinarAnnouncementBadgeWrap">
+    <!-- COMPACT HIGH-CONVERTING HERO CARD -->
+    <div class="webinar-announcement-card" id="webinarLiveCard" style="padding: 16px 18px; margin: 0 auto 16px; border-radius: 18px;">
+      <div class="announcement-badge" id="webinarAnnouncementBadgeWrap" style="margin-bottom: 8px; font-size: 0.76rem; padding: 4px 12px;">
         <span style="width: 8px; height: 8px; border-radius: 50%; background: #EF4444; display: inline-block; animation: pulse 1.5s infinite;"></span>
-        <span id="webinarBadgePill">🔥 BATCH 2 • LIVE MASTERCLASS (27TH SEPTEMBER)</span>
+        <span id="webinarBadgePill">🔥 LIVE MASTERCLASS</span>
       </div>
       
-      <h2 id="webinarHeroHeading">
-        Batch 2 Live Masterclass Confirmed for 27th September, Sunday!
+      <h2 id="webinarHeroHeading" style="font-size: 1.35rem; font-weight: 900; margin: 4px 0 8px; color: var(--text-primary); line-height: 1.25;">
+        Live Masterclass on 27th September
       </h2>
       
-      <p id="webinarHeroDetail">
-        Registrations are now officially open for <strong>Batch 2</strong>! Join FlipCut Creation's lead architects on <strong>Sunday, 27th September 2026 at 10:00 AM IST</strong> for intensive practical training on building high-converting websites and scaling your online business. Limited seats available for Batch 2 at an exclusive <strong>₹49 early pass fee</strong>!
-      </p>
+      <div id="webinarHeroDetail" style="display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; font-size: 0.86rem; font-weight: 700;">
+        <span style="background: rgba(99, 102, 241, 0.12); border: 1px solid rgba(99, 102, 241, 0.3); color: var(--brand-indigo); padding: 4px 12px; border-radius: 9999px;">
+          ⏰ 10:00 AM IST
+        </span>
+        <span style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35); color: #10B981; padding: 4px 12px; border-radius: 9999px;">
+          🎟️ Pass: <strong id="webinarHeroFeeTag">₹49</strong>
+        </span>
+      </div>
     </div>
 
-        <div id="vipGateErrorAlert" style="display: none; background: rgba(239, 68, 68, 0.15); border: 1px solid #EF4444; border-radius: 8px; padding: 10px 14px; color: #FCA5A5; font-size: 0.82rem; margin-bottom: 14px; text-align: center;">
-          <i class="fa-solid fa-triangle-exclamation"></i> <span id="vipGateErrorText">User ID not found. Please check your ticket pass or register below.</span>
-        </div>
-
-        <button type="submit" id="btnUnlockVipPlayer" class="btn btn-primary" style="width: 100%; height: 48px; font-weight: 800; font-size: 1rem; justify-content: center; background: linear-gradient(135deg, #6366F1, #8B5CF6); border-color: #6366F1; box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4); border-radius: 12px;">
-          <i class="fa-solid fa-unlock-keyhole"></i> <span>Unlock Live Player</span>
-        </button>
-      </form>
-
-      <div style="margin-top: 18px; font-size: 0.82rem; color: #94A3B8;">
-        <span>Haven't registered for a ticket pass yet?</span> <a href="#webinarBriefCard" style="color: #818CF8; font-weight: 700; text-decoration: underline;">Book VIP Pass (₹49)</a>
-      </div>
+    <!-- Hidden compatibility container for legacy handles -->
+    <div style="display: none !important;" aria-hidden="true">
+      <div id="vipGateErrorAlert"><span id="vipGateErrorText"></span></div>
+      <button type="button" id="btnUnlockVipPlayer"></button>
     </div>
 
     <!-- State 2: Unlocked Live Cinema Player -->
@@ -1136,15 +1176,9 @@
       <div id="webinarFormContainer">
 
 
-        <div style="text-align: center; margin-bottom: 25px;">
-          <h2 style="font-size: 1.75rem; font-weight: 800; margin-bottom: 8px;" id="webinarFormTitle">Book Your Live Masterclass Pass</h2>
-          <p style="color: var(--text-muted); font-size: 0.92rem; margin-bottom: 12px;" id="webinarFormSubtitle">Enter your details, select your website type, and complete payment of just ₹49 via UPI / GPay / Netbanking to unlock your pass.</p>
-          <div style="display: inline-flex; align-items: center; gap: 8px; font-size: 0.88rem; background: rgba(99, 102, 241, 0.08); border: 1px dashed rgba(99, 102, 241, 0.35); padding: 6px 16px; border-radius: 20px;">
-            <span style="color: var(--text-secondary);">Already booked or paid?</span>
-            <button type="button" onclick="openFindPassModal()" style="background: none; border: none; color: var(--brand-indigo); font-weight: 700; cursor: pointer; text-decoration: underline; padding: 0; font-size: 0.88rem; display: inline-flex; align-items: center; gap: 4px;">
-              <i class="fa-solid fa-magnifying-glass"></i> Find / Retrieve Your Pass
-            </button>
-          </div>
+        <div style="text-align: center; margin-bottom: 16px;">
+          <h2 style="font-size: 1.35rem; font-weight: 800; margin-bottom: 4px;" id="webinarFormTitle">Enter Details to Book Ticket Pass</h2>
+          <p style="display: none;" id="webinarFormSubtitle"></p>
         </div>
 
         <form id="webinarRegistrationForm">
@@ -1277,9 +1311,13 @@
             </div>
 
             <!-- Step 1 Button: Pay via Razorpay (Active Live Mode) -->
-            <button type="button" class="btn btn-primary" id="btnPayRazorpay" style="width: 100%; justify-content: center; padding: 15px 20px; font-size: 1.05rem; font-weight: 800; background: linear-gradient(135deg, #6366F1, #4F46E5); border: none; box-shadow: 0 6px 22px rgba(99,102,241,0.45); border-radius: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
-              <i class="fa-solid fa-lock"></i>
-              <span id="btnPayRazorpayText">Pay ₹49 & Unlock Registration</span>
+            <button type="button" class="btn btn-primary" id="btnPayRazorpay" style="position: relative; overflow: hidden; width: 100%; justify-content: center; padding: 16px 20px; font-size: 1.08rem; font-weight: 900; background: linear-gradient(135deg, #4F46E5 0%, #6366F1 50%, #EC4899 100%); border: none; box-shadow: 0 8px 24px rgba(79, 70, 229, 0.45); border-radius: 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; animation: btnMagneticPop 2.2s ease-in-out infinite;">
+              <span class="btn-shine-sweep"></span>
+              <span style="position: relative; z-index: 2; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
+                <i class="fa-solid fa-bolt" style="color: #FDE047;"></i>
+                <span id="btnPayRazorpayText">Register Now for ₹49 &amp; Claim Seat</span>
+                <i class="fa-solid fa-arrow-right"></i>
+              </span>
             </button>
 
             <!-- Step 2 Button: Final Submit (Visible after Payment Done in Live Mode) -->
@@ -1679,13 +1717,13 @@
         if (heroBadge) heroBadge.textContent = '⏳ REGISTRATIONS CLOSED • NEXT BATCH COMING SOON';
         if (heroHeading) heroHeading.textContent = 'Live Masterclass Webinar — Coming Soon!';
         if (heroDetail) {
-          heroDetail.innerHTML = 'Registrations for the current live cohort are temporarily closed. We are scheduling the next live masterclass batch! Enter your details below to join the <strong>Priority Waitlist</strong> and get VIP WhatsApp alerts before seats open to the public.';
+          heroDetail.innerHTML = '<span style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); color: #F59E0B; padding: 4px 12px; border-radius: 9999px;">Next Batch Announced Soon</span>';
         }
         setTxt('webinarDateText', 'Next Batch Announced Soon');
         setTxt('webinarModalDateText', 'Next Batch Announced Soon');
         setTxt('webinarSeatsText', 'Waitlist Open');
         setTxt('webinarFormTitle', 'Join Next Batch Priority Waitlist');
-        setTxt('webinarFormSubtitle', 'Enter your name & WhatsApp number below to get early priority notification and discount when registrations reopen.');
+        setTxt('webinarFormSubtitle', '');
         setTxt('webinarPriceDisplay', 'Next Batch: Coming Soon');
         const origPriceEl = document.getElementById('webinarOrigPriceDisplay');
         if (origPriceEl) origPriceEl.style.display = 'none';
@@ -1707,17 +1745,17 @@
         // ==========================================
         // 🟢 MASTER SWITCH IS ON -> LIVE BOOKING MODE
         // ==========================================
-        if (heroBadge) heroBadge.textContent = webinarCfg.badge || '🔥 LIVE MASTERCLASS • 27TH SEPTEMBER (SUNDAY)';
-        if (heroHeading) heroHeading.textContent = 'Live Masterclass Confirmed for 27th September, Sunday!';
+        if (heroBadge) heroBadge.textContent = webinarCfg.badge || '🔥 LIVE MASTERCLASS';
+        if (heroHeading) heroHeading.textContent = 'Live Masterclass on 27th September';
         if (heroDetail) {
-          heroDetail.innerHTML = 'Registrations are now officially open! Join FlipCut Creation\'s lead architects on <strong>Sunday, 27th September 2026 at 10:00 AM IST</strong> for intensive practical training on building high-converting websites and scaling your online business. Limited seats available at an exclusive <strong>₹' + price + ' early pass fee</strong>!';
+          heroDetail.innerHTML = `<span style="background: rgba(99, 102, 241, 0.12); border: 1px solid rgba(99, 102, 241, 0.3); color: var(--brand-indigo); padding: 4px 12px; border-radius: 9999px;">⏰ Time: 10:00 AM IST</span> <span style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35); color: #10B981; padding: 4px 12px; border-radius: 9999px;">🎟️ Pass: <strong>₹${price}</strong></span>`;
         }
         setTxt('webinarDateText', webinarCfg.date || '27th September, Sunday • 10:00 AM IST');
         setTxt('webinarModalDateText', webinarCfg.date || '27th September, Sunday • 10:00 AM IST');
         setTxt('webinarDurationText', webinarCfg.duration || '2 Hours (Live + Q&A)');
         setTxt('webinarSeatsText', webinarCfg.seats || 'Limited 150 Seats');
-        setTxt('webinarFormTitle', webinarCfg.formTitle || 'Book Your Live Masterclass Pass');
-        setTxt('webinarFormSubtitle', webinarCfg.formSubtitle || `Enter your details, select your website type, and complete payment of just ₹${price} via UPI / GPay / Netbanking to unlock your pass.`);
+        setTxt('webinarFormTitle', 'Enter Details to Book Ticket Pass');
+        setTxt('webinarFormSubtitle', '');
 
         setTxt('webinarTicketFeeText', `₹${price}`);
         setTxt('webinarPriceDisplay', `₹${price}`);
@@ -1726,7 +1764,7 @@
           origPriceEl.textContent = `₹${origPrice}`;
           origPriceEl.style.display = '';
         }
-        setTxt('btnPayRazorpayText', `Pay ₹${price} & Unlock Registration`);
+        setTxt('btnPayRazorpayText', `Register Now for ₹${price} & Claim Seat`);
         setTxt('ticketPassAmountText', `₹${price} (Confirmed via Razorpay)`);
         setTxt('mobileDockPassLabel', `Pass ₹${price}`);
         setTxt('stickyWebinarPrice', `₹${price}`);
