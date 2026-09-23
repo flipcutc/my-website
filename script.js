@@ -2594,6 +2594,19 @@ window.closeWebinarEntrancePopup = function() {
   if (__webinarCountdownTimer) clearInterval(__webinarCountdownTimer);
 };
 
+window.goToWebinarInstant = function(e) {
+  if (e && e.preventDefault) e.preventDefault();
+  const btn = (e && e.currentTarget) || document.querySelector('.webinar-entrance-card .popup-cta-btn');
+  if (btn) {
+    btn.style.opacity = '0.92';
+    btn.style.transform = 'scale(0.96)';
+    const textEl = document.getElementById('webinarPopupBtnText');
+    if (textEl) textEl.textContent = 'Opening Webinar...';
+  }
+  // Immediate 0ms browser navigation to clean URL (bypasses 301 redirects)
+  window.location.href = '/webinar';
+};
+
 // Close on Escape key press
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' || e.key === 'Esc') {

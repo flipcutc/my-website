@@ -209,6 +209,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet">
 
+  <!-- Instant Pre-fetch for Zero-Latency Navigation to Webinar -->
+  <link rel="prefetch" href="/webinar">
+
   <!-- Stylesheet -->
   <link rel="stylesheet" href="styles.css?v=24.0">
 
@@ -233,7 +236,7 @@
     // Instant 0ms Pre-Hydration & Zero-Flicker Renderer
     (function() {
       try {
-        var FLIPCUT_BUILD = '20260923_V25';
+        var FLIPCUT_BUILD = '20260923_V26';
         if (localStorage.getItem('flipcut_build_ver') !== FLIPCUT_BUILD) {
           localStorage.setItem('flipcut_build_ver', FLIPCUT_BUILD);
           localStorage.removeItem('flipcut_site_content');
@@ -669,7 +672,7 @@
         </span>
       </div>
       <div class="announcement-action-wrap">
-        <a href="webinar.html" class="announcement-cta-btn" id="topAnnouncementCtaBtn">
+        <a href="/webinar" class="announcement-cta-btn" id="topAnnouncementCtaBtn">
           <span id="topAnnouncementBtnText">Book Ticket Pass (₹49)</span>
           <i class="fa-solid fa-arrow-right"></i>
         </a>
@@ -696,7 +699,7 @@
           <li><a href="#services" class="nav-link">Services</a></li>
           <li><a href="#portfolio" class="nav-link">Portfolio</a></li>
           <li><a href="#pricing" class="nav-link">Pricing</a></li>
-          <li id="navWebinarItem"><a href="webinar.html" class="nav-link" style="color: var(--brand-indigo); font-weight: 700;"><i class="fa-solid fa-ticket"></i> Webinar (₹49)</a></li>
+          <li id="navWebinarItem"><a href="/webinar" class="nav-link" style="color: var(--brand-indigo); font-weight: 700;"><i class="fa-solid fa-ticket"></i> Webinar (₹49)</a></li>
           <li><a href="#faq" class="nav-link">FAQ</a></li>
         </ul>
       </nav>
@@ -761,7 +764,7 @@
                 <span>Join VIP WhatsApp Group</span>
               </a>
               <div style="display: flex; gap: 8px;">
-                <a href="webinar.html" class="btn btn-secondary" style="flex: 1; justify-content: center; padding: 8px 12px; font-size: 0.82rem;">
+                <a href="/webinar" class="btn btn-secondary" style="flex: 1; justify-content: center; padding: 8px 12px; font-size: 0.82rem;">
                   <i class="fa-solid fa-ticket"></i> View Pass
                 </a>
                 <button type="button" class="btn btn-secondary" onclick="signOutUser()" style="padding: 8px 12px; font-size: 0.82rem; color: #EF4444;" title="Sign out / Clear profile">
@@ -827,7 +830,7 @@
             Showcase</span></a></li>
       <li><a href="#pricing" class="mobile-nav-link"><i class="fa-solid fa-gem text-gradient"></i> <span>Retainer
             Plans</span></a></li>
-      <li><a href="webinar.html" class="mobile-nav-link" style="color: var(--brand-indigo); font-weight: 700;"><i class="fa-solid fa-ticket text-gradient"></i> <span>Live Masterclass Webinar (₹49)</span></a></li>
+      <li><a href="/webinar" class="mobile-nav-link" style="color: var(--brand-indigo); font-weight: 700;"><i class="fa-solid fa-ticket text-gradient"></i> <span>Live Masterclass Webinar (₹49)</span></a></li>
       <li><a href="#faq" class="mobile-nav-link"><i class="fa-solid fa-circle-question text-gradient"></i>
           <span>FAQ</span></a></li>
       <li><a href="#contact" class="mobile-nav-link"><i class="fa-solid fa-envelope text-gradient"></i> <span>Project
@@ -1865,7 +1868,7 @@
 
       <!-- CTA Section: Continuous Magnetic Pop Pulse + Shimmer Sweep Button -->
       <div style="display: flex; flex-direction: column; gap: 8px;">
-        <a href="webinar.html" class="popup-cta-btn" onclick="closeWebinarEntrancePopup()">
+        <a href="/webinar" class="popup-cta-btn" onclick="goToWebinarInstant(event)">
           <span class="btn-shine-sweep"></span>
           <span class="btn-content-inner">
             <i class="fa-solid fa-bolt btn-icon-bolt"></i>
@@ -1931,7 +1934,7 @@
     </a>
   </nav>
 
-  <script src="script.js?v=23.0"></script>
+  <script src="script.js?v=24.0"></script>
   <!-- Instant Order Alert Notification Engine (Non-blocking) -->
   <script src="notification-service.js" defer></script>
   <!-- Real-time Live Visitor & Analytics Tracker (Non-blocking) -->
