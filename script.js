@@ -2487,10 +2487,10 @@ window.showWebinarEntrancePopup = function() {
   let price = String(webinarCfg.price !== undefined && webinarCfg.price !== '' ? webinarCfg.price : '49').replace(/[^0-9]/g, '') || '49';
   if (!price || Number(price) < 1) price = '49';
   const origPrice = String(webinarCfg.originalPrice !== undefined && webinarCfg.originalPrice !== '' ? webinarCfg.originalPrice : '999').replace(/[^0-9]/g, '') || '999';
-  const sessionDate = webinarCfg.date || '27th September, Sunday • 10:00 AM IST';
-  const title = webinarCfg.title || 'Live Website Creation & Scaling Masterclass 🚀';
-  const desc = webinarCfg.description || 'Build high-converting websites, launch your brand & master modern web design with FlipCut Creation!';
-  const badge = webinarCfg.badge || '🔥 Live Masterclass • 27th September, Sunday';
+  const sessionDate = webinarCfg.date || '27th Sep, Sunday • 10:00 AM IST';
+  const title = webinarCfg.title || 'Live Website Creation Masterclass 🚀';
+  const desc = webinarCfg.description || 'Build high-converting websites & launch your brand with zero coding!';
+  const badge = webinarCfg.badge || '🔥 Live Masterclass • Sunday 10 AM';
 
   const setElText = (id, val) => {
     const el = document.getElementById(id);
@@ -2513,7 +2513,7 @@ window.showWebinarEntrancePopup = function() {
     const currentBookings = Math.min(totalSeats, Math.max(baseMilestone, count));
     const seatsLeft = Math.max(0, totalSeats - currentBookings);
     setElText('popupBookingText', currentBookings + ' People Already Registered / Booked');
-    setElText('popupSeatsLeft', 'Only ' + seatsLeft + ' Seats Left! (Total ' + totalSeats + ')');
+    setElText('popupSeatsLeft', 'Only ' + seatsLeft + ' Seats Left for ₹' + price + ' • Fast Filling!');
     const progBar = document.getElementById('popupProgressBar');
     if (progBar) {
       const pct = Math.min(100, Math.round((currentBookings / totalSeats) * 100));

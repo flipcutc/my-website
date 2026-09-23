@@ -210,7 +210,7 @@
     rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=23.0">
+  <link rel="stylesheet" href="styles.css?v=24.0">
 
   <!-- FontAwesome Icons for clean UI symbols -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -233,7 +233,7 @@
     // Instant 0ms Pre-Hydration & Zero-Flicker Renderer
     (function() {
       try {
-        var FLIPCUT_BUILD = '20260910_V22';
+        var FLIPCUT_BUILD = '20260923_V23';
         if (localStorage.getItem('flipcut_build_ver') !== FLIPCUT_BUILD) {
           localStorage.setItem('flipcut_build_ver', FLIPCUT_BUILD);
           localStorage.removeItem('flipcut_site_content');
@@ -313,81 +313,332 @@
   </script>
 
   <style>
-    /* Compact Responsive Mobile-Tuned Entrance Popup */
+    /* ==========================================================================
+       MODERN LIGHT-THEMED HIGH-CONVERTING WEBINAR POPUP CARD
+       Light, Clean, Minimalist, with Magnetic Shimmer & Pop Register Button
+       ========================================================================== */
     .webinar-entrance-card {
       width: 92% !important;
-      max-width: 480px !important;
+      max-width: 440px !important;
       text-align: center !important;
-      padding: 26px 22px !important;
-      background: linear-gradient(160deg, #10162B, #0A0F1D) !important;
-      border-radius: 22px !important;
-      border: 1.5px solid rgba(99, 102, 241, 0.35) !important;
-      box-shadow: 0 25px 70px rgba(0,0,0,0.85) !important;
+      padding: 26px 22px 20px 22px !important;
+      background: #FFFFFF !important;
+      border-radius: 26px !important;
+      border: 1.5px solid rgba(99, 102, 241, 0.22) !important;
+      box-shadow: 0 25px 70px rgba(15, 23, 42, 0.35), 0 0 40px rgba(99, 102, 241, 0.15) !important;
       position: relative !important;
       overflow: hidden !important;
       margin: auto !important;
       max-height: 94vh !important;
       overflow-y: auto !important;
     }
+
+    /* Top Decorative Radiant Gradient Stripe */
+    .webinar-entrance-card .top-accent-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background: linear-gradient(90deg, #4F46E5, #7C3AED, #EC4899, #10B981);
+    }
+
+    /* Clean Light Close Button */
+    .webinar-entrance-card .modal-close-btn {
+      position: absolute !important;
+      top: 14px !important;
+      right: 14px !important;
+      width: 32px !important;
+      height: 32px !important;
+      border-radius: 50% !important;
+      background: #F1F5F9 !important;
+      border: 1px solid #E2E8F0 !important;
+      color: #64748B !important;
+      font-size: 0.9rem !important;
+      cursor: pointer !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      transition: all 0.2s ease !important;
+      z-index: 10 !important;
+    }
+    .webinar-entrance-card .modal-close-btn:hover {
+      background: #E2E8F0 !important;
+      color: #0F172A !important;
+      transform: scale(1.1) rotate(90deg) !important;
+    }
+
+    /* Live Badge Pill */
+    .webinar-entrance-card .popup-badge-pill {
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 7px !important;
+      background: #FEF2F2 !important;
+      border: 1px solid #FCA5A5 !important;
+      padding: 5px 14px !important;
+      border-radius: 9999px !important;
+      margin-bottom: 10px !important;
+    }
+    .webinar-entrance-card .popup-live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #EF4444;
+      display: inline-block;
+      box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+      animation: liveDotPulse 1.5s infinite;
+    }
+    @keyframes liveDotPulse {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+      70% { transform: scale(1.15); box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+    .webinar-entrance-card #webinarPopupBadge {
+      font-size: 0.76rem !important;
+      font-weight: 800 !important;
+      color: #DC2626 !important;
+      letter-spacing: 0.5px !important;
+      text-transform: uppercase !important;
+    }
+
+    /* Headline & Subtitle */
+    .webinar-entrance-card #webinarPopupTitle {
+      font-size: 1.35rem !important;
+      font-weight: 900 !important;
+      color: #0F172A !important;
+      line-height: 1.25 !important;
+      margin: 0 0 6px 0 !important;
+      letter-spacing: -0.3px !important;
+    }
+    .webinar-entrance-card #webinarPopupDesc {
+      font-size: 0.82rem !important;
+      color: #64748B !important;
+      margin: 0 0 14px 0 !important;
+      line-height: 1.4 !important;
+      font-weight: 500 !important;
+    }
+
+    /* 3 Clean Benefit Chips (Zero text wall) */
+    .webinar-entrance-card .popup-benefits-grid {
+      display: grid !important;
+      grid-template-columns: repeat(3, 1fr) !important;
+      gap: 7px !important;
+      margin-bottom: 14px !important;
+      text-align: center !important;
+    }
+    .webinar-entrance-card .popup-benefit-card {
+      background: #F8FAFC !important;
+      border: 1px solid #E2E8F0 !important;
+      border-radius: 12px !important;
+      padding: 9px 5px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 3px !important;
+    }
+    .webinar-entrance-card .popup-benefit-card .chip-icon {
+      font-size: 1.1rem !important;
+      line-height: 1 !important;
+    }
+    .webinar-entrance-card .popup-benefit-card span {
+      font-size: 0.74rem !important;
+      font-weight: 800 !important;
+      color: #1E293B !important;
+      line-height: 1.2 !important;
+    }
+
+    /* High-Contrast Light Price Box */
+    .webinar-entrance-card .popup-price-wrap {
+      background: linear-gradient(135deg, #F0FDF4 0%, #EEF2FF 100%) !important;
+      border: 1.5px solid #10B981 !important;
+      border-radius: 16px !important;
+      padding: 10px 14px !important;
+      margin-bottom: 14px !important;
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+    }
+    .webinar-entrance-card #webinarPopupPrice {
+      font-size: 1.65rem !important;
+      font-weight: 900 !important;
+      color: #059669 !important;
+      line-height: 1 !important;
+    }
+    .webinar-entrance-card #webinarPopupOrigPrice {
+      font-size: 0.95rem !important;
+      color: #94A3B8 !important;
+      text-decoration: line-through !important;
+      margin-left: 5px !important;
+    }
+    .webinar-entrance-card #webinarPopupDate {
+      font-size: 0.82rem !important;
+      color: #0F172A !important;
+      font-weight: 800 !important;
+    }
+
+    /* ==========================================================================
+       STAR CTA BUTTON: MAGNETIC CONTINUOUS SHINE SWEEP + HEARTBEAT POP PULSE
+       ========================================================================== */
+    .webinar-entrance-card .popup-cta-btn {
+      position: relative !important;
+      overflow: hidden !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: 100% !important;
+      padding: 14px 18px !important;
+      background: linear-gradient(135deg, #4F46E5 0%, #6366F1 50%, #EC4899 100%) !important;
+      color: #FFFFFF !important;
+      font-size: 1rem !important;
+      font-weight: 900 !important;
+      border-radius: 14px !important;
+      border: none !important;
+      text-decoration: none !important;
+      box-shadow: 0 8px 24px rgba(79, 70, 229, 0.45) !important;
+      cursor: pointer !important;
+      animation: btnMagneticPop 2.2s ease-in-out infinite !important;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease !important;
+    }
+
+    /* Continuous Pop / Heartbeat Scale Animation */
+    @keyframes btnMagneticPop {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 8px 24px rgba(79, 70, 229, 0.45);
+      }
+      35% {
+        transform: scale(1.038);
+        box-shadow: 0 14px 34px rgba(79, 70, 229, 0.7), 0 0 24px rgba(236, 72, 153, 0.4);
+      }
+      55% {
+        transform: scale(1.015);
+        box-shadow: 0 10px 28px rgba(79, 70, 229, 0.55);
+      }
+    }
+
+    /* Continuous Shining Light Ray Sweep Across Button */
+    .webinar-entrance-card .btn-shine-sweep {
+      position: absolute !important;
+      top: 0 !important;
+      left: -130% !important;
+      width: 80% !important;
+      height: 100% !important;
+      background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.55) 50%, transparent 100%) !important;
+      transform: skewX(-25deg) !important;
+      animation: btnShimmerSweep 2.2s ease-in-out infinite !important;
+      pointer-events: none !important;
+      z-index: 1 !important;
+    }
+    @keyframes btnShimmerSweep {
+      0% { left: -130%; }
+      38% { left: 160%; }
+      100% { left: 160%; }
+    }
+
+    .webinar-entrance-card .btn-content-inner {
+      position: relative !important;
+      z-index: 2 !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 8px !important;
+    }
+
+    .webinar-entrance-card .btn-icon-bolt {
+      color: #FDE047 !important;
+      animation: boltFlash 1.5s ease-in-out infinite !important;
+    }
+    @keyframes boltFlash {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.3); }
+    }
+
+    .webinar-entrance-card .btn-arrow-wiggle {
+      font-size: 0.95rem !important;
+      margin-left: 2px !important;
+      animation: arrowWiggle 1.5s ease-in-out infinite !important;
+    }
+    @keyframes arrowWiggle {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(5px); }
+    }
+
+    .webinar-entrance-card .popup-cta-btn:hover {
+      transform: scale(1.06) !important;
+      box-shadow: 0 16px 40px rgba(79, 70, 229, 0.8), 0 0 30px rgba(236, 72, 153, 0.5) !important;
+    }
+    .webinar-entrance-card .popup-cta-btn:active {
+      transform: scale(0.97) !important;
+    }
+
+    /* Secondary Dismissal Link */
+    .webinar-entrance-card .popup-dismiss-btn {
+      background: none !important;
+      border: none !important;
+      color: #94A3B8 !important;
+      font-size: 0.76rem !important;
+      font-weight: 600 !important;
+      cursor: pointer !important;
+      padding: 4px !important;
+      text-decoration: underline !important;
+      text-underline-offset: 3px !important;
+      transition: color 0.2s !important;
+    }
+    .webinar-entrance-card .popup-dismiss-btn:hover {
+      color: #475569 !important;
+    }
+
     @media (max-width: 640px) {
       .webinar-entrance-card {
-        max-width: 350px !important;
+        max-width: 340px !important;
         width: 92% !important;
-        padding: 16px 14px !important;
-        border-radius: 16px !important;
+        padding: 20px 14px 14px 14px !important;
+        border-radius: 20px !important;
       }
       .webinar-entrance-card .modal-close-btn {
-        top: 8px !important;
-        right: 8px !important;
+        top: 10px !important;
+        right: 10px !important;
         width: 28px !important;
         height: 28px !important;
         font-size: 0.82rem !important;
       }
-      .webinar-entrance-card .popup-badge-pill {
-        padding: 4px 10px !important;
-        margin-bottom: 8px !important;
-        font-size: 0.72rem !important;
-      }
       .webinar-entrance-card #webinarPopupTitle {
         font-size: 1.15rem !important;
-        line-height: 1.25 !important;
-        margin: 0 0 6px 0 !important;
+        margin: 0 0 4px 0 !important;
       }
       .webinar-entrance-card #webinarPopupDesc {
-        font-size: 0.76rem !important;
-        line-height: 1.35 !important;
-        margin: 0 0 8px 0 !important;
+        font-size: 0.75rem !important;
+        margin: 0 0 10px 0 !important;
       }
-      .webinar-entrance-card .popup-points-wrap {
-        padding: 8px 10px !important;
+      .webinar-entrance-card .popup-benefits-grid {
+        gap: 5px !important;
         margin-bottom: 10px !important;
-        gap: 6px !important;
       }
-      .webinar-entrance-card .popup-point-row {
-        font-size: 0.74rem !important;
-        gap: 6px !important;
+      .webinar-entrance-card .popup-benefit-card {
+        padding: 7px 4px !important;
+        border-radius: 10px !important;
+      }
+      .webinar-entrance-card .popup-benefit-card span {
+        font-size: 0.68rem !important;
       }
       .webinar-entrance-card .popup-price-wrap {
-        padding: 8px 12px !important;
+        padding: 8px 10px !important;
         margin-bottom: 10px !important;
       }
       .webinar-entrance-card #webinarPopupPrice {
-        font-size: 1.35rem !important;
+        font-size: 1.4rem !important;
       }
       .webinar-entrance-card #webinarPopupOrigPrice {
         font-size: 0.82rem !important;
       }
       .webinar-entrance-card #webinarPopupDate {
-        font-size: 0.76rem !important;
+        font-size: 0.74rem !important;
       }
       .webinar-entrance-card .popup-cta-btn {
-        padding: 10px 14px !important;
-        font-size: 0.88rem !important;
-        border-radius: 10px !important;
-      }
-      .webinar-entrance-card .popup-dismiss-btn {
-        font-size: 0.72rem !important;
-        padding: 4px !important;
+        padding: 12px 14px !important;
+        font-size: 0.92rem !important;
+        border-radius: 12px !important;
       }
     }
   </style>
@@ -1559,70 +1810,74 @@
   <!-- ==========================================================================
        AUTOMATIC WEBINAR MASTERCLASS ENTRANCE POPUP MODAL (₹49 REGISTER NOW)
        ========================================================================== -->
-  <div class="lightbox-modal" id="webinarEntrancePopupModal" role="dialog" aria-modal="true" style="display: none; background: rgba(5, 8, 22, 0.82); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 999999;">
+  <div class="lightbox-modal" id="webinarEntrancePopupModal" role="dialog" aria-modal="true" style="display: none; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); z-index: 999999;">
     <div class="lightbox-content-box webinar-entrance-card">
       
-      <!-- Top Glowing Radial Orb -->
-      <div style="position: absolute; top: -80px; left: 50%; transform: translateX(-50%); width: 280px; height: 160px; background: radial-gradient(circle, rgba(99,102,241,0.45) 0%, rgba(99,102,241,0) 70%); pointer-events: none;"></div>
+      <!-- Top Decorative Radiant Rainbow Bar -->
+      <div class="top-accent-bar"></div>
 
-      <!-- Close Button -->
-      <button class="modal-close-btn" onclick="closeWebinarEntrancePopup()" aria-label="Close Modal" style="position: absolute; top: 16px; right: 16px; width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #94A3B8; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+      <!-- Clean Close Button -->
+      <button class="modal-close-btn" onclick="closeWebinarEntrancePopup()" aria-label="Close Modal">
         <i class="fa-solid fa-xmark"></i>
       </button>
 
       <!-- Live Masterclass Pill Badge -->
-      <div class="popup-badge-pill" style="display: inline-flex; align-items: center; gap: 8px; background: rgba(239, 68, 68, 0.15); border: 1px solid #EF4444; padding: 6px 14px; border-radius: 9999px; margin-bottom: 14px;">
-        <span style="width: 9px; height: 9px; border-radius: 50%; background: #EF4444; display: inline-block; animation: pulse 1.5s infinite;"></span>
-        <span id="webinarPopupBadge" style="font-size: 0.8rem; font-weight: 800; color: #FCA5A5; letter-spacing: 0.5px; text-transform: uppercase;">🔥 Live Masterclass • 27th September, Sunday</span>
+      <div class="popup-badge-pill">
+        <span class="popup-live-dot"></span>
+        <span id="webinarPopupBadge">🔥 Live Masterclass • Sunday 10 AM</span>
       </div>
 
-      <!-- Title & Headline -->
-      <h2 id="webinarPopupTitle" style="font-size: 1.55rem; font-weight: 900; color: #FFFFFF; line-height: 1.25; margin: 0 0 8px 0;">
-        Live Website Creation &amp; Scaling Masterclass 🚀
-      </h2>
-      <p id="webinarPopupDesc" style="font-size: 0.92rem; color: #94A3B8; margin: 0 0 18px 0; line-height: 1.45;">
-        Build high-converting websites, launch your brand &amp; master modern web design with <strong style="color: #FFF;">FlipCut Creation</strong>!
-      </p>
+      <!-- Title & Headline (Clean, uncluttered) -->
+      <h2 id="webinarPopupTitle">Live Website Creation Masterclass 🚀</h2>
+      <p id="webinarPopupDesc">Build high-converting websites &amp; launch your brand with zero coding!</p>
 
-      <!-- Key Value Points Box -->
-      <div class="popup-points-wrap" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 14px 16px; text-align: left; margin-bottom: 18px; display: flex; flex-direction: column; gap: 9px;">
-        <div class="popup-point-row" style="display: flex; align-items: center; gap: 10px; font-size: 0.88rem; color: #F1F5F9;">
-          <i class="fa-solid fa-circle-check" style="color: #10B981; font-size: 1rem;"></i>
-          <span>Build Complete Business Websites (Zero coding required)</span>
+      <!-- 3 Clean Micro-Benefit Chips (No long walls of text) -->
+      <div class="popup-benefits-grid">
+        <div class="popup-benefit-card">
+          <span class="chip-icon">⚡</span>
+          <span>Zero Coding</span>
         </div>
-        <div class="popup-point-row" style="display: flex; align-items: center; gap: 10px; font-size: 0.88rem; color: #F1F5F9;">
-          <i class="fa-solid fa-circle-check" style="color: #10B981; font-size: 1rem;"></i>
-          <span>High-Converting E-Commerce, Portfolio &amp; Lead Architecture</span>
+        <div class="popup-benefit-card">
+          <span class="chip-icon">💻</span>
+          <span>Live Build</span>
         </div>
-        <div class="popup-point-row" style="display: flex; align-items: center; gap: 10px; font-size: 0.88rem; color: #F1F5F9;">
-          <i class="fa-solid fa-circle-check" style="color: #10B981; font-size: 1rem;"></i>
-          <span>Instant Verified Digital Ticket Pass &amp; VIP WhatsApp Community</span>
+        <div class="popup-benefit-card">
+          <span class="chip-icon">🎟️</span>
+          <span>VIP Pass</span>
         </div>
       </div>
 
-      <!-- Price Offer Box -->
-      <div class="popup-price-wrap" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(16, 185, 129, 0.12)); border: 1.5px solid #10B981; border-radius: 14px; padding: 12px 18px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+      <!-- High-Contrast Clean Price Box -->
+      <div class="popup-price-wrap">
         <div style="text-align: left;">
-          <span style="font-size: 0.75rem; color: #94A3B8; display: block; text-transform: uppercase; font-weight: 700;">Exclusive Masterclass Fee</span>
-          <div style="display: flex; align-items: baseline; gap: 8px;">
-            <strong id="webinarPopupPrice" style="font-size: 1.6rem; font-weight: 900; color: #10B981;">₹49</strong>
-            <span id="webinarPopupOrigPrice" style="font-size: 0.95rem; color: #64748B; text-decoration: line-through;">₹999</span>
-            <span style="font-size: 0.75rem; font-weight: 800; color: #F59E0B; background: rgba(245,158,11,0.15); padding: 2px 6px; border-radius: 4px;">95% OFF</span>
+          <span style="font-size: 0.72rem; color: #64748B; display: block; text-transform: uppercase; font-weight: 700; letter-spacing: 0.4px;">Live Workshop Fee</span>
+          <div style="display: flex; align-items: baseline; gap: 6px;">
+            <strong id="webinarPopupPrice">₹49</strong>
+            <span id="webinarPopupOrigPrice">₹999</span>
+            <span style="font-size: 0.72rem; font-weight: 800; color: #059669; background: #DCFCE7; padding: 2px 6px; border-radius: 6px;">95% OFF</span>
           </div>
         </div>
         <div style="text-align: right;">
-          <span style="font-size: 0.75rem; color: #94A3B8; display: block; font-weight: 600;">📅 Sunday Live</span>
-          <span id="webinarPopupDate" style="font-size: 0.88rem; color: #F1F5F9; font-weight: 800;">27th September, Sunday</span>
+          <span style="font-size: 0.72rem; color: #64748B; display: block; font-weight: 600;">📅 Date &amp; Time</span>
+          <span id="webinarPopupDate">27th Sep, Sun</span>
         </div>
       </div>
 
-      <!-- CTA Buttons -->
-      <div style="display: flex; flex-direction: column; gap: 10px;">
-        <a href="webinar.html" class="btn btn-primary popup-cta-btn" onclick="closeWebinarEntrancePopup()" style="padding: 14px 20px; font-size: 1.05rem; font-weight: 800; justify-content: center; background: linear-gradient(135deg, #6366F1, #4F46E5); border: none; box-shadow: 0 6px 20px rgba(99,102,241,0.45); border-radius: 12px; text-decoration: none; color: #FFF; display: flex; align-items: center; gap: 8px;">
-          <i class="fa-solid fa-ticket"></i>
-          <span id="webinarPopupBtnText">Register Now for ₹49 &amp; Claim Seat</span>
+      <!-- CTA Section: Continuous Magnetic Pop Pulse + Shimmer Sweep Button -->
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <a href="webinar.html" class="popup-cta-btn" onclick="closeWebinarEntrancePopup()">
+          <span class="btn-shine-sweep"></span>
+          <span class="btn-content-inner">
+            <i class="fa-solid fa-bolt btn-icon-bolt"></i>
+            <span id="webinarPopupBtnText">Register Now for ₹49 &amp; Claim Seat</span>
+            <i class="fa-solid fa-arrow-right btn-arrow-wiggle"></i>
+          </span>
         </a>
-        <button type="button" class="popup-dismiss-btn" onclick="closeWebinarEntrancePopup()" style="background: none; border: none; color: #64748B; font-size: 0.82rem; font-weight: 600; cursor: pointer; padding: 6px;">
+        <div style="font-size: 0.75rem; color: #DC2626; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 5px;">
+          <i class="fa-solid fa-fire"></i>
+          <span id="popupSeatsLeft">Only 12 Seats Left for ₹49 • Fast Filling!</span>
+        </div>
+        <button type="button" class="popup-dismiss-btn" onclick="closeWebinarEntrancePopup()">
           Maybe later, explore portfolio first
         </button>
       </div>
@@ -1676,7 +1931,7 @@
     </a>
   </nav>
 
-  <script src="script.js?v=21.0"></script>
+  <script src="script.js?v=22.0"></script>
   <!-- Instant Order Alert Notification Engine (Non-blocking) -->
   <script src="notification-service.js" defer></script>
   <!-- Real-time Live Visitor & Analytics Tracker (Non-blocking) -->
