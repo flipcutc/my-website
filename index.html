@@ -233,7 +233,7 @@
     // Instant 0ms Pre-Hydration & Zero-Flicker Renderer
     (function() {
       try {
-        var FLIPCUT_BUILD = '20260923_V23';
+        var FLIPCUT_BUILD = '20260923_V24';
         if (localStorage.getItem('flipcut_build_ver') !== FLIPCUT_BUILD) {
           localStorage.setItem('flipcut_build_ver', FLIPCUT_BUILD);
           localStorage.removeItem('flipcut_site_content');
@@ -1835,15 +1835,15 @@
       <div class="popup-benefits-grid">
         <div class="popup-benefit-card">
           <span class="chip-icon">⚡</span>
-          <span>Zero Coding</span>
+          <span id="webinarPopupChip1">Zero Coding</span>
         </div>
         <div class="popup-benefit-card">
           <span class="chip-icon">💻</span>
-          <span>Live Build</span>
+          <span id="webinarPopupChip2">Live Build</span>
         </div>
         <div class="popup-benefit-card">
           <span class="chip-icon">🎟️</span>
-          <span>VIP Pass</span>
+          <span id="webinarPopupChip3">VIP Pass</span>
         </div>
       </div>
 
@@ -1854,7 +1854,7 @@
           <div style="display: flex; align-items: baseline; gap: 6px;">
             <strong id="webinarPopupPrice">₹49</strong>
             <span id="webinarPopupOrigPrice">₹999</span>
-            <span style="font-size: 0.72rem; font-weight: 800; color: #059669; background: #DCFCE7; padding: 2px 6px; border-radius: 6px;">95% OFF</span>
+            <span id="webinarPopupDiscount" style="font-size: 0.72rem; font-weight: 800; color: #059669; background: #DCFCE7; padding: 2px 6px; border-radius: 6px;">95% OFF</span>
           </div>
         </div>
         <div style="text-align: right;">
@@ -1931,7 +1931,7 @@
     </a>
   </nav>
 
-  <script src="script.js?v=22.0"></script>
+  <script src="script.js?v=23.0"></script>
   <!-- Instant Order Alert Notification Engine (Non-blocking) -->
   <script src="notification-service.js" defer></script>
   <!-- Real-time Live Visitor & Analytics Tracker (Non-blocking) -->

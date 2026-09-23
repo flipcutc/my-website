@@ -2488,9 +2488,12 @@ window.showWebinarEntrancePopup = function() {
   if (!price || Number(price) < 1) price = '49';
   const origPrice = String(webinarCfg.originalPrice !== undefined && webinarCfg.originalPrice !== '' ? webinarCfg.originalPrice : '999').replace(/[^0-9]/g, '') || '999';
   const sessionDate = webinarCfg.date || '27th Sep, Sunday • 10:00 AM IST';
-  const title = webinarCfg.title || 'Live Website Creation Masterclass 🚀';
-  const desc = webinarCfg.description || 'Build high-converting websites & launch your brand with zero coding!';
-  const badge = webinarCfg.badge || '🔥 Live Masterclass • Sunday 10 AM';
+  const title = webinarCfg.popupTitle || webinarCfg.title || 'Live Website Creation Masterclass 🚀';
+  const desc = webinarCfg.popupDesc || webinarCfg.description || 'Build high-converting websites & launch your brand with zero coding!';
+  const badge = webinarCfg.popupBadge || webinarCfg.badge || '🔥 Live Masterclass • Sunday 10 AM';
+  const chip1 = webinarCfg.popupChip1 || 'Zero Coding';
+  const chip2 = webinarCfg.popupChip2 || 'Live Build';
+  const chip3 = webinarCfg.popupChip3 || 'VIP Pass';
 
   const setElText = (id, val) => {
     const el = document.getElementById(id);
@@ -2503,7 +2506,22 @@ window.showWebinarEntrancePopup = function() {
   setElText('webinarPopupTitle', title);
   setElText('webinarPopupDesc', desc);
   setElText('webinarPopupBadge', badge);
-  setElText('webinarPopupBtnText', 'Register Now for ₹' + price + ' & Claim Seat');
+  setElText('webinarPopupChip1', chip1.replace(/^[^\w\s]+/g, '').trim() || chip1);
+  setElText('webinarPopupChip2', chip2.replace(/^[^\w\s]+/g, '').trim() || chip2);
+  setElText('webinarPopupChip3', chip3.replace(/^[^\w\s]+/g, '').trim() || chip3);
+
+  // Dynamic % OFF calculation
+  const pNum = Number(price);
+  const opNum = Number(origPrice);
+  if (opNum > pNum && opNum > 0) {
+    const discPct = Math.round(((opNum - pNum) / opNum) * 100);
+    setElText('webinarPopupDiscount', discPct + '% OFF');
+  }
+
+  // Dynamic / Custom Button Text
+  let customBtnText = webinarCfg.popupBtnText || 'Register Now for ₹{price} & Claim Seat';
+  customBtnText = customBtnText.replace(/\{price\}/g, price).replace(/₹\s*\d+/g, '₹' + price);
+  setElText('webinarPopupBtnText', customBtnText);
 
   // Live Real-Time Bookings Counter Calculation (Base 38, increments live with every new registration)
   const totalSeats = Number(webinarCfg.totalSeats) || 150;
@@ -2513,7 +2531,12 @@ window.showWebinarEntrancePopup = function() {
     const currentBookings = Math.min(totalSeats, Math.max(baseMilestone, count));
     const seatsLeft = Math.max(0, totalSeats - currentBookings);
     setElText('popupBookingText', currentBookings + ' People Already Registered / Booked');
-    setElText('popupSeatsLeft', 'Only ' + seatsLeft + ' Seats Left for ₹' + price + ' • Fast Filling!');
+    
+    // Dynamic / Custom Urgency Text
+    let urgencyTemplate = webinarCfg.popupUrgencyText || 'Only {seats} Seats Left for ₹{price} • Fast Filling!';
+    urgencyTemplate = urgencyTemplate.replace(/\{seats\}/g, seatsLeft).replace(/\{price\}/g, price).replace(/₹\s*\d+/g, '₹' + price);
+    setElText('popupSeatsLeft', urgencyTemplate);
+
     const progBar = document.getElementById('popupProgressBar');
     if (progBar) {
       const pct = Math.min(100, Math.round((currentBookings / totalSeats) * 100));
