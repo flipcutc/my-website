@@ -3489,10 +3489,16 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
               <h2>🎓 Masterclass Webinar CMS & Pricing (₹ INR)</h2>
               <p>Edit all webinar text, session details, registration ticket price, original price, and VIP WhatsApp message.</p>
             </div>
-            <div style="display: flex; gap: 10px; align-items: center;">
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
               <a href="webinar.html" target="_blank" class="btn btn-secondary" style="font-size: 0.85rem;">
                 <i class="fa-solid fa-arrow-up-right-from-square"></i> Preview Webinar Page
               </a>
+              <button type="button" class="btn btn-primary" onclick="window.saveAdminDraft(true)" style="padding: 9px 18px; font-weight: 700; font-size: 0.88rem;">
+                <i class="fa-solid fa-floppy-disk"></i> Save Webinar Changes
+              </button>
+              <button type="button" class="btn" onclick="window.publishLiveToWebsite()" style="padding: 9px 18px; font-weight: 700; font-size: 0.88rem; background: linear-gradient(135deg, #10B981, #059669); color: white;">
+                <i class="fa-solid fa-paper-plane"></i> Publish Live
+              </button>
             </div>
           </div>
 
@@ -3524,6 +3530,7 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
                 </label>
               </div>
             </div>
+          </div>
           <!-- ====================================================================
                HOMEPAGE ENTRANCE POPUP MODAL CMS (CLEAN LIGHT THEME SETTINGS)
                ==================================================================== -->
@@ -3542,12 +3549,17 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
                   Control the popup text, 3 benefit chips, registration fee, and continuous shining CTA button.
                 </p>
               </div>
-              <div style="display: flex; align-items: center; gap: 10px;">
-                <span style="font-size: 0.85rem; font-weight: 700; color: #E2E8F0;">Auto Popup:</span>
-                <label class="toggle-switch">
-                  <input type="checkbox" id="cfgWebinarAutoPopup" checked>
-                  <span class="toggle-slider"></span>
-                </label>
+              <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-size: 0.85rem; font-weight: 700; color: #E2E8F0;">Auto Popup:</span>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="cfgWebinarAutoPopup" checked>
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+                <button type="button" class="btn btn-primary" onclick="window.saveAdminDraft(true); if (typeof window.publishLiveToWebsite === 'function') window.publishLiveToWebsite();" style="padding: 8px 16px; font-size: 0.84rem; font-weight: 700;">
+                  <i class="fa-solid fa-floppy-disk"></i> Save &amp; Publish Popup
+                </button>
               </div>
             </div>
 
@@ -3597,6 +3609,15 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
                 <input type="text" id="cfgWebinarPopupUrgencyText" class="form-control" placeholder="Only {seats} Seats Left for ₹{price} • Fast Filling!">
                 <small style="color: #64748B; font-size: 0.75rem;">Use <code>{seats}</code> and <code>{price}</code> for live values</small>
               </div>
+            </div>
+
+            <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; gap: 12px; align-items: center; flex-wrap: wrap;">
+              <span style="color: #94A3B8; font-size: 0.82rem;">
+                <i class="fa-solid fa-circle-info" style="color: #818CF8;"></i> Any changes saved here sync directly to Cloud (Firebase + Supabase) &amp; update flipcutcreation.in in real-time.
+              </span>
+              <button type="button" class="btn btn-primary" onclick="window.saveAdminDraft(true); if (typeof window.publishLiveToWebsite === 'function') window.publishLiveToWebsite();" style="padding: 10px 22px; font-weight: 800; font-size: 0.92rem; background: linear-gradient(135deg, #6366F1, #8B5CF6); box-shadow: 0 4px 14px rgba(99,102,241,0.4);">
+                <i class="fa-solid fa-cloud-arrow-up"></i> Save &amp; Publish Popup to Live Website
+              </button>
             </div>
           </div>
 
@@ -3739,6 +3760,19 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
             <div class="form-group">
               <label>Live Class Scheduled Time Display</label>
               <input type="text" id="cfgWebinarLiveTime" class="form-control" placeholder="Sunday, 9:00 AM IST">
+            </div>
+          <div style="margin-top: 24px; padding: 18px 20px; background: rgba(99, 102, 241, 0.08); border: 1.5px solid rgba(99, 102, 241, 0.3); border-radius: var(--radius-md); display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;">
+            <div>
+              <h4 style="margin: 0; font-size: 1rem; color: #FFF; font-weight: 800;"><i class="fa-solid fa-cloud-arrow-up text-gradient"></i> Ready to Publish Webinar Changes?</h4>
+              <p style="margin: 3px 0 0; font-size: 0.82rem; color: #94A3B8;">Clicking Publish saves all ticket prices, dates, popup copy, and settings directly to live Cloud DB.</p>
+            </div>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+              <button type="button" class="btn btn-secondary" onclick="window.saveAdminDraft(true)" style="padding: 10px 20px; font-size: 0.88rem; font-weight: 700;">
+                <i class="fa-solid fa-floppy-disk"></i> Save Draft
+              </button>
+              <button type="button" class="btn" onclick="window.publishLiveToWebsite()" style="padding: 10px 24px; font-size: 0.92rem; font-weight: 800; background: linear-gradient(135deg, #10B981, #059669); color: white; box-shadow: 0 4px 14px rgba(16,185,129,0.4);">
+                <i class="fa-solid fa-paper-plane"></i> Publish Live to Website
+              </button>
             </div>
           </div>
 
@@ -4279,6 +4313,7 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
         if (!content) content = getSiteContent();
 
         const getCheck = (id, def = true) => { const el = document.getElementById(id); return el ? el.checked : def; };
+        const isChecked = getCheck;
         const getVal = (id, currentVal = '') => { 
           const el = document.getElementById(id); 
           if (!el) return currentVal !== undefined ? currentVal : '';
@@ -4705,9 +4740,9 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
           content.webinar.shareBannerImage = getVal('cfgWebinarShareImage', content.webinar.shareBannerImage || 'https://flipcutcreation.in/assets/logo.png');
           content.webinar.whatsappGroupLink = getVal('cfgWebinarWaGroupLink', content.webinar.whatsappGroupLink || 'https://chat.whatsapp.com/B5hdxy7LbkNCrWRsHMtW8h');
           content.webinar.whatsappGroupMsg = getVal('cfgWebinarWaMsg', content.webinar.whatsappGroupMsg || '');
-          content.webinar.liveSectionVisible = isChecked('toggleWebinarLiveSection');
+          content.webinar.liveSectionVisible = getCheck('toggleWebinarLiveSection');
           if (!content.sectionsVisibility) content.sectionsVisibility = {};
-          content.sectionsVisibility.webinarLiveSection = isChecked('toggleWebinarLiveSection');
+          content.sectionsVisibility.webinarLiveSection = getCheck('toggleWebinarLiveSection');
           content.webinar.liveStatus = getVal('cfgWebinarLiveStatus', content.webinar.liveStatus || 'offline');
           let ytVal = getVal('cfgWebinarLiveYtId', content.webinar.liveYoutubeId || '');
           if (ytVal.includes('v=')) { const m = ytVal.match(/v=([a-zA-Z0-9_-]+)/); if (m) ytVal = m[1]; }
@@ -4718,7 +4753,7 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
 
           // Collect Homepage Entrance Popup CMS Fields
           if (document.getElementById('cfgWebinarAutoPopup')) {
-            content.webinar.autoPopupEnabled = isChecked('cfgWebinarAutoPopup');
+            content.webinar.autoPopupEnabled = getCheck('cfgWebinarAutoPopup');
           }
           if (document.getElementById('cfgWebinarPopupTitle')) {
             content.webinar.popupBadge = getVal('cfgWebinarPopupBadge', content.webinar.popupBadge || '🔥 Live Masterclass • Sunday 10 AM');
@@ -4768,8 +4803,15 @@ CREATE POLICY "Allow all access with API key" ON public.leads FOR ALL USING (tru
           if (typeof saveSiteContent === 'function') {
             await saveSiteContent(content);
           }
-          if (typeof window.saveContentToDualCloud === 'function') {
+          if (typeof window.publishCmsToDualCloud === 'function') {
+            await window.publishCmsToDualCloud(content);
+          } else if (typeof window.saveContentToDualCloud === 'function') {
             await window.saveContentToDualCloud(content);
+          }
+          if (typeof BroadcastChannel !== 'undefined') {
+            const bc = new BroadcastChannel('flipcut_cms_channel');
+            bc.postMessage({ type: 'CMS_UPDATED', content: content });
+            bc.close();
           }
         } catch (err) {
           console.warn('Cloud save note:', err);

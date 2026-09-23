@@ -662,6 +662,7 @@ if (typeof window !== 'undefined') {
   window.updateLeadStatusDualCloud = updateLeadStatusDualCloud;
   window.deleteLeadDualCloud = deleteLeadDualCloud;
   window.publishCmsToDualCloud = publishCmsToDualCloud;
+  window.saveContentToDualCloud = publishCmsToDualCloud;
   window.checkDuplicateLead = checkDuplicateLead;
   window.syncAuthUserToDatabase = syncAuthUserToDatabase;
   window.FIREBASE_SYNC_CONFIG = FIREBASE_SYNC_CONFIG;

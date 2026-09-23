@@ -52,14 +52,12 @@ window.startPlanCheckout = function(packageName, rawAmount) {
  */
 
 // Version-Aware Intelligent Cache Purge
-const FLIPCUT_CURRENT_BUILD = '20260910_V22';
+const FLIPCUT_CURRENT_BUILD = '20260923_V27';
 try {
   const lastBuild = localStorage.getItem('flipcut_build_ver');
   if (lastBuild !== FLIPCUT_CURRENT_BUILD) {
     localStorage.setItem('flipcut_build_ver', FLIPCUT_CURRENT_BUILD);
-    localStorage.removeItem('flipcut_site_content');
-    localStorage.removeItem('flipcut_cms_draft');
-    localStorage.removeItem('flipcut_site_content_backup');
+    sessionStorage.removeItem('flipcut_webinar_popup_dismissed');
   }
 } catch (_) {}
 
@@ -67,7 +65,7 @@ try {
 let siteAppContent = (typeof getSiteContent === 'function') ? getSiteContent() : DEFAULT_SITE_CONTENT;
 let content = siteAppContent;
 
-// Real-Time 0ms Live Sync across tabs when Admin publishes
+// Real-Time 0ms Live Sync across tabs when Admin saves or publishes
 if (typeof window !== 'undefined') {
   window.addEventListener('flipcut:cms-updated', (e) => {
     if (e && e.detail) {
@@ -89,6 +87,20 @@ if (typeof window !== 'undefined') {
       };
     }
   } catch (_) {}
+
+  // Cross-Tab Instant Sync: any save in Admin panel updates open website tabs immediately
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'flipcut_site_content' || e.key === 'flipcut_cms_draft') {
+      try {
+        const updated = JSON.parse(e.newValue);
+        if (updated && typeof updated === 'object') {
+          siteAppContent = updated;
+          content = updated;
+          hydratePageFromCMS(updated);
+        }
+      } catch (_) {}
+    }
+  });
 }
 
 /* ==========================================================================
@@ -733,6 +745,15 @@ function hydratePageFromCMS(customContent) {
       if (footerTagline && footerData.tagline) footerTagline.textContent = footerData.tagline;
     } catch (ftErr) {
       console.warn('Footer hydration note:', ftErr);
+    }
+
+    // Dynamic Entrance Popup Hydration from latest CMS
+    try {
+      if (typeof hydrateWebinarPopup === 'function') {
+        hydrateWebinarPopup(content ? content.webinar : null);
+      }
+    } catch (popErr) {
+      console.warn('Popup hydration note:', popErr);
     }
 
     if (typeof document !== 'undefined' && document.body) {
@@ -2469,6 +2490,93 @@ function startPopupCountdownTimer(targetDateStr) {
   __webinarCountdownTimer = setInterval(tick, 1000);
 }
 
+function hydrateWebinarPopup(webinarCfg) {
+  const modal = document.getElementById('webinarEntrancePopupModal');
+  if (!modal) return;
+
+  if (!webinarCfg) {
+    const current = (typeof getSiteContent === 'function') ? getSiteContent() : (window.flipcutSiteContent || siteAppContent || {});
+    webinarCfg = (current && current.webinar) ? current.webinar : {};
+  }
+
+  const isMasterLive = (webinarCfg.masterLiveMode !== false) && (webinarCfg.enabled !== false);
+  if (!isMasterLive || webinarCfg.autoPopupEnabled === false) {
+    if (modal.classList.contains('active')) {
+      window.closeWebinarEntrancePopup();
+    }
+    return;
+  }
+
+  let price = String(webinarCfg.price !== undefined && webinarCfg.price !== '' ? webinarCfg.price : '49').replace(/[^0-9]/g, '') || '49';
+  if (!price || Number(price) < 1) price = '49';
+  const origPrice = String(webinarCfg.originalPrice !== undefined && webinarCfg.originalPrice !== '' ? webinarCfg.originalPrice : '999').replace(/[^0-9]/g, '') || '999';
+  const sessionDate = webinarCfg.date || '27th Sep, Sunday • 10:00 AM IST';
+  const title = webinarCfg.popupTitle || webinarCfg.title || 'Live Website Creation Masterclass 🚀';
+  const desc = webinarCfg.popupDesc || webinarCfg.description || 'Build high-converting websites & launch your brand with zero coding!';
+  const badge = webinarCfg.popupBadge || webinarCfg.badge || '🔥 Live Masterclass • Sunday 10 AM';
+  const chip1 = webinarCfg.popupChip1 || '⚡ Zero Coding';
+  const chip2 = webinarCfg.popupChip2 || '💻 Live Build';
+  const chip3 = webinarCfg.popupChip3 || '🎟️ VIP Pass';
+
+  const setElText = (id, val) => {
+    const el = document.getElementById(id);
+    if (el && val !== undefined && val !== null) el.textContent = val;
+  };
+
+  setElText('webinarPopupPrice', '₹' + price);
+  setElText('webinarPopupOrigPrice', '₹' + origPrice);
+  setElText('webinarPopupDate', sessionDate);
+  setElText('webinarPopupTitle', title);
+  setElText('webinarPopupDesc', desc);
+  setElText('webinarPopupBadge', badge);
+  setElText('webinarPopupChip1', chip1);
+  setElText('webinarPopupChip2', chip2);
+  setElText('webinarPopupChip3', chip3);
+
+  // Dynamic % OFF calculation
+  const pNum = Number(price);
+  const opNum = Number(origPrice);
+  if (opNum > pNum && opNum > 0) {
+    const discPct = Math.round(((opNum - pNum) / opNum) * 100);
+    setElText('webinarPopupDiscount', discPct + '% OFF');
+  }
+
+  // Dynamic / Custom Button Text
+  let customBtnText = (webinarCfg.popupBtnText && webinarCfg.popupBtnText.trim()) ? webinarCfg.popupBtnText : 'Register Now for ₹{price} & Claim Seat';
+  customBtnText = customBtnText.replace(/\{price\}/gi, price).replace(/₹\s*\{price\}/gi, '₹' + price);
+  setElText('webinarPopupBtnText', customBtnText);
+
+  // Live Real-Time Bookings Counter Calculation (Base 38, increments live with every new registration)
+  const totalSeats = Number(webinarCfg.totalSeats) || 150;
+  const baseMilestone = Number(webinarCfg.registeredCount) || 38;
+
+  function updateBookingUI(count) {
+    const currentBookings = Math.min(totalSeats, Math.max(baseMilestone, count));
+    const seatsLeft = Math.max(0, totalSeats - currentBookings);
+    setElText('popupBookingText', currentBookings + ' People Already Registered / Booked');
+    
+    // Dynamic / Custom Urgency Text with robust placeholder replacement for {seats}, {25}, {price}, etc.
+    let urgencyTemplate = (webinarCfg.popupUrgencyText && webinarCfg.popupUrgencyText.trim()) ? webinarCfg.popupUrgencyText : 'Only {seats} Seats Left for ₹{price} • Fast Filling!';
+    urgencyTemplate = urgencyTemplate
+      .replace(/\{seats\}/gi, seatsLeft)
+      .replace(/\{(\d+)\}/g, (m, p) => p)
+      .replace(/\{price\}/gi, price)
+      .replace(/₹\s*\{price\}/gi, '₹' + price);
+    setElText('popupSeatsLeft', urgencyTemplate);
+
+    const progBar = document.getElementById('popupProgressBar');
+    if (progBar) {
+      const pct = Math.min(100, Math.round((currentBookings / totalSeats) * 100));
+      progBar.style.width = pct + '%';
+    }
+  }
+
+  window.__updatePopupBookingUI = updateBookingUI;
+  const initialCount = window.__lastWebinarTotalLiveCount || baseMilestone;
+  updateBookingUI(initialCount);
+}
+window.hydrateWebinarPopup = hydrateWebinarPopup;
+
 window.showWebinarEntrancePopup = function() {
   const modal = document.getElementById('webinarEntrancePopupModal');
   if (!modal) return;
@@ -2484,68 +2592,8 @@ window.showWebinarEntrancePopup = function() {
     return; // Admin turned off master live mode or auto-popup
   }
 
-  let price = String(webinarCfg.price !== undefined && webinarCfg.price !== '' ? webinarCfg.price : '49').replace(/[^0-9]/g, '') || '49';
-  if (!price || Number(price) < 1) price = '49';
-  const origPrice = String(webinarCfg.originalPrice !== undefined && webinarCfg.originalPrice !== '' ? webinarCfg.originalPrice : '999').replace(/[^0-9]/g, '') || '999';
-  const sessionDate = webinarCfg.date || '27th Sep, Sunday • 10:00 AM IST';
-  const title = webinarCfg.popupTitle || webinarCfg.title || 'Live Website Creation Masterclass 🚀';
-  const desc = webinarCfg.popupDesc || webinarCfg.description || 'Build high-converting websites & launch your brand with zero coding!';
-  const badge = webinarCfg.popupBadge || webinarCfg.badge || '🔥 Live Masterclass • Sunday 10 AM';
-  const chip1 = webinarCfg.popupChip1 || 'Zero Coding';
-  const chip2 = webinarCfg.popupChip2 || 'Live Build';
-  const chip3 = webinarCfg.popupChip3 || 'VIP Pass';
-
-  const setElText = (id, val) => {
-    const el = document.getElementById(id);
-    if (el && val) el.textContent = val;
-  };
-
-  setElText('webinarPopupPrice', '₹' + price);
-  setElText('webinarPopupOrigPrice', '₹' + origPrice);
-  setElText('webinarPopupDate', sessionDate);
-  setElText('webinarPopupTitle', title);
-  setElText('webinarPopupDesc', desc);
-  setElText('webinarPopupBadge', badge);
-  setElText('webinarPopupChip1', chip1.replace(/^[^\w\s]+/g, '').trim() || chip1);
-  setElText('webinarPopupChip2', chip2.replace(/^[^\w\s]+/g, '').trim() || chip2);
-  setElText('webinarPopupChip3', chip3.replace(/^[^\w\s]+/g, '').trim() || chip3);
-
-  // Dynamic % OFF calculation
-  const pNum = Number(price);
-  const opNum = Number(origPrice);
-  if (opNum > pNum && opNum > 0) {
-    const discPct = Math.round(((opNum - pNum) / opNum) * 100);
-    setElText('webinarPopupDiscount', discPct + '% OFF');
-  }
-
-  // Dynamic / Custom Button Text
-  let customBtnText = webinarCfg.popupBtnText || 'Register Now for ₹{price} & Claim Seat';
-  customBtnText = customBtnText.replace(/\{price\}/g, price).replace(/₹\s*\d+/g, '₹' + price);
-  setElText('webinarPopupBtnText', customBtnText);
-
-  // Live Real-Time Bookings Counter Calculation (Base 38, increments live with every new registration)
-  const totalSeats = Number(webinarCfg.totalSeats) || 150;
-  const baseMilestone = Number(webinarCfg.registeredCount) || 38;
-
-  function updateBookingUI(count) {
-    const currentBookings = Math.min(totalSeats, Math.max(baseMilestone, count));
-    const seatsLeft = Math.max(0, totalSeats - currentBookings);
-    setElText('popupBookingText', currentBookings + ' People Already Registered / Booked');
-    
-    // Dynamic / Custom Urgency Text
-    let urgencyTemplate = webinarCfg.popupUrgencyText || 'Only {seats} Seats Left for ₹{price} • Fast Filling!';
-    urgencyTemplate = urgencyTemplate.replace(/\{seats\}/g, seatsLeft).replace(/\{price\}/g, price).replace(/₹\s*\d+/g, '₹' + price);
-    setElText('popupSeatsLeft', urgencyTemplate);
-
-    const progBar = document.getElementById('popupProgressBar');
-    if (progBar) {
-      const pct = Math.min(100, Math.round((currentBookings / totalSeats) * 100));
-      progBar.style.width = pct + '%';
-    }
-  }
-
-  // Display initial base count
-  updateBookingUI(baseMilestone);
+  // Hydrate popup content with latest values
+  hydrateWebinarPopup(webinarCfg);
 
   // Real-time Cloud Sync from Supabase DB to dynamically add newly registered attendees
   (async function syncLiveRegistrations() {
@@ -2565,8 +2613,12 @@ window.showWebinarEntrancePopup = function() {
             return new Date(r.created_at).getTime() >= milestoneTime;
           }).length;
 
+          const baseMilestone = Number(webinarCfg.registeredCount) || 38;
           const totalLiveCount = baseMilestone + liveNewRegistrations;
-          updateBookingUI(totalLiveCount);
+          window.__lastWebinarTotalLiveCount = totalLiveCount;
+          if (typeof window.__updatePopupBookingUI === 'function') {
+            window.__updatePopupBookingUI(totalLiveCount);
+          }
         }
       }
     } catch (_) {}
