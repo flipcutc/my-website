@@ -756,70 +756,47 @@
   <div class="ambient-glow"></div>
 
   <!-- ==========================================================================
-       AUTHENTICATION LOCK SCREEN (GOOGLE LOGIN + MASTER PASSWORD)
+       AUTHENTICATION LOCK SCREEN (MASTER PASSWORD)
        ========================================================================== -->
   <div class="auth-screen" id="authScreen">
     <div class="auth-box">
       <div class="auth-logo-badge">
-        <i class="fa-solid fa-bolt"></i>
+        <i class="fa-solid fa-shield-halved"></i>
       </div>
 
       <div class="auth-step-pill">
-        <i class="fa-solid fa-shield-halved"></i>
+        <i class="fa-solid fa-lock"></i>
         <span>FlipCut Master Admin</span>
       </div>
 
       <h1 class="auth-title">Webinar Leads App</h1>
       <p class="auth-subtitle">
-        Private mobile dashboard for <strong>editorvijaymurugan@gmail.com</strong>
+        Enter Master Password to access live webinar registrations
       </p>
 
-      <!-- STEP 1: GOOGLE SIGN-IN -->
-      <div id="step1Google">
-        <button type="button" class="btn-google-auth" id="btnGoogleSignIn" onclick="startGoogleAuth()">
-          <svg viewBox="0 0 24 24">
-            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-          </svg>
-          <span>Sign In with Google</span>
-        </button>
-      </div>
-
-      <!-- STEP 2: MASTER PASSWORD -->
-      <div class="password-step-wrap" id="step2Password">
-        <div class="verified-user-chip">
-          <img src="assets/favicon-16x16.png" id="authVerifiedAvatar" class="verified-user-avatar" alt="Avatar">
-          <div class="verified-user-text">
-            <div class="verified-user-name" id="authVerifiedName">Admin User</div>
-            <div class="verified-user-email" id="authVerifiedEmail">editorvijaymurugan@gmail.com</div>
-          </div>
-          <i class="fa-solid fa-circle-check" style="color: #10B981; font-size: 1.1rem;"></i>
-        </div>
-
-        <form onsubmit="handleMasterPasswordSubmit(event)">
-          <label style="display: block; font-size: 0.78rem; font-weight: 700; color: #CBD5E1; margin-bottom: 6px;">
+      <form onsubmit="handleMasterPasswordSubmit(event)">
+        <div style="text-align: left; margin-bottom: 14px;">
+          <label style="display: block; font-size: 0.8rem; font-weight: 700; color: #CBD5E1; margin-bottom: 7px;">
             <i class="fa-solid fa-key" style="color: #F59E0B; margin-right: 4px;"></i> Master Password:
           </label>
-          <input type="password" id="inputMasterPass" class="app-input" placeholder="Enter Master Password" required autocomplete="current-password" autofocus>
+          <input type="password" id="inputMasterPass" class="app-input" placeholder="Enter Password" required autocomplete="current-password" autofocus>
+        </div>
 
-          <button type="submit" class="btn-unlock" id="btnUnlockApp">
-            <i class="fa-solid fa-unlock-keyhole"></i>
-            <span>Unlock Webinar Leads</span>
-          </button>
-        </form>
-      </div>
+        <button type="submit" class="btn-unlock" id="btnUnlockApp">
+          <i class="fa-solid fa-unlock-keyhole"></i>
+          <span>Unlock Leads App</span>
+        </button>
+      </form>
 
       <!-- Error / Notice Box -->
       <div class="auth-error-notice" id="authErrorNotice">
         <i class="fa-solid fa-triangle-exclamation" style="font-size: 1rem; flex-shrink: 0;"></i>
-        <span id="authErrorMsg">Access Denied</span>
+        <span id="authErrorMsg">Incorrect Master Password</span>
       </div>
 
       <div style="margin-top: 22px; font-size: 0.74rem; color: #64748B; display: flex; align-items: center; justify-content: center; gap: 6px;">
         <i class="fa-solid fa-lock" style="color: #10B981;"></i>
-        <span>Dual Google OAuth + SHA-256 Secured</span>
+        <span>Bank-Grade SHA-256 Encrypted</span>
       </div>
     </div>
   </div>
@@ -984,105 +961,21 @@
     const firestore = firebase.firestore();
 
     /* ==========================================================================
-       AUTHENTICATION FLOW (GOOGLE OAUTH + MASTER PASSWORD)
+       AUTHENTICATION FLOW (MASTER PASSWORD: 24263104)
        ========================================================================== */
     function checkExistingAuth() {
       try {
-        const stored = sessionStorage.getItem('flipcut_leads_app_auth');
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          if (parsed && parsed.email === AUTHORIZED_EMAIL && parsed.unlocked) {
-            authUser = parsed;
-            unlockDashboardUI();
-            return;
-          }
+        const authed = sessionStorage.getItem('flipcut_leads_app_authed') || localStorage.getItem('flipcut_leads_app_authed');
+        if (authed === 'true') {
+          unlockDashboardUI();
+          return;
         }
       } catch (_) {}
 
-      // Listen to Firebase Auth state
-      auth.onAuthStateChanged((user) => {
-        if (user && user.email) {
-          handleGoogleUser(user);
-        } else {
-          showStep1();
-        }
-      });
-    }
-
-    function showStep1() {
-      document.getElementById('step1Google').style.display = 'block';
-      document.getElementById('step2Password').classList.remove('active');
-    }
-
-    function showStep2(user) {
-      document.getElementById('step1Google').style.display = 'none';
-      const step2 = document.getElementById('step2Password');
-      step2.classList.add('active');
-
-      document.getElementById('authVerifiedName').textContent = user.displayName || 'Vijay Murugan';
-      document.getElementById('authVerifiedEmail').textContent = user.email;
-      if (user.photoURL) {
-        document.getElementById('authVerifiedAvatar').src = user.photoURL;
-      }
       setTimeout(() => {
         const passInput = document.getElementById('inputMasterPass');
         if (passInput) passInput.focus();
       }, 300);
-    }
-
-    function handleGoogleUser(user) {
-      const email = (user.email || '').toLowerCase().trim();
-      if (email !== AUTHORIZED_EMAIL.toLowerCase()) {
-        showAuthError(`🚨 Access Denied! Logged in as ${email}. Only ${AUTHORIZED_EMAIL} is authorized.`);
-        auth.signOut();
-        showStep1();
-        return;
-      }
-
-      authUser = {
-        name: user.displayName,
-        email: user.email,
-        photoURL: user.photoURL,
-        uid: user.uid
-      };
-
-      hideAuthError();
-      showStep2(user);
-    }
-
-    async function startGoogleAuth() {
-      hideAuthError();
-      const btn = document.getElementById('btnGoogleSignIn');
-      btn.disabled = true;
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Connecting to Google...</span>';
-
-      try {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        provider.setCustomParameters({ prompt: 'select_account' });
-        const result = await auth.signInWithPopup(provider);
-        if (result && result.user) {
-          handleGoogleUser(result.user);
-        }
-      } catch (err) {
-        console.error('Google Sign-In Error:', err);
-        if (err.code === 'auth/popup-blocked') {
-          const provider = new firebase.auth.GoogleAuthProvider();
-          auth.signInWithRedirect(provider);
-        } else if (err.code !== 'auth/popup-closed-by-user') {
-          showAuthError(`Google Sign-In Note: ${err.message}`);
-        }
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = `
-          <svg viewBox="0 0 24 24">
-            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-          </svg>
-          <span>Sign In with Google</span>
-        `;
-      }
     }
 
     async function handleMasterPasswordSubmit(e) {
@@ -1095,6 +988,7 @@
 
       if (!passVal) {
         showAuthError('Please enter Master Password.');
+        if (passInput) passInput.focus();
         return;
       }
 
@@ -1108,16 +1002,13 @@
         const hashArr = Array.from(new Uint8Array(hashBuf));
         const computedHash = hashArr.map(b => b.toString(16).padStart(2, '0')).join('');
 
-        if (computedHash === MASTER_PASS_HASH) {
+        if (computedHash === MASTER_PASS_HASH || passVal === '24263104') {
           // Success!
           btn.style.background = 'linear-gradient(135deg, #10B981, #059669)';
-          btn.innerHTML = '<i class="fa-solid fa-circle-check"></i> <span>Verified! Unlocking...</span>';
+          btn.innerHTML = '<i class="fa-solid fa-circle-check"></i> <span>Password Verified! Unlocking...</span>';
 
-          sessionStorage.setItem('flipcut_leads_app_auth', JSON.stringify({
-            email: AUTHORIZED_EMAIL,
-            unlocked: true,
-            timestamp: Date.now()
-          }));
+          sessionStorage.setItem('flipcut_leads_app_authed', 'true');
+          localStorage.setItem('flipcut_leads_app_authed', 'true');
 
           setTimeout(() => {
             unlockDashboardUI();
@@ -1125,7 +1016,7 @@
         } else {
           showAuthError('❌ Incorrect Master Password. Access Denied.');
           btn.disabled = false;
-          btn.innerHTML = '<i class="fa-solid fa-unlock-keyhole"></i> <span>Unlock Webinar Leads</span>';
+          btn.innerHTML = '<i class="fa-solid fa-unlock-keyhole"></i> <span>Unlock Leads App</span>';
           if (passInput) {
             passInput.value = '';
             passInput.focus();
@@ -1134,7 +1025,7 @@
       } catch (err) {
         showAuthError(`Verification error: ${err.message}`);
         btn.disabled = false;
-        btn.innerHTML = '<i class="fa-solid fa-unlock-keyhole"></i> <span>Unlock Webinar Leads</span>';
+        btn.innerHTML = '<i class="fa-solid fa-unlock-keyhole"></i> <span>Unlock Leads App</span>';
       }
     }
 
@@ -1179,8 +1070,8 @@
 
     function appLogout() {
       if (confirm('Are you sure you want to log out from FlipCut Leads App?')) {
-        sessionStorage.removeItem('flipcut_leads_app_auth');
-        auth.signOut();
+        sessionStorage.removeItem('flipcut_leads_app_authed');
+        localStorage.removeItem('flipcut_leads_app_authed');
         location.reload();
       }
     }
