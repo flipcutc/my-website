@@ -26,8 +26,8 @@
   <style>
     :root {
       --bg-primary: #0B0F19;
-      --bg-card: rgba(17, 24, 39, 0.88);
-      --bg-card-hover: rgba(30, 41, 59, 0.95);
+      --bg-card: rgba(17, 24, 39, 0.92);
+      --bg-card-hover: rgba(30, 41, 59, 0.98);
       --border-subtle: rgba(255, 255, 255, 0.08);
       --border-accent: rgba(99, 102, 241, 0.35);
       --brand-indigo: #6366F1;
@@ -59,24 +59,24 @@
       min-height: -webkit-fill-available;
       overflow-x: hidden;
       padding-top: var(--safe-top);
-      padding-bottom: calc(var(--safe-bottom) + 20px);
+      padding-bottom: calc(var(--safe-bottom) + 24px);
       -webkit-font-smoothing: antialiased;
     }
 
     /* Ambient Background Glow */
     .ambient-glow {
       position: fixed;
-      top: -100px;
-      right: -100px;
-      width: 320px;
-      height: 320px;
-      background: radial-gradient(circle, rgba(99, 102, 241, 0.18) 0%, rgba(11, 15, 25, 0) 70%);
+      top: -120px;
+      right: -120px;
+      width: 360px;
+      height: 360px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.22) 0%, rgba(11, 15, 25, 0) 70%);
       pointer-events: none;
       z-index: 0;
     }
 
     /* ==========================================================================
-       AUTH LOCK SCREEN (GOOGLE LOGIN + MASTER PASSWORD)
+       AUTHENTICATION LOCK SCREEN (MASTER PASSWORD ONLY)
        ========================================================================== */
     .auth-screen {
       position: fixed;
@@ -101,7 +101,7 @@
       background: rgba(15, 23, 42, 0.95);
       border: 1.5px solid rgba(99, 102, 241, 0.35);
       border-radius: 24px;
-      padding: 32px 24px;
+      padding: 34px 24px;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 40px rgba(99, 102, 241, 0.2);
       text-align: center;
       backdrop-filter: blur(20px);
@@ -125,7 +125,7 @@
     }
 
     .auth-title {
-      font-size: 1.4rem;
+      font-size: 1.45rem;
       font-weight: 800;
       color: #FFF;
       letter-spacing: -0.5px;
@@ -152,82 +152,6 @@
       font-weight: 700;
       text-transform: uppercase;
       margin-bottom: 16px;
-    }
-
-    /* Google Sign-in Button */
-    .btn-google-auth {
-      width: 100%;
-      background: #FFFFFF;
-      color: #1F2937;
-      border: none;
-      padding: 13px 18px;
-      border-radius: 14px;
-      font-size: 0.95rem;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      cursor: pointer;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
-      transition: all 0.2s ease;
-      touch-action: manipulation;
-    }
-    .btn-google-auth:active {
-      transform: scale(0.98);
-      background: #F3F4F6;
-    }
-    .btn-google-auth svg {
-      width: 20px;
-      height: 20px;
-    }
-
-    /* Password Input Area */
-    .password-step-wrap {
-      display: none;
-      margin-top: 18px;
-      text-align: left;
-    }
-    .password-step-wrap.active {
-      display: block;
-      animation: fadeIn 0.3s ease;
-    }
-
-    .verified-user-chip {
-      background: rgba(16, 185, 129, 0.12);
-      border: 1px solid rgba(16, 185, 129, 0.35);
-      border-radius: 12px;
-      padding: 10px 12px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 16px;
-    }
-    .verified-user-avatar {
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 1.5px solid var(--brand-green);
-    }
-    .verified-user-text {
-      flex: 1;
-      overflow: hidden;
-    }
-    .verified-user-name {
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: #FFF;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .verified-user-email {
-      font-size: 0.74rem;
-      color: var(--brand-green-light);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
 
     .app-input {
@@ -297,6 +221,45 @@
       z-index: 1;
     }
 
+    /* Push Notification Prompt Banner */
+    .notif-permission-banner {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(16, 185, 129, 0.25));
+      border: 1.5px solid var(--brand-indigo);
+      border-radius: 16px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      box-shadow: 0 4px 20px rgba(99, 102, 241, 0.25);
+      animation: fadeIn 0.3s ease;
+    }
+    .notif-banner-text {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #FFF;
+      line-height: 1.35;
+    }
+    .notif-banner-btn {
+      background: #10B981;
+      color: #FFF;
+      border: none;
+      padding: 7px 12px;
+      border-radius: 9px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+    }
+    .notif-banner-btn:active {
+      transform: scale(0.95);
+    }
+
     /* Top App Bar */
     .app-topbar {
       display: flex;
@@ -304,7 +267,7 @@
       justify-content: space-between;
       padding: 10px 0 16px;
       border-bottom: 1px solid var(--border-subtle);
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
     .app-brand {
       display: flex;
@@ -312,19 +275,19 @@
       gap: 10px;
     }
     .app-brand-logo {
-      width: 40px;
-      height: 40px;
+      width: 42px;
+      height: 42px;
       border-radius: 12px;
       background: linear-gradient(135deg, #4F46E5, #06B6D4);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.2rem;
+      font-size: 1.25rem;
       color: #FFF;
       box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
     }
     .app-brand-title {
-      font-size: 1.15rem;
+      font-size: 1.18rem;
       font-weight: 900;
       color: #FFF;
       letter-spacing: -0.3px;
@@ -377,6 +340,45 @@
     .icon-btn.active {
       color: var(--brand-indigo-light);
       border-color: var(--brand-indigo);
+    }
+
+    /* ==========================================================================
+       BATCH SWITCHER TABS (SAME AS MAIN WEBSITE CMS)
+       ========================================================================== */
+    .batch-switcher-bar {
+      display: flex;
+      gap: 6px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1.5px solid rgba(99, 102, 241, 0.25);
+      border-radius: 16px;
+      padding: 5px;
+      margin-bottom: 14px;
+    }
+    .batch-tab {
+      flex: 1;
+      padding: 10px 8px;
+      border-radius: 12px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      touch-action: manipulation;
+    }
+    .batch-tab:active {
+      transform: scale(0.97);
+    }
+    .batch-tab.active {
+      background: linear-gradient(135deg, #4F46E5, #6366F1);
+      color: #FFF;
+      box-shadow: 0 4px 14px rgba(79, 70, 229, 0.4);
     }
 
     /* KPI Quick Stats Row */
@@ -537,11 +539,11 @@
       background: var(--bg-card-hover);
     }
     .lead-card.new-pulse {
-      animation: highlightGlow 2.5s ease-out;
+      animation: highlightGlow 2.8s ease-out;
       border-color: var(--brand-green);
     }
     @keyframes highlightGlow {
-      0% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.6); transform: scale(1.02); }
+      0% { box-shadow: 0 0 24px rgba(16, 185, 129, 0.7); transform: scale(1.02); }
       100% { box-shadow: none; transform: scale(1); }
     }
 
@@ -550,6 +552,7 @@
       align-items: flex-start;
       gap: 12px;
       margin-bottom: 12px;
+      cursor: pointer;
     }
     .lead-avatar {
       width: 44px;
@@ -651,11 +654,16 @@
       font-family: monospace;
       letter-spacing: 0.4px;
     }
+    .badge-batch {
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: #FBBF24;
+    }
 
     /* Card Action Buttons (Big Touch Targets) */
     .card-actions {
       display: grid;
-      grid-template-columns: 1.5fr 1fr 1fr;
+      grid-template-columns: 1.2fr 1.3fr 1fr;
       gap: 8px;
       border-top: 1px solid var(--border-subtle);
       padding-top: 12px;
@@ -664,7 +672,7 @@
       border: none;
       padding: 10px 8px;
       border-radius: 11px;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 700;
       display: flex;
       align-items: center;
@@ -678,6 +686,11 @@
     .btn-card:active {
       transform: scale(0.96);
     }
+    .btn-card-overview {
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.35);
+      color: var(--brand-indigo-light);
+    }
     .btn-card-wa {
       background: linear-gradient(135deg, #25D366, #128C7E);
       color: #FFF;
@@ -688,10 +701,138 @@
       border: 1px solid rgba(56, 189, 248, 0.35);
       color: #38BDF8;
     }
-    .btn-card-copy {
+
+    /* ==========================================================================
+       USER REGISTERED OVERVIEW MODAL / BOTTOM SHEET
+       ========================================================================== */
+    .overview-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.78);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 999999;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      transition: opacity 0.25s ease;
+    }
+    .overview-modal-backdrop.active {
+      display: flex;
+    }
+
+    .overview-sheet {
+      width: 100%;
+      max-width: 580px;
+      background: #0F172A;
+      border: 1.5px solid rgba(99, 102, 241, 0.4);
+      border-bottom: none;
+      border-radius: 26px 26px 0 0;
+      padding: 20px 20px calc(var(--safe-bottom) + 24px);
+      box-shadow: 0 -20px 50px rgba(0, 0, 0, 0.85);
+      max-height: 88vh;
+      display: flex;
+      flex-direction: column;
+      animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    .overview-handle {
+      width: 44px;
+      height: 4px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.2);
+      margin: 0 auto 16px;
+    }
+
+    .overview-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 12px;
+    }
+    .overview-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #FFF;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .close-sheet-btn {
       background: rgba(255, 255, 255, 0.08);
-      border: 1px solid var(--border-subtle);
+      border: none;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
       color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .close-sheet-btn:active {
+      transform: scale(0.9);
+    }
+
+    .overview-body {
+      overflow-y: auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding-right: 4px;
+    }
+
+    .overview-section-box {
+      background: rgba(17, 24, 39, 0.9);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 14px;
+    }
+    .overview-label {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .overview-val {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #FFF;
+    }
+
+    .overview-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .status-toggle-btn {
+      padding: 9px 12px;
+      border-radius: 10px;
+      border: none;
+      font-size: 0.78rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 8px;
+      width: 100%;
+      touch-action: manipulation;
     }
 
     /* Empty State */
@@ -712,18 +853,18 @@
       bottom: calc(var(--safe-bottom) + 24px);
       left: 50%;
       transform: translateX(-50%) translateY(120px);
-      background: rgba(15, 23, 42, 0.95);
+      background: rgba(15, 23, 42, 0.96);
       border: 1.5px solid var(--brand-indigo);
       color: #FFF;
       padding: 12px 20px;
       border-radius: 14px;
       font-size: 0.86rem;
       font-weight: 700;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.75);
       display: flex;
       align-items: center;
       gap: 10px;
-      z-index: 9999999;
+      z-index: 99999999;
       opacity: 0;
       pointer-events: none;
       transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -756,7 +897,7 @@
   <div class="ambient-glow"></div>
 
   <!-- ==========================================================================
-       AUTHENTICATION LOCK SCREEN (MASTER PASSWORD)
+       AUTHENTICATION LOCK SCREEN (MASTER PASSWORD: 24263104)
        ========================================================================== -->
   <div class="auth-screen" id="authScreen">
     <div class="auth-box">
@@ -806,6 +947,17 @@
        ========================================================================== -->
   <main class="app-main" id="appMain" style="display: none;">
 
+    <!-- Push Notification Permission Prompt Banner -->
+    <div class="notif-permission-banner" id="notifBanner" style="display: none;">
+      <div class="notif-banner-text">
+        <i class="fa-solid fa-bell" style="font-size: 1.2rem; color: #F59E0B;"></i>
+        <span>Enable Mobile Push Notifications for instant new lead alerts!</span>
+      </div>
+      <button type="button" class="notif-banner-btn" onclick="requestAppNotificationPermission()">
+        Enable Alert
+      </button>
+    </div>
+
     <!-- Top App Bar -->
     <header class="app-topbar">
       <div class="app-brand">
@@ -822,10 +974,10 @@
       </div>
 
       <div class="app-topbar-actions">
-        <button type="button" class="icon-btn" id="btnAudioToggle" onclick="toggleAudioChime()" title="Toggle Sound Chime">
+        <button type="button" class="icon-btn active" id="btnAudioToggle" onclick="toggleAudioChime()" title="Sound Chime">
           <i class="fa-solid fa-bell" id="audioIcon"></i>
         </button>
-        <button type="button" class="icon-btn" onclick="refreshLeadsManually()" title="Refresh Leads">
+        <button type="button" class="icon-btn" onclick="refreshLeadsManually()" title="Refresh">
           <i class="fa-solid fa-rotate" id="refreshIcon"></i>
         </button>
         <button type="button" class="icon-btn" onclick="appLogout()" title="Logout" style="color: #EF4444;">
@@ -833,6 +985,22 @@
         </button>
       </div>
     </header>
+
+    <!-- BATCH SWITCHER BAR (SAME AS WEBSITE CMS) -->
+    <section class="batch-switcher-bar">
+      <button type="button" class="batch-tab active" data-batch="active" onclick="setBatchFilter('active', this)">
+        <i class="fa-solid fa-fire"></i>
+        <span>Batch 2 (Active)</span>
+      </button>
+      <button type="button" class="batch-tab" data-batch="completed" onclick="setBatchFilter('completed', this)">
+        <i class="fa-solid fa-box-archive"></i>
+        <span>Batch 1 (Past)</span>
+      </button>
+      <button type="button" class="batch-tab" data-batch="all" onclick="setBatchFilter('all', this)">
+        <i class="fa-solid fa-layer-group"></i>
+        <span>All Batches</span>
+      </button>
+    </section>
 
     <!-- KPI Quick Stats Row -->
     <section class="kpi-grid">
@@ -842,7 +1010,7 @@
           <i class="fa-solid fa-users" style="color: #818CF8;"></i>
         </div>
         <div class="kpi-value" id="kpiTotalCount">0</div>
-        <div class="kpi-sub">● All Registrations</div>
+        <div class="kpi-sub" id="kpiSubBatch">Batch 2 Attendees</div>
       </div>
 
       <div class="kpi-card">
@@ -884,10 +1052,10 @@
       </div>
 
       <div class="filter-pills">
-        <button type="button" class="pill active" data-filter="all" onclick="setFilter('all', this)">All Leads</button>
-        <button type="button" class="pill" data-filter="paid" onclick="setFilter('paid', this)">✅ Paid Pass</button>
-        <button type="button" class="pill" data-filter="wa_joined" onclick="setFilter('wa_joined', this)">💬 WhatsApp Joined</button>
-        <button type="button" class="pill" data-filter="pending" onclick="setFilter('pending', this)">⏳ Pending UPI</button>
+        <button type="button" class="pill active" data-filter="all" onclick="setStatusFilter('all', this)">All Status</button>
+        <button type="button" class="pill" data-filter="paid" onclick="setStatusFilter('paid', this)">✅ Paid Pass</button>
+        <button type="button" class="pill" data-filter="wa_joined" onclick="setStatusFilter('wa_joined', this)">💬 WhatsApp Joined</button>
+        <button type="button" class="pill" data-filter="pending" onclick="setStatusFilter('pending', this)">⏳ Pending UPI</button>
       </div>
     </section>
 
@@ -908,6 +1076,29 @@
 
   </main>
 
+  <!-- ==========================================================================
+       USER REGISTERED OVERVIEW MODAL / BOTTOM SHEET (FULL DETAIL DRAWER)
+       ========================================================================== -->
+  <div class="overview-modal-backdrop" id="overviewModalBackdrop" onclick="handleBackdropClick(event)">
+    <div class="overview-sheet" id="overviewSheet">
+      <div class="overview-handle"></div>
+
+      <div class="overview-top-row">
+        <div class="overview-title">
+          <i class="fa-solid fa-address-card" style="color: #6366F1;"></i>
+          <span>Attendee Overview</span>
+        </div>
+        <button type="button" class="close-sheet-btn" onclick="closeLeadOverview()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="overview-body" id="overviewBodyContent">
+        <!-- Dynamically rendered -->
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification Box -->
   <div class="toast-msg" id="appToast">
     <i class="fa-solid fa-bolt" style="color: #10B981;"></i>
@@ -918,7 +1109,6 @@
        SCRIPTS: FIREBASE COMPAT + SUPABASE + LEADS LOGIC
        ========================================================================== -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -927,7 +1117,6 @@
     /* ==========================================================================
        CONFIG & SECURITY CONSTANTS
        ========================================================================== */
-    const AUTHORIZED_EMAIL = 'editorvijaymurugan@gmail.com';
     const MASTER_PASS_HASH = 'f8d66ff88098f80c86499f1f981e5831df1d2fc82a9c891701363aec8614d28f';
     const MASTER_PASS_SALT = 'flipcut_admin_vault_salt_2026_';
 
@@ -946,19 +1135,28 @@
 
     // State Variables
     let allLeads = [];
-    let currentFilter = 'all';
+    let currentBatchFilter = 'active'; // 'active' (Batch 2), 'completed' (Batch 1), 'all'
+    let currentStatusFilter = 'all';    // 'all', 'paid', 'wa_joined', 'pending'
     let searchQuery = '';
     let soundEnabled = true;
-    let authUser = null;
     let isAppUnlocked = false;
+    let activeOverviewLeadId = null;
 
     // Initialize Firebase
     if (!firebase.apps.length) {
       firebase.initializeApp(FIREBASE_CONFIG);
     }
-    const auth = firebase.auth();
     const rtdb = firebase.database();
     const firestore = firebase.firestore();
+
+    // Register Service Worker for Real-time Notifications & PWA
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').then((reg) => {
+        console.log('[FlipCut PWA SW Registered]', reg.scope);
+      }).catch((err) => {
+        console.warn('[SW Registration Note]', err);
+      });
+    }
 
     /* ==========================================================================
        AUTHENTICATION FLOW (MASTER PASSWORD: 24263104)
@@ -1012,7 +1210,7 @@
 
           setTimeout(() => {
             unlockDashboardUI();
-          }, 400);
+          }, 350);
         } else {
           showAuthError('❌ Incorrect Master Password. Access Denied.');
           btn.disabled = false;
@@ -1048,6 +1246,9 @@
       document.getElementById('authScreen').classList.add('hidden');
       document.getElementById('appMain').style.display = 'block';
 
+      // Check Push Notification Permission
+      checkNotificationPermission();
+
       // Load cached leads immediately for 0ms delay
       try {
         const cached = localStorage.getItem('flipcut_leads');
@@ -1077,6 +1278,70 @@
     }
 
     /* ==========================================================================
+       REAL-TIME PUSH NOTIFICATIONS
+       ========================================================================== */
+    function checkNotificationPermission() {
+      if (!('Notification' in window)) return;
+      if (Notification.permission === 'default') {
+        const banner = document.getElementById('notifBanner');
+        if (banner) banner.style.display = 'flex';
+      }
+    }
+
+    function requestAppNotificationPermission() {
+      if (!('Notification' in window)) {
+        alert('Push notifications are not supported on this browser.');
+        return;
+      }
+      Notification.requestPermission().then((permission) => {
+        const banner = document.getElementById('notifBanner');
+        if (banner) banner.style.display = 'none';
+        if (permission === 'granted') {
+          showToast('✅ Instant Real-time Alerts Enabled!');
+          playChime();
+          // Test Notification
+          sendDevicePushAlert({
+            name: 'Vijay Murugan',
+            id: 'FC-TEST',
+            phone: 'Active',
+            amount: '₹2',
+            batch: 'Batch 2'
+          }, true);
+        }
+      });
+    }
+
+    function sendDevicePushAlert(lead, isTest = false) {
+      if (!('Notification' in window) || Notification.permission !== 'granted') return;
+
+      const title = isTest ? '🔔 FlipCut Alerts Active!' : '⚡ New Webinar Attendee Registered!';
+      const body = isTest 
+        ? 'Realtime push alerts are now active on your device.'
+        : `${lead.name} (${lead.phone}) just registered for ${lead.batch}! [${lead.id}]`;
+
+      const options = {
+        body: body,
+        icon: 'apple-touch-icon.png',
+        badge: 'assets/favicon-16x16.png',
+        tag: lead.id,
+        renotify: true,
+        vibrate: [250, 100, 250]
+      };
+
+      try {
+        if (navigator.serviceWorker && navigator.serviceWorker.ready) {
+          navigator.serviceWorker.ready.then((reg) => {
+            reg.showNotification(title, options);
+          });
+        } else {
+          new Notification(title, options);
+        }
+      } catch (err) {
+        console.warn('[Push Notification Error]', err);
+      }
+    }
+
+    /* ==========================================================================
        DATA FETCH & REAL-TIME SYNCHRONIZER
        ========================================================================== */
     function formatRawLeads(rows) {
@@ -1091,10 +1356,16 @@
       }).map(r => {
         const isWaJoined = r.whatsappJoined === true || r.waGroupStatus === 'Joined' || (r.message && r.message.includes('WhatsApp Group Joined'));
         const isPaid = String(r.status || '').toLowerCase().includes('paid') || (r.paymentId && String(r.paymentId).startsWith('pay_'));
+        
+        // Exact Batch classification matching admin.html
+        const isPastDate = (r.created_at && r.created_at < '2026-09-12') || (r.date && r.date < '2026-09-12');
+        const defaultBatchName = isPastDate ? 'Batch 1 (Past Completed)' : 'Batch 2 - Sep/Oct 2026';
+        const batchName = r.batchName || r.batch || (r.message && r.message.match(/\[Batch:\s*([^\]]+)\]/i)?.[1]?.trim()) || defaultBatchName;
+
         return {
           id: r.id || r.userId,
           userId: r.userId || r.id,
-          name: r.name || 'Anonymous Client',
+          name: r.name || 'Anonymous Attendee',
           phone: r.phone || '',
           email: r.email || '',
           service: r.service || 'Webinar Registration',
@@ -1104,7 +1375,9 @@
           isPaid: isPaid,
           whatsappJoined: isWaJoined,
           waGroupStatus: isWaJoined ? 'Joined' : 'Not Joined',
-          batch: r.batchName || r.batch || 'Batch 2 - Sep/Oct 2026',
+          batch: batchName,
+          notes: r.message || r.notes || '',
+          paymentId: r.paymentId || (isPaid ? 'rzp_verified' : ''),
           created_at: r.created_at || r.date || new Date().toISOString()
         };
       }).sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
@@ -1142,54 +1415,69 @@
     }
 
     function initRealtimeSync() {
-      // 1. Firebase RTDB Listener
+      // 1. Firebase RTDB Listener (Instant WebSocket push)
       try {
         rtdb.ref('leads').limitToLast(10).on('child_added', (snap) => {
           const val = snap.val();
-          if (val) processIncomingLead(val);
+          if (val) processIncomingLead(val, 'Firebase Realtime');
+        });
+        rtdb.ref('leads').limitToLast(10).on('child_changed', (snap) => {
+          const val = snap.val();
+          if (val) processIncomingLead(val, 'Firebase Update');
         });
       } catch (_) {}
 
-      // 2. Cross-tab Broadcast Channel
+      // 2. Cross-tab Broadcast Channel (0ms Same-Device sync)
       try {
         if (typeof BroadcastChannel !== 'undefined') {
           const bc = new BroadcastChannel('flipcut_leads_channel');
           bc.onmessage = (msg) => {
             if (msg && msg.data && msg.data.lead) {
-              processIncomingLead(msg.data.lead);
+              processIncomingLead(msg.data.lead, 'Broadcast Channel');
             }
           };
         }
       } catch (_) {}
 
-      // 3. Heartbeat polling every 4 seconds (Guaranteed fallback)
+      // 3. Heartbeat polling every 3.5 seconds (Guaranteed fallback)
       setInterval(() => {
         fetch(`${SUPABASE_URL}/rest/v1/leads?id=neq.CMS_SITE_CONTENT_LIVE&order=created_at.desc&limit=8`, {
           headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` },
           cache: 'no-store'
         }).then(r => r.json()).then(rows => {
           if (Array.isArray(rows)) {
-            rows.forEach(r => processIncomingLead(r));
+            rows.forEach(r => processIncomingLead(r, 'Heartbeat'));
           }
         }).catch(() => {});
-      }, 4000);
+      }, 3500);
     }
 
-    function processIncomingLead(raw) {
+    function processIncomingLead(raw, source = 'Live') {
       if (!raw || !raw.id || raw.id.startsWith('CMS_') || raw.id.startsWith('VIS_')) return;
       const formatted = formatRawLeads([raw])[0];
       if (!formatted) return;
 
       const idx = allLeads.findIndex(l => l.id === formatted.id || l.userId === formatted.id);
       if (idx === -1) {
-        // Brand New Lead!
+        // BRAND NEW ATTENDEE!
         allLeads.unshift(formatted);
         renderLeadsList(formatted.id);
         updateKPIs();
+
+        // 1. Dual Device Vibration
+        if (navigator.vibrate) navigator.vibrate([250, 100, 250]);
+
+        // 2. Audible celebratory chime
         playChime();
-        showToast(`⚡ NEW LEAD: ${formatted.name} (${formatted.id})`);
+
+        // 3. Native Device Push Notification
+        sendDevicePushAlert(formatted);
+
+        // 4. In-App Toast
+        showToast(`⚡ NEW ATTENDEE: ${formatted.name} [${formatted.id}]`);
+        console.log(`[REALTIME APP ALERT] New registration:`, formatted.name, formatted.id);
       } else {
-        // Update existing lead status if changed
+        // Status update on existing lead (e.g. UPI Paid, WhatsApp Joined)
         const existing = allLeads[idx];
         if (existing.status !== formatted.status || existing.whatsappJoined !== formatted.whatsappJoined) {
           allLeads[idx] = { ...existing, ...formatted };
@@ -1200,22 +1488,35 @@
     }
 
     /* ==========================================================================
-       UI RENDERING & FILTERING
+       UI RENDERING & BATCH / STATUS FILTERING
        ========================================================================== */
     function renderLeadsList(highlightId = null) {
       const container = document.getElementById('leadsListContainer');
       const countEl = document.getElementById('visibleLeadsCount');
       if (!container) return;
 
-      // Filter leads
+      // 1. Batch Filtering (Exact match to admin.html logic)
       let filtered = allLeads.filter(l => {
-        if (currentFilter === 'paid') return l.isPaid;
-        if (currentFilter === 'wa_joined') return l.whatsappJoined;
-        if (currentFilter === 'pending') return !l.isPaid;
+        const lb = (l.batch || '').toLowerCase();
+        const isBatch1 = lb.includes('batch 1') || (l.created_at && l.created_at < '2026-09-12');
+
+        if (currentBatchFilter === 'active') {
+          return !isBatch1; // Shows current Active Batch 2
+        } else if (currentBatchFilter === 'completed') {
+          return isBatch1;  // Shows past Batch 1
+        }
+        return true; // 'all'
+      });
+
+      // 2. Status Filtering
+      filtered = filtered.filter(l => {
+        if (currentStatusFilter === 'paid') return l.isPaid;
+        if (currentStatusFilter === 'wa_joined') return l.whatsappJoined;
+        if (currentStatusFilter === 'pending') return !l.isPaid;
         return true;
       });
 
-      // Search query filter
+      // 3. Search Query Filter
       if (searchQuery) {
         const q = searchQuery.toLowerCase();
         filtered = filtered.filter(l =>
@@ -1227,7 +1528,8 @@
       }
 
       if (countEl) {
-        countEl.textContent = `Showing ${filtered.length} of ${allLeads.length} attendees`;
+        const batchLabel = currentBatchFilter === 'active' ? 'Batch 2' : (currentBatchFilter === 'completed' ? 'Batch 1' : 'All Batches');
+        countEl.textContent = `Showing ${filtered.length} attendees (${batchLabel})`;
       }
 
       if (filtered.length === 0) {
@@ -1235,7 +1537,7 @@
           <div class="empty-state">
             <div class="empty-icon"><i class="fa-solid fa-folder-open"></i></div>
             <h3 style="color: #FFF; font-size: 1.05rem; margin-bottom: 4px;">No attendees found</h3>
-            <p style="font-size: 0.8rem; color: #64748B;">Try changing your search or filter</p>
+            <p style="font-size: 0.8rem; color: #64748B;">Try selecting "All Batches" or resetting search</p>
           </div>
         `;
         return;
@@ -1256,7 +1558,7 @@
 
         return `
           <div class="lead-card ${isHighlight ? 'new-pulse' : ''}" id="card_${lead.id}">
-            <div class="card-top">
+            <div class="card-top" onclick="openLeadOverview('${lead.id}')">
               <div class="lead-avatar">${initials}</div>
               <div class="lead-info">
                 <div class="lead-name-row">
@@ -1276,6 +1578,9 @@
               <span class="badge badge-id">
                 <i class="fa-solid fa-ticket"></i> ${lead.id}
               </span>
+              <span class="badge badge-batch">
+                ${lead.batch.includes('Batch 1') ? 'Batch 1' : 'Batch 2'}
+              </span>
               <span class="badge ${lead.isPaid ? 'badge-paid' : 'badge-pending'}">
                 <i class="fa-solid ${lead.isPaid ? 'fa-circle-check' : 'fa-clock'}"></i>
                 ${lead.amount} ${lead.isPaid ? 'Paid' : 'Pending UPI'}
@@ -1288,6 +1593,11 @@
 
             <!-- 1-Click Action Buttons -->
             <div class="card-actions">
+              <button type="button" class="btn-card btn-card-overview" onclick="openLeadOverview('${lead.id}')">
+                <i class="fa-solid fa-circle-info"></i>
+                <span>Overview</span>
+              </button>
+
               <a href="${waUrl}" target="_blank" rel="noopener" class="btn-card btn-card-wa">
                 <i class="fa-brands fa-whatsapp" style="font-size: 1rem;"></i>
                 <span>Send Pass</span>
@@ -1297,11 +1607,6 @@
                 <i class="fa-solid fa-phone"></i>
                 <span>Call</span>
               </a>
-
-              <button type="button" class="btn-card btn-card-copy" onclick="copyLeadDetails('${lead.id}')">
-                <i class="fa-solid fa-copy"></i>
-                <span>Copy</span>
-              </button>
             </div>
           </div>
         `;
@@ -1309,10 +1614,19 @@
     }
 
     function updateKPIs() {
-      const total = allLeads.length;
-      const paid = allLeads.filter(l => l.isPaid).length;
-      const wa = allLeads.filter(l => l.whatsappJoined).length;
-      const revenue = allLeads.reduce((acc, l) => {
+      // Calculate KPIs respecting current Batch filter
+      const batchLeads = allLeads.filter(l => {
+        const lb = (l.batch || '').toLowerCase();
+        const isBatch1 = lb.includes('batch 1') || (l.created_at && l.created_at < '2026-09-12');
+        if (currentBatchFilter === 'active') return !isBatch1;
+        if (currentBatchFilter === 'completed') return isBatch1;
+        return true;
+      });
+
+      const total = batchLeads.length;
+      const paid = batchLeads.filter(l => l.isPaid).length;
+      const wa = batchLeads.filter(l => l.whatsappJoined).length;
+      const revenue = batchLeads.reduce((acc, l) => {
         if (l.isPaid) {
           const num = parseInt(String(l.amount).replace(/[^0-9]/g, '') || '2', 10);
           return acc + (isNaN(num) ? 2 : num);
@@ -1324,10 +1638,23 @@
       document.getElementById('kpiPaidCount').textContent = paid;
       document.getElementById('kpiWaJoinedCount').textContent = wa;
       document.getElementById('kpiTotalRevenue').textContent = '₹' + revenue.toLocaleString('en-IN');
+
+      const subLabel = document.getElementById('kpiSubBatch');
+      if (subLabel) {
+        subLabel.textContent = currentBatchFilter === 'active' ? 'Batch 2 Attendees' : (currentBatchFilter === 'completed' ? 'Batch 1 Attendees' : 'All Batches Combined');
+      }
     }
 
-    function setFilter(filterType, btn) {
-      currentFilter = filterType;
+    function setBatchFilter(batchType, btn) {
+      currentBatchFilter = batchType;
+      document.querySelectorAll('.batch-switcher-bar .batch-tab').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderLeadsList();
+      updateKPIs();
+    }
+
+    function setStatusFilter(filterType, btn) {
+      currentStatusFilter = filterType;
       document.querySelectorAll('.filter-pills .pill').forEach(p => p.classList.remove('active'));
       if (btn) btn.classList.add('active');
       renderLeadsList();
@@ -1346,22 +1673,219 @@
       handleSearch('');
     }
 
-    function copyLeadDetails(leadId) {
-      const lead = allLeads.find(l => l.id === leadId);
+    /* ==========================================================================
+       USER REGISTERED OVERVIEW MODAL (FULL ATTENDEE PROFILE)
+       ========================================================================== */
+    function openLeadOverview(id) {
+      const lead = allLeads.find(l => l.id === id || l.userId === id);
       if (!lead) return;
-      const text = `Attendee: ${lead.name}\nPhone: ${lead.phone}\nEmail: ${lead.email}\nTicket: ${lead.id}\nStatus: ${lead.status}`;
-      navigator.clipboard.writeText(text).then(() => {
-        showToast(`Copied ${lead.name}'s info!`);
+      activeOverviewLeadId = id;
+
+      const backdrop = document.getElementById('overviewModalBackdrop');
+      const content = document.getElementById('overviewBodyContent');
+      if (!backdrop || !content) return;
+
+      const cleanPhone = lead.phone.replace(/[^0-9]/g, '');
+      const waPhone = cleanPhone.length === 10 ? '91' + cleanPhone : cleanPhone;
+      const waMsg = encodeURIComponent(
+        `Hi ${lead.name},\n\nFlipCut Creation Webinar Ticket Pass (${lead.id}) confirm aagiyachu! 🎟️\n\n📅 Live Masterclass on 27th September at 10:00 AM\n💬 Official WhatsApp Group Link:\nhttps://chat.whatsapp.com/G5qE6l9P1jW8m3Zq2Y8Q7w\n\nSee you inside the live class!`
+      );
+      const waUrl = `https://wa.me/${waPhone}?text=${waMsg}`;
+      const initials = lead.name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() || 'FC';
+
+      content.innerHTML = `
+        <!-- Attendee Top Header -->
+        <div style="display: flex; align-items: center; gap: 14px; background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 18px; padding: 14px;">
+          <div style="width: 52px; height: 52px; border-radius: 16px; background: linear-gradient(135deg, #6366F1, #8B5CF6); color: #FFF; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; font-weight: 900; box-shadow: 0 4px 14px rgba(99,102,241,0.4);">
+            ${initials}
+          </div>
+          <div style="flex: 1; min-width: 0;">
+            <h3 style="font-size: 1.15rem; font-weight: 800; color: #FFF; margin-bottom: 2px;">${escapeHtml(lead.name)}</h3>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 0.78rem; color: #818CF8; font-family: monospace; font-weight: 700;">${lead.id}</span>
+              <button type="button" onclick="copyText('${lead.id}', 'Ticket ID')" style="background: none; border: none; color: #94A3B8; cursor: pointer; font-size: 0.75rem;">
+                <i class="fa-solid fa-copy"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cohort & Date Overview -->
+        <div class="overview-grid">
+          <div class="overview-section-box">
+            <div class="overview-label"><i class="fa-solid fa-graduation-cap"></i> Cohort / Batch</div>
+            <div class="overview-val" style="color: #FBBF24;">${escapeHtml(lead.batch)}</div>
+          </div>
+          <div class="overview-section-box">
+            <div class="overview-label"><i class="fa-solid fa-calendar-day"></i> Registered On</div>
+            <div class="overview-val">${lead.created_at ? lead.created_at.slice(0, 10) : 'Today'}</div>
+          </div>
+        </div>
+
+        <!-- Contact Overview -->
+        <div class="overview-section-box">
+          <div class="overview-label"><i class="fa-solid fa-address-book"></i> Contact Details</div>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+            <div style="font-size: 0.95rem; font-weight: 700; color: #FFF;">
+              <i class="fa-solid fa-phone" style="color: #38BDF8; font-size: 0.8rem; margin-right: 6px;"></i> ${escapeHtml(lead.phone || 'No phone')}
+            </div>
+            <div style="display: flex; gap: 6px;">
+              <a href="tel:${lead.phone}" style="background: rgba(56,189,248,0.2); border: 1px solid rgba(56,189,248,0.4); color: #38BDF8; padding: 6px 12px; border-radius: 8px; text-decoration: none; font-size: 0.75rem; font-weight: 700;">
+                <i class="fa-solid fa-phone"></i> Call
+              </a>
+              <button type="button" onclick="copyText('${lead.phone}', 'Phone number')" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); color: #FFF; padding: 6px 10px; border-radius: 8px; cursor: pointer;">
+                <i class="fa-solid fa-copy"></i>
+              </button>
+            </div>
+          </div>
+
+          ${lead.email ? `
+            <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 8px;">
+              <div style="font-size: 0.85rem; color: #CBD5E1;">
+                <i class="fa-solid fa-envelope" style="color: #F43F5E; font-size: 0.8rem; margin-right: 6px;"></i> ${escapeHtml(lead.email)}
+              </div>
+              <a href="mailto:${lead.email}" style="background: rgba(244,63,94,0.15); border: 1px solid rgba(244,63,94,0.3); color: #FB7185; padding: 5px 10px; border-radius: 8px; text-decoration: none; font-size: 0.72rem; font-weight: 700;">
+                Mail
+              </a>
+            </div>
+          ` : ''}
+        </div>
+
+        <!-- Payment & WhatsApp Status Controls -->
+        <div class="overview-grid">
+          <div class="overview-section-box">
+            <div class="overview-label"><i class="fa-solid fa-credit-card"></i> Payment Status</div>
+            <div class="overview-val" style="color: ${lead.isPaid ? '#34D399' : '#FBBF24'};">
+              ${lead.amount} ${lead.isPaid ? 'Paid & Verified' : 'Pending UPI'}
+            </div>
+            <button type="button" class="status-toggle-btn" onclick="toggleLeadPaymentStatus('${lead.id}')" style="background: ${lead.isPaid ? 'rgba(239,68,68,0.2); color:#F87171;' : 'linear-gradient(135deg, #10B981, #059669); color:#FFF;'}">
+              <i class="fa-solid ${lead.isPaid ? 'fa-rotate-left' : 'fa-circle-check'}"></i>
+              <span>${lead.isPaid ? 'Mark as Unpaid' : 'Mark as Paid'}</span>
+            </button>
+          </div>
+
+          <div class="overview-section-box">
+            <div class="overview-label"><i class="fa-brands fa-whatsapp"></i> WhatsApp Group</div>
+            <div class="overview-val" style="color: ${lead.whatsappJoined ? '#25D366' : '#94A3B8'};">
+              ${lead.whatsappJoined ? 'Joined Group' : 'Not Joined Yet'}
+            </div>
+            <button type="button" class="status-toggle-btn" onclick="toggleLeadWhatsAppStatus('${lead.id}')" style="background: ${lead.whatsappJoined ? 'rgba(148,163,184,0.2); color:#CBD5E1;' : 'linear-gradient(135deg, #25D366, #128C7E); color:#FFF;'}">
+              <i class="fa-brands fa-whatsapp"></i>
+              <span>${lead.whatsappJoined ? 'Mark as Not Joined' : 'Mark as Joined'}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Attendee Notes / Message -->
+        <div class="overview-section-box">
+          <div class="overview-label"><i class="fa-solid fa-comment-dots"></i> Submitted Notes / Details</div>
+          <div style="font-size: 0.84rem; color: #CBD5E1; line-height: 1.45; white-space: pre-wrap;">
+            ${escapeHtml(lead.notes || 'No extra notes submitted during registration.')}
+          </div>
+        </div>
+
+        <!-- 1-Click WhatsApp Direct Pass Dispatch -->
+        <a href="${waUrl}" target="_blank" rel="noopener" style="width: 100%; padding: 14px; border-radius: 14px; background: linear-gradient(135deg, #25D366, #128C7E); color: #FFF; text-decoration: none; font-weight: 800; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 18px rgba(37,211,102,0.4); touch-action: manipulation;">
+          <i class="fa-brands fa-whatsapp" style="font-size: 1.25rem;"></i>
+          <span>Dispatch Ticket Pass on WhatsApp</span>
+        </a>
+      `;
+
+      backdrop.classList.add('active');
+    }
+
+    function closeLeadOverview() {
+      const backdrop = document.getElementById('overviewModalBackdrop');
+      if (backdrop) backdrop.classList.remove('active');
+      activeOverviewLeadId = null;
+    }
+
+    function handleBackdropClick(e) {
+      if (e.target.id === 'overviewModalBackdrop') {
+        closeLeadOverview();
+      }
+    }
+
+    async function toggleLeadPaymentStatus(id) {
+      const lead = allLeads.find(l => l.id === id);
+      if (!lead) return;
+
+      const newIsPaid = !lead.isPaid;
+      const newStatus = newIsPaid ? 'Booked / Paid' : 'Pending Payment';
+      lead.isPaid = newIsPaid;
+      lead.status = newStatus;
+
+      // Update Supabase Cloud directly
+      try {
+        await fetch(`${SUPABASE_URL}/rest/v1/leads?id=eq.${encodeURIComponent(id)}`, {
+          method: 'PATCH',
+          headers: {
+            apikey: SUPABASE_KEY,
+            Authorization: `Bearer ${SUPABASE_KEY}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ status: newStatus })
+        });
+      } catch (_) {}
+
+      // Re-render
+      renderLeadsList();
+      updateKPIs();
+      openLeadOverview(id);
+      showToast(`Updated: Marked as ${newStatus}`);
+    }
+
+    async function toggleLeadWhatsAppStatus(id) {
+      const lead = allLeads.find(l => l.id === id);
+      if (!lead) return;
+
+      const newWa = !lead.whatsappJoined;
+      lead.whatsappJoined = newWa;
+      lead.waGroupStatus = newWa ? 'Joined' : 'Not Joined';
+
+      // Update Supabase Cloud directly
+      try {
+        await fetch(`${SUPABASE_URL}/rest/v1/leads?id=eq.${encodeURIComponent(id)}`, {
+          method: 'PATCH',
+          headers: {
+            apikey: SUPABASE_KEY,
+            Authorization: `Bearer ${SUPABASE_KEY}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ whatsappJoined: newWa, waGroupStatus: lead.waGroupStatus })
+        });
+      } catch (_) {}
+
+      // Re-render
+      renderLeadsList();
+      updateKPIs();
+      openLeadOverview(id);
+      showToast(`Updated WhatsApp Status: ${lead.waGroupStatus}`);
+    }
+
+    function copyText(str, label = 'Text') {
+      navigator.clipboard.writeText(str).then(() => {
+        showToast(`Copied ${label}!`);
       });
     }
 
     function exportLeadsCsv() {
-      if (!allLeads.length) {
-        showToast('No leads to export.');
+      // Export current filtered batch
+      const batchLeads = allLeads.filter(l => {
+        const lb = (l.batch || '').toLowerCase();
+        const isBatch1 = lb.includes('batch 1') || (l.created_at && l.created_at < '2026-09-12');
+        if (currentBatchFilter === 'active') return !isBatch1;
+        if (currentBatchFilter === 'completed') return isBatch1;
+        return true;
+      });
+
+      if (!batchLeads.length) {
+        showToast('No leads to export for this batch.');
         return;
       }
+
       let csv = 'ID,Name,Phone,Email,Amount,Status,WhatsAppJoined,Batch,CreatedAt\n';
-      allLeads.forEach(l => {
+      batchLeads.forEach(l => {
         csv += `"${l.id}","${l.name}","${l.phone}","${l.email}","${l.amount}","${l.status}","${l.whatsappJoined ? 'Yes' : 'No'}","${l.batch}","${l.created_at}"\n`;
       });
 
@@ -1369,7 +1893,7 @@
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.setAttribute('href', url);
-      link.setAttribute('download', `FlipCut_Webinar_Leads_${new Date().toISOString().slice(0, 10)}.csv`);
+      link.setAttribute('download', `FlipCut_Webinar_${currentBatchFilter.toUpperCase()}_${new Date().toISOString().slice(0, 10)}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -1407,13 +1931,13 @@
         const gain = ctx.createGain();
         osc.type = 'sine';
         osc.frequency.setValueAtTime(587.33, now); // D5
-        osc.frequency.exponentialRampToValueAtTime(880, now + 0.1); // A5
-        gain.gain.setValueAtTime(0.2, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+        osc.frequency.exponentialRampToValueAtTime(880, now + 0.12); // A5
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
         osc.connect(gain);
         gain.connect(ctx.destination);
         osc.start(now);
-        osc.stop(now + 0.45);
+        osc.stop(now + 0.5);
       } catch (_) {}
     }
 
@@ -1429,7 +1953,7 @@
       clearTimeout(toast._timer);
       toast._timer = setTimeout(() => {
         toast.classList.remove('show');
-      }, 3000);
+      }, 3200);
     }
 
     function formatTimeAgo(dateStr) {
