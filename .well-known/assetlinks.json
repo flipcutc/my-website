@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "in.flipcutcreation.leads",
+        "sha256_cert_fingerprints": ["30:BC:DC:F1:F8:9A:2B:32:B5:F7:4B:64:1A:8E:47:D5:A6:7C:47:FD:6D:7B:CE:E8:0D:E4:4F:08:41:40:24:3C"]
+      }
+    }]

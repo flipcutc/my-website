@@ -959,14 +959,19 @@
     </div>
 
     <!-- 1-Click Install Android APK Banner -->
-    <div class="notif-permission-banner" id="installBanner" style="display: none; background: linear-gradient(135deg, rgba(16, 185, 129, 0.22), rgba(6, 182, 212, 0.22)); border-color: #10B981;">
-      <div class="notif-banner-text">
+    <div class="notif-permission-banner" id="installBanner" style="display: flex; background: linear-gradient(135deg, rgba(16, 185, 129, 0.22), rgba(6, 182, 212, 0.22)); border-color: #10B981; flex-wrap: wrap; gap: 8px;">
+      <div class="notif-banner-text" style="flex: 1 1 200px;">
         <i class="fa-brands fa-android" style="font-size: 1.35rem; color: #10B981;"></i>
-        <span>Install FlipCut Leads App directly on Android!</span>
+        <span>Android App: Install or Download APK directly!</span>
       </div>
-      <button type="button" class="notif-banner-btn" onclick="triggerInstallApp()" style="background: linear-gradient(135deg, #10B981, #059669);">
-        <i class="fa-solid fa-download"></i> Install App
-      </button>
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <button type="button" class="notif-banner-btn" onclick="triggerInstallApp()" style="background: linear-gradient(135deg, #10B981, #059669);">
+          <i class="fa-solid fa-download"></i> 1-Click Install
+        </button>
+        <a href="/FlipCut-Leads.apk" download="FlipCut-Leads.apk" class="notif-banner-btn" style="background: rgba(255,255,255,0.12); color: #fff; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; border: 1px solid rgba(255,255,255,0.2);">
+          <i class="fa-solid fa-file-arrow-down"></i> .APK File
+        </a>
+      </div>
     </div>
 
     <!-- Top App Bar -->

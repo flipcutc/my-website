@@ -4,10 +4,14 @@
     "ignore": [
       "firebase.json",
       ".firebaserc",
-      "**/.*",
+      ".git/**",
+      ".github/**",
       ".firebase/**",
       "**/node_modules/**",
       "backups/**",
+      "flipcut-apk-dist/**",
+      "flipcut-apk-signed-dist/**",
+      "*.zip",
       "server.js",
       "db.js",
       "gdrive.js",
@@ -129,6 +133,36 @@
             "value": "0"
           }
         ]
+      },
+      {
+        "source": "**/*.@(apk)",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "application/vnd.android.package-archive"
+          },
+          {
+            "key": "Content-Disposition",
+            "value": "attachment; filename=\"FlipCut-Leads.apk\""
+          },
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          }
+        ]
+      },
+      {
+        "source": "/.well-known/assetlinks.json",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          }
+        ]
       }
     ],
     "rewrites": [
@@ -143,6 +177,10 @@
       {
         "source": "/app",
         "destination": "/leads.html"
+      },
+      {
+        "source": "/download-apk",
+        "destination": "/FlipCut-Leads.apk"
       }
     ]
   }

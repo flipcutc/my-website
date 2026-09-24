@@ -25,3 +25,8 @@ Thumbs.db
 *.log
 .vscode/
 .idea/
+
+# APK build temp archives
+flipcut-apk-dist/
+flipcut-apk-signed-dist/
+*.zip
