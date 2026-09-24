@@ -1292,13 +1292,13 @@
         </p>
 
         <div style="background: #FFF; padding: 10px; border-radius: 12px; display: inline-block; box-shadow: 0 4px 15px rgba(0,0,0,0.4);">
-          <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=otpauth%3A%2F%2Ftotp%2FFlipCut%2520Creation%3AAdmin%3Fsecret%3DJBSWY3DPEHPK3PXPFLIPCUT2026ADMIN%26issuer%3DFlipCut%2520Creation%26algorithm%3DSHA1%26digits%3D6%26period%3D30" alt="Google Authenticator QR Code" width="180" height="180" style="display: block; border-radius: 4px;">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=otpauth%3A%2F%2Ftotp%2FFlipCut%3Aadmin%3Fsecret%3DJBSWY3DPEHPK3PXPFLIPCUTADMINKEY2%26issuer%3DFlipCut" alt="Google Authenticator QR Code" width="180" height="180" style="display: block; border-radius: 4px;">
         </div>
 
         <div style="margin-top: 14px;">
           <span style="font-size: 0.76rem; color: #94A3B8; display: block; margin-bottom: 4px;">Or enter this Secret Key manually:</span>
           <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
-            <code style="background: #000; color: #38BDF8; padding: 6px 12px; border-radius: 6px; font-size: 0.86rem; letter-spacing: 0.08em; font-weight: 700; user-select: all;">JBSWY3DPEHPK3PXPFLIPCUT2026ADMIN</code>
+            <code style="background: #000; color: #38BDF8; padding: 6px 12px; border-radius: 6px; font-size: 0.86rem; letter-spacing: 0.08em; font-weight: 700; user-select: all;">JBSWY3DPEHPK3PXPFLIPCUTADMINKEY2</code>
             <button type="button" class="btn btn-secondary" onclick="window.copyVaultKey()" style="padding: 6px 10px; font-size: 0.76rem;">
               <i class="fa-solid fa-copy"></i>
             </button>
@@ -11609,7 +11609,7 @@ ${waGroup}
        ========================================================================== */
     const VAULT_SALT = 'flipcut_admin_vault_salt_2026_';
     const VAULT_PASSWORD_HASH = 'f8d66ff88098f80c86499f1f981e5831df1d2fc82a9c891701363aec8614d28f';
-    const VAULT_TOTP_SECRET = 'JBSWY3DPEHPK3PXPFLIPCUT2026ADMIN';
+    const VAULT_TOTP_SECRET = 'JBSWY3DPEHPK3PXPFLIPCUTADMINKEY2';
     const VAULT_SESSION_KEY = 'flipcut_vault_auth_session';
     const VAULT_LOCKOUT_KEY = 'flipcut_vault_lockout_until';
     const VAULT_ATTEMPTS_KEY = 'flipcut_vault_failed_attempts';
