@@ -1,0 +1,1575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>FlipCut Leads | Webinar Admin</title>
+
+  <!-- PWA & Mobile Meta Tags -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0B0F19">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="FlipCut Leads">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+  <link rel="shortcut icon" href="favicon.ico">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- FontAwesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    :root {
+      --bg-primary: #0B0F19;
+      --bg-card: rgba(17, 24, 39, 0.88);
+      --bg-card-hover: rgba(30, 41, 59, 0.95);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-accent: rgba(99, 102, 241, 0.35);
+      --brand-indigo: #6366F1;
+      --brand-indigo-light: #818CF8;
+      --brand-green: #10B981;
+      --brand-green-light: #34D399;
+      --brand-amber: #F59E0B;
+      --brand-red: #EF4444;
+      --brand-cyan: #38BDF8;
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+      --text-dim: #64748B;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      min-height: 100vh;
+      min-height: -webkit-fill-available;
+      overflow-x: hidden;
+      padding-top: var(--safe-top);
+      padding-bottom: calc(var(--safe-bottom) + 20px);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Ambient Background Glow */
+    .ambient-glow {
+      position: fixed;
+      top: -100px;
+      right: -100px;
+      width: 320px;
+      height: 320px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.18) 0%, rgba(11, 15, 25, 0) 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ==========================================================================
+       AUTH LOCK SCREEN (GOOGLE LOGIN + MASTER PASSWORD)
+       ========================================================================== */
+    .auth-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 999999;
+      background: radial-gradient(circle at 50% 15%, #131A2E 0%, #070A12 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      padding-top: calc(var(--safe-top) + 24px);
+      padding-bottom: calc(var(--safe-bottom) + 24px);
+    }
+    .auth-screen.hidden {
+      display: none !important;
+    }
+
+    .auth-box {
+      width: 100%;
+      max-width: 420px;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1.5px solid rgba(99, 102, 241, 0.35);
+      border-radius: 24px;
+      padding: 32px 24px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 40px rgba(99, 102, 241, 0.2);
+      text-align: center;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      position: relative;
+    }
+
+    .auth-logo-badge {
+      width: 68px;
+      height: 68px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(16, 185, 129, 0.2));
+      border: 1.5px solid rgba(99, 102, 241, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.9rem;
+      color: #FFF;
+      margin: 0 auto 16px;
+      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.35);
+    }
+
+    .auth-title {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #FFF;
+      letter-spacing: -0.5px;
+      margin-bottom: 4px;
+    }
+
+    .auth-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      line-height: 1.45;
+    }
+
+    .auth-step-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.4);
+      color: var(--brand-indigo-light);
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    /* Google Sign-in Button */
+    .btn-google-auth {
+      width: 100%;
+      background: #FFFFFF;
+      color: #1F2937;
+      border: none;
+      padding: 13px 18px;
+      border-radius: 14px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+      transition: all 0.2s ease;
+      touch-action: manipulation;
+    }
+    .btn-google-auth:active {
+      transform: scale(0.98);
+      background: #F3F4F6;
+    }
+    .btn-google-auth svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* Password Input Area */
+    .password-step-wrap {
+      display: none;
+      margin-top: 18px;
+      text-align: left;
+    }
+    .password-step-wrap.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .verified-user-chip {
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      border-radius: 12px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .verified-user-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1.5px solid var(--brand-green);
+    }
+    .verified-user-text {
+      flex: 1;
+      overflow: hidden;
+    }
+    .verified-user-name {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #FFF;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .verified-user-email {
+      font-size: 0.74rem;
+      color: var(--brand-green-light);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .app-input {
+      width: 100%;
+      background: rgba(7, 11, 20, 0.95);
+      border: 1.5px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 13px 16px;
+      font-size: 1rem;
+      color: #FFF;
+      outline: none;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+    .app-input:focus {
+      border-color: var(--brand-indigo);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+    }
+
+    .btn-unlock {
+      width: 100%;
+      margin-top: 14px;
+      background: linear-gradient(135deg, #4F46E5, #6366F1);
+      border: none;
+      padding: 13px 18px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #FFF;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 18px rgba(99, 102, 241, 0.45);
+      transition: all 0.2s ease;
+      touch-action: manipulation;
+    }
+    .btn-unlock:active {
+      transform: scale(0.98);
+    }
+
+    .auth-error-notice {
+      display: none;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #F87171;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-top: 14px;
+      text-align: left;
+      line-height: 1.4;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ==========================================================================
+       APP MAIN WRAPPER (MOBILE-FIRST)
+       ========================================================================== */
+    .app-main {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 14px 16px 80px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Top App Bar */
+    .app-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 16px;
+    }
+    .app-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .app-brand-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #4F46E5, #06B6D4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: #FFF;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
+    }
+    .app-brand-title {
+      font-size: 1.15rem;
+      font-weight: 900;
+      color: #FFF;
+      letter-spacing: -0.3px;
+    }
+    .app-brand-tag {
+      font-size: 0.7rem;
+      color: var(--brand-green-light);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-weight: 600;
+    }
+    .live-pulse {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--brand-green);
+      animation: pulse 1.8s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.3); }
+    }
+
+    .app-topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .icon-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 11px;
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      touch-action: manipulation;
+    }
+    .icon-btn:active {
+      transform: scale(0.92);
+      color: #FFF;
+      background: rgba(99, 102, 241, 0.2);
+    }
+    .icon-btn.active {
+      color: var(--brand-indigo-light);
+      border-color: var(--brand-indigo);
+    }
+
+    /* KPI Quick Stats Row */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    @media (min-width: 480px) {
+      .kpi-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 14px 14px;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+    .kpi-label {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    .kpi-value {
+      font-size: 1.45rem;
+      font-weight: 900;
+      color: #FFF;
+      line-height: 1.1;
+    }
+    .kpi-sub {
+      font-size: 0.68rem;
+      color: var(--brand-green-light);
+      margin-top: 4px;
+      font-weight: 600;
+    }
+
+    /* Search & Filter Controls */
+    .search-wrap {
+      position: relative;
+      margin-bottom: 12px;
+    }
+    .search-input {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 12px 14px 12px 42px;
+      font-size: 0.92rem;
+      color: #FFF;
+      outline: none;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+    .search-input:focus {
+      border-color: var(--brand-indigo);
+      background: rgba(15, 23, 42, 1);
+    }
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-dim);
+      font-size: 0.95rem;
+      pointer-events: none;
+    }
+    .clear-search-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      font-size: 0.9rem;
+      padding: 4px;
+      display: none;
+    }
+
+    /* Filter Pills */
+    .filter-pills {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      margin-bottom: 14px;
+    }
+    .filter-pills::-webkit-scrollbar {
+      display: none;
+    }
+    .pill {
+      white-space: nowrap;
+      padding: 8px 14px;
+      border-radius: 9999px;
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      touch-action: manipulation;
+    }
+    .pill:active {
+      transform: scale(0.95);
+    }
+    .pill.active {
+      background: var(--brand-indigo);
+      border-color: var(--brand-indigo);
+      color: #FFF;
+      box-shadow: 0 2px 10px rgba(99, 102, 241, 0.4);
+    }
+
+    /* Leads Feed & Cards */
+    .leads-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding: 0 4px;
+    }
+    .leads-count-text {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+    .leads-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* Mobile Lead Card */
+    .lead-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 18px;
+      padding: 16px;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      transition: transform 0.15s ease, border-color 0.15s ease;
+      position: relative;
+    }
+    .lead-card:active {
+      background: var(--bg-card-hover);
+    }
+    .lead-card.new-pulse {
+      animation: highlightGlow 2.5s ease-out;
+      border-color: var(--brand-green);
+    }
+    @keyframes highlightGlow {
+      0% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.6); transform: scale(1.02); }
+      100% { box-shadow: none; transform: scale(1); }
+    }
+
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .lead-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #6366F1, #8B5CF6);
+      color: #FFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.15rem;
+      font-weight: 900;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+    .lead-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .lead-name-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 2px;
+    }
+    .lead-name {
+      font-size: 1.02rem;
+      font-weight: 800;
+      color: #FFF;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .lead-time {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+    .lead-phone {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+    .lead-email {
+      font-size: 0.76rem;
+      color: var(--text-dim);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: block;
+    }
+
+    /* Badges Row */
+    .badges-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: 7px;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+    .badge-paid {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #34D399;
+    }
+    .badge-pending {
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      color: #FBBF24;
+    }
+    .badge-wa-joined {
+      background: rgba(37, 211, 102, 0.15);
+      border: 1px solid rgba(37, 211, 102, 0.35);
+      color: #25D366;
+    }
+    .badge-wa-pending {
+      background: rgba(148, 163, 184, 0.12);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      color: #94A3B8;
+    }
+    .badge-id {
+      background: rgba(99, 102, 241, 0.12);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      color: var(--brand-indigo-light);
+      font-family: monospace;
+      letter-spacing: 0.4px;
+    }
+
+    /* Card Action Buttons (Big Touch Targets) */
+    .card-actions {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr;
+      gap: 8px;
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 12px;
+    }
+    .btn-card {
+      border: none;
+      padding: 10px 8px;
+      border-radius: 11px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.15s ease;
+      touch-action: manipulation;
+    }
+    .btn-card:active {
+      transform: scale(0.96);
+    }
+    .btn-card-wa {
+      background: linear-gradient(135deg, #25D366, #128C7E);
+      color: #FFF;
+      box-shadow: 0 3px 12px rgba(37, 211, 102, 0.3);
+    }
+    .btn-card-call {
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      color: #38BDF8;
+    }
+    .btn-card-copy {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 48px 20px;
+      color: var(--text-dim);
+    }
+    .empty-icon {
+      font-size: 3rem;
+      margin-bottom: 12px;
+      opacity: 0.5;
+    }
+
+    /* Toast Notification */
+    .toast-msg {
+      position: fixed;
+      bottom: calc(var(--safe-bottom) + 24px);
+      left: 50%;
+      transform: translateX(-50%) translateY(120px);
+      background: rgba(15, 23, 42, 0.95);
+      border: 1.5px solid var(--brand-indigo);
+      color: #FFF;
+      padding: 12px 20px;
+      border-radius: 14px;
+      font-size: 0.86rem;
+      font-weight: 700;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 9999999;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      max-width: 90%;
+    }
+    .toast-msg.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Loading Spinner */
+    .spinner-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 0;
+      color: var(--brand-indigo-light);
+      font-size: 1.8rem;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="ambient-glow"></div>
+
+  <!-- ==========================================================================
+       AUTHENTICATION LOCK SCREEN (GOOGLE LOGIN + MASTER PASSWORD)
+       ========================================================================== -->
+  <div class="auth-screen" id="authScreen">
+    <div class="auth-box">
+      <div class="auth-logo-badge">
+        <i class="fa-solid fa-bolt"></i>
+      </div>
+
+      <div class="auth-step-pill">
+        <i class="fa-solid fa-shield-halved"></i>
+        <span>FlipCut Master Admin</span>
+      </div>
+
+      <h1 class="auth-title">Webinar Leads App</h1>
+      <p class="auth-subtitle">
+        Private mobile dashboard for <strong>editorvijaymurugan@gmail.com</strong>
+      </p>
+
+      <!-- STEP 1: GOOGLE SIGN-IN -->
+      <div id="step1Google">
+        <button type="button" class="btn-google-auth" id="btnGoogleSignIn" onclick="startGoogleAuth()">
+          <svg viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+          </svg>
+          <span>Sign In with Google</span>
+        </button>
+      </div>
+
+      <!-- STEP 2: MASTER PASSWORD -->
+      <div class="password-step-wrap" id="step2Password">
+        <div class="verified-user-chip">
+          <img src="assets/favicon-16x16.png" id="authVerifiedAvatar" class="verified-user-avatar" alt="Avatar">
+          <div class="verified-user-text">
+            <div class="verified-user-name" id="authVerifiedName">Admin User</div>
+            <div class="verified-user-email" id="authVerifiedEmail">editorvijaymurugan@gmail.com</div>
+          </div>
+          <i class="fa-solid fa-circle-check" style="color: #10B981; font-size: 1.1rem;"></i>
+        </div>
+
+        <form onsubmit="handleMasterPasswordSubmit(event)">
+          <label style="display: block; font-size: 0.78rem; font-weight: 700; color: #CBD5E1; margin-bottom: 6px;">
+            <i class="fa-solid fa-key" style="color: #F59E0B; margin-right: 4px;"></i> Master Password:
+          </label>
+          <input type="password" id="inputMasterPass" class="app-input" placeholder="Enter Master Password" required autocomplete="current-password" autofocus>
+
+          <button type="submit" class="btn-unlock" id="btnUnlockApp">
+            <i class="fa-solid fa-unlock-keyhole"></i>
+            <span>Unlock Webinar Leads</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Error / Notice Box -->
+      <div class="auth-error-notice" id="authErrorNotice">
+        <i class="fa-solid fa-triangle-exclamation" style="font-size: 1rem; flex-shrink: 0;"></i>
+        <span id="authErrorMsg">Access Denied</span>
+      </div>
+
+      <div style="margin-top: 22px; font-size: 0.74rem; color: #64748B; display: flex; align-items: center; justify-content: center; gap: 6px;">
+        <i class="fa-solid fa-lock" style="color: #10B981;"></i>
+        <span>Dual Google OAuth + SHA-256 Secured</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MAIN MOBILE DASHBOARD VIEW
+       ========================================================================== -->
+  <main class="app-main" id="appMain" style="display: none;">
+
+    <!-- Top App Bar -->
+    <header class="app-topbar">
+      <div class="app-brand">
+        <div class="app-brand-logo">
+          <i class="fa-solid fa-video"></i>
+        </div>
+        <div>
+          <h1 class="app-brand-title">FlipCut Leads</h1>
+          <div class="app-brand-tag">
+            <span class="live-pulse"></span>
+            <span id="liveStatusText">Live Cloud Sync</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="app-topbar-actions">
+        <button type="button" class="icon-btn" id="btnAudioToggle" onclick="toggleAudioChime()" title="Toggle Sound Chime">
+          <i class="fa-solid fa-bell" id="audioIcon"></i>
+        </button>
+        <button type="button" class="icon-btn" onclick="refreshLeadsManually()" title="Refresh Leads">
+          <i class="fa-solid fa-rotate" id="refreshIcon"></i>
+        </button>
+        <button type="button" class="icon-btn" onclick="appLogout()" title="Logout" style="color: #EF4444;">
+          <i class="fa-solid fa-right-from-bracket"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- KPI Quick Stats Row -->
+    <section class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">
+          <span>Total Leads</span>
+          <i class="fa-solid fa-users" style="color: #818CF8;"></i>
+        </div>
+        <div class="kpi-value" id="kpiTotalCount">0</div>
+        <div class="kpi-sub">● All Registrations</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-label">
+          <span>Confirmed</span>
+          <i class="fa-solid fa-circle-check" style="color: #10B981;"></i>
+        </div>
+        <div class="kpi-value" id="kpiPaidCount" style="color: #34D399;">0</div>
+        <div class="kpi-sub">Pass Issued</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-label">
+          <span>WA Group</span>
+          <i class="fa-brands fa-whatsapp" style="color: #25D366;"></i>
+        </div>
+        <div class="kpi-value" id="kpiWaJoinedCount" style="color: #25D366;">0</div>
+        <div class="kpi-sub">Joined VIP Group</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-label">
+          <span>Revenue</span>
+          <i class="fa-solid fa-indian-rupee-sign" style="color: #F59E0B;"></i>
+        </div>
+        <div class="kpi-value" id="kpiTotalRevenue" style="color: #FBBF24;">₹0</div>
+        <div class="kpi-sub">Webinar Sales</div>
+      </div>
+    </section>
+
+    <!-- Search & Filter Controls -->
+    <section>
+      <div class="search-wrap">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input type="text" class="search-input" id="leadSearchInput" placeholder="Search name, phone, ticket ID..." oninput="handleSearch(this.value)">
+        <button type="button" class="clear-search-btn" id="btnClearSearch" onclick="clearSearch()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="filter-pills">
+        <button type="button" class="pill active" data-filter="all" onclick="setFilter('all', this)">All Leads</button>
+        <button type="button" class="pill" data-filter="paid" onclick="setFilter('paid', this)">✅ Paid Pass</button>
+        <button type="button" class="pill" data-filter="wa_joined" onclick="setFilter('wa_joined', this)">💬 WhatsApp Joined</button>
+        <button type="button" class="pill" data-filter="pending" onclick="setFilter('pending', this)">⏳ Pending UPI</button>
+      </div>
+    </section>
+
+    <!-- Leads List Header -->
+    <div class="leads-header-row">
+      <span class="leads-count-text" id="visibleLeadsCount">Showing 0 webinar attendees</span>
+      <button type="button" onclick="exportLeadsCsv()" style="background: none; border: none; color: #818CF8; font-size: 0.78rem; font-weight: 700; cursor: pointer;">
+        <i class="fa-solid fa-download"></i> Export CSV
+      </button>
+    </div>
+
+    <!-- Leads Card Feed -->
+    <div class="leads-list" id="leadsListContainer">
+      <div class="spinner-wrap">
+        <i class="fa-solid fa-spinner fa-spin"></i>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Toast Notification Box -->
+  <div class="toast-msg" id="appToast">
+    <i class="fa-solid fa-bolt" style="color: #10B981;"></i>
+    <span id="appToastText">Syncing...</span>
+  </div>
+
+  <!-- ==========================================================================
+       SCRIPTS: FIREBASE COMPAT + SUPABASE + LEADS LOGIC
+       ========================================================================== -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    /* ==========================================================================
+       CONFIG & SECURITY CONSTANTS
+       ========================================================================== */
+    const AUTHORIZED_EMAIL = 'editorvijaymurugan@gmail.com';
+    const MASTER_PASS_HASH = 'f8d66ff88098f80c86499f1f981e5831df1d2fc82a9c891701363aec8614d28f';
+    const MASTER_PASS_SALT = 'flipcut_admin_vault_salt_2026_';
+
+    const FIREBASE_CONFIG = {
+      apiKey: "AIzaSyDPJoYyUt4opENdFjlIQrX2S4j8xxb_rIg",
+      authDomain: "flipcut-website.firebaseapp.com",
+      databaseURL: "https://flipcut-website-default-rtdb.firebaseio.com",
+      projectId: "flipcut-website",
+      storageBucket: "flipcut-website.firebasestorage.app",
+      messagingSenderId: "284282950565",
+      appId: "1:284282950565:web:aa70c74635eb80e3868e4c"
+    };
+
+    const SUPABASE_URL = 'https://cznixvdphwbjdnnmapvb.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6bml4dmRwaHdiamRubm1hcHZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTgwMTgsImV4cCI6MjEwMzEzNDAxOH0.dTLN1DCbUiBawZq8YlS5Bol-i81JFKhKpPKCboyocuQ';
+
+    // State Variables
+    let allLeads = [];
+    let currentFilter = 'all';
+    let searchQuery = '';
+    let soundEnabled = true;
+    let authUser = null;
+    let isAppUnlocked = false;
+
+    // Initialize Firebase
+    if (!firebase.apps.length) {
+      firebase.initializeApp(FIREBASE_CONFIG);
+    }
+    const auth = firebase.auth();
+    const rtdb = firebase.database();
+    const firestore = firebase.firestore();
+
+    /* ==========================================================================
+       AUTHENTICATION FLOW (GOOGLE OAUTH + MASTER PASSWORD)
+       ========================================================================== */
+    function checkExistingAuth() {
+      try {
+        const stored = sessionStorage.getItem('flipcut_leads_app_auth');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (parsed && parsed.email === AUTHORIZED_EMAIL && parsed.unlocked) {
+            authUser = parsed;
+            unlockDashboardUI();
+            return;
+          }
+        }
+      } catch (_) {}
+
+      // Listen to Firebase Auth state
+      auth.onAuthStateChanged((user) => {
+        if (user && user.email) {
+          handleGoogleUser(user);
+        } else {
+          showStep1();
+        }
+      });
+    }
+
+    function showStep1() {
+      document.getElementById('step1Google').style.display = 'block';
+      document.getElementById('step2Password').classList.remove('active');
+    }
+
+    function showStep2(user) {
+      document.getElementById('step1Google').style.display = 'none';
+      const step2 = document.getElementById('step2Password');
+      step2.classList.add('active');
+
+      document.getElementById('authVerifiedName').textContent = user.displayName || 'Vijay Murugan';
+      document.getElementById('authVerifiedEmail').textContent = user.email;
+      if (user.photoURL) {
+        document.getElementById('authVerifiedAvatar').src = user.photoURL;
+      }
+      setTimeout(() => {
+        const passInput = document.getElementById('inputMasterPass');
+        if (passInput) passInput.focus();
+      }, 300);
+    }
+
+    function handleGoogleUser(user) {
+      const email = (user.email || '').toLowerCase().trim();
+      if (email !== AUTHORIZED_EMAIL.toLowerCase()) {
+        showAuthError(`🚨 Access Denied! Logged in as ${email}. Only ${AUTHORIZED_EMAIL} is authorized.`);
+        auth.signOut();
+        showStep1();
+        return;
+      }
+
+      authUser = {
+        name: user.displayName,
+        email: user.email,
+        photoURL: user.photoURL,
+        uid: user.uid
+      };
+
+      hideAuthError();
+      showStep2(user);
+    }
+
+    async function startGoogleAuth() {
+      hideAuthError();
+      const btn = document.getElementById('btnGoogleSignIn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Connecting to Google...</span>';
+
+      try {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: 'select_account' });
+        const result = await auth.signInWithPopup(provider);
+        if (result && result.user) {
+          handleGoogleUser(result.user);
+        }
+      } catch (err) {
+        console.error('Google Sign-In Error:', err);
+        if (err.code === 'auth/popup-blocked') {
+          const provider = new firebase.auth.GoogleAuthProvider();
+          auth.signInWithRedirect(provider);
+        } else if (err.code !== 'auth/popup-closed-by-user') {
+          showAuthError(`Google Sign-In Note: ${err.message}`);
+        }
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `
+          <svg viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+          </svg>
+          <span>Sign In with Google</span>
+        `;
+      }
+    }
+
+    async function handleMasterPasswordSubmit(e) {
+      if (e) e.preventDefault();
+      hideAuthError();
+
+      const passInput = document.getElementById('inputMasterPass');
+      const passVal = (passInput ? passInput.value : '').trim();
+      const btn = document.getElementById('btnUnlockApp');
+
+      if (!passVal) {
+        showAuthError('Please enter Master Password.');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Verifying...</span>';
+
+      try {
+        const enc = new TextEncoder();
+        const data = enc.encode(MASTER_PASS_SALT + passVal);
+        const hashBuf = await crypto.subtle.digest('SHA-256', data);
+        const hashArr = Array.from(new Uint8Array(hashBuf));
+        const computedHash = hashArr.map(b => b.toString(16).padStart(2, '0')).join('');
+
+        if (computedHash === MASTER_PASS_HASH) {
+          // Success!
+          btn.style.background = 'linear-gradient(135deg, #10B981, #059669)';
+          btn.innerHTML = '<i class="fa-solid fa-circle-check"></i> <span>Verified! Unlocking...</span>';
+
+          sessionStorage.setItem('flipcut_leads_app_auth', JSON.stringify({
+            email: AUTHORIZED_EMAIL,
+            unlocked: true,
+            timestamp: Date.now()
+          }));
+
+          setTimeout(() => {
+            unlockDashboardUI();
+          }, 400);
+        } else {
+          showAuthError('❌ Incorrect Master Password. Access Denied.');
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-unlock-keyhole"></i> <span>Unlock Webinar Leads</span>';
+          if (passInput) {
+            passInput.value = '';
+            passInput.focus();
+          }
+        }
+      } catch (err) {
+        showAuthError(`Verification error: ${err.message}`);
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-unlock-keyhole"></i> <span>Unlock Webinar Leads</span>';
+      }
+    }
+
+    function showAuthError(msg) {
+      const banner = document.getElementById('authErrorNotice');
+      const text = document.getElementById('authErrorMsg');
+      if (banner && text) {
+        text.textContent = msg;
+        banner.style.display = 'flex';
+      }
+    }
+
+    function hideAuthError() {
+      const banner = document.getElementById('authErrorNotice');
+      if (banner) banner.style.display = 'none';
+    }
+
+    function unlockDashboardUI() {
+      isAppUnlocked = true;
+      document.getElementById('authScreen').classList.add('hidden');
+      document.getElementById('appMain').style.display = 'block';
+
+      // Load cached leads immediately for 0ms delay
+      try {
+        const cached = localStorage.getItem('flipcut_leads');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            allLeads = formatRawLeads(parsed);
+            renderLeadsList();
+            updateKPIs();
+          }
+        }
+      } catch (_) {}
+
+      // Fetch fresh leads from Supabase Cloud
+      fetchLeadsFromCloud();
+
+      // Initialize real-time listeners
+      initRealtimeSync();
+    }
+
+    function appLogout() {
+      if (confirm('Are you sure you want to log out from FlipCut Leads App?')) {
+        sessionStorage.removeItem('flipcut_leads_app_auth');
+        auth.signOut();
+        location.reload();
+      }
+    }
+
+    /* ==========================================================================
+       DATA FETCH & REAL-TIME SYNCHRONIZER
+       ========================================================================== */
+    function formatRawLeads(rows) {
+      if (!Array.isArray(rows)) return [];
+      return rows.filter(r => {
+        if (!r || !r.id || r.id.startsWith('CMS_') || r.id.startsWith('VIS_')) return false;
+        const isWebinar = (r.service || '').toLowerCase().includes('webinar') ||
+                          String(r.id).startsWith('FC-WEB') ||
+                          String(r.packageName || '').toLowerCase().includes('webinar') ||
+                          String(r.status || '').toLowerCase().includes('paid');
+        return isWebinar;
+      }).map(r => {
+        const isWaJoined = r.whatsappJoined === true || r.waGroupStatus === 'Joined' || (r.message && r.message.includes('WhatsApp Group Joined'));
+        const isPaid = String(r.status || '').toLowerCase().includes('paid') || (r.paymentId && String(r.paymentId).startsWith('pay_'));
+        return {
+          id: r.id || r.userId,
+          userId: r.userId || r.id,
+          name: r.name || 'Anonymous Client',
+          phone: r.phone || '',
+          email: r.email || '',
+          service: r.service || 'Webinar Registration',
+          packageName: r.packageName || 'Webinar Pass',
+          amount: r.budget || r.amount || (isPaid ? '₹2' : '₹49'),
+          status: isPaid ? 'Booked / Paid' : (r.status || 'Pending Payment'),
+          isPaid: isPaid,
+          whatsappJoined: isWaJoined,
+          waGroupStatus: isWaJoined ? 'Joined' : 'Not Joined',
+          batch: r.batchName || r.batch || 'Batch 2 - Sep/Oct 2026',
+          created_at: r.created_at || r.date || new Date().toISOString()
+        };
+      }).sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+    }
+
+    async function fetchLeadsFromCloud() {
+      const refreshIcon = document.getElementById('refreshIcon');
+      if (refreshIcon) refreshIcon.classList.add('fa-spin');
+
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/leads?id=neq.CMS_SITE_CONTENT_LIVE&id=not.like.VIS_*&order=created_at.desc`, {
+          headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` },
+          cache: 'no-store'
+        });
+
+        if (res.ok) {
+          const rows = await res.json();
+          if (Array.isArray(rows)) {
+            allLeads = formatRawLeads(rows);
+            try { localStorage.setItem('flipcut_leads', JSON.stringify(rows)); } catch (_) {}
+            renderLeadsList();
+            updateKPIs();
+          }
+        }
+      } catch (err) {
+        console.warn('Leads fetch note:', err);
+      } finally {
+        if (refreshIcon) refreshIcon.classList.remove('fa-spin');
+      }
+    }
+
+    function refreshLeadsManually() {
+      fetchLeadsFromCloud();
+      showToast('Refreshing latest webinar leads...');
+    }
+
+    function initRealtimeSync() {
+      // 1. Firebase RTDB Listener
+      try {
+        rtdb.ref('leads').limitToLast(10).on('child_added', (snap) => {
+          const val = snap.val();
+          if (val) processIncomingLead(val);
+        });
+      } catch (_) {}
+
+      // 2. Cross-tab Broadcast Channel
+      try {
+        if (typeof BroadcastChannel !== 'undefined') {
+          const bc = new BroadcastChannel('flipcut_leads_channel');
+          bc.onmessage = (msg) => {
+            if (msg && msg.data && msg.data.lead) {
+              processIncomingLead(msg.data.lead);
+            }
+          };
+        }
+      } catch (_) {}
+
+      // 3. Heartbeat polling every 4 seconds (Guaranteed fallback)
+      setInterval(() => {
+        fetch(`${SUPABASE_URL}/rest/v1/leads?id=neq.CMS_SITE_CONTENT_LIVE&order=created_at.desc&limit=8`, {
+          headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` },
+          cache: 'no-store'
+        }).then(r => r.json()).then(rows => {
+          if (Array.isArray(rows)) {
+            rows.forEach(r => processIncomingLead(r));
+          }
+        }).catch(() => {});
+      }, 4000);
+    }
+
+    function processIncomingLead(raw) {
+      if (!raw || !raw.id || raw.id.startsWith('CMS_') || raw.id.startsWith('VIS_')) return;
+      const formatted = formatRawLeads([raw])[0];
+      if (!formatted) return;
+
+      const idx = allLeads.findIndex(l => l.id === formatted.id || l.userId === formatted.id);
+      if (idx === -1) {
+        // Brand New Lead!
+        allLeads.unshift(formatted);
+        renderLeadsList(formatted.id);
+        updateKPIs();
+        playChime();
+        showToast(`⚡ NEW LEAD: ${formatted.name} (${formatted.id})`);
+      } else {
+        // Update existing lead status if changed
+        const existing = allLeads[idx];
+        if (existing.status !== formatted.status || existing.whatsappJoined !== formatted.whatsappJoined) {
+          allLeads[idx] = { ...existing, ...formatted };
+          renderLeadsList();
+          updateKPIs();
+        }
+      }
+    }
+
+    /* ==========================================================================
+       UI RENDERING & FILTERING
+       ========================================================================== */
+    function renderLeadsList(highlightId = null) {
+      const container = document.getElementById('leadsListContainer');
+      const countEl = document.getElementById('visibleLeadsCount');
+      if (!container) return;
+
+      // Filter leads
+      let filtered = allLeads.filter(l => {
+        if (currentFilter === 'paid') return l.isPaid;
+        if (currentFilter === 'wa_joined') return l.whatsappJoined;
+        if (currentFilter === 'pending') return !l.isPaid;
+        return true;
+      });
+
+      // Search query filter
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        filtered = filtered.filter(l =>
+          l.name.toLowerCase().includes(q) ||
+          l.phone.toLowerCase().includes(q) ||
+          l.id.toLowerCase().includes(q) ||
+          l.email.toLowerCase().includes(q)
+        );
+      }
+
+      if (countEl) {
+        countEl.textContent = `Showing ${filtered.length} of ${allLeads.length} attendees`;
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon"><i class="fa-solid fa-folder-open"></i></div>
+            <h3 style="color: #FFF; font-size: 1.05rem; margin-bottom: 4px;">No attendees found</h3>
+            <p style="font-size: 0.8rem; color: #64748B;">Try changing your search or filter</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map(lead => {
+        const initials = lead.name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() || 'FC';
+        const isHighlight = lead.id === highlightId;
+        const timeAgo = formatTimeAgo(lead.created_at);
+
+        // Pre-filled WhatsApp greeting link
+        const cleanPhone = lead.phone.replace(/[^0-9]/g, '');
+        const waPhone = cleanPhone.length === 10 ? '91' + cleanPhone : cleanPhone;
+        const waMsg = encodeURIComponent(
+          `Hi ${lead.name},\n\nFlipCut Creation Webinar Ticket Pass (${lead.id}) confirm aagiyachu! 🎟️\n\n📅 Live Masterclass on 27th September at 10:00 AM\n💬 Official WhatsApp Group Link:\nhttps://chat.whatsapp.com/G5qE6l9P1jW8m3Zq2Y8Q7w\n\nSee you inside the live class!`
+        );
+        const waUrl = `https://wa.me/${waPhone}?text=${waMsg}`;
+
+        return `
+          <div class="lead-card ${isHighlight ? 'new-pulse' : ''}" id="card_${lead.id}">
+            <div class="card-top">
+              <div class="lead-avatar">${initials}</div>
+              <div class="lead-info">
+                <div class="lead-name-row">
+                  <span class="lead-name">${escapeHtml(lead.name)}</span>
+                  <span class="lead-time">${timeAgo}</span>
+                </div>
+                <div class="lead-phone">
+                  <i class="fa-solid fa-phone" style="font-size: 0.72rem; color: #38BDF8;"></i>
+                  <span>${escapeHtml(lead.phone || 'No Phone')}</span>
+                </div>
+                ${lead.email ? `<span class="lead-email">${escapeHtml(lead.email)}</span>` : ''}
+              </div>
+            </div>
+
+            <!-- Badges -->
+            <div class="badges-row">
+              <span class="badge badge-id">
+                <i class="fa-solid fa-ticket"></i> ${lead.id}
+              </span>
+              <span class="badge ${lead.isPaid ? 'badge-paid' : 'badge-pending'}">
+                <i class="fa-solid ${lead.isPaid ? 'fa-circle-check' : 'fa-clock'}"></i>
+                ${lead.amount} ${lead.isPaid ? 'Paid' : 'Pending UPI'}
+              </span>
+              <span class="badge ${lead.whatsappJoined ? 'badge-wa-joined' : 'badge-wa-pending'}">
+                <i class="fa-brands fa-whatsapp"></i>
+                ${lead.whatsappJoined ? 'Joined Group' : 'Not Joined WA'}
+              </span>
+            </div>
+
+            <!-- 1-Click Action Buttons -->
+            <div class="card-actions">
+              <a href="${waUrl}" target="_blank" rel="noopener" class="btn-card btn-card-wa">
+                <i class="fa-brands fa-whatsapp" style="font-size: 1rem;"></i>
+                <span>Send Pass</span>
+              </a>
+
+              <a href="tel:${lead.phone}" class="btn-card btn-card-call">
+                <i class="fa-solid fa-phone"></i>
+                <span>Call</span>
+              </a>
+
+              <button type="button" class="btn-card btn-card-copy" onclick="copyLeadDetails('${lead.id}')">
+                <i class="fa-solid fa-copy"></i>
+                <span>Copy</span>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function updateKPIs() {
+      const total = allLeads.length;
+      const paid = allLeads.filter(l => l.isPaid).length;
+      const wa = allLeads.filter(l => l.whatsappJoined).length;
+      const revenue = allLeads.reduce((acc, l) => {
+        if (l.isPaid) {
+          const num = parseInt(String(l.amount).replace(/[^0-9]/g, '') || '2', 10);
+          return acc + (isNaN(num) ? 2 : num);
+        }
+        return acc;
+      }, 0);
+
+      document.getElementById('kpiTotalCount').textContent = total;
+      document.getElementById('kpiPaidCount').textContent = paid;
+      document.getElementById('kpiWaJoinedCount').textContent = wa;
+      document.getElementById('kpiTotalRevenue').textContent = '₹' + revenue.toLocaleString('en-IN');
+    }
+
+    function setFilter(filterType, btn) {
+      currentFilter = filterType;
+      document.querySelectorAll('.filter-pills .pill').forEach(p => p.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderLeadsList();
+    }
+
+    function handleSearch(val) {
+      searchQuery = val.trim();
+      const clearBtn = document.getElementById('btnClearSearch');
+      if (clearBtn) clearBtn.style.display = searchQuery ? 'block' : 'none';
+      renderLeadsList();
+    }
+
+    function clearSearch() {
+      const input = document.getElementById('leadSearchInput');
+      if (input) input.value = '';
+      handleSearch('');
+    }
+
+    function copyLeadDetails(leadId) {
+      const lead = allLeads.find(l => l.id === leadId);
+      if (!lead) return;
+      const text = `Attendee: ${lead.name}\nPhone: ${lead.phone}\nEmail: ${lead.email}\nTicket: ${lead.id}\nStatus: ${lead.status}`;
+      navigator.clipboard.writeText(text).then(() => {
+        showToast(`Copied ${lead.name}'s info!`);
+      });
+    }
+
+    function exportLeadsCsv() {
+      if (!allLeads.length) {
+        showToast('No leads to export.');
+        return;
+      }
+      let csv = 'ID,Name,Phone,Email,Amount,Status,WhatsAppJoined,Batch,CreatedAt\n';
+      allLeads.forEach(l => {
+        csv += `"${l.id}","${l.name}","${l.phone}","${l.email}","${l.amount}","${l.status}","${l.whatsappJoined ? 'Yes' : 'No'}","${l.batch}","${l.created_at}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', `FlipCut_Webinar_Leads_${new Date().toISOString().slice(0, 10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast('Exported CSV successfully!');
+    }
+
+    /* ==========================================================================
+       AUDIO SYNTHESIZER CHIME (ZERO EXTERNAL ASSET DEPENDENCY)
+       ========================================================================== */
+    function toggleAudioChime() {
+      soundEnabled = !soundEnabled;
+      const icon = document.getElementById('audioIcon');
+      const btn = document.getElementById('btnAudioToggle');
+      if (soundEnabled) {
+        icon.className = 'fa-solid fa-bell';
+        btn.classList.add('active');
+        showToast('Sound Chime Enabled 🔔');
+        playChime();
+      } else {
+        icon.className = 'fa-solid fa-bell-slash';
+        btn.classList.remove('active');
+        showToast('Sound Chime Muted 🔕');
+      }
+    }
+
+    function playChime() {
+      if (!soundEnabled) return;
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const now = ctx.currentTime;
+
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(587.33, now); // D5
+        osc.frequency.exponentialRampToValueAtTime(880, now + 0.1); // A5
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.45);
+      } catch (_) {}
+    }
+
+    /* ==========================================================================
+       HELPERS
+       ========================================================================== */
+    function showToast(msg) {
+      const toast = document.getElementById('appToast');
+      const text = document.getElementById('appToastText');
+      if (!toast || !text) return;
+      text.textContent = msg;
+      toast.classList.add('show');
+      clearTimeout(toast._timer);
+      toast._timer = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    function formatTimeAgo(dateStr) {
+      if (!dateStr) return '';
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return dateStr;
+      const diffMs = Date.now() - d.getTime();
+      const diffSecs = Math.floor(diffMs / 1000);
+      const diffMins = Math.floor(diffSecs / 60);
+      const diffHours = Math.floor(diffMins / 60);
+      const diffDays = Math.floor(diffHours / 24);
+
+      if (diffSecs < 60) return 'Just now';
+      if (diffMins < 60) return `${diffMins}m ago`;
+      if (diffHours < 24) return `${diffHours}h ago`;
+      if (diffDays === 1) return 'Yesterday';
+      return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // Startup check
+    document.addEventListener('DOMContentLoaded', checkExistingAuth);
+  </script>
+</body>
+</html>

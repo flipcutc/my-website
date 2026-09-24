@@ -135,6 +135,14 @@
       {
         "source": "/webinar",
         "destination": "/webinar.html"
+      },
+      {
+        "source": "/leads",
+        "destination": "/leads.html"
+      },
+      {
+        "source": "/app",
+        "destination": "/leads.html"
       }
     ]
   }
