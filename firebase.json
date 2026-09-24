@@ -12,6 +12,7 @@
       "flipcut-apk-dist/**",
       "flipcut-apk-signed-dist/**",
       "*.zip",
+      "*.apk",
       "server.js",
       "db.js",
       "gdrive.js",
@@ -135,23 +136,6 @@
         ]
       },
       {
-        "source": "**/*.@(apk)",
-        "headers": [
-          {
-            "key": "Content-Type",
-            "value": "application/vnd.android.package-archive"
-          },
-          {
-            "key": "Content-Disposition",
-            "value": "attachment; filename=\"FlipCut-Leads.apk\""
-          },
-          {
-            "key": "Cache-Control",
-            "value": "no-cache, no-store, must-revalidate"
-          }
-        ]
-      },
-      {
         "source": "/.well-known/assetlinks.json",
         "headers": [
           {
@@ -163,6 +147,18 @@
             "value": "no-cache, no-store, must-revalidate"
           }
         ]
+      }
+    ],
+    "redirects": [
+      {
+        "source": "/FlipCut-Leads.apk",
+        "destination": "https://raw.githubusercontent.com/flipcutc/my-website/main/FlipCut-Leads.apk",
+        "type": 302
+      },
+      {
+        "source": "/download-apk",
+        "destination": "https://raw.githubusercontent.com/flipcutc/my-website/main/FlipCut-Leads.apk",
+        "type": 302
       }
     ],
     "rewrites": [
@@ -177,10 +173,6 @@
       {
         "source": "/app",
         "destination": "/leads.html"
-      },
-      {
-        "source": "/download-apk",
-        "destination": "/FlipCut-Leads.apk"
       }
     ]
   }
